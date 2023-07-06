@@ -1,0 +1,14 @@
+debug/load_manager.o
+debug/log_system.o
+debug/notification_system.o
+debug/mainwindow_gui.o
+debug/interface_programmer.o
+debug/jlink_manual_programmer.o
+debug/main.o
+debug/mainwindow.o
+debug/moc_load_manager.o
+debug/moc_log_system.o
+debug/moc_notification_system.o
+debug/moc_mainwindow.o
+debug/moc_mainwindow_gui.o
+debug/moc_interface_programmer.o

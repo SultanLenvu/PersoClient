@@ -1,0 +1,14 @@
+release/load_manager.o
+release/log_system.o
+release/notification_system.o
+release/mainwindow_gui.o
+release/interface_programmer.o
+release/jlink_manual_programmer.o
+release/main.o
+release/mainwindow.o
+release/moc_load_manager.o
+release/moc_log_system.o
+release/moc_notification_system.o
+release/moc_mainwindow.o
+release/moc_mainwindow_gui.o
+release/moc_interface_programmer.o
