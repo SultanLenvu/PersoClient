@@ -1,4 +1,4 @@
-﻿#ifndef MAINWINDOW_GUI_H
+#ifndef MAINWINDOW_GUI_H
 #define MAINWINDOW_GUI_H
 
 #include <QMainWindow>
@@ -24,8 +24,9 @@ public:
   //==================================================
   QGroupBox* MainPushButtonGroup;
   QVBoxLayout* MainPushButtonLayout;
-  QPushButton* PB_ManualProgramChip;
-  QPushButton *PB_AutoProgramChip;
+  QPushButton *PB_EraseDevice;
+  QPushButton *PB_ManualProgramDevice;
+  QPushButton *PB_AutoProgramDevice;
   QSpacerItem *VerticalSpacer1;
 
   QGroupBox *GeneralLogGroup;

@@ -1,4 +1,4 @@
-﻿#include "mainwindow_gui.h"
+#include "mainwindow_gui.h"
 
 MainWindow_GUI::MainWindow_GUI(QMainWindow* mainWindow)
   : QObject(mainWindow)
@@ -190,20 +190,27 @@ void MainWindow_GUI::createWorkspaceWidgets()
   MainPushButtonLayout = new QVBoxLayout();
   MainPushButtonGroup->setLayout(MainPushButtonLayout);
 
-  PB_ManualProgramChip = new QPushButton(QString("Загрузить прошивку"));
-  PB_ManualProgramChip->setObjectName(QString::fromUtf8("PB_ManualProgramChip"));
-  PB_ManualProgramChip->setSizePolicy(QSizePolicy::Expanding,
-                                      QSizePolicy::Expanding);
-  MainPushButtonLayout->addWidget(PB_ManualProgramChip);
+  PB_EraseDevice = new QPushButton(QString("Стереть прошивку"));
+  PB_EraseDevice->setObjectName(QString::fromUtf8("PB_EraseDevice"));
+  PB_EraseDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  MainPushButtonLayout->addWidget(PB_EraseDevice);
 
-  PB_AutoProgramChip = new QPushButton(QString("Включить автозагрузку"));
-  PB_AutoProgramChip->setObjectName(QString::fromUtf8("PB_AutoProgramChip"));
-  PB_AutoProgramChip->setSizePolicy(QSizePolicy::Expanding,
-                                    QSizePolicy::Expanding);
-  MainPushButtonLayout->addWidget(PB_AutoProgramChip);
+  PB_ManualProgramDevice = new QPushButton(QString("Загрузить прошивку"));
+  PB_ManualProgramDevice->setObjectName(
+      QString::fromUtf8("PB_ManualProgramDevice"));
+  PB_ManualProgramDevice->setSizePolicy(QSizePolicy::Expanding,
+                                        QSizePolicy::Expanding);
+  MainPushButtonLayout->addWidget(PB_ManualProgramDevice);
+
+  PB_AutoProgramDevice = new QPushButton(QString("Включить автозагрузку"));
+  PB_AutoProgramDevice->setObjectName(
+      QString::fromUtf8("PB_AutoProgramDevice"));
+  PB_AutoProgramDevice->setSizePolicy(QSizePolicy::Expanding,
+                                      QSizePolicy::Expanding);
+  MainPushButtonLayout->addWidget(PB_AutoProgramDevice);
 
   VerticalSpacer1 =
-      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Minimum);
   MainPushButtonLayout->addItem(VerticalSpacer1);
 
   // Виджеты для отображения логов

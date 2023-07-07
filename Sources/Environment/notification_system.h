@@ -4,7 +4,7 @@
 #include <QMessageBox>
 #include <QObject>
 
-#include "../Environment/load_manager.h"
+#include "../Environment/firmware_manager.h"
 
 class UserNotificationSystem : public QObject {
   Q_OBJECT

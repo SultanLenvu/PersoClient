@@ -1,4 +1,4 @@
-﻿#include "mainwindow.h"
+#include "mainwindow.h"
 
 MainWindow::MainWindow()
 {
@@ -10,20 +10,28 @@ MainWindow::MainWindow()
 
   UserNotificator = new UserNotificationSystem(this, this);
 
-  Manager = new LoadManager(this);
-  connect(Manager, &LoadManager::logging, Logger, &LogSystem::loadManagerLog);
-  connect(Manager->programmer(), &InterfaceProgrammer::logging, Logger,
-          &LogSystem::programmerLog);
+  Manager = new FirmwareManager(this, Logger);
+  connect(Manager, &FirmwareManager::logging, Logger,
+          &LogSystem::loadManagerLog);
+  connect(Manager, &FirmwareManager::notifyUser, UserNotificator,
+          &UserNotificationSystem::generateUserNotification);
 }
 
 MainWindow::~MainWindow() {}
 
-void MainWindow::on_PB_ManualProgramChip_clicked() {
-  Manager->processingFirmwareLoading();
+void MainWindow::on_PB_EraseDevice_clicked() {
+  // GUI->GeneralLogs->clear();
+  Manager->performErasing();
 }
 
-void MainWindow::on_PB_AutoProgramChip_clicked() {
-  Manager->processingFirmwareErasing();
+void MainWindow::on_PB_ManualProgramDevice_clicked() {
+  // GUI->GeneralLogs->clear();
+  Manager->performLoading();
+}
+
+void MainWindow::on_PB_AutoProgramDevice_clicked() {
+  // GUI->GeneralLogs->clear();
+  Manager->performAutoLoading();
 }
 
 void MainWindow::displayLog(const QString &log) {
