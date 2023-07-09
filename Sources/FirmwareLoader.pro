@@ -14,7 +14,7 @@ SOURCES += \
     Environment/notification_system.cpp \
     GUI/mainwindow_gui.cpp \
     Programmers/interface_programmer.cpp \
-    Programmers/jlink_manual_programmer.cpp \
+    Programmers/jlink_exe_programmer.cpp \
     main.cpp \
     GUI/mainwindow.cpp
 
@@ -26,7 +26,7 @@ HEADERS += \
     GUI/mainwindow.h \
     GUI/mainwindow_gui.h \
     Programmers/interface_programmer.h \
-    Programmers/jlink_manual_programmer.h
+    Programmers/jlink_exe_programmer.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

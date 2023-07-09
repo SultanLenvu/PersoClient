@@ -14,7 +14,7 @@ MainWindow::MainWindow()
   connect(Manager, &FirmwareManager::logging, Logger,
           &LogSystem::loadManagerLog);
   connect(Manager, &FirmwareManager::notifyUser, UserNotificator,
-          &UserNotificationSystem::generateUserNotification);
+          &UserNotificationSystem::firmwareManagerNotification);
 }
 
 MainWindow::~MainWindow() {}

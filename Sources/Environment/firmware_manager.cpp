@@ -4,7 +4,7 @@ FirmwareManager::FirmwareManager(QObject *parent, LogSystem *logger)
     : QObject(parent) {
   Logger = logger;
 
-  Programmer = new JLinkManualProgrammer();
+  Programmer = nullptr;
   ProgrammerThread = nullptr;
 
   ReadyIndicator = true;
@@ -29,7 +29,7 @@ void FirmwareManager::performErasing() {
   // Когда поток будет запущен, Programmer начнет выполнять соответствующую
   // операцию
   connect(ProgrammerThread, &QThread::started, Programmer,
-          &InterfaceProgrammer::erase);
+          &InterfaceProgrammer::eraseFirmware);
 
   // Запускаем поток програматора
   ProgrammerThread->start();
@@ -51,7 +51,7 @@ void FirmwareManager::performLoading() {
   // Когда поток будет запущен, Programmer начнет выполнять соответствующую
   // операцию
   connect(ProgrammerThread, &QThread::started, Programmer,
-          &InterfaceProgrammer::load);
+          &InterfaceProgrammer::loadFirmware);
 
   // Запускаем поток програматора
   ProgrammerThread->start();
@@ -84,7 +84,7 @@ void FirmwareManager::buildProgrammerInstance() {
   ProgrammerThread = new QThread(this);
 
   // И интерфейс программатора
-  //  Programmer = new JLinkManualProgrammer();
+  Programmer = new JLinkExeProgrammer();
   Programmer->moveToThread(ProgrammerThread);
 
   // Подключаем логгирование к Programmer'у
@@ -94,17 +94,27 @@ void FirmwareManager::buildProgrammerInstance() {
   connect(Programmer, &InterfaceProgrammer::operationFinished, ProgrammerThread,
           &QThread::quit);
   // Когда поток завершит работу, объект Programmer будет удален
-  //  connect(ProgrammerThread, &QThread::finished, Programmer,
-  //          &QObject::deleteLater);
+  connect(ProgrammerThread, &QThread::finished, Programmer,
+          &QObject::deleteLater);
   // Когда поток завершит работу, он будет удален
   connect(ProgrammerThread, &QThread::finished, ProgrammerThread,
           &QObject::deleteLater);
   // Когда программатор завершит операцию, можно будет приступить к следующей
   connect(Programmer, &InterfaceProgrammer::operationFinished, this,
-          &FirmwareManager::setReadyIndicator);
+          &FirmwareManager::performingFinished);
+  // Если программатор успешно выполнит свою операцию
+  connect(Programmer, &InterfaceProgrammer::operationCompleted, this,
+          &FirmwareManager::performingCompleted);
+  // Если программатор не выполнит свою операцию
+  connect(Programmer, &InterfaceProgrammer::operationFailed, this,
+          &FirmwareManager::performingFailed);
 }
 
-void FirmwareManager::setReadyIndicator() {
+void FirmwareManager::performingFinished() {
   ReadyIndicator = true;
-  Programmer->moveToThread(QThread::currentThread());
+  notifyUser(LastStatus);
 }
+
+void FirmwareManager::performingCompleted() { LastStatus = Completed; }
+
+void FirmwareManager::performingFailed() { LastStatus = Failed; }

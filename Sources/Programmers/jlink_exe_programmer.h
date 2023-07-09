@@ -8,7 +8,7 @@
 #include "interface_programmer.h"
 #include "../Environment/definitions.h"
 
-class JLinkManualProgrammer : public InterfaceProgrammer {
+class JLinkExeProgrammer : public InterfaceProgrammer {
 
 private:
   QFile *LoadingFirmware;
@@ -20,16 +20,19 @@ private:
   QFile *JLinkScript;
 
   QStringList ProcessArguments;
-  QByteArray ProcessOutput;
+  QStringList ProcessOutput;
 
 public:
-  explicit JLinkManualProgrammer(QObject *parent = nullptr);
-  ~JLinkManualProgrammer();
+  explicit JLinkExeProgrammer(QObject *parent = nullptr);
+  ~JLinkExeProgrammer();
 
 public slots:
-  virtual void connect(void) override;
-  virtual void erase(void) override;
-  virtual void load(void) override;
+  virtual void connectDevice(void) override;
+  virtual void loadFirmware(void) override;
+  virtual void eraseFirmware(void) override;
+  virtual void resetDevice(void) override;
+  virtual void runDevice(void) override;
+  virtual void exit(void) override;
   virtual void setLoadingFirmware(QFile *firmware) override;
 
 private:

@@ -1,17 +1,16 @@
-#include "jlink_manual_programmer.h"
+#include "jlink_exe_programmer.h"
 
-JLinkManualProgrammer::JLinkManualProgrammer(QObject *parent)
+JLinkExeProgrammer::JLinkExeProgrammer(QObject *parent)
     : InterfaceProgrammer(parent) {
-
   processingJLinkExePath(DEFAULT_JLINKEXE_FILE_PATH);
 }
 
-JLinkManualProgrammer::~JLinkManualProgrammer() {
+JLinkExeProgrammer::~JLinkExeProgrammer() {
   delete JLinkExeInfo;
   delete JLinkScriptInfo;
 }
 
-void JLinkManualProgrammer::connect() {
+void JLinkExeProgrammer::connectDevice() {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     emit logging(
@@ -33,8 +32,7 @@ void JLinkManualProgrammer::connect() {
   emit operationFinished();
 }
 
-void JLinkManualProgrammer::load(void) {
-  // Проверка на существование прошивки
+void JLinkExeProgrammer::loadFirmware() { // Проверка на существование прошивки
   if (LoadingFirmware == nullptr) {
     emit logging(
         QString("The firmware file is missing in the default directory, "
@@ -42,11 +40,10 @@ void JLinkManualProgrammer::load(void) {
     return;
   }
   // Проверка на существование программы адаптера для программатора JLink
-  if (JLinkProcess == nullptr)
-  {
+  if (JLinkProcess == nullptr) {
     emit logging(
-      QString("The JLink.exe file is missing in the default directory, "
-              "select it manually."));
+        QString("The JLink.exe file is missing in the default directory, "
+                "select it manually."));
     return;
   }
   // Логгирование
@@ -62,21 +59,23 @@ void JLinkManualProgrammer::load(void) {
   // Запускаем выполнение скрипта JLink
   excuteJLinkScript();
 
+  // Обрабатываем вывод JLink.exe
+  if ((ProcessOutput.size() == 100) &&
+      (ProcessOutput.at(88) == QString("O.K.")))
+    emit operationCompleted();
+  else
+    emit operationFailed();
+
   // Посылаем сигнал о завершении операции
   emit operationFinished();
 }
 
-void JLinkManualProgrammer::setLoadingFirmware(QFile *firmware) {
-  LoadingFirmware = firmware;
-}
-
-void JLinkManualProgrammer::erase() {
+void JLinkExeProgrammer::eraseFirmware() {
   // Проверка на существование программы адаптера для программатора JLink
-  if (JLinkProcess == nullptr)
-  {
+  if (JLinkProcess == nullptr) {
     emit logging(
-      QString("The JLink.exe file is missing in the default directory, "
-              "select it manually."));
+        QString("The JLink.exe file is missing in the default directory, "
+                "select it manually."));
     return;
   }
   // Логгирование
@@ -89,42 +88,79 @@ void JLinkManualProgrammer::erase() {
   // Запускаем выполнение скрипта JLink
   excuteJLinkScript();
 
+  // Обрабатываем вывод JLink.exe
+  if ((ProcessOutput.size() == 87) &&
+      (ProcessOutput.at(75) == QString("Erasing done.")))
+    emit operationCompleted();
+  else
+    emit operationFailed();
+
   // Посылаем сигнал о завершении операции
   emit operationFinished();
 }
 
-void JLinkManualProgrammer::processingJLinkExePath(const QString &path) {
+void JLinkExeProgrammer::resetDevice() {}
+
+void JLinkExeProgrammer::runDevice() {}
+
+void JLinkExeProgrammer::exit() {}
+
+void JLinkExeProgrammer::setLoadingFirmware(QFile *firmware) {
+  LoadingFirmware = firmware;
+}
+
+void JLinkExeProgrammer::processingJLinkExePath(const QString &path) {
   JLinkExeInfo = new QFileInfo(path);
 
-  if ((JLinkExeInfo->exists()) && (JLinkExeInfo->isFile()))
-  {
+  if ((JLinkExeInfo->exists()) && (JLinkExeInfo->isFile())) {
     JLinkProcess = new QProcess(this);
     JLinkProcess->setProgram(path);
-  }
-  else
+  } else
     JLinkProcess = nullptr;
 }
 
-void JLinkManualProgrammer::excuteJLinkScript() {
+void JLinkExeProgrammer::excuteJLinkScript() {
   // Добавляем завершение скрипта
-  JLinkScript->write(QByteArray("r\n"));
-  JLinkScript->write(QByteArray("g\n"));
+  // Посылаем сигнал Reset на МК
+  JLinkScript->write(QByteArray("reset\n"));
+  // Запускаем ядро
+  JLinkScript->write(QByteArray("go\n"));
+  // Выходим из JLink.exe
   JLinkScript->write(QByteArray("exit\n"));
+
+  // Закрываем файл
   JLinkScript->close();
 
-  // Запускаем JLink.exe
-  ProcessArguments << "-CommandFile" << JLinkScript->fileName();
+  // Запускаем JLink.exe с соответствующими аргументами
+  ProcessArguments << "-nogui"
+                   << "1";
+  ProcessArguments << "-exitonerror"
+                   << "1";
+  ProcessArguments << "-device"
+                   << "N32L403KB";
+  ProcessArguments << "-if"
+                   << "SWD";
+  ProcessArguments << "-speed"
+                   << "4000";
+  ProcessArguments << "-jtagconf"
+                   << "-1 -1";
+  ProcessArguments << "-autoconnect"
+                   << "1";
+  ProcessArguments << "-commandfile" << JLinkScript->fileName();
   JLinkProcess->setArguments(ProcessArguments);
   JLinkProcess->start();
   JLinkProcess->waitForFinished();
-  ProcessOutput = JLinkProcess->readAllStandardOutput();
+  QByteArray rawOutput = JLinkProcess->readAllStandardOutput();
   JLinkProcess->close();
 
+  // Форматирование вывода JLink.exe
+  ProcessOutput = QString(rawOutput).split("\r\n");
+
   // Логгирование вывода JLink.exe
-  emit logging(ProcessOutput);
+  emit logging(rawOutput);
 }
 
-void JLinkManualProgrammer::initScript() {
+void JLinkExeProgrammer::initScript() {
   // Удаляем старый скрипт для адаптера
   JLinkScriptInfo = new QFileInfo(DEFAULT_JLINK_SCRIPT_FILE_NAME);
   if ((JLinkScriptInfo->exists()) && (JLinkScriptInfo->isFile()))
@@ -136,9 +172,17 @@ void JLinkManualProgrammer::initScript() {
     emit logging("JLink command script created. ");
 
     // Добавляем иницирующие команды в скрипт
-    JLinkScript->write(QByteArray("device N32L403KB\n"));
-    JLinkScript->write(QByteArray("if SWD\n"));
-    JLinkScript->write(QByteArray("speed 4000\n"));
+
+    // Подключаемся к программатору по USB
+    JLinkScript->write(QByteArray("USB\n"));
+    // Вводим МК в состояние Reset
+    JLinkScript->write(QByteArray("R0\n"));
+    // Подключаемся к МК
+    JLinkScript->write(QByteArray("connect\n"));
+    // Останавливаем ядро МК
+    JLinkScript->write(QByteArray("Halt\n"));
+    // Снимаем состояние Reset
+    JLinkScript->write(QByteArray("R1\n"));
   } else {
     emit logging("JLink command script creation failed. ");
   }

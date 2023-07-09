@@ -6,14 +6,13 @@
 #include <QThread>
 
 #include "../Programmers/interface_programmer.h"
-#include "../Programmers/jlink_manual_programmer.h"
+#include "../Programmers/jlink_exe_programmer.h"
 #include "log_system.h"
 
 class FirmwareManager : public QObject {
   Q_OBJECT
-
 public:
-  enum LoaderStatus { Free, Success, Failed };
+  enum PerfomingStatus { Completed, Failed };
 
 private:
   LogSystem *Logger;
@@ -25,6 +24,8 @@ private:
 
   bool AutoLoadingFlag;
   bool ReadyIndicator;
+
+  PerfomingStatus LastStatus;
 
 public:
   explicit FirmwareManager(QObject *parent, LogSystem *logger);
@@ -41,11 +42,15 @@ public:
 private:
   void processingFirmwarePath(const QString &path);
   void buildProgrammerInstance(void);
-  void setReadyIndicator(void);
+
+private slots:
+  void performingFinished(void);
+  void performingCompleted(void);
+  void performingFailed(void);
 
 signals:
   void logging(const QString &log);
-  void notifyUser(QString &data);
+  void notifyUser(PerfomingStatus status);
 };
 
 #endif // FIRMWARE_MANAGER_H

@@ -16,7 +16,7 @@ public:
   explicit UserNotificationSystem(QObject *parent, QWidget *window);
 
 public slots:
-  void generateUserNotification(const QString &text);
+  void firmwareManagerNotification(FirmwareManager::PerfomingStatus status);
 };
 
 #endif // NOTIFICATION_SYSTEM_H
