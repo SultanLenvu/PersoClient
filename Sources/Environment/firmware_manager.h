@@ -24,6 +24,7 @@ private:
   QFile *FirmwareFile;
 
   bool AutoLoadingFlag;
+  bool ReadyIndicator;
 
 public:
   explicit FirmwareManager(QObject *parent, LogSystem *logger);
@@ -39,6 +40,8 @@ public:
 
 private:
   void processingFirmwarePath(const QString &path);
+  void buildProgrammerInstance(void);
+  void setReadyIndicator(void);
 
 signals:
   void logging(const QString &log);

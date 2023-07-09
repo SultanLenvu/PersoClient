@@ -12,9 +12,6 @@ JLinkManualProgrammer::~JLinkManualProgrammer() {
 }
 
 void JLinkManualProgrammer::connect() {
-  // Даем доступ только одному потоку
-  Mutex.lock();
-
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     emit logging(
@@ -24,23 +21,21 @@ void JLinkManualProgrammer::connect() {
   }
   // Логгирование
   emit logging(QString("Connecting to the device."));
+
+  // Формируем скрипт JLink
   initScript();
   JLinkScript->write(QByteArray("connect\n"));
+
+  // Запускаем выполнение скрипта JLink
   excuteJLinkScript();
 
   // Посылаем сигнал о завершении операции
   emit operationFinished();
-
-  // Разблокируем доступ
-  Mutex.unlock();
 }
 
-void JLinkManualProgrammer::load(QFile *firmware) {
-  // Даем доступ только одному потоку
-  Mutex.lock();
-
-  // Проверка на сущетсвование прошивки
-  if (firmware == nullptr) {
+void JLinkManualProgrammer::load(void) {
+  // Проверка на существование прошивки
+  if (LoadingFirmware == nullptr) {
     emit logging(
         QString("The firmware file is missing in the default directory, "
                 "select it manually."));
@@ -57,25 +52,25 @@ void JLinkManualProgrammer::load(QFile *firmware) {
   // Логгирование
   emit logging(QString("Program firmware."));
 
+  // Формируем скрипт JLink
   initScript();
   JLinkScript->write(QByteArray("erase\n"));
-  QString temp =
-      QString("loadbin ") + firmware->fileName() + QString(", 0x08000000\n");
+  QString temp = QString("loadbin ") + LoadingFirmware->fileName() +
+                 QString(", 0x08000000\n");
   JLinkScript->write(temp.toUtf8());
 
+  // Запускаем выполнение скрипта JLink
   excuteJLinkScript();
 
   // Посылаем сигнал о завершении операции
   emit operationFinished();
+}
 
-  // Разблокируем доступ
-  Mutex.unlock();
+void JLinkManualProgrammer::setLoadingFirmware(QFile *firmware) {
+  LoadingFirmware = firmware;
 }
 
 void JLinkManualProgrammer::erase() {
-  // Даем доступ только одному потоку
-  Mutex.lock();
-
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr)
   {
@@ -87,16 +82,15 @@ void JLinkManualProgrammer::erase() {
   // Логгирование
   emit logging(QString("Erase firmware."));
 
+  // Формируем скрипт JLink
   initScript();
   JLinkScript->write(QByteArray("erase\n"));
 
+  // Запускаем выполнение скрипта JLink
   excuteJLinkScript();
 
   // Посылаем сигнал о завершении операции
   emit operationFinished();
-
-  // Разблокируем доступ
-  Mutex.unlock();
 }
 
 void JLinkManualProgrammer::processingJLinkExePath(const QString &path) {
@@ -118,6 +112,7 @@ void JLinkManualProgrammer::excuteJLinkScript() {
   JLinkScript->write(QByteArray("exit\n"));
   JLinkScript->close();
 
+  // Запускаем JLink.exe
   ProcessArguments << "-CommandFile" << JLinkScript->fileName();
   JLinkProcess->setArguments(ProcessArguments);
   JLinkProcess->start();
@@ -125,6 +120,7 @@ void JLinkManualProgrammer::excuteJLinkScript() {
   ProcessOutput = JLinkProcess->readAllStandardOutput();
   JLinkProcess->close();
 
+  // Логгирование вывода JLink.exe
   emit logging(ProcessOutput);
 }
 

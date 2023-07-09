@@ -20,17 +20,19 @@ MainWindow::MainWindow()
 MainWindow::~MainWindow() {}
 
 void MainWindow::on_PB_EraseDevice_clicked() {
-  // GUI->GeneralLogs->clear();
+  GUI->GeneralLogs->clear();
   Manager->performErasing();
 }
 
 void MainWindow::on_PB_ManualProgramDevice_clicked() {
-  // GUI->GeneralLogs->clear();
+
+  GUI->GeneralLogs->clear();
   Manager->performLoading();
 }
 
 void MainWindow::on_PB_AutoProgramDevice_clicked() {
-  // GUI->GeneralLogs->clear();
+
+  GUI->GeneralLogs->clear();
   Manager->performAutoLoading();
 }
 

@@ -38,30 +38,10 @@ public:
   // Виджеты верхней панели меню
   //==================================================
   QMenu* fileMenu;
-  QMenu* editMenu;
-  QMenu* formatMenu;
   QMenu* helpMenu;
-  QActionGroup* alignmentGroup;
-  QAction* newAct;
-  QAction* openAct;
-  QAction* saveAct;
-  QAction* printAct;
-  QAction* exitAct;
-  QAction* undoAct;
-  QAction* redoAct;
-  QAction* cutAct;
-  QAction* copyAct;
-  QAction* pasteAct;
-  QAction* boldAct;
-  QAction* italicAct;
-  QAction* leftAlignAct;
-  QAction* rightAlignAct;
-  QAction* justifyAct;
-  QAction* centerAct;
-  QAction* setLineSpacingAct;
-  QAction* setParagraphSpacingAct;
-  QAction* aboutAct;
-  QAction* aboutQtAct;
+  QAction *connectAct;
+  QAction *systemAccessAct;
+  QAction *aboutProgramAct;
   QLabel* infoLabel;
   //==================================================
 
@@ -69,6 +49,8 @@ public:
   MainWindow_GUI(QMainWindow* mainWindow);
 
   void create(void);
+  void hideSystemWidgets(void);
+  void showSystemWidgets(void);
 
 private:
   void createActions(void);

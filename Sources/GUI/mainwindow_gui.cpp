@@ -36,149 +36,33 @@ MainWindow_GUI::create(void)
   QMetaObject::connectSlotsByName(MainWindow);
 }
 
+void MainWindow_GUI::hideSystemWidgets() {}
+
+void MainWindow_GUI::showSystemWidgets() {}
+
 void MainWindow_GUI::createActions() {
-  newAct = new QAction("New", MainWindow);
-  newAct->setShortcuts(QKeySequence::New);
-  newAct->setStatusTip("Create a new file");
+  connectAct = new QAction("Подключиться", MainWindow);
+  connectAct->setShortcuts(QKeySequence::New);
+  connectAct->setStatusTip("Подключиться к программатору");
 
-  openAct = new QAction("Open...", MainWindow);
-  openAct->setShortcuts(QKeySequence::Open);
-  openAct->setStatusTip("Open an existing file");
+  systemAccessAct = new QAction("Мастер доступ", MainWindow);
+  systemAccessAct->setShortcuts(QKeySequence::Open);
+  systemAccessAct->setStatusTip("Мастер доступ");
 
-  saveAct = new QAction("Save", MainWindow);
-  saveAct->setShortcuts(QKeySequence::Save);
-  saveAct->setStatusTip("Save the document to disk");
-
-  printAct = new QAction("Print...", MainWindow);
-  printAct->setShortcuts(QKeySequence::Print);
-  printAct->setStatusTip("Print the document");
-
-  exitAct = new QAction("Exit", MainWindow);
-  exitAct->setShortcuts(QKeySequence::Quit);
-  exitAct->setStatusTip("Exit the application");
-
-  undoAct = new QAction("Undo", MainWindow);
-  undoAct->setShortcuts(QKeySequence::Undo);
-  undoAct->setStatusTip("Undo the last operation");
-
-  redoAct = new QAction("Redo", MainWindow);
-  redoAct->setShortcuts(QKeySequence::Redo);
-  redoAct->setStatusTip("Redo the last operation");
-
-  cutAct = new QAction("Cut", MainWindow);
-  cutAct->setShortcuts(QKeySequence::Cut);
-  cutAct->setStatusTip("Cut the current selection's contents to the "
-                       "clipboard");
-
-  copyAct = new QAction("Copy", MainWindow);
-  copyAct->setShortcuts(QKeySequence::Copy);
-  copyAct->setStatusTip("Copy the current selection's contents to the "
-                        "clipboard");
-
-  pasteAct = new QAction("Paste", MainWindow);
-  pasteAct->setShortcuts(QKeySequence::Paste);
-  pasteAct->setStatusTip("Paste the clipboard's contents into the current "
-                         "selection");
-
-  boldAct = new QAction("Bold", MainWindow);
-  boldAct->setCheckable(true);
-  boldAct->setShortcut(QKeySequence::Bold);
-  boldAct->setStatusTip("Make the text bold");
-
-  QFont boldFont = boldAct->font();
-  boldFont.setBold(true);
-  boldAct->setFont(boldFont);
-
-  italicAct = new QAction("Italic", MainWindow);
-  italicAct->setCheckable(true);
-  italicAct->setShortcut(QKeySequence::Italic);
-  italicAct->setStatusTip("Make the text italic");
-
-  QFont italicFont = italicAct->font();
-  italicFont.setItalic(true);
-  italicAct->setFont(italicFont);
-
-  setLineSpacingAct = new QAction("Set &Line Spacing...", MainWindow);
-  setLineSpacingAct->setStatusTip("Change the gap between the lines of a "
-                                  "paragraph");
-
-  setParagraphSpacingAct = new QAction("Set &Paragraph Spacing...", MainWindow);
-  setParagraphSpacingAct->setStatusTip("Change the gap between paragraphs");
-
-  aboutAct = new QAction("&About", MainWindow);
-  aboutAct->setStatusTip("Show the application's About box");
-
-  aboutQtAct = new QAction("About Qt", MainWindow);
-  aboutQtAct->setStatusTip("Show the Qt library's About box");
-
-  const QKeySequence ks;
-  leftAlignAct = new QAction("Left Align", MainWindow);
-  leftAlignAct->setCheckable(true);
-  ks.mnemonic("Ctrl+L");
-  leftAlignAct->setShortcut(ks);
-  leftAlignAct->setStatusTip("Left align the selected text");
-
-  rightAlignAct = new QAction("Right Align", MainWindow);
-  rightAlignAct->setCheckable(true);
-  ks.mnemonic("Ctrl+R");
-  rightAlignAct->setShortcut(ks);
-  rightAlignAct->setStatusTip("Right align the selected text");
-
-  justifyAct = new QAction("Justify", MainWindow);
-  justifyAct->setCheckable(true);
-  ks.mnemonic("Ctrl+J");
-  justifyAct->setShortcut(ks);
-  justifyAct->setStatusTip("Justify the selected text");
-
-  centerAct = new QAction("Center", MainWindow);
-  centerAct->setCheckable(true);
-  ks.mnemonic("Ctrl+E");
-  centerAct->setShortcut(ks);
-  centerAct->setStatusTip("Center the selected text");
-
-  alignmentGroup = new QActionGroup(MainWindow);
-  alignmentGroup->addAction(leftAlignAct);
-  alignmentGroup->addAction(rightAlignAct);
-  alignmentGroup->addAction(justifyAct);
-  alignmentGroup->addAction(centerAct);
-  leftAlignAct->setChecked(true);
+  aboutProgramAct = new QAction("О программе", MainWindow);
+  aboutProgramAct->setShortcuts(QKeySequence::Paste);
+  aboutProgramAct->setStatusTip("Показать сведения о программе");
 }
 
-void
-MainWindow_GUI::createTopMenus()
-{
-  fileMenu = MainWindow->menuBar()->addMenu("File");
-  fileMenu->addAction(newAct);
-  fileMenu->addAction(openAct);
-  fileMenu->addAction(saveAct);
-  fileMenu->addAction(printAct);
+void MainWindow_GUI::createTopMenus() {
+  fileMenu = MainWindow->menuBar()->addMenu("Сервис");
+  fileMenu->addAction(connectAct);
   fileMenu->addSeparator();
-  fileMenu->addAction(exitAct);
+  fileMenu->addAction(systemAccessAct);
 
-  editMenu = MainWindow->menuBar()->addMenu("Edit");
-  editMenu->addAction(undoAct);
-  editMenu->addAction(redoAct);
-  editMenu->addSeparator();
-  editMenu->addAction(cutAct);
-  editMenu->addAction(copyAct);
-  editMenu->addAction(pasteAct);
-  editMenu->addSeparator();
-
-  helpMenu = MainWindow->menuBar()->addMenu("Help");
-  helpMenu->addAction(aboutAct);
-  helpMenu->addAction(aboutQtAct);
-
-  formatMenu = editMenu->addMenu("Format");
-  formatMenu->addAction(boldAct);
-  formatMenu->addAction(italicAct);
-  formatMenu->addSeparator()->setText("Alignment");
-  formatMenu->addAction(leftAlignAct);
-  formatMenu->addAction(rightAlignAct);
-  formatMenu->addAction(justifyAct);
-  formatMenu->addAction(centerAct);
-  formatMenu->addSeparator();
-  formatMenu->addAction(setLineSpacingAct);
-  formatMenu->addAction(setParagraphSpacingAct);
+  helpMenu = MainWindow->menuBar()->addMenu("Справка");
+  helpMenu->addAction(aboutProgramAct);
+  helpMenu->addAction(aboutProgramAct);
 }
 
 void MainWindow_GUI::createWorkspaceWidgets()

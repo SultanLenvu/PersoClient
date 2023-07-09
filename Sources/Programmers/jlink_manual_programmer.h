@@ -11,6 +11,8 @@
 class JLinkManualProgrammer : public InterfaceProgrammer {
 
 private:
+  QFile *LoadingFirmware;
+
   QFileInfo *JLinkExeInfo;
   QProcess *JLinkProcess;
 
@@ -27,7 +29,8 @@ public:
 public slots:
   virtual void connect(void) override;
   virtual void erase(void) override;
-  virtual void load(QFile *firmware) override;
+  virtual void load(void) override;
+  virtual void setLoadingFirmware(QFile *firmware) override;
 
 private:
   void processingJLinkExePath(const QString& path);
