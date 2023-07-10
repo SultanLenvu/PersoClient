@@ -15,11 +15,9 @@ FirmwareManager::FirmwareManager(QObject *parent, LogSystem *logger)
 FirmwareManager::~FirmwareManager() {
   delete FirmwareFileInfo;
 
-  if (ProgrammerThread) {
-    if (ProgrammerThread->isFinished() == false) {
-      ProgrammerThread->quit();
-      ProgrammerThread->wait();
-    }
+  if (ReadyIndicator == false) {
+    ProgrammerThread->quit();
+    ProgrammerThread->wait();
   }
 }
 

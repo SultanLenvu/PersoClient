@@ -42,17 +42,22 @@ void MainWindow::on_MasterAccessRequestAct_triggered() {
   QString pass;
   emit requestMasterPasswordFromUser(pass);
 
-  if (pass == QString(MASTER_ACCESS_PASSWORD))
+  if (pass == QString(MASTER_ACCESS_PASSWORD)) {
     GUI->showMasterAccessWidgets();
+    Logger->enable(true);
+  }
 }
 
 void MainWindow::on_CommonAccessRequestAct_triggered() {
   GUI->hideMasterAccessWidgets();
+  Logger->enable(false);
 }
 
 void MainWindow::displayLog(const QString &log) {
-  if (GUI->GeneralLogs->toPlainText().count() > 100000)
-    GUI->GeneralLogs->clear();
+  if (GUI->GeneralLogs->isVisible()) {
+    if (GUI->GeneralLogs->toPlainText().count() > 100000)
+      GUI->GeneralLogs->clear();
 
-  GUI->GeneralLogs->appendPlainText(log);
+    GUI->GeneralLogs->appendPlainText(log);
+  }
 }

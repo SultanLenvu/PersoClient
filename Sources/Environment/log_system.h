@@ -6,8 +6,14 @@
 class LogSystem : public QObject
 {
   Q_OBJECT
+private:
+  bool IsEnable;
+
 public:
   explicit LogSystem(QObject *parent);
+
+public:
+  void enable(bool flag);
 
 public slots:
   void programmerLog(const QString &log);

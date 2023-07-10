@@ -51,8 +51,10 @@ void JLinkExeProgrammer::loadFirmware() { // Проверка на сущест�
 
   // Формируем скрипт JLink
   initScript();
-  JLinkScript->write(QByteArray("erase\n"));
-  QString temp = QString("loadbin ") + LoadingFirmware->fileName() +
+  // Очищаем FLash
+  JLinkScript->write(QByteArray("Erase\n"));
+  // Загружаем прошивку
+  QString temp = QString("LoadBin ") + LoadingFirmware->fileName() +
                  QString(", 0x08000000\n");
   JLinkScript->write(temp.toUtf8());
 
@@ -121,31 +123,21 @@ void JLinkExeProgrammer::processingJLinkExePath(const QString &path) {
 void JLinkExeProgrammer::excuteJLinkScript() {
   // Добавляем завершение скрипта
   // Посылаем сигнал Reset на МК
-  JLinkScript->write(QByteArray("reset\n"));
+  // JLinkScript->write(QByteArray("Reset\n"));
   // Запускаем ядро
-  JLinkScript->write(QByteArray("go\n"));
+  JLinkScript->write(QByteArray("Go\n"));
   // Выходим из JLink.exe
-  JLinkScript->write(QByteArray("exit\n"));
+  JLinkScript->write(QByteArray("Exit\n"));
 
   // Закрываем файл
   JLinkScript->close();
 
   // Запускаем JLink.exe с соответствующими аргументами
-  ProcessArguments << "-nogui"
+  ProcessArguments << "-NoGUI"
                    << "1";
-  ProcessArguments << "-exitonerror"
+  ProcessArguments << "-ExitOnError"
                    << "1";
-  ProcessArguments << "-device"
-                   << "N32L403KB";
-  ProcessArguments << "-if"
-                   << "SWD";
-  ProcessArguments << "-speed"
-                   << "4000";
-  ProcessArguments << "-jtagconf"
-                   << "-1 -1";
-  ProcessArguments << "-autoconnect"
-                   << "1";
-  ProcessArguments << "-commandfile" << JLinkScript->fileName();
+  ProcessArguments << "-CommandFile" << JLinkScript->fileName();
   JLinkProcess->setArguments(ProcessArguments);
   JLinkProcess->start();
   JLinkProcess->waitForFinished();
@@ -174,14 +166,11 @@ void JLinkExeProgrammer::initScript() {
 
     // Подключаемся к программатору по USB
     JLinkScript->write(QByteArray("USB\n"));
-    // Вводим МК в состояние Reset
-    //    JLinkScript->write(QByteArray("R0\n"));
+    JLinkScript->write(QByteArray("Device N32L403KB\n"));
+    JLinkScript->write(QByteArray("SelectInterface SWD\n"));
+    JLinkScript->write(QByteArray("Speed 4000\n"));
     // Подключаемся к МК
-    JLinkScript->write(QByteArray("connect\n"));
-    // Останавливаем ядро МК
-    // JLinkScript->write(QByteArray("Halt\n"));
-    // Снимаем состояние Reset
-    //    JLinkScript->write(QByteArray("R1\n"));
+    // JLinkScript->write(QByteArray("Connect\n"));
   } else {
     emit logging("JLink command script creation failed. ");
   }

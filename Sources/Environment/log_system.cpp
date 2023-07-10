@@ -1,14 +1,15 @@
 #include "log_system.h"
 
-LogSystem::LogSystem(QObject *parent) : QObject(parent)
-{
-  
-}
+LogSystem::LogSystem(QObject *parent) : QObject(parent) { IsEnable = true; }
+
+void LogSystem::enable(bool flag) { IsEnable = flag; }
 
 void LogSystem::programmerLog(const QString &log) {
-  emit requestDisplayLog(QString("Programmer - ") + log);
+  if (IsEnable)
+    emit requestDisplayLog(QString("Programmer - ") + log);
 }
 
 void LogSystem::loadManagerLog(const QString &log) {
-  emit requestDisplayLog(QString("Manager - ") + log);
+  if (IsEnable)
+    emit requestDisplayLog(QString("Manager - ") + log);
 }
