@@ -12,7 +12,16 @@ FirmwareManager::FirmwareManager(QObject *parent, LogSystem *logger)
   processingFirmwarePath(DEFAULT_FIRMWARE_FILE_PATH);
 }
 
-FirmwareManager::~FirmwareManager() { delete FirmwareFileInfo; }
+FirmwareManager::~FirmwareManager() {
+  delete FirmwareFileInfo;
+
+  if (ProgrammerThread) {
+    if (ProgrammerThread->isFinished() == false) {
+      ProgrammerThread->quit();
+      ProgrammerThread->wait();
+    }
+  }
+}
 
 InterfaceProgrammer *FirmwareManager::programmer() const { return Programmer; }
 
@@ -90,7 +99,8 @@ void FirmwareManager::buildProgrammerInstance() {
   // Подключаем логгирование к Programmer'у
   connect(Programmer, &InterfaceProgrammer::logging, Logger,
           &LogSystem::programmerLog);
-  // Когда объект Programmer завершит свою работу, поток начнет свое завершение
+  // Когда объект Programmer завершит свою работу, поток начнет свое
+  // завершение
   connect(Programmer, &InterfaceProgrammer::operationFinished, ProgrammerThread,
           &QThread::quit);
   // Когда поток завершит работу, объект Programmer будет удален
