@@ -34,35 +34,68 @@ MainWindow_GUI::create(void)
 
   // Подключаем неявное связывание сигналов и слотов по их имени
   QMetaObject::connectSlotsByName(MainWindow);
+
+  // Скрываем виджеты мастер доступа
+  hideMasterAccessWidgets();
 }
 
-void MainWindow_GUI::hideSystemWidgets() {}
+void MainWindow_GUI::hideMasterAccessWidgets() {
+  MainPushButtonLayout->removeWidget(PB_AutoProgramDevice);
+  MainPushButtonLayout->removeWidget(PB_EraseDevice);
 
-void MainWindow_GUI::showSystemWidgets() {}
+  PB_EraseDevice->hide();
+  PB_AutoProgramDevice->hide();
+
+  MainLayout->removeWidget(GeneralLogGroup);
+  GeneralLogGroup->hide();
+
+  ServiceMenu->removeAction(CommonAccessRequestAct);
+  ServiceMenu->addAction(MasterAccessRequestAct);
+}
+
+void MainWindow_GUI::showMasterAccessWidgets() {
+  MainPushButtonLayout->addWidget(PB_AutoProgramDevice);
+  MainPushButtonLayout->addWidget(PB_EraseDevice);
+
+  PB_EraseDevice->show();
+  PB_AutoProgramDevice->show();
+
+  MainLayout->addWidget(GeneralLogGroup);
+  GeneralLogGroup->show();
+
+  ServiceMenu->removeAction(MasterAccessRequestAct);
+  ServiceMenu->addAction(CommonAccessRequestAct);
+}
 
 void MainWindow_GUI::createActions() {
-  connectAct = new QAction("Подключиться", MainWindow);
-  connectAct->setShortcuts(QKeySequence::New);
-  connectAct->setStatusTip("Подключиться к программатору");
+  ConnectAct = new QAction("Подключиться", MainWindow);
+  ConnectAct->setObjectName(QString::fromUtf8("ConnectAct"));
+  ConnectAct->setStatusTip("Подключиться к программатору");
 
-  systemAccessAct = new QAction("Мастер доступ", MainWindow);
-  systemAccessAct->setShortcuts(QKeySequence::Open);
-  systemAccessAct->setStatusTip("Мастер доступ");
+  MasterAccessRequestAct = new QAction("Мастер доступ", MainWindow);
+  MasterAccessRequestAct->setObjectName(
+      QString::fromUtf8("MasterAccessRequestAct"));
+  MasterAccessRequestAct->setStatusTip("Получить мастер доступ");
 
-  aboutProgramAct = new QAction("О программе", MainWindow);
-  aboutProgramAct->setShortcuts(QKeySequence::Paste);
-  aboutProgramAct->setStatusTip("Показать сведения о программе");
+  CommonAccessRequestAct = new QAction("Обычный доступ", MainWindow);
+  CommonAccessRequestAct->setObjectName(
+      QString::fromUtf8("CommonAccessRequestAct"));
+  CommonAccessRequestAct->setStatusTip("Получить обычный доступ");
+
+  AboutProgramAct = new QAction("О программе", MainWindow);
+  AboutProgramAct->setObjectName(QString::fromUtf8("AboutProgramAct"));
+  AboutProgramAct->setStatusTip("Показать сведения о программе");
 }
 
 void MainWindow_GUI::createTopMenus() {
-  fileMenu = MainWindow->menuBar()->addMenu("Сервис");
-  fileMenu->addAction(connectAct);
-  fileMenu->addSeparator();
-  fileMenu->addAction(systemAccessAct);
+  ServiceMenu = MainWindow->menuBar()->addMenu("Сервис");
+  ServiceMenu->addAction(ConnectAct);
+  ServiceMenu->addSeparator();
+  ServiceMenu->addAction(MasterAccessRequestAct);
 
-  helpMenu = MainWindow->menuBar()->addMenu("Справка");
-  helpMenu->addAction(aboutProgramAct);
-  helpMenu->addAction(aboutProgramAct);
+  HelpMenu = MainWindow->menuBar()->addMenu("Справка");
+  HelpMenu->addAction(AboutProgramAct);
+  HelpMenu->addAction(AboutProgramAct);
 }
 
 void MainWindow_GUI::createWorkspaceWidgets()
@@ -74,16 +107,12 @@ void MainWindow_GUI::createWorkspaceWidgets()
   MainPushButtonLayout = new QVBoxLayout();
   MainPushButtonGroup->setLayout(MainPushButtonLayout);
 
-  PB_EraseDevice = new QPushButton(QString("Стереть прошивку"));
-  PB_EraseDevice->setObjectName(QString::fromUtf8("PB_EraseDevice"));
-  PB_EraseDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-  MainPushButtonLayout->addWidget(PB_EraseDevice);
-
   PB_ManualProgramDevice = new QPushButton(QString("Загрузить прошивку"));
   PB_ManualProgramDevice->setObjectName(
       QString::fromUtf8("PB_ManualProgramDevice"));
   PB_ManualProgramDevice->setSizePolicy(QSizePolicy::Expanding,
                                         QSizePolicy::Expanding);
+  PB_ManualProgramDevice->setFont(QFont("Arial", 16, QFont::Bold));
   MainPushButtonLayout->addWidget(PB_ManualProgramDevice);
 
   PB_AutoProgramDevice = new QPushButton(QString("Включить автозагрузку"));
@@ -91,7 +120,14 @@ void MainWindow_GUI::createWorkspaceWidgets()
       QString::fromUtf8("PB_AutoProgramDevice"));
   PB_AutoProgramDevice->setSizePolicy(QSizePolicy::Expanding,
                                       QSizePolicy::Expanding);
+  PB_AutoProgramDevice->setFont(QFont("Arial", 16, QFont::Bold));
   MainPushButtonLayout->addWidget(PB_AutoProgramDevice);
+
+  PB_EraseDevice = new QPushButton(QString("Стереть прошивку"));
+  PB_EraseDevice->setObjectName(QString::fromUtf8("PB_EraseDevice"));
+  PB_EraseDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  PB_EraseDevice->setFont(QFont("Arial", 16, QFont::Bold));
+  MainPushButtonLayout->addWidget(PB_EraseDevice);
 
   VerticalSpacer1 =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Minimum);

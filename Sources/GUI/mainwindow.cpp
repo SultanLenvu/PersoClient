@@ -8,13 +8,15 @@ MainWindow::MainWindow()
   Logger = new LogSystem(this);
   connect(Logger, &LogSystem::requestDisplayLog, this, &MainWindow::displayLog);
 
-  UserNotificator = new UserNotificationSystem(this, this);
+  UserInteraction = new UserInteractionSystem(this, this);
+  connect(this, &MainWindow::requestMasterPasswordFromUser, UserInteraction,
+          &UserInteractionSystem::getMasterPassword);
 
   Manager = new FirmwareManager(this, Logger);
   connect(Manager, &FirmwareManager::logging, Logger,
           &LogSystem::loadManagerLog);
-  connect(Manager, &FirmwareManager::notifyUser, UserNotificator,
-          &UserNotificationSystem::firmwareManagerNotification);
+  connect(Manager, &FirmwareManager::notifyUser, UserInteraction,
+          &UserInteractionSystem::firmwareManagerNotification);
 }
 
 MainWindow::~MainWindow() {}
@@ -34,6 +36,18 @@ void MainWindow::on_PB_AutoProgramDevice_clicked() {
 
   GUI->GeneralLogs->clear();
   Manager->performAutoLoading();
+}
+
+void MainWindow::on_MasterAccessRequestAct_triggered() {
+  QString pass;
+  emit requestMasterPasswordFromUser(pass);
+
+  if (pass == QString(MASTER_ACCESS_PASSWORD))
+    GUI->showMasterAccessWidgets();
+}
+
+void MainWindow::on_CommonAccessRequestAct_triggered() {
+  GUI->hideMasterAccessWidgets();
 }
 
 void MainWindow::displayLog(const QString &log) {

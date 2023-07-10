@@ -60,8 +60,8 @@ void JLinkExeProgrammer::loadFirmware() { // Проверка на сущест�
   excuteJLinkScript();
 
   // Обрабатываем вывод JLink.exe
-  if ((ProcessOutput.size() == 100) &&
-      (ProcessOutput.at(88) == QString("O.K.")))
+  if ((ProcessOutput.indexOf("O.K.") > -1) &&
+      (ProcessOutput.indexOf("Erasing done.") > -1))
     emit operationCompleted();
   else
     emit operationFailed();
@@ -89,8 +89,7 @@ void JLinkExeProgrammer::eraseFirmware() {
   excuteJLinkScript();
 
   // Обрабатываем вывод JLink.exe
-  if ((ProcessOutput.size() == 87) &&
-      (ProcessOutput.at(75) == QString("Erasing done.")))
+  if (ProcessOutput.indexOf("Erasing done.") > -1)
     emit operationCompleted();
   else
     emit operationFailed();
@@ -176,13 +175,13 @@ void JLinkExeProgrammer::initScript() {
     // Подключаемся к программатору по USB
     JLinkScript->write(QByteArray("USB\n"));
     // Вводим МК в состояние Reset
-    JLinkScript->write(QByteArray("R0\n"));
+    //    JLinkScript->write(QByteArray("R0\n"));
     // Подключаемся к МК
     JLinkScript->write(QByteArray("connect\n"));
     // Останавливаем ядро МК
-    JLinkScript->write(QByteArray("Halt\n"));
+    // JLinkScript->write(QByteArray("Halt\n"));
     // Снимаем состояние Reset
-    JLinkScript->write(QByteArray("R1\n"));
+    //    JLinkScript->write(QByteArray("R1\n"));
   } else {
     emit logging("JLink command script creation failed. ");
   }

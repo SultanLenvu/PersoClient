@@ -37,20 +37,20 @@ public:
 
   // Виджеты верхней панели меню
   //==================================================
-  QMenu* fileMenu;
-  QMenu* helpMenu;
-  QAction *connectAct;
-  QAction *systemAccessAct;
-  QAction *aboutProgramAct;
-  QLabel* infoLabel;
+  QMenu *ServiceMenu;
+  QMenu *HelpMenu;
+  QAction *ConnectAct;
+  QAction *MasterAccessRequestAct;
+  QAction *CommonAccessRequestAct;
+  QAction *AboutProgramAct;
   //==================================================
 
 public:
   MainWindow_GUI(QMainWindow* mainWindow);
 
   void create(void);
-  void hideSystemWidgets(void);
-  void showSystemWidgets(void);
+  void hideMasterAccessWidgets(void);
+  void showMasterAccessWidgets(void);
 
 private:
   void createActions(void);

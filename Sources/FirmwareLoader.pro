@@ -11,7 +11,7 @@ CONFIG += c++11
 SOURCES += \
     Environment/firmware_manager.cpp \
     Environment/log_system.cpp \
-    Environment/notification_system.cpp \
+    Environment/user_Interaction_system.cpp \
     GUI/mainwindow_gui.cpp \
     Programmers/interface_programmer.cpp \
     Programmers/jlink_exe_programmer.cpp \
@@ -22,7 +22,7 @@ HEADERS += \
     Environment/definitions.h \
     Environment/firmware_manager.h \
     Environment/log_system.h \
-    Environment/notification_system.h \
+    Environment/user_Interaction_system.h \
     GUI/mainwindow.h \
     GUI/mainwindow_gui.h \
     Programmers/interface_programmer.h \
