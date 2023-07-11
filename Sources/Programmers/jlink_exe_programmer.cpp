@@ -123,11 +123,11 @@ void JLinkExeProgrammer::processingJLinkExePath(const QString &path) {
 void JLinkExeProgrammer::excuteJLinkScript() {
   // Добавляем завершение скрипта
   // Посылаем сигнал Reset на МК
-  // JLinkScript->write(QByteArray("Reset\n"));
+  JLinkScript->write(QByteArray("r\n"));
   // Запускаем ядро
-  JLinkScript->write(QByteArray("Go\n"));
+  JLinkScript->write(QByteArray("g\n"));
   // Выходим из JLink.exe
-  JLinkScript->write(QByteArray("Exit\n"));
+  JLinkScript->write(QByteArray("exit\n"));
 
   // Закрываем файл
   JLinkScript->close();
@@ -165,10 +165,10 @@ void JLinkExeProgrammer::initScript() {
     // Добавляем иницирующие команды в скрипт
 
     // Подключаемся к программатору по USB
-    JLinkScript->write(QByteArray("USB\n"));
-    JLinkScript->write(QByteArray("Device N32L403KB\n"));
-    JLinkScript->write(QByteArray("SelectInterface SWD\n"));
-    JLinkScript->write(QByteArray("Speed 4000\n"));
+    JLinkScript->write(QByteArray("usb\n"));
+    JLinkScript->write(QByteArray("device N32L403KB\n"));
+    JLinkScript->write(QByteArray("si SWD\n"));
+    JLinkScript->write(QByteArray("speed 4000\n"));
     // Подключаемся к МК
     // JLinkScript->write(QByteArray("Connect\n"));
   } else {

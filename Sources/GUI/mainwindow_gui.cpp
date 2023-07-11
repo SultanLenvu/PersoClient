@@ -36,7 +36,7 @@ MainWindow_GUI::create(void)
   QMetaObject::connectSlotsByName(MainWindow);
 
   // Скрываем виджеты мастер доступа
-  // hideMasterAccessWidgets();
+  hideMasterAccessWidgets();
 }
 
 void MainWindow_GUI::hideMasterAccessWidgets() {
