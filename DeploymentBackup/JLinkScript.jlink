@@ -1,8 +1,0 @@
-USB
-Device N32L403KB
-SelectInterface SWD
-Speed 4000
-Erase
-LoadBin Firmware/firmware.hex, 0x08000000
-Go
-Exit
