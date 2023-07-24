@@ -20,6 +20,7 @@ public:
 public slots:
   void firmwareManagerNotification(FirmwareManager::PerfomingStatus status);
   void getMasterPassword(QString &pass);
+  void generateErrorMessage(const QString &text);
 };
 
 #endif // USER_INTERACTION_SYSTEM_H

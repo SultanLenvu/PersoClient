@@ -1,11 +1,9 @@
 #include "firmware_manager.h"
 
-FirmwareManager::FirmwareManager(QObject *parent, LogSystem *logger)
-    : QObject(parent) {
-  Logger = logger;
-
+FirmwareManager::FirmwareManager(QObject *parent) : QObject(parent) {
   Programmer = nullptr;
   ProgrammerThread = nullptr;
+  Logger = nullptr;
 
   ReadyIndicator = true;
 
@@ -64,8 +62,6 @@ void FirmwareManager::performLoading() {
   ProgrammerThread->start();
 }
 
-void FirmwareManager::performAutoLoading() {}
-
 void FirmwareManager::setFirmwareFile(const QString &path) {
   delete FirmwareFile;
   delete FirmwareFileInfo;
@@ -76,6 +72,8 @@ void FirmwareManager::setFirmwareFile(const QString &path) {
     emit logging(QString("The firmware file is missing in the default "
                          "directory, select it manually."));
 }
+
+void FirmwareManager::setLogger(LogSystem *logger) { Logger = logger; }
 
 void FirmwareManager::processingFirmwarePath(const QString &path) {
   FirmwareFileInfo = new QFileInfo(path);
@@ -95,8 +93,9 @@ void FirmwareManager::buildProgrammerInstance() {
   Programmer->moveToThread(ProgrammerThread);
 
   // Подключаем логгирование к Programmer'у
-  connect(Programmer, &InterfaceProgrammer::logging, Logger,
-          &LogSystem::programmerLog);
+  if (Logger != nullptr)
+    connect(Programmer, &InterfaceProgrammer::logging, Logger,
+            &LogSystem::programmerLog);
   // Когда объект Programmer завершит свою работу, поток начнет свое
   // завершение
   connect(Programmer, &InterfaceProgrammer::operationFinished, ProgrammerThread,

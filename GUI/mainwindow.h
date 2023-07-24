@@ -8,14 +8,27 @@
 #include "../Environment/firmware_manager.h"
 #include "../Environment/log_system.h"
 #include "../Environment/user_Interaction_system.h"
-#include "../GUI/mainwindow_gui.h"
+#include "../GUI/master_gui.h"
+#include "../GUI/production_gui.h"
 
 class MainWindow : public QMainWindow
 {
   Q_OBJECT
 
 private:
-  MainWindow_GUI *GUI;
+  QRect DesktopGeometry;
+  GUI *CurrentGUI;
+
+  // Виджеты верхней панели меню
+  //==================================================
+  QMenu *ServiceMenu;
+  QMenu *HelpMenu;
+
+  QAction *MasterInterfaceRequestAct;
+  QAction *ProductionInterfaceRequestAct;
+  QAction *AboutProgramAct;
+  //==================================================
+
   LogSystem *Logger;
   UserInteractionSystem *UserInteraction;
   FirmwareManager *Manager;
@@ -25,17 +38,25 @@ public:
   ~MainWindow();
 
 public slots:
-  void on_PB_EraseDevice_clicked(void);
-  void on_PB_ManualProgramDevice_clicked(void);
-  void on_PB_AutoProgramDevice_clicked(void);
-  void on_MasterAccessRequestAct_triggered(void);
-  void on_CommonAccessRequestAct_triggered(void);
+  void on_EraseDevice_slot(void);
+  void on_ProgramDevice_slot(void);
 
-public slots:
-  void displayLog(const QString &log);
+  void on_MasterInterfaceRequestAct_slot(void);
+  void on_ProductionInterfaceRequestAct_slot(void);
+
+private:
+  void createMasterInterface(void);
+  void connectMasterInterface(void);
+
+  void createProductionInterface(void);
+  void connectProductionInterface(void);
+
+  void createTopMenuActions(void);
+  void createTopMenu(void);
 
 signals:
   void requestMasterPasswordFromUser(QString &pass);
+  void notifyUserAboutError(const QString &text);
 };
 
 #endif // MAINWINDOW_H

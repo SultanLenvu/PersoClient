@@ -12,7 +12,9 @@ SOURCES += \
     Environment/firmware_manager.cpp \
     Environment/log_system.cpp \
     Environment/user_Interaction_system.cpp \
-    GUI/mainwindow_gui.cpp \
+    GUI/gui.cpp \
+    GUI/master_gui.cpp \
+    GUI/production_gui.cpp \
     Programmers/interface_programmer.cpp \
     Programmers/jlink_exe_programmer.cpp \
     main.cpp \
@@ -23,8 +25,10 @@ HEADERS += \
     Environment/firmware_manager.h \
     Environment/log_system.h \
     Environment/user_Interaction_system.h \
+    GUI/gui.h \
     GUI/mainwindow.h \
-    GUI/mainwindow_gui.h \
+    GUI/master_gui.h \
+    GUI/production_gui.h \
     Programmers/interface_programmer.h \
     Programmers/jlink_exe_programmer.h
 

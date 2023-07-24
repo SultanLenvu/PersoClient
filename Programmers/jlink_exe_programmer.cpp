@@ -127,7 +127,7 @@ void JLinkExeProgrammer::excuteJLinkScript() {
   // Запускаем ядро
   JLinkScript->write(QByteArray("g\n"));
   // Выходим из JLink.exe
-  JLinkScript->write(QByteArray("exit\n"));
+  JLinkScript->write(QByteArray("q\n"));
 
   // Закрываем файл
   JLinkScript->close();
@@ -169,8 +169,20 @@ void JLinkExeProgrammer::initScript() {
     JLinkScript->write(QByteArray("device N32L403KB\n"));
     JLinkScript->write(QByteArray("si SWD\n"));
     JLinkScript->write(QByteArray("speed 4000\n"));
-    // Подключаемся к МК
-    // JLinkScript->write(QByteArray("Connect\n"));
+    // Подключаемся к МК: сбрасываем и останавливаем ядро
+    JLinkScript->write(QByteArray("r\n"));
+    JLinkScript->write(QByteArray("halt\n"));
+    // Снимаем защиту с flash-памяти
+    JLinkScript->write(QByteArray("w4 0x40022004, 0x45670123\n"));
+    JLinkScript->write(QByteArray("w4 0x40022004, 0xCDEF89AB\n"));
+    JLinkScript->write(QByteArray("w4 0x40022008, 0x45670123\n"));
+    JLinkScript->write(QByteArray("w4 0x40022008, 0xCDEF89AB\n"));
+
+    JLinkScript->write(QByteArray("w4 0x1FFFF800, 0x00FF5AA5\n"));
+    JLinkScript->write(QByteArray("r\n"));
+    JLinkScript->write(QByteArray("mem 0x1FFFF800, 4\n"));
+    // JLinkScript->write(QByteArray("g\n"));
+    JLinkScript->write(QByteArray("connect\n"));
   } else {
     emit logging("JLink command script creation failed. ");
   }

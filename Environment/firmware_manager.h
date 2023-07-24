@@ -28,16 +28,16 @@ private:
   PerfomingStatus LastStatus;
 
 public:
-  explicit FirmwareManager(QObject *parent, LogSystem *logger);
+  explicit FirmwareManager(QObject *parent);
   ~FirmwareManager();
 
   InterfaceProgrammer *programmer(void) const;
 
   void performErasing(void);
   void performLoading(void);
-  void performAutoLoading(void);
 
   void setFirmwareFile(const QString &path);
+  void setLogger(LogSystem *logger);
 
 private:
   void processingFirmwarePath(const QString &path);

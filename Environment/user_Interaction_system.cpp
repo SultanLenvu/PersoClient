@@ -24,3 +24,7 @@ void UserInteractionSystem::getMasterPassword(QString &pass) {
       QInputDialog::getText(ParentWindow, "Мастер доступ",
                             "Введите пароль:", QLineEdit::Normal, "", nullptr);
 }
+
+void UserInteractionSystem::generateErrorMessage(const QString &text) {
+  QMessageBox::critical(ParentWindow, "Доступ", text, QMessageBox::Ok);
+}

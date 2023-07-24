@@ -2,8 +2,6 @@
 
 LogSystem::LogSystem(QObject *parent) : QObject(parent) { IsEnable = true; }
 
-void LogSystem::enable(bool flag) { IsEnable = flag; }
-
 void LogSystem::programmerLog(const QString &log) {
   if (IsEnable)
     emit requestDisplayLog(QString("Programmer - ") + log);
