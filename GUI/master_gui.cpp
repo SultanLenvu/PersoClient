@@ -10,18 +10,43 @@ QWidget *MasterGUI::create() {
   MainButtonLayout = new QVBoxLayout();
   MainButtonGroup->setLayout(MainButtonLayout);
 
-  ProgramDeviceButton = new QPushButton(QString("Загрузить прошивку"));
-  ProgramDeviceButton->setSizePolicy(QSizePolicy::Expanding,
-                                     QSizePolicy::Expanding);
-  ProgramDeviceButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(ProgramDeviceButton);
+  MasterProgramDeviceButton = new QPushButton(QString("Загрузить прошивку"));
+  MasterProgramDeviceButton->setSizePolicy(QSizePolicy::Expanding,
+                                           QSizePolicy::Expanding);
+  MasterProgramDeviceButton->setFont(QFont("Arial", 16, QFont::Bold));
+  MainButtonLayout->addWidget(MasterProgramDeviceButton);
+
+  ProgramDeviceUserDataButton =
+      new QPushButton(QString("Загрузить  пользовательские данные"));
+  ProgramDeviceUserDataButton->setSizePolicy(QSizePolicy::Expanding,
+                                             QSizePolicy::Expanding);
+  ProgramDeviceUserDataButton->setFont(QFont("Arial", 16, QFont::Bold));
+  MainButtonLayout->addWidget(ProgramDeviceUserDataButton);
 
   EraseDeviceButton = new QPushButton(QString("Стереть прошивку"));
-  EraseDeviceButton->setObjectName(QString::fromUtf8("PB_EraseDevice"));
   EraseDeviceButton->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
   EraseDeviceButton->setFont(QFont("Arial", 16, QFont::Bold));
   MainButtonLayout->addWidget(EraseDeviceButton);
+
+  UnlockDeviceButton = new QPushButton(QString("Разблокировать память"));
+  UnlockDeviceButton->setSizePolicy(QSizePolicy::Expanding,
+                                    QSizePolicy::Expanding);
+  UnlockDeviceButton->setFont(QFont("Arial", 16, QFont::Bold));
+  MainButtonLayout->addWidget(UnlockDeviceButton);
+
+  ReadDeviceFirmwareButton = new QPushButton(QString("Считать прошивку"));
+  ReadDeviceFirmwareButton->setSizePolicy(QSizePolicy::Expanding,
+                                          QSizePolicy::Expanding);
+  ReadDeviceFirmwareButton->setFont(QFont("Arial", 16, QFont::Bold));
+  MainButtonLayout->addWidget(ReadDeviceFirmwareButton);
+
+  ReadDeviceUserDataButton =
+      new QPushButton(QString("Считать пользовательские данные"));
+  ReadDeviceUserDataButton->setSizePolicy(QSizePolicy::Expanding,
+                                          QSizePolicy::Expanding);
+  ReadDeviceUserDataButton->setFont(QFont("Arial", 16, QFont::Bold));
+  MainButtonLayout->addWidget(ReadDeviceUserDataButton);
 
   ButtonVerticalSpacer =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Minimum);

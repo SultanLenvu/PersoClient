@@ -15,8 +15,8 @@ MainWindow::MainWindow() {
           &UserInteractionSystem::generateErrorMessage);
 
   // Менеджер для взаимодействия с программатором
-  Manager = new FirmwareManager(this);
-  connect(Manager, &FirmwareManager::notifyUser, UserInteraction,
+  Manager = new ProgrammatorManager(this);
+  connect(Manager, &ProgrammatorManager::notifyUser, UserInteraction,
           &UserInteractionSystem::firmwareManagerNotification);
 
   // Настраиваем размер главного окна
@@ -31,28 +31,51 @@ MainWindow::MainWindow() {
 
 MainWindow::~MainWindow() {}
 
-void MainWindow::on_EraseDevice_slot() {
-  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
-
-  Manager->performErasing();
+void MainWindow::on_ProgramDevice_slot() {
+  Manager->performDeviceUnlock();
+  Manager->performFirmwareLoading(DEFAULT_FIRMWARE_FILE_PATH);
 }
 
-void MainWindow::on_ProgramDevice_slot() {
-  if (CurrentGUI->type() == GUI::Master)
-    dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+void MainWindow::on_MasterProgramDeviceButton_slot() {
+  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
 
-  Manager->performLoading();
+  Manager->performFirmwareLoading(QFileDialog::getOpenFileName(
+      nullptr, "Выберите файл", "", "Все файлы (*.*)"));
+}
+
+void MainWindow::on_ProgramDeviceUserDataButton_slot() {
+  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+
+  Manager->performUserDataLoading(QFileDialog::getOpenFileName(
+      nullptr, "Выберите файл", "", "Все файлы (*.*)"));
+}
+
+void MainWindow::on_EraseDeviceButton_slot() {
+  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+
+  Manager->performFirmwareErasing();
+}
+
+void MainWindow::on_UnlockDeviceButton_slot() {
+  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+
+  Manager->performDeviceUnlock();
+}
+
+void MainWindow::on_ReadDeviceFirmwareButton_slot() {
+  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+
+  Manager->performDeviceFirmwareReading();
+}
+
+void MainWindow::on_ReadDeviceUserDataButton_slot() {
+  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+
+  Manager->performDeviceUserDataReading();
 }
 
 void MainWindow::on_MasterInterfaceRequestAct_slot() {
   createMasterInterface();
-
-  Logger = new LogSystem(this);
-  connect(Logger, &LogSystem::requestDisplayLog,
-          dynamic_cast<MasterGUI *>(CurrentGUI), &MasterGUI::displayLogData);
-  connect(Manager, &FirmwareManager::logging, Logger,
-          &LogSystem::loadManagerLog);
-  Manager->setLogger(Logger);
 }
 
 void MainWindow::on_ProductionInterfaceRequestAct_slot() {
@@ -77,6 +100,14 @@ void MainWindow::createMasterInterface() {
 
     // Создаем верхнее меню
     createTopMenu();
+
+    // Создаем и связываем логгер
+    Logger = new LogSystem(this);
+    connect(Logger, &LogSystem::requestDisplayLog,
+            dynamic_cast<MasterGUI *>(CurrentGUI), &MasterGUI::displayLogData);
+    connect(Manager, &ProgrammatorManager::logging, Logger,
+            &LogSystem::loadManagerLog);
+    Manager->setLogger(Logger);
   } else
     emit notifyUserAboutError("Неверный пароль");
 }
@@ -84,10 +115,19 @@ void MainWindow::createMasterInterface() {
 void MainWindow::connectMasterInterface() {
   MasterGUI *gui = dynamic_cast<MasterGUI *>(CurrentGUI);
 
-  connect(gui->ProgramDeviceButton, &QPushButton::clicked, this,
-          &MainWindow::on_ProgramDevice_slot);
+  connect(gui->MasterProgramDeviceButton, &QPushButton::clicked, this,
+          &MainWindow::on_MasterProgramDeviceButton_slot);
+  connect(gui->ProgramDeviceUserDataButton, &QPushButton::clicked, this,
+          &MainWindow::on_ProgramDeviceUserDataButton_slot);
   connect(gui->EraseDeviceButton, &QPushButton::clicked, this,
-          &MainWindow::on_EraseDevice_slot);
+          &MainWindow::on_EraseDeviceButton_slot);
+
+  connect(gui->UnlockDeviceButton, &QPushButton::clicked, this,
+          &MainWindow::on_UnlockDeviceButton_slot);
+  connect(gui->ReadDeviceFirmwareButton, &QPushButton::clicked, this,
+          &MainWindow::on_ReadDeviceFirmwareButton_slot);
+  connect(gui->ReadDeviceUserDataButton, &QPushButton::clicked, this,
+          &MainWindow::on_ReadDeviceUserDataButton_slot);
 }
 
 void MainWindow::createProductionInterface() {

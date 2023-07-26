@@ -1,5 +1,5 @@
-#ifndef FIRMWARE_MANAGER_H
-#define FIRMWARE_MANAGER_H
+#ifndef PROGRAMMATOR_MANAGER_H
+#define PROGRAMMATOR_MANAGER_H
 
 #include <QApplication>
 #include <QObject>
@@ -9,7 +9,7 @@
 #include "../Programmers/jlink_exe_programmer.h"
 #include "log_system.h"
 
-class FirmwareManager : public QObject {
+class ProgrammatorManager : public QObject {
   Q_OBJECT
 public:
   enum PerfomingStatus { Completed, Failed };
@@ -22,25 +22,34 @@ private:
   QFileInfo *FirmwareFileInfo;
   QFile *FirmwareFile;
 
+  QFileInfo *UserDataFileInfo;
+  QFile *UserDataFile;
+
   bool AutoLoadingFlag;
   bool ReadyIndicator;
 
   PerfomingStatus LastStatus;
 
 public:
-  explicit FirmwareManager(QObject *parent);
-  ~FirmwareManager();
+  explicit ProgrammatorManager(QObject *parent);
+  ~ProgrammatorManager();
 
   InterfaceProgrammer *programmer(void) const;
 
-  void performErasing(void);
-  void performLoading(void);
+  void performFirmwareErasing(void);
+  void performFirmwareLoading(const QString &path);
+  void performUserDataLoading(const QString &path);
+
+  void performDeviceUnlock(void);
+  void performDeviceFirmwareReading(void);
+  void performDeviceUserDataReading(void);
 
   void setFirmwareFile(const QString &path);
   void setLogger(LogSystem *logger);
 
 private:
   void processingFirmwarePath(const QString &path);
+  void processingUserDataPath(const QString &path);
   void buildProgrammerInstance(void);
 
 private slots:
@@ -53,4 +62,4 @@ signals:
   void notifyUser(PerfomingStatus status);
 };
 
-#endif // FIRMWARE_MANAGER_H
+#endif // PROGRAMMATOR_MANAGER_H

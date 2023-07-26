@@ -5,8 +5,8 @@
 #include <QtWidgets>
 
 #include "../Environment/definitions.h"
-#include "../Environment/firmware_manager.h"
 #include "../Environment/log_system.h"
+#include "../Environment/programmator_manager.h"
 #include "../Environment/user_Interaction_system.h"
 #include "../GUI/master_gui.h"
 #include "../GUI/production_gui.h"
@@ -31,15 +31,22 @@ private:
 
   LogSystem *Logger;
   UserInteractionSystem *UserInteraction;
-  FirmwareManager *Manager;
+  ProgrammatorManager *Manager;
 
 public:
   MainWindow();
   ~MainWindow();
 
 public slots:
-  void on_EraseDevice_slot(void);
   void on_ProgramDevice_slot(void);
+
+  void on_MasterProgramDeviceButton_slot(void);
+  void on_ProgramDeviceUserDataButton_slot(void);
+  void on_EraseDeviceButton_slot(void);
+
+  void on_UnlockDeviceButton_slot(void);
+  void on_ReadDeviceFirmwareButton_slot(void);
+  void on_ReadDeviceUserDataButton_slot(void);
 
   void on_MasterInterfaceRequestAct_slot(void);
   void on_ProductionInterfaceRequestAct_slot(void);

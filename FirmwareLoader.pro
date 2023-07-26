@@ -9,8 +9,8 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    Environment/firmware_manager.cpp \
     Environment/log_system.cpp \
+    Environment/programmator_manager.cpp \
     Environment/user_Interaction_system.cpp \
     GUI/gui.cpp \
     GUI/master_gui.cpp \
@@ -22,8 +22,8 @@ SOURCES += \
 
 HEADERS += \
     Environment/definitions.h \
-    Environment/firmware_manager.h \
     Environment/log_system.h \
+    Environment/programmator_manager.h \
     Environment/user_Interaction_system.h \
     GUI/gui.h \
     GUI/mainwindow.h \

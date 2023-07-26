@@ -9,8 +9,15 @@ public:
   QGroupBox *MainButtonGroup;
   QVBoxLayout *MainButtonLayout;
 
-  QPushButton *ProgramDeviceButton;
+  // Кнопки
+  QPushButton *MasterProgramDeviceButton;
+  QPushButton *ProgramDeviceUserDataButton;
   QPushButton *EraseDeviceButton;
+
+  QPushButton *UnlockDeviceButton;
+  QPushButton *ReadDeviceFirmwareButton;
+  QPushButton *ReadDeviceUserDataButton;
+
   QSpacerItem *ButtonVerticalSpacer;
 
   // Виджеты для отображения логов
