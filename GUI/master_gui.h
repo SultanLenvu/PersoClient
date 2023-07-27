@@ -10,13 +10,16 @@ public:
   QVBoxLayout *MainButtonLayout;
 
   // Кнопки
-  QPushButton *MasterProgramDeviceButton;
-  QPushButton *ProgramDeviceUserDataButton;
+  QPushButton *AutoProgramDeviceButton;
+  QPushButton *ManualProgramDeviceButton;
+  QPushButton *ReadDeviceFirmwareButton;
   QPushButton *EraseDeviceButton;
 
-  QPushButton *UnlockDeviceButton;
-  QPushButton *ReadDeviceFirmwareButton;
+  QPushButton *ProgramDeviceUserDataButton;
   QPushButton *ReadDeviceUserDataButton;
+
+  QPushButton *UnlockDeviceButton;
+  QPushButton *LockDeviceButton;
 
   QSpacerItem *ButtonVerticalSpacer;
 

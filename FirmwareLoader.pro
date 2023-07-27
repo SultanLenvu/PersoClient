@@ -10,7 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     Environment/log_system.cpp \
-    Environment/programmator_manager.cpp \
+    Environment/programmer_manager.cpp \
     Environment/user_Interaction_system.cpp \
     GUI/gui.cpp \
     GUI/master_gui.cpp \
@@ -23,7 +23,7 @@ SOURCES += \
 HEADERS += \
     Environment/definitions.h \
     Environment/log_system.h \
-    Environment/programmator_manager.h \
+    Environment/programmer_manager.h \
     Environment/user_Interaction_system.h \
     GUI/gui.h \
     GUI/mainwindow.h \

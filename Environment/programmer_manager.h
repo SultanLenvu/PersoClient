@@ -1,15 +1,16 @@
-#ifndef PROGRAMMATOR_MANAGER_H
-#define PROGRAMMATOR_MANAGER_H
+#ifndef PROGRAMMER_MANAGER_H
+#define PROGRAMMER_MANAGER_H
 
 #include <QApplication>
 #include <QObject>
 #include <QThread>
+#include <QVector>
 
 #include "../Programmers/interface_programmer.h"
 #include "../Programmers/jlink_exe_programmer.h"
 #include "log_system.h"
 
-class ProgrammatorManager : public QObject {
+class ProgrammerManager : public QObject {
   Q_OBJECT
 public:
   enum PerfomingStatus { Completed, Failed };
@@ -31,18 +32,20 @@ private:
   PerfomingStatus LastStatus;
 
 public:
-  explicit ProgrammatorManager(QObject *parent);
-  ~ProgrammatorManager();
+  explicit ProgrammerManager(QObject *parent);
+  ~ProgrammerManager();
 
   InterfaceProgrammer *programmer(void) const;
 
+  void performFirmwareLoading(const QString &path, bool unlockOption);
+  void performFirmwareReading(void);
   void performFirmwareErasing(void);
-  void performFirmwareLoading(const QString &path);
+
+  void performUserDataReading(void);
   void performUserDataLoading(const QString &path);
 
   void performDeviceUnlock(void);
-  void performDeviceFirmwareReading(void);
-  void performDeviceUserDataReading(void);
+  void performDeviceLock(void);
 
   void setFirmwareFile(const QString &path);
   void setLogger(LogSystem *logger);
@@ -62,4 +65,4 @@ signals:
   void notifyUser(PerfomingStatus status);
 };
 
-#endif // PROGRAMMATOR_MANAGER_H
+#endif // PROGRAMMER_MANAGER_H

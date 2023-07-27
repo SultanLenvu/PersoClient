@@ -6,7 +6,7 @@
 
 #include "../Environment/definitions.h"
 #include "../Environment/log_system.h"
-#include "../Environment/programmator_manager.h"
+#include "../Environment/programmer_manager.h"
 #include "../Environment/user_Interaction_system.h"
 #include "../GUI/master_gui.h"
 #include "../GUI/production_gui.h"
@@ -31,22 +31,23 @@ private:
 
   LogSystem *Logger;
   UserInteractionSystem *UserInteraction;
-  ProgrammatorManager *Manager;
+  ProgrammerManager *Manager;
 
 public:
   MainWindow();
   ~MainWindow();
 
 public slots:
-  void on_ProgramDevice_slot(void);
-
-  void on_MasterProgramDeviceButton_slot(void);
-  void on_ProgramDeviceUserDataButton_slot(void);
+  void on_AutoProgramDeviceButton_slot(void);
+  void on_ManualProgramDeviceButton_slot(void);
+  void on_ReadDeviceFirmwareButton_slot(void);
   void on_EraseDeviceButton_slot(void);
 
-  void on_UnlockDeviceButton_slot(void);
-  void on_ReadDeviceFirmwareButton_slot(void);
+  void on_ProgramDeviceUserDataButton_slot(void);
   void on_ReadDeviceUserDataButton_slot(void);
+
+  void on_UnlockDeviceButton_slot(void);
+  void on_LockDeviceButton_slot(void);
 
   void on_MasterInterfaceRequestAct_slot(void);
   void on_ProductionInterfaceRequestAct_slot(void);

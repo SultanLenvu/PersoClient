@@ -28,15 +28,20 @@ public:
 
 public slots:
   virtual void connectDevice(void) = 0;
-  virtual void loadFirmware(void) = 0;
-  virtual void loadUserData(void) = 0;
-  virtual void readFirmware(void) = 0;
-  virtual void readUserData(void) = 0;
-  virtual void eraseFirmware(void) = 0;
-
   virtual void resetDevice(void) = 0;
   virtual void runDevice(void) = 0;
+
+  virtual void loadFirmware(void) = 0;
+  virtual void loadFirmwareWithUnlock(void) = 0;
+  virtual void readFirmware(void) = 0;
+  virtual void eraseFirmware(void) = 0;
+
+  virtual void loadUserData(void) = 0;
+  virtual void readUserData(void) = 0;
+
   virtual void unlockDevice(void) = 0;
+  virtual void lockDevice(void) = 0;
+
   virtual void exit(void) = 0;
 
   void setLoadingFirmware(QFile *firmware);

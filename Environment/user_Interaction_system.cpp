@@ -6,13 +6,13 @@ UserInteractionSystem::UserInteractionSystem(QObject *parent, QWidget *window)
 }
 
 void UserInteractionSystem::firmwareManagerNotification(
-    ProgrammatorManager::PerfomingStatus status) {
+    ProgrammerManager::PerfomingStatus status) {
   switch (status) {
-  case ProgrammatorManager::Completed:
+  case ProgrammerManager::Completed:
     QMessageBox::information(ParentWindow, "Менеджер",
                              "Операция успешно выполнена", QMessageBox::Ok);
     break;
-  case ProgrammatorManager::Failed:
+  case ProgrammerManager::Failed:
     QMessageBox::critical(ParentWindow, "Менеджер", "Операция провалилась",
                           QMessageBox::Ok);
     break;

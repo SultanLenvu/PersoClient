@@ -1,6 +1,6 @@
-#include "programmator_manager.h"
+#include "programmer_manager.h"
 
-ProgrammatorManager::ProgrammatorManager(QObject *parent) : QObject(parent) {
+ProgrammerManager::ProgrammerManager(QObject *parent) : QObject(parent) {
   Programmer = nullptr;
   ProgrammerThread = nullptr;
   Logger = nullptr;
@@ -8,11 +8,15 @@ ProgrammatorManager::ProgrammatorManager(QObject *parent) : QObject(parent) {
   FirmwareFileInfo = nullptr;
   FirmwareFile = nullptr;
 
+  UserDataFileInfo = nullptr;
+  UserDataFile = nullptr;
+
   ReadyIndicator = true;
 }
 
-ProgrammatorManager::~ProgrammatorManager() {
+ProgrammerManager::~ProgrammerManager() {
   delete FirmwareFileInfo;
+  delete UserDataFileInfo;
 
   if (ReadyIndicator == false) {
     ProgrammerThread->quit();
@@ -20,11 +24,60 @@ ProgrammatorManager::~ProgrammatorManager() {
   }
 }
 
-InterfaceProgrammer *ProgrammatorManager::programmer() const {
+InterfaceProgrammer *ProgrammerManager::programmer() const {
   return Programmer;
 }
 
-void ProgrammatorManager::performFirmwareErasing() {
+void ProgrammerManager::performFirmwareLoading(const QString &path,
+                                               bool unlockOption) {
+  // Проверяем наличие файла
+  processingFirmwarePath(path);
+
+  // Проверяем готовность к выполнению операции
+  if (ReadyIndicator == false)
+    return;
+  else
+    ReadyIndicator = false;
+
+  // Создаем программатор и среду его выполнения
+  buildProgrammerInstance();
+
+  // Отправляем прошивку программатору
+  Programmer->setLoadingFirmware(FirmwareFile);
+
+  // Когда поток будет запущен, Programmer начнет выполнять соответствующую
+  // операцию
+  if (unlockOption == true)
+    connect(ProgrammerThread, &QThread::started, Programmer,
+            &InterfaceProgrammer::loadFirmwareWithUnlock);
+  else
+    connect(ProgrammerThread, &QThread::started, Programmer,
+            &InterfaceProgrammer::loadFirmware);
+
+  // Запускаем поток програматора
+  ProgrammerThread->start();
+}
+
+void ProgrammerManager::performFirmwareReading() {
+  // Проверяем готовность к выполнению операции
+  if (ReadyIndicator == false)
+    return;
+  else
+    ReadyIndicator = false;
+
+  // Создаем программатор и среду его выполнения
+  buildProgrammerInstance();
+
+  // Когда поток будет запущен, Programmer начнет выполнять соответствующую
+  // операцию
+  connect(ProgrammerThread, &QThread::started, Programmer,
+          &InterfaceProgrammer::readFirmware);
+
+  // Запускаем поток програматора
+  ProgrammerThread->start();
+}
+
+void ProgrammerManager::performFirmwareErasing() {
   // Проверяем готовность
   if (ReadyIndicator == false)
     return;
@@ -43,32 +96,7 @@ void ProgrammatorManager::performFirmwareErasing() {
   ProgrammerThread->start();
 }
 
-void ProgrammatorManager::performFirmwareLoading(const QString &path) {
-  // Проверяем готовность к выполнению операции
-  if (ReadyIndicator == false)
-    return;
-  else
-    ReadyIndicator = false;
-
-  // Проверяем наличие файла
-  processingFirmwarePath(path);
-
-  // Создаем программатор и среду его выполнения
-  buildProgrammerInstance();
-
-  // Отправляем прошивку программатору
-  Programmer->setLoadingFirmware(FirmwareFile);
-
-  // Когда поток будет запущен, Programmer начнет выполнять соответствующую
-  // операцию
-  connect(ProgrammerThread, &QThread::started, Programmer,
-          &InterfaceProgrammer::loadFirmware);
-
-  // Запускаем поток програматора
-  ProgrammerThread->start();
-}
-
-void ProgrammatorManager::performUserDataLoading(const QString &path) {
+void ProgrammerManager::performUserDataLoading(const QString &path) {
   // Проверяем готовность к выполнению операции
   if (ReadyIndicator == false)
     return;
@@ -93,7 +121,7 @@ void ProgrammatorManager::performUserDataLoading(const QString &path) {
   ProgrammerThread->start();
 }
 
-void ProgrammatorManager::performDeviceUnlock() {
+void ProgrammerManager::performDeviceUnlock() {
   // Проверяем готовность к выполнению операции
   if (ReadyIndicator == false)
     return;
@@ -102,9 +130,6 @@ void ProgrammatorManager::performDeviceUnlock() {
 
   // Создаем программатор и среду его выполнения
   buildProgrammerInstance();
-
-  // Отправляем прошивку программатору
-  Programmer->setLoadingFirmware(FirmwareFile);
 
   // Когда поток будет запущен, Programmer начнет выполнять соответствующую
   // операцию
@@ -115,7 +140,7 @@ void ProgrammatorManager::performDeviceUnlock() {
   ProgrammerThread->start();
 }
 
-void ProgrammatorManager::performDeviceFirmwareReading() {
+void ProgrammerManager::performDeviceLock() {
   // Проверяем готовность к выполнению операции
   if (ReadyIndicator == false)
     return;
@@ -128,13 +153,13 @@ void ProgrammatorManager::performDeviceFirmwareReading() {
   // Когда поток будет запущен, Programmer начнет выполнять соответствующую
   // операцию
   connect(ProgrammerThread, &QThread::started, Programmer,
-          &InterfaceProgrammer::readFirmware);
+          &InterfaceProgrammer::lockDevice);
 
   // Запускаем поток програматора
   ProgrammerThread->start();
 }
 
-void ProgrammatorManager::performDeviceUserDataReading() {
+void ProgrammerManager::performUserDataReading() {
   // Проверяем готовность к выполнению операции
   if (ReadyIndicator == false)
     return;
@@ -153,7 +178,7 @@ void ProgrammatorManager::performDeviceUserDataReading() {
   ProgrammerThread->start();
 }
 
-void ProgrammatorManager::setFirmwareFile(const QString &path) {
+void ProgrammerManager::setFirmwareFile(const QString &path) {
   delete FirmwareFile;
   delete FirmwareFileInfo;
 
@@ -164,9 +189,9 @@ void ProgrammatorManager::setFirmwareFile(const QString &path) {
                          "directory, select it manually."));
 }
 
-void ProgrammatorManager::setLogger(LogSystem *logger) { Logger = logger; }
+void ProgrammerManager::setLogger(LogSystem *logger) { Logger = logger; }
 
-void ProgrammatorManager::processingFirmwarePath(const QString &path) {
+void ProgrammerManager::processingFirmwarePath(const QString &path) {
   delete FirmwareFileInfo;
   delete FirmwareFile;
 
@@ -178,7 +203,7 @@ void ProgrammatorManager::processingFirmwarePath(const QString &path) {
     FirmwareFile = nullptr;
 }
 
-void ProgrammatorManager::processingUserDataPath(const QString &path) {
+void ProgrammerManager::processingUserDataPath(const QString &path) {
   delete UserDataFileInfo;
   delete UserDataFile;
 
@@ -190,7 +215,7 @@ void ProgrammatorManager::processingUserDataPath(const QString &path) {
     UserDataFile = nullptr;
 }
 
-void ProgrammatorManager::buildProgrammerInstance() {
+void ProgrammerManager::buildProgrammerInstance() {
   // Создаем поток для программатора
   ProgrammerThread = new QThread(this);
 
@@ -214,20 +239,20 @@ void ProgrammatorManager::buildProgrammerInstance() {
           &QObject::deleteLater);
   // Когда программатор завершит операцию, можно будет приступить к следующей
   connect(Programmer, &InterfaceProgrammer::operationFinished, this,
-          &ProgrammatorManager::performingFinished);
+          &ProgrammerManager::performingFinished);
   // Если программатор успешно выполнит свою операцию
   connect(Programmer, &InterfaceProgrammer::operationCompleted, this,
-          &ProgrammatorManager::performingCompleted);
+          &ProgrammerManager::performingCompleted);
   // Если программатор не выполнит свою операцию
   connect(Programmer, &InterfaceProgrammer::operationFailed, this,
-          &ProgrammatorManager::performingFailed);
+          &ProgrammerManager::performingFailed);
 }
 
-void ProgrammatorManager::performingFinished() {
+void ProgrammerManager::performingFinished() {
   ReadyIndicator = true;
   notifyUser(LastStatus);
 }
 
-void ProgrammatorManager::performingCompleted() { LastStatus = Completed; }
+void ProgrammerManager::performingCompleted() { LastStatus = Completed; }
 
-void ProgrammatorManager::performingFailed() { LastStatus = Failed; }
+void ProgrammerManager::performingFailed() { LastStatus = Failed; }
