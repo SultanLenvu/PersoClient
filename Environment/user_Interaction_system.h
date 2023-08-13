@@ -6,7 +6,7 @@
 #include <QMessageBox>
 #include <QObject>
 
-#include "../Environment/programmer_manager.h"
+#include "../Environment/client_manager.h"
 
 class UserInteractionSystem : public QObject {
   Q_OBJECT
@@ -17,10 +17,10 @@ private:
 public:
   explicit UserInteractionSystem(QObject *parent, QWidget *window);
 
-public slots:
-  void firmwareManagerNotification(ProgrammerManager::PerfomingStatus status);
-  void getMasterPassword(QString &pass);
-  void generateErrorMessage(const QString &text);
+ public slots:
+  void generateMessage(const QString& pass);
+  void getMasterPassword(QString& pass);
+  void generateErrorMessage(const QString& text);
 };
 
 #endif // USER_INTERACTION_SYSTEM_H

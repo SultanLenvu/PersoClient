@@ -2,6 +2,7 @@
 
 JLinkExeProgrammer::JLinkExeProgrammer(QObject *parent)
     : InterfaceProgrammer(parent, JLink) {
+  setObjectName("JLinkExeProgrammer");
   processingJLinkExePath(DEFAULT_JLINKEXE_FILE_PATH);
 }
 

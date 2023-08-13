@@ -1,9 +1,8 @@
-#include "programmer_manager.h"
+#include "client_manager.h"
 
-ProgrammerManager::ProgrammerManager(QObject *parent) : QObject(parent) {
+ClientManager::ClientManager(QObject* parent) : QObject(parent) {
   Programmer = nullptr;
   ProgrammerThread = nullptr;
-  Logger = nullptr;
 
   FirmwareFileInfo = nullptr;
   FirmwareFile = nullptr;
@@ -12,9 +11,12 @@ ProgrammerManager::ProgrammerManager(QObject *parent) : QObject(parent) {
   UserDataFile = nullptr;
 
   ReadyIndicator = true;
+
+  Client = new PersoClient(this);
+  connect(Client, &PersoClient::logging, this, &ClientManager::proxyLogging);
 }
 
-ProgrammerManager::~ProgrammerManager() {
+ClientManager::~ClientManager() {
   delete FirmwareFileInfo;
   delete UserDataFileInfo;
 
@@ -24,12 +26,12 @@ ProgrammerManager::~ProgrammerManager() {
   }
 }
 
-InterfaceProgrammer *ProgrammerManager::programmer() const {
+InterfaceProgrammer* ClientManager::programmer() const {
   return Programmer;
 }
 
-void ProgrammerManager::performFirmwareLoading(const QString &path,
-                                               bool unlockOption) {
+void ClientManager::performFirmwareLoading(const QString& path,
+                                           bool unlockOption) {
   // Проверяем наличие файла
   processingFirmwarePath(path);
 
@@ -58,7 +60,7 @@ void ProgrammerManager::performFirmwareLoading(const QString &path,
   ProgrammerThread->start();
 }
 
-void ProgrammerManager::performFirmwareReading() {
+void ClientManager::performFirmwareReading() {
   // Проверяем готовность к выполнению операции
   if (ReadyIndicator == false)
     return;
@@ -77,7 +79,7 @@ void ProgrammerManager::performFirmwareReading() {
   ProgrammerThread->start();
 }
 
-void ProgrammerManager::performFirmwareErasing() {
+void ClientManager::performFirmwareErasing() {
   // Проверяем готовность
   if (ReadyIndicator == false)
     return;
@@ -96,7 +98,7 @@ void ProgrammerManager::performFirmwareErasing() {
   ProgrammerThread->start();
 }
 
-void ProgrammerManager::performUserDataLoading(const QString &path) {
+void ClientManager::performUserDataLoading(const QString& path) {
   // Проверяем готовность к выполнению операции
   if (ReadyIndicator == false)
     return;
@@ -121,7 +123,7 @@ void ProgrammerManager::performUserDataLoading(const QString &path) {
   ProgrammerThread->start();
 }
 
-void ProgrammerManager::performDeviceUnlock() {
+void ClientManager::performDeviceUnlock() {
   // Проверяем готовность к выполнению операции
   if (ReadyIndicator == false)
     return;
@@ -140,7 +142,7 @@ void ProgrammerManager::performDeviceUnlock() {
   ProgrammerThread->start();
 }
 
-void ProgrammerManager::performDeviceLock() {
+void ClientManager::performDeviceLock() {
   // Проверяем готовность к выполнению операции
   if (ReadyIndicator == false)
     return;
@@ -159,7 +161,44 @@ void ProgrammerManager::performDeviceLock() {
   ProgrammerThread->start();
 }
 
-void ProgrammerManager::performUserDataReading() {
+void ClientManager::performServerConnecting() {
+  // Проверяем готовность к выполнению операции
+  if (ReadyIndicator == false)
+    return;
+  else
+    ReadyIndicator = false;
+
+  Client->connectToPersoServer();
+
+  ReadyIndicator = true;
+}
+
+void ClientManager::performServerDisconnecting() {
+  // Проверяем готовность к выполнению операции
+  if (ReadyIndicator == false)
+    return;
+  else
+    ReadyIndicator = false;
+
+  Client->disconnectFromPersoServer();
+
+  ReadyIndicator = true;
+}
+
+void ClientManager::performServerEchoRequest() {
+  // Проверяем готовность к выполнению операции
+  if (ReadyIndicator == false)
+    return;
+  else
+    ReadyIndicator = false;
+
+  emit logging("Отправка эхо-запроса. ");
+  Client->sendEchoRequest();
+
+  ReadyIndicator = true;
+}
+
+void ClientManager::performUserDataReading() {
   // Проверяем готовность к выполнению операции
   if (ReadyIndicator == false)
     return;
@@ -178,20 +217,19 @@ void ProgrammerManager::performUserDataReading() {
   ProgrammerThread->start();
 }
 
-void ProgrammerManager::setFirmwareFile(const QString &path) {
+void ClientManager::setFirmwareFile(const QString& path) {
   delete FirmwareFile;
   delete FirmwareFileInfo;
 
   processingFirmwarePath(path);
 
   if (FirmwareFile == nullptr)
-    emit logging(QString("The firmware file is missing in the default "
-                         "directory, select it manually."));
+    emit logging(
+        QString("The firmware file is missing in the default "
+                "directory, select it manually."));
 }
 
-void ProgrammerManager::setLogger(LogSystem *logger) { Logger = logger; }
-
-void ProgrammerManager::processingFirmwarePath(const QString &path) {
+void ClientManager::processingFirmwarePath(const QString& path) {
   delete FirmwareFileInfo;
   delete FirmwareFile;
 
@@ -203,7 +241,7 @@ void ProgrammerManager::processingFirmwarePath(const QString &path) {
     FirmwareFile = nullptr;
 }
 
-void ProgrammerManager::processingUserDataPath(const QString &path) {
+void ClientManager::processingUserDataPath(const QString& path) {
   delete UserDataFileInfo;
   delete UserDataFile;
 
@@ -215,7 +253,7 @@ void ProgrammerManager::processingUserDataPath(const QString &path) {
     UserDataFile = nullptr;
 }
 
-void ProgrammerManager::buildProgrammerInstance() {
+void ClientManager::buildProgrammerInstance() {
   // Создаем поток для программатора
   ProgrammerThread = new QThread(this);
 
@@ -224,9 +262,8 @@ void ProgrammerManager::buildProgrammerInstance() {
   Programmer->moveToThread(ProgrammerThread);
 
   // Подключаем логгирование к Programmer'у
-  if (Logger != nullptr)
-    connect(Programmer, &InterfaceProgrammer::logging, Logger,
-            &LogSystem::programmerLog);
+  connect(Programmer, &InterfaceProgrammer::logging, this,
+          &ClientManager::proxyLogging);
   // Когда объект Programmer завершит свою работу, поток начнет свое
   // завершение
   connect(Programmer, &InterfaceProgrammer::operationFinished, ProgrammerThread,
@@ -239,20 +276,37 @@ void ProgrammerManager::buildProgrammerInstance() {
           &QObject::deleteLater);
   // Когда программатор завершит операцию, можно будет приступить к следующей
   connect(Programmer, &InterfaceProgrammer::operationFinished, this,
-          &ProgrammerManager::performingFinished);
+          &ClientManager::performingFinished);
   // Если программатор успешно выполнит свою операцию
   connect(Programmer, &InterfaceProgrammer::operationCompleted, this,
-          &ProgrammerManager::performingCompleted);
+          &ClientManager::performingCompleted);
   // Если программатор не выполнит свою операцию
   connect(Programmer, &InterfaceProgrammer::operationFailed, this,
-          &ProgrammerManager::performingFailed);
+          &ClientManager::performingFailed);
 }
 
-void ProgrammerManager::performingFinished() {
+void ClientManager::proxyLogging(const QString& log) {
+  if (sender()->objectName() == "JLinkExeProgrammer")
+    emit logging("JLink.exe - " + log);
+  else if (sender()->objectName() == "PersoClient")
+    emit logging("Client - " + log);
+  else
+    emit logging("Unknown - " + log);
+}
+
+void ClientManager::performingFinished() {
   ReadyIndicator = true;
-  notifyUser(LastStatus);
+
+  if (LastStatus == ClientManager::Completed)
+    emit notifyUser("Операция успешно завершена. ");
+  else
+    emit notifyUserAboutError("Выполнение операции провалено. ");
 }
 
-void ProgrammerManager::performingCompleted() { LastStatus = Completed; }
+void ClientManager::performingCompleted() {
+  LastStatus = Completed;
+}
 
-void ProgrammerManager::performingFailed() { LastStatus = Failed; }
+void ClientManager::performingFailed() {
+  LastStatus = Failed;
+}

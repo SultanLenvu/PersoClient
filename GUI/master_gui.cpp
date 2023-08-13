@@ -44,15 +44,11 @@ QWidget *MasterGUI::create() {
   MainButtonLayout->addWidget(ProgramDeviceUserDataButton);
 
   ReadDeviceUserDataButton =
-      new QPushButton(QString("Считать пользовательские данные"));
+      new QPushButton(QString("Считать  пользовательские данные"));
   ReadDeviceUserDataButton->setSizePolicy(QSizePolicy::Expanding,
                                           QSizePolicy::Expanding);
   ReadDeviceUserDataButton->setFont(QFont("Arial", 16, QFont::Bold));
   MainButtonLayout->addWidget(ReadDeviceUserDataButton);
-
-  ButtonVerticalSpacer =
-      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Minimum);
-  MainButtonLayout->addItem(ButtonVerticalSpacer);
 
   UnlockDeviceButton = new QPushButton(QString("Разблокировать память"));
   UnlockDeviceButton->setSizePolicy(QSizePolicy::Expanding,
@@ -65,6 +61,30 @@ QWidget *MasterGUI::create() {
                                   QSizePolicy::Expanding);
   LockDeviceButton->setFont(QFont("Arial", 16, QFont::Bold));
   MainButtonLayout->addWidget(LockDeviceButton);
+
+  ButtonVerticalSpacer =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  MainButtonLayout->addItem(ButtonVerticalSpacer);
+
+  PersoServerConnectPushButton =
+      new QPushButton(QString("Подключиться к серверу персонализации"));
+  PersoServerConnectPushButton->setSizePolicy(QSizePolicy::Expanding,
+                                              QSizePolicy::Expanding);
+  PersoServerConnectPushButton->setFont(QFont("Arial", 16, QFont::Bold));
+  MainButtonLayout->addWidget(PersoServerConnectPushButton);
+
+  PersoServerDisconnectButton =
+      new QPushButton(QString("Отключиться от сервера персонализации"));
+  PersoServerDisconnectButton->setSizePolicy(QSizePolicy::Expanding,
+                                             QSizePolicy::Expanding);
+  PersoServerDisconnectButton->setFont(QFont("Arial", 16, QFont::Bold));
+  MainButtonLayout->addWidget(PersoServerDisconnectButton);
+
+  PersoServerSendEchoButton = new QPushButton(QString("Отправить эхо-запрос"));
+  PersoServerSendEchoButton->setSizePolicy(QSizePolicy::Expanding,
+                                           QSizePolicy::Expanding);
+  PersoServerSendEchoButton->setFont(QFont("Arial", 16, QFont::Bold));
+  MainButtonLayout->addWidget(PersoServerSendEchoButton);
 
   // Виджеты для отображения логов
   GeneralLogGroup = new QGroupBox("Логи");

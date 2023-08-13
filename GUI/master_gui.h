@@ -21,6 +21,10 @@ public:
   QPushButton *UnlockDeviceButton;
   QPushButton *LockDeviceButton;
 
+  QPushButton* PersoServerConnectPushButton;
+  QPushButton* PersoServerDisconnectButton;
+  QPushButton* PersoServerSendEchoButton;
+
   QSpacerItem *ButtonVerticalSpacer;
 
   // Виджеты для отображения логов

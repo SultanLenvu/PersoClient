@@ -3,24 +3,22 @@
 
 #include <QObject>
 
-class LogSystem : public QObject
-{
+class LogSystem : public QObject {
   Q_OBJECT
-private:
+ private:
   bool IsEnable;
 
-public:
-  explicit LogSystem(QObject *parent);
+ public:
+  explicit LogSystem(QObject* parent);
 
-public:
+ public:
   void enable(bool flag);
 
-public slots:
-  void programmerLog(const QString &log);
-  void loadManagerLog(const QString &log);
+ public slots:
+  void generateLog(const QString& log);
 
-signals:
-  void requestDisplayLog(const QString &log);
+ signals:
+  void requestDisplayLog(const QString& log);
 };
 
-#endif // LOG_SYSTEM_H
+#endif  // LOG_SYSTEM_H

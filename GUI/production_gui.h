@@ -6,18 +6,19 @@
 #include "gui.h"
 
 class ProductionGUI : public GUI {
-public:
-  QGroupBox *MainButtonGroup;
-  QVBoxLayout *MainButtonLayout;
+ public:
+  QGroupBox* MainButtonGroup;
+  QVBoxLayout* MainButtonLayout;
 
-  QPushButton *ProgramDeviceButton;
-  QSpacerItem *ButtonVerticalSpacer;
+  QPushButton* ProgramDeviceButton;
 
-public:
-  ProductionGUI(QObject *parent);
+  QSpacerItem* ButtonVerticalSpacer;
 
-  virtual QWidget *create(void) override;
+ public:
+  ProductionGUI(QObject* parent);
+
+  virtual QWidget* create(void) override;
   virtual void update(void) override;
 };
 
-#endif // PRODUCTION_GUI_H
+#endif  // PRODUCTION_GUI_H

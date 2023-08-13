@@ -4,9 +4,9 @@
 #include <QMainWindow>
 #include <QtWidgets>
 
+#include "../Environment/client_manager.h"
 #include "../Environment/definitions.h"
 #include "../Environment/log_system.h"
-#include "../Environment/programmer_manager.h"
 #include "../Environment/user_Interaction_system.h"
 #include "../GUI/master_gui.h"
 #include "../GUI/production_gui.h"
@@ -31,9 +31,9 @@ private:
 
   LogSystem *Logger;
   UserInteractionSystem *UserInteraction;
-  ProgrammerManager *Manager;
+  ClientManager* Manager;
 
-public:
+ public:
   MainWindow();
   ~MainWindow();
 
@@ -48,6 +48,10 @@ public slots:
 
   void on_UnlockDeviceButton_slot(void);
   void on_LockDeviceButton_slot(void);
+
+  void on_PersoServerConnectPushButton_slot(void);
+  void on_PersoServerDisconnectButton_slot(void);
+  void on_PersoServerSendEchoButton_slot(void);
 
   void on_MasterInterfaceRequestAct_slot(void);
   void on_ProductionInterfaceRequestAct_slot(void);

@@ -15,9 +15,11 @@ MainWindow::MainWindow() {
           &UserInteractionSystem::generateErrorMessage);
 
   // Менеджер для взаимодействия с программатором
-  Manager = new ProgrammerManager(this);
-  connect(Manager, &ProgrammerManager::notifyUser, UserInteraction,
-          &UserInteractionSystem::firmwareManagerNotification);
+  Manager = new ClientManager(this);
+  connect(Manager, &ClientManager::notifyUser, UserInteraction,
+          &UserInteractionSystem::generateMessage);
+  connect(Manager, &ClientManager::notifyUserAboutError, UserInteraction,
+          &UserInteractionSystem::generateErrorMessage);
 
   // Настраиваем размер главного окна
   DesktopGeometry = QApplication::desktop()->screenGeometry();
@@ -79,9 +81,27 @@ void MainWindow::on_UnlockDeviceButton_slot() {
 }
 
 void MainWindow::on_LockDeviceButton_slot() {
-  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+  dynamic_cast<MasterGUI*>(CurrentGUI)->GeneralLogs->clear();
 
   Manager->performDeviceLock();
+}
+
+void MainWindow::on_PersoServerConnectPushButton_slot() {
+  dynamic_cast<MasterGUI*>(CurrentGUI)->GeneralLogs->clear();
+
+  Manager->performServerConnecting();
+}
+
+void MainWindow::on_PersoServerDisconnectButton_slot() {
+  dynamic_cast<MasterGUI*>(CurrentGUI)->GeneralLogs->clear();
+
+  Manager->performServerDisconnecting();
+}
+
+void MainWindow::on_PersoServerSendEchoButton_slot() {
+  dynamic_cast<MasterGUI*>(CurrentGUI)->GeneralLogs->clear();
+
+  Manager->performServerEchoRequest();
 }
 
 void MainWindow::on_MasterInterfaceRequestAct_slot() {
@@ -93,7 +113,6 @@ void MainWindow::on_ProductionInterfaceRequestAct_slot() {
 
   delete Logger;
   Logger = nullptr;
-  Manager->setLogger(nullptr);
 }
 
 void MainWindow::createMasterInterface() {
@@ -116,9 +135,7 @@ void MainWindow::createMasterInterface() {
     Logger = new LogSystem(this);
     connect(Logger, &LogSystem::requestDisplayLog,
             dynamic_cast<MasterGUI *>(CurrentGUI), &MasterGUI::displayLogData);
-    connect(Manager, &ProgrammerManager::logging, Logger,
-            &LogSystem::loadManagerLog);
-    Manager->setLogger(Logger);
+    connect(Manager, &ClientManager::logging, Logger, &LogSystem::generateLog);
   } else
     emit notifyUserAboutError("Неверный пароль");
 }
@@ -144,6 +161,13 @@ void MainWindow::connectMasterInterface() {
           &MainWindow::on_UnlockDeviceButton_slot);
   connect(gui->LockDeviceButton, &QPushButton::clicked, this,
           &MainWindow::on_LockDeviceButton_slot);
+
+  connect(gui->PersoServerConnectPushButton, &QPushButton::clicked, this,
+          &MainWindow::on_PersoServerConnectPushButton_slot);
+  connect(gui->PersoServerDisconnectButton, &QPushButton::clicked, this,
+          &MainWindow::on_PersoServerDisconnectButton_slot);
+  connect(gui->PersoServerSendEchoButton, &QPushButton::clicked, this,
+          &MainWindow::on_PersoServerSendEchoButton_slot);
 }
 
 void MainWindow::createProductionInterface() {
