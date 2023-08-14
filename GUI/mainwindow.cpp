@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 
 MainWindow::MainWindow() {
+  setObjectName("MainWindow");
+  loadSettings();
+
   // Логгер пока не создан
   Logger = nullptr;
 
@@ -11,6 +14,8 @@ MainWindow::MainWindow() {
   UserInteraction = new UserInteractionSystem(this, this);
   connect(this, &MainWindow::requestMasterPasswordFromUser, UserInteraction,
           &UserInteractionSystem::getMasterPassword);
+  connect(this, &MainWindow::notifyUser, UserInteraction,
+          &UserInteractionSystem::generateMessage);
   connect(this, &MainWindow::notifyUserAboutError, UserInteraction,
           &UserInteractionSystem::generateErrorMessage);
 
@@ -86,6 +91,27 @@ void MainWindow::on_LockDeviceButton_slot() {
   Manager->performDeviceLock();
 }
 
+void MainWindow::on_ApplySettingsPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  // Проверка пользовательского ввода
+  if (!checkNewSettings()) {
+    emit notifyUserAboutError("Введены некорректные данные для настроек. ");
+    return;
+  }
+
+  Settings->setValue("Personalization/UseServerOption",
+                     gui->UsePersoServerCheckBox->isChecked());
+  Settings->setValue("Personalization/ServerIpAddress",
+                     gui->PersoServerIpAddressLineEdit->text());
+  Settings->setValue("Personalization/ServerPort",
+                     gui->PersoServerPortLineEdit->text().toInt());
+
+  Manager->applySettings();
+
+  emit notifyUser("Новые настройки успешно применены. ");
+}
+
 void MainWindow::on_PersoServerConnectPushButton_slot() {
   dynamic_cast<MasterGUI*>(CurrentGUI)->GeneralLogs->clear();
 
@@ -115,6 +141,32 @@ void MainWindow::on_ProductionInterfaceRequestAct_slot() {
   Logger = nullptr;
 }
 
+void MainWindow::loadSettings() {
+  QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
+  QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
+  QCoreApplication::setApplicationName(PROGRAM_NAME);
+
+  Settings = new QSettings(this);
+}
+
+bool MainWindow::checkNewSettings() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  QHostAddress IP = QHostAddress(gui->PersoServerIpAddressLineEdit->text());
+
+  if (IP.isNull()) {
+    return false;
+  }
+
+  uint32_t port = gui->PersoServerPortLineEdit->text().toInt();
+
+  if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
+    return false;
+  }
+
+  return true;
+}
+
 void MainWindow::createMasterInterface() {
   QString pass;
   emit requestMasterPasswordFromUser(pass);
@@ -123,7 +175,8 @@ void MainWindow::createMasterInterface() {
     // Создаем интерфейс
     delete CurrentGUI;
     CurrentGUI = new MasterGUI(this);
-    setCentralWidget(CurrentGUI->create());
+    CurrentGUI->create();
+    setCentralWidget(CurrentGUI);
 
     // Подключаем интерфейс
     connectMasterInterface();
@@ -141,7 +194,14 @@ void MainWindow::createMasterInterface() {
 }
 
 void MainWindow::connectMasterInterface() {
-  MasterGUI *gui = dynamic_cast<MasterGUI *>(CurrentGUI);
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+
+  connect(gui->PersoServerConnectPushButton, &QPushButton::clicked, this,
+          &MainWindow::on_PersoServerConnectPushButton_slot);
+  connect(gui->PersoServerDisconnectButton, &QPushButton::clicked, this,
+          &MainWindow::on_PersoServerDisconnectButton_slot);
+  connect(gui->PersoServerSendEchoButton, &QPushButton::clicked, this,
+          &MainWindow::on_PersoServerSendEchoButton_slot);
 
   connect(gui->AutoProgramDeviceButton, &QPushButton::clicked, this,
           &MainWindow::on_AutoProgramDeviceButton_slot);
@@ -162,19 +222,16 @@ void MainWindow::connectMasterInterface() {
   connect(gui->LockDeviceButton, &QPushButton::clicked, this,
           &MainWindow::on_LockDeviceButton_slot);
 
-  connect(gui->PersoServerConnectPushButton, &QPushButton::clicked, this,
-          &MainWindow::on_PersoServerConnectPushButton_slot);
-  connect(gui->PersoServerDisconnectButton, &QPushButton::clicked, this,
-          &MainWindow::on_PersoServerDisconnectButton_slot);
-  connect(gui->PersoServerSendEchoButton, &QPushButton::clicked, this,
-          &MainWindow::on_PersoServerSendEchoButton_slot);
+  connect(gui->ApplySettingsPushButton, &QPushButton::clicked, this,
+          &MainWindow::on_ApplySettingsPushButton_slot);
 }
 
 void MainWindow::createProductionInterface() {
   // Создаем интерфейс
   delete CurrentGUI;
   CurrentGUI = new ProductionGUI(this);
-  setCentralWidget(CurrentGUI->create());
+  CurrentGUI->create();
+  setCentralWidget(CurrentGUI);
 
   // Подключаем интерфейс
   connectProductionInterface();

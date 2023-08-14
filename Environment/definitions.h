@@ -1,6 +1,10 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+#define PROGRAM_NAME "PersoClient"
+#define ORGANIZATION_DOMAIN "powersynt.ru"
+#define ORGANIZATION_NAME "PowerSyntez"
+
 #define MASTER_ACCESS_PASSWORD "1995"
 
 #define DEFAULT_FIRMWARE_FILE_PATH "../Firmware/firmware.hex"
@@ -14,6 +18,7 @@
 #define PERSO_SERVER_DEFAULT_IP "127.0.0.1"
 #define PERSO_SERVER_DEFAULT_PORT 6666
 #define IP_PORT_MAX_VALUE 65535
+#define IP_PORT_MIN_VALUE 0
 
 #define FIRMWARE_TEMP_FILE_NAME "temp.hex"
 

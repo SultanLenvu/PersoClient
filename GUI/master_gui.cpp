@@ -1,91 +1,165 @@
 #include "master_gui.h"
 
-MasterGUI::MasterGUI(QObject *parent) : GUI(parent, Master) {}
+MasterGUI::MasterGUI(QWidget* parent) : GUI(parent, Master) {}
 
-QWidget *MasterGUI::create() {
-  // Группа основных кнопок
-  MainButtonGroup = new QGroupBox("Панель управления");
-  MainLayout->addWidget(MainButtonGroup);
+void MasterGUI::create() {
+  // Вкладки с всеми интерфейсами
+  Tabs = new QTabWidget();
+  MainLayout->addWidget(Tabs);
 
-  MainButtonLayout = new QVBoxLayout();
-  MainButtonGroup->setLayout(MainButtonLayout);
+  // Интерфейс для взаимодействия с сервером персонализации
+  createServerTab();
 
-  AutoProgramDeviceButton =
-      new QPushButton(QString("Автоматическая зарузка прошивки"));
-  AutoProgramDeviceButton->setSizePolicy(QSizePolicy::Expanding,
-                                         QSizePolicy::Expanding);
-  AutoProgramDeviceButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(AutoProgramDeviceButton);
+  // Интерфейс для взаиомдейтсвия с программатором
+  createProgrammatorTab();
 
-  ManualProgramDeviceButton =
-      new QPushButton(QString("Ручная зарузка прошивки"));
-  ManualProgramDeviceButton->setSizePolicy(QSizePolicy::Expanding,
-                                           QSizePolicy::Expanding);
-  ManualProgramDeviceButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(ManualProgramDeviceButton);
+  // Интерфейс для изменения настроек
+  createSettingsTab();
 
-  ReadDeviceFirmwareButton = new QPushButton(QString("Считать прошивку"));
-  ReadDeviceFirmwareButton->setSizePolicy(QSizePolicy::Expanding,
-                                          QSizePolicy::Expanding);
-  ReadDeviceFirmwareButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(ReadDeviceFirmwareButton);
+  // Виджеты для отображения логов
+  createLogWidgets();
+}
 
-  EraseDeviceButton = new QPushButton(QString("Стереть прошивку"));
-  EraseDeviceButton->setSizePolicy(QSizePolicy::Expanding,
-                                   QSizePolicy::Expanding);
-  EraseDeviceButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(EraseDeviceButton);
+void MasterGUI::update() {}
 
-  ProgramDeviceUserDataButton =
-      new QPushButton(QString("Загрузить  пользовательские данные"));
-  ProgramDeviceUserDataButton->setSizePolicy(QSizePolicy::Expanding,
-                                             QSizePolicy::Expanding);
-  ProgramDeviceUserDataButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(ProgramDeviceUserDataButton);
+void MasterGUI::createServerTab() {
+  ServerTab = new QWidget();
+  Tabs->addTab(ServerTab, "Сервер");
 
-  ReadDeviceUserDataButton =
-      new QPushButton(QString("Считать  пользовательские данные"));
-  ReadDeviceUserDataButton->setSizePolicy(QSizePolicy::Expanding,
-                                          QSizePolicy::Expanding);
-  ReadDeviceUserDataButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(ReadDeviceUserDataButton);
+  ServerTabMainLayout = new QHBoxLayout();
+  ServerTab->setLayout(ServerTabMainLayout);
 
-  UnlockDeviceButton = new QPushButton(QString("Разблокировать память"));
-  UnlockDeviceButton->setSizePolicy(QSizePolicy::Expanding,
-                                    QSizePolicy::Expanding);
-  UnlockDeviceButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(UnlockDeviceButton);
+  // Панель управления
+  ServerControlPanel = new QGroupBox("Панель управления");
+  ServerTabMainLayout->addWidget(ServerControlPanel);
 
-  LockDeviceButton = new QPushButton(QString("Заблокировать память"));
-  LockDeviceButton->setSizePolicy(QSizePolicy::Expanding,
-                                  QSizePolicy::Expanding);
-  LockDeviceButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(LockDeviceButton);
-
-  ButtonVerticalSpacer =
-      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  MainButtonLayout->addItem(ButtonVerticalSpacer);
+  ServerControlPanelLayout = new QVBoxLayout();
+  ServerControlPanel->setLayout(ServerControlPanelLayout);
 
   PersoServerConnectPushButton =
       new QPushButton(QString("Подключиться к серверу персонализации"));
-  PersoServerConnectPushButton->setSizePolicy(QSizePolicy::Expanding,
-                                              QSizePolicy::Expanding);
-  PersoServerConnectPushButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(PersoServerConnectPushButton);
+  PersoServerConnectPushButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ServerControlPanelLayout->addWidget(PersoServerConnectPushButton);
 
   PersoServerDisconnectButton =
       new QPushButton(QString("Отключиться от сервера персонализации"));
-  PersoServerDisconnectButton->setSizePolicy(QSizePolicy::Expanding,
-                                             QSizePolicy::Expanding);
-  PersoServerDisconnectButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(PersoServerDisconnectButton);
+  PersoServerDisconnectButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ServerControlPanelLayout->addWidget(PersoServerDisconnectButton);
 
   PersoServerSendEchoButton = new QPushButton(QString("Отправить эхо-запрос"));
-  PersoServerSendEchoButton->setSizePolicy(QSizePolicy::Expanding,
-                                           QSizePolicy::Expanding);
-  PersoServerSendEchoButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(PersoServerSendEchoButton);
+  PersoServerSendEchoButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ServerControlPanelLayout->addWidget(PersoServerSendEchoButton);
 
+  ButtonVerticalSpacer1 =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  ServerControlPanelLayout->addItem(ButtonVerticalSpacer1);
+}
+
+void MasterGUI::createProgrammatorTab() {
+  ProgrammatorTab = new QWidget();
+  Tabs->addTab(ProgrammatorTab, "Программатор");
+
+  ProgrammatorTabMainLayout = new QHBoxLayout();
+  ProgrammatorTab->setLayout(ProgrammatorTabMainLayout);
+
+  // Панель управления
+  ProgrammatorControlPanel = new QGroupBox("Панель управления");
+  ProgrammatorTabMainLayout->addWidget(ProgrammatorControlPanel);
+
+  ProgrammatorControlPanelLayout = new QVBoxLayout();
+  ProgrammatorControlPanel->setLayout(ProgrammatorControlPanelLayout);
+
+  AutoProgramDeviceButton =
+      new QPushButton(QString("Автоматическая зарузка прошивки"));
+  AutoProgramDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ProgrammatorControlPanelLayout->addWidget(AutoProgramDeviceButton);
+
+  ManualProgramDeviceButton =
+      new QPushButton(QString("Ручная зарузка прошивки"));
+  ManualProgramDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ProgrammatorControlPanelLayout->addWidget(ManualProgramDeviceButton);
+
+  ReadDeviceFirmwareButton = new QPushButton(QString("Считать прошивку"));
+  ReadDeviceFirmwareButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ProgrammatorControlPanelLayout->addWidget(ReadDeviceFirmwareButton);
+
+  EraseDeviceButton = new QPushButton(QString("Стереть прошивку"));
+  EraseDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ProgrammatorControlPanelLayout->addWidget(EraseDeviceButton);
+
+  ProgramDeviceUserDataButton =
+      new QPushButton(QString("Загрузить  пользовательские данные"));
+  ProgramDeviceUserDataButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ProgrammatorControlPanelLayout->addWidget(ProgramDeviceUserDataButton);
+
+  ReadDeviceUserDataButton =
+      new QPushButton(QString("Считать  пользовательские данные"));
+  ReadDeviceUserDataButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ProgrammatorControlPanelLayout->addWidget(ReadDeviceUserDataButton);
+
+  UnlockDeviceButton = new QPushButton(QString("Разблокировать память"));
+  UnlockDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ProgrammatorControlPanelLayout->addWidget(UnlockDeviceButton);
+
+  LockDeviceButton = new QPushButton(QString("Заблокировать память"));
+  LockDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ProgrammatorControlPanelLayout->addWidget(LockDeviceButton);
+
+  ButtonVerticalSpacer =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  ProgrammatorControlPanelLayout->addItem(ButtonVerticalSpacer);
+}
+
+void MasterGUI::createSettingsTab() {
+  SettingsTab = new QWidget();
+  Tabs->addTab(SettingsTab, "Настройки");
+
+  // Главный макет меню настроек
+  SettingsMainLayout = new QHBoxLayout();
+  SettingsTab->setLayout(SettingsMainLayout);
+
+  SettingsMainSubLayout = new QVBoxLayout();
+  SettingsMainLayout->addLayout(SettingsMainSubLayout);
+
+  // Настройки персонализации
+  QGroupBox* PersoSettingsGroupBox =
+      new QGroupBox(QString("Настройки персонализации"));
+  SettingsMainSubLayout->addWidget(PersoSettingsGroupBox);
+
+  PersoSettingsMainLayout = new QGridLayout();
+  PersoSettingsGroupBox->setLayout(PersoSettingsMainLayout);
+
+  UsePersoServerLabel = new QLabel("Использование сервера персонализации");
+  PersoSettingsMainLayout->addWidget(UsePersoServerLabel, 0, 0, 1, 1);
+
+  UsePersoServerCheckBox = new QCheckBox("Вкл/выкл");
+  PersoSettingsMainLayout->addWidget(UsePersoServerCheckBox, 0, 1, 1, 1);
+
+  PersoServerIpAddressLabel =
+      new QLabel("IP адрес или URL сервера персонализации");
+  PersoSettingsMainLayout->addWidget(PersoServerIpAddressLabel, 1, 0, 1, 1);
+
+  PersoServerIpAddressLineEdit = new QLineEdit(PERSO_SERVER_DEFAULT_IP);
+  PersoSettingsMainLayout->addWidget(PersoServerIpAddressLineEdit, 1, 1, 1, 1);
+
+  PersoServerPortLabel = new QLabel("Порт сервера персонализации");
+  PersoSettingsMainLayout->addWidget(PersoServerPortLabel, 2, 0, 1, 1);
+
+  PersoServerPortLineEdit =
+      new QLineEdit(QString::number(PERSO_SERVER_DEFAULT_PORT));
+  PersoSettingsMainLayout->addWidget(PersoServerPortLineEdit, 2, 1, 1, 1);
+
+  // Кнопка сохранения настроек
+  ApplySettingsPushButton = new QPushButton("Применить изменения");
+  SettingsMainSubLayout->addWidget(ApplySettingsPushButton);
+
+  // Сжимаем позиционирование
+  SettingsVerticalSpacer1 =
+      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+  SettingsMainSubLayout->addItem(SettingsVerticalSpacer1);
+}
+
+void MasterGUI::createLogWidgets() {
   // Виджеты для отображения логов
   GeneralLogGroup = new QGroupBox("Логи");
   MainLayout->addWidget(GeneralLogGroup);
@@ -100,11 +174,7 @@ QWidget *MasterGUI::create() {
   GeneralLogs->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
   GeneralLogs->setCenterOnScroll(false);
   GeneralLogLayout->addWidget(GeneralLogs);
-
-  return MainWidget;
 }
-
-void MasterGUI::update() {}
 
 void MasterGUI::displayLogData(const QString &log) {
   if (GeneralLogs->toPlainText().count() > 100000)

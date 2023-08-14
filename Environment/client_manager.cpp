@@ -1,6 +1,8 @@
 #include "client_manager.h"
 
 ClientManager::ClientManager(QObject* parent) : QObject(parent) {
+  setObjectName("ClientManager");
+
   Programmer = nullptr;
   ProgrammerThread = nullptr;
 
@@ -228,6 +230,8 @@ void ClientManager::setFirmwareFile(const QString& path) {
         QString("The firmware file is missing in the default "
                 "directory, select it manually."));
 }
+
+void ClientManager::applySettings() {}
 
 void ClientManager::processingFirmwarePath(const QString& path) {
   delete FirmwareFileInfo;

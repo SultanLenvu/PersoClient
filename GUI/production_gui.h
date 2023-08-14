@@ -15,9 +15,9 @@ class ProductionGUI : public GUI {
   QSpacerItem* ButtonVerticalSpacer;
 
  public:
-  ProductionGUI(QObject* parent);
+  ProductionGUI(QWidget* parent);
 
-  virtual QWidget* create(void) override;
+  virtual void create(void) override;
   virtual void update(void) override;
 };
 

@@ -1,8 +1,8 @@
 #include "production_gui.h"
 
-ProductionGUI::ProductionGUI(QObject *parent) : GUI(parent, Production) {}
+ProductionGUI::ProductionGUI(QWidget* parent) : GUI(parent, Production) {}
 
-QWidget *ProductionGUI::create(void) {
+void ProductionGUI::create(void) {
   // Группа основных кнопок
   MainButtonGroup = new QGroupBox("Панель управления");
   MainLayout->addWidget(MainButtonGroup);
@@ -19,8 +19,6 @@ QWidget *ProductionGUI::create(void) {
   ButtonVerticalSpacer =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Minimum);
   MainButtonLayout->addItem(ButtonVerticalSpacer);
-
-  return MainWidget;
 }
 
 void ProductionGUI::update() {}

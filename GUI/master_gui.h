@@ -1,45 +1,89 @@
 #ifndef MASTERGUI_H
 #define MASTERGUI_H
 
+#include "Environment/definitions.h"
 #include "gui.h"
 
-class MasterGUI : public GUI
-{
-public:
-  QGroupBox *MainButtonGroup;
-  QVBoxLayout *MainButtonLayout;
+class MasterGUI : public GUI {
+ public:
+  QTabWidget* Tabs;
 
-  // Кнопки
-  QPushButton *AutoProgramDeviceButton;
-  QPushButton *ManualProgramDeviceButton;
-  QPushButton *ReadDeviceFirmwareButton;
-  QPushButton *EraseDeviceButton;
+  // Виджеты для отображения логов
+  QGroupBox* GeneralLogGroup;
+  QVBoxLayout* GeneralLogLayout;
+  QPlainTextEdit* GeneralLogs;
 
-  QPushButton *ProgramDeviceUserDataButton;
-  QPushButton *ReadDeviceUserDataButton;
+  /* Интерфейс для взаимодействия с программатором */
+  //============================================================
+  QWidget* ProgrammatorTab;
+  QHBoxLayout* ProgrammatorTabMainLayout;
 
-  QPushButton *UnlockDeviceButton;
-  QPushButton *LockDeviceButton;
+  QGroupBox* ProgrammatorControlPanel;
+  QVBoxLayout* ProgrammatorControlPanelLayout;
+
+  QPushButton* AutoProgramDeviceButton;
+  QPushButton* ManualProgramDeviceButton;
+  QPushButton* ReadDeviceFirmwareButton;
+  QPushButton* EraseDeviceButton;
+
+  QPushButton* ProgramDeviceUserDataButton;
+  QPushButton* ReadDeviceUserDataButton;
+
+  QPushButton* UnlockDeviceButton;
+  QPushButton* LockDeviceButton;
+
+  QSpacerItem* ButtonVerticalSpacer;
+  //============================================================
+
+  /* Интерфейс для взаимодействия с сервером */
+  //============================================================
+  QWidget* ServerTab;
+  QHBoxLayout* ServerTabMainLayout;
+
+  QGroupBox* ServerControlPanel;
+  QVBoxLayout* ServerControlPanelLayout;
 
   QPushButton* PersoServerConnectPushButton;
   QPushButton* PersoServerDisconnectButton;
   QPushButton* PersoServerSendEchoButton;
 
-  QSpacerItem *ButtonVerticalSpacer;
+  QSpacerItem* ButtonVerticalSpacer1;
+  //============================================================
 
-  // Виджеты для отображения логов
-  QGroupBox *GeneralLogGroup;
-  QVBoxLayout *GeneralLogLayout;
-  QPlainTextEdit *GeneralLogs;
+  /* Настройки клиента */
+  //============================================================
+  QWidget* SettingsTab;
+  QHBoxLayout* SettingsMainLayout;
+  QVBoxLayout* SettingsMainSubLayout;
+  QPushButton* ApplySettingsPushButton;
 
-public:
-  MasterGUI(QObject *parent);
+  // Персонализация
+  QGroupBox* PersoSettingsGroupBox;
+  QGridLayout* PersoSettingsMainLayout;
+  QLabel* UsePersoServerLabel;
+  QCheckBox* UsePersoServerCheckBox;
+  QLabel* PersoServerIpAddressLabel;
+  QLineEdit* PersoServerIpAddressLineEdit;
+  QLabel* PersoServerPortLabel;
+  QLineEdit* PersoServerPortLineEdit;
 
-  virtual QWidget *create(void) override;
+  QSpacerItem* SettingsVerticalSpacer1;
+  //============================================================
+
+ public:
+  MasterGUI(QWidget* parent);
+
+  virtual void create(void) override;
   virtual void update(void) override;
 
-public slots:
-  void displayLogData(const QString &log);
+ private:
+  void createServerTab(void);
+  void createProgrammatorTab(void);
+  void createSettingsTab(void);
+  void createLogWidgets(void);
+
+ public slots:
+  void displayLogData(const QString& log);
 };
 
-#endif // MASTERGUI_H
+#endif  // MASTERGUI_H

@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QObject>
+#include <QSettings>
 #include <QThread>
 #include <QVector>
 
@@ -51,6 +52,7 @@ class ClientManager : public QObject {
   void performServerEchoRequest(void);
 
   void setFirmwareFile(const QString& path);
+  void applySettings(void);
 
  private:
   void processingFirmwarePath(const QString& path);

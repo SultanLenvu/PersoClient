@@ -4,28 +4,27 @@
 #include <QObject>
 #include <QtWidgets>
 
-class GUI : public QObject {
+class GUI : public QWidget {
   Q_OBJECT
-public:
+ public:
   enum GuiType { Master, Production };
 
-public:
-  QWidget *MainWidget;
-  QHBoxLayout *MainLayout;
+ public:
+  QHBoxLayout* MainLayout;
 
-private:
+ private:
   GuiType Type;
 
-public:
-  GUI(QObject *parent, GuiType type);
+ public:
+  GUI(QWidget* parent, GuiType type);
   virtual ~GUI();
 
-  virtual QWidget *create(void) = 0;
+  virtual void create(void) = 0;
   virtual void update(void) = 0;
 
   GuiType type(void);
 
-signals:
+ signals:
 };
 
-#endif // GUI_H
+#endif  // GUI_H
