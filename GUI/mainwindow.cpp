@@ -2,10 +2,9 @@
 
 MainWindow::MainWindow() {
   setObjectName("MainWindow");
-  loadSettings();
 
-  // Логгер пока не создан
-  Logger = nullptr;
+  // Загружаем настройки приложения
+  loadSettings();
 
   // Интерфейс пока не создан
   CurrentGUI = nullptr;
@@ -32,6 +31,10 @@ MainWindow::MainWindow() {
               DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
   setLayoutDirection(Qt::LeftToRight);
 
+  // Создаем логгер
+  Logger = new LogSystem(this);
+  connect(Manager, &ClientManager::logging, Logger, &LogSystem::generateLog);
+
   // Создаем графический интерфейс
   createProductionInterface();
 }
@@ -39,14 +42,13 @@ MainWindow::MainWindow() {
 MainWindow::~MainWindow() {}
 
 void MainWindow::on_AutoProgramDeviceButton_slot() {
-  if (CurrentGUI->type() == GUI::Master)
-    dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+  Logger->clear();
 
   Manager->performFirmwareLoading(DEFAULT_FIRMWARE_FILE_PATH, true);
 }
 
 void MainWindow::on_ManualProgramDeviceButton_slot() {
-  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+  Logger->clear();
 
   Manager->performFirmwareLoading(
       QFileDialog::getOpenFileName(nullptr, "Выберите файл", "",
@@ -55,38 +57,38 @@ void MainWindow::on_ManualProgramDeviceButton_slot() {
 }
 
 void MainWindow::on_ReadDeviceFirmwareButton_slot() {
-  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+  Logger->clear();
 
   Manager->performFirmwareReading();
 }
 
 void MainWindow::on_EraseDeviceButton_slot() {
-  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+  Logger->clear();
 
   Manager->performFirmwareErasing();
 }
 
 void MainWindow::on_ProgramDeviceUserDataButton_slot() {
-  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+  Logger->clear();
 
   Manager->performUserDataLoading(QFileDialog::getOpenFileName(
       nullptr, "Выберите файл", "", "Все файлы (*.*)"));
 }
 
 void MainWindow::on_ReadDeviceUserDataButton_slot() {
-  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+  Logger->clear();
 
   Manager->performUserDataReading();
 }
 
 void MainWindow::on_UnlockDeviceButton_slot() {
-  dynamic_cast<MasterGUI *>(CurrentGUI)->GeneralLogs->clear();
+  Logger->clear();
 
   Manager->performDeviceUnlock();
 }
 
 void MainWindow::on_LockDeviceButton_slot() {
-  dynamic_cast<MasterGUI*>(CurrentGUI)->GeneralLogs->clear();
+  Logger->clear();
 
   Manager->performDeviceLock();
 }
@@ -94,12 +96,15 @@ void MainWindow::on_LockDeviceButton_slot() {
 void MainWindow::on_ApplySettingsPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
 
+  Logger->clear();
+
   // Проверка пользовательского ввода
   if (!checkNewSettings()) {
     emit notifyUserAboutError("Введены некорректные данные для настроек. ");
     return;
   }
 
+  // Считывание пользовательского ввода
   Settings->setValue("Personalization/UseServerOption",
                      gui->UsePersoServerCheckBox->isChecked());
   Settings->setValue("Personalization/ServerIpAddress",
@@ -107,25 +112,26 @@ void MainWindow::on_ApplySettingsPushButton_slot() {
   Settings->setValue("Personalization/ServerPort",
                      gui->PersoServerPortLineEdit->text().toInt());
 
+  // Применение новых настроек
   Manager->applySettings();
 
   emit notifyUser("Новые настройки успешно применены. ");
 }
 
 void MainWindow::on_PersoServerConnectPushButton_slot() {
-  dynamic_cast<MasterGUI*>(CurrentGUI)->GeneralLogs->clear();
+  Logger->clear();
 
   Manager->performServerConnecting();
 }
 
 void MainWindow::on_PersoServerDisconnectButton_slot() {
-  dynamic_cast<MasterGUI*>(CurrentGUI)->GeneralLogs->clear();
+  Logger->clear();
 
   Manager->performServerDisconnecting();
 }
 
 void MainWindow::on_PersoServerSendEchoButton_slot() {
-  dynamic_cast<MasterGUI*>(CurrentGUI)->GeneralLogs->clear();
+  Logger->clear();
 
   Manager->performServerEchoRequest();
 }
@@ -137,8 +143,7 @@ void MainWindow::on_MasterInterfaceRequestAct_slot() {
 void MainWindow::on_ProductionInterfaceRequestAct_slot() {
   createProductionInterface();
 
-  delete Logger;
-  Logger = nullptr;
+  Logger->setEnable(false);
 }
 
 void MainWindow::loadSettings() {
@@ -158,7 +163,7 @@ bool MainWindow::checkNewSettings() {
     return false;
   }
 
-  uint32_t port = gui->PersoServerPortLineEdit->text().toInt();
+  int32_t port = gui->PersoServerPortLineEdit->text().toInt();
 
   if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
     return false;
@@ -184,11 +189,8 @@ void MainWindow::createMasterInterface() {
     // Создаем верхнее меню
     createTopMenu();
 
-    // Создаем и связываем логгер
-    Logger = new LogSystem(this);
-    connect(Logger, &LogSystem::requestDisplayLog,
-            dynamic_cast<MasterGUI *>(CurrentGUI), &MasterGUI::displayLogData);
-    connect(Manager, &ClientManager::logging, Logger, &LogSystem::generateLog);
+    // Включаем систему логгирования
+    Logger->setEnable(true);
   } else
     emit notifyUserAboutError("Неверный пароль");
 }
@@ -196,6 +198,7 @@ void MainWindow::createMasterInterface() {
 void MainWindow::connectMasterInterface() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
 
+  // Подключение виджетов
   connect(gui->PersoServerConnectPushButton, &QPushButton::clicked, this,
           &MainWindow::on_PersoServerConnectPushButton_slot);
   connect(gui->PersoServerDisconnectButton, &QPushButton::clicked, this,
@@ -224,6 +227,13 @@ void MainWindow::connectMasterInterface() {
 
   connect(gui->ApplySettingsPushButton, &QPushButton::clicked, this,
           &MainWindow::on_ApplySettingsPushButton_slot);
+
+  // Подключение системы логгирования
+  connect(Logger, &LogSystem::requestDisplayLog,
+          dynamic_cast<MasterGUI*>(CurrentGUI), &MasterGUI::displayLogData);
+  connect(Logger, &LogSystem::requestClearDisplayLog,
+          dynamic_cast<MasterGUI*>(CurrentGUI),
+          &MasterGUI::clearLogDataDisplay);
 }
 
 void MainWindow::createProductionInterface() {
@@ -238,6 +248,9 @@ void MainWindow::createProductionInterface() {
 
   // Создаем верхнее меню
   createTopMenu();
+
+  // Включаем систему логгирования
+  Logger->setEnable(false);
 }
 
 void MainWindow::connectProductionInterface() {

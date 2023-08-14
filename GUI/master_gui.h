@@ -76,14 +76,15 @@ class MasterGUI : public GUI {
   virtual void create(void) override;
   virtual void update(void) override;
 
+ public slots:
+  void displayLogData(const QString& log);
+  void clearLogDataDisplay(void);
+
  private:
   void createServerTab(void);
   void createProgrammatorTab(void);
   void createSettingsTab(void);
   void createLogWidgets(void);
-
- public slots:
-  void displayLogData(const QString& log);
 };
 
 #endif  // MASTERGUI_H

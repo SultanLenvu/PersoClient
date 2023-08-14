@@ -12,13 +12,15 @@ class LogSystem : public QObject {
   explicit LogSystem(QObject* parent);
 
  public:
-  void enable(bool flag);
+  void setEnable(bool flag);
+  void clear(void);
 
  public slots:
   void generateLog(const QString& log);
 
  signals:
   void requestDisplayLog(const QString& log);
+  void requestClearDisplayLog(void);
 };
 
 #endif  // LOG_SYSTEM_H

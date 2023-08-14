@@ -41,8 +41,9 @@ public slots:
   virtual void lockDevice(void) override;
 
   virtual void exit(void) override;
+  virtual void applySettings() override;
 
-private:
+ private:
   void processingJLinkExePath(const QString& path);
   void excuteJLinkScript(void);
   void initScript(void);

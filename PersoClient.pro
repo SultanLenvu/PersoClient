@@ -13,7 +13,6 @@ SOURCES += \
     Environment/log_system.cpp \
     Environment/perso_client.cpp \
     Environment/user_Interaction_system.cpp \
-    Environment/user_settings.cpp \
     GUI/gui.cpp \
     GUI/master_gui.cpp \
     GUI/production_gui.cpp \
@@ -28,7 +27,6 @@ HEADERS += \
     Environment/log_system.h \
     Environment/perso_client.h \
     Environment/user_Interaction_system.h \
-    Environment/user_settings.h \
     GUI/gui.h \
     GUI/mainwindow.h \
     GUI/master_gui.h \

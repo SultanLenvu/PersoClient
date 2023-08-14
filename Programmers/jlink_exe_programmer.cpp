@@ -355,6 +355,8 @@ void JLinkExeProgrammer::lockDevice() { // Проверка на существ�
 
 void JLinkExeProgrammer::exit() {}
 
+void JLinkExeProgrammer::applySettings() {}
+
 /*
   Приватные методы
 */

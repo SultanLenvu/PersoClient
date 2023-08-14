@@ -231,7 +231,10 @@ void ClientManager::setFirmwareFile(const QString& path) {
                 "directory, select it manually."));
 }
 
-void ClientManager::applySettings() {}
+void ClientManager::applySettings() {
+  Client->applySettings();
+  Programmer->applySettings();
+}
 
 void ClientManager::processingFirmwarePath(const QString& path) {
   delete FirmwareFileInfo;

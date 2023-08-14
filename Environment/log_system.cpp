@@ -2,7 +2,22 @@
 
 LogSystem::LogSystem(QObject *parent) : QObject(parent) { IsEnable = true; }
 
+void LogSystem::setEnable(bool flag) {
+  IsEnable = flag;
+}
+
+void LogSystem::clear() {
+  if (!IsEnable) {
+    return;
+  }
+
+  emit requestClearDisplayLog();
+}
+
 void LogSystem::generateLog(const QString& log) {
-  if (IsEnable)
-    emit requestDisplayLog(QString("Manager - ") + log);
+  if (!IsEnable) {
+    return;
+  }
+
+  emit requestDisplayLog(QString("Manager - ") + log);
 }

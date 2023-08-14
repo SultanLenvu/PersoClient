@@ -4,10 +4,13 @@
 #include <QByteArray>
 #include <QFile>
 #include <QHostAddress>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QObject>
+#include <QSettings>
 #include <QTcpSocket>
 
-#include "user_settings.h"
+#include "Environment/definitions.h"
 
 class PersoClient : public QObject {
   Q_OBJECT
@@ -19,18 +22,21 @@ class PersoClient : public QObject {
   QHostAddress PersoServerAddress;
   uint32_t PersoServerPort;
 
-  QByteArray ReceivedData;
+  QJsonDocument* CurrentCommand;
+  QJsonDocument* CurrentResponse;
 
  public:
   explicit PersoClient(QObject* parent);
   ~PersoClient();
 
   QFile* getFirmware(void);
-  void applySettings(UserSettings* settings);
+  void applySettings(void);
 
   void connectToPersoServer(void);
   void disconnectFromPersoServer(void);
-  void sendEchoRequest(void);
+
+  void echoRequest(void);
+  void getFirmwareRequest(void);
 
  private:
   void deleteFirmware(void);

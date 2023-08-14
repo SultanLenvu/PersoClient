@@ -29,9 +29,12 @@ QFile* PersoClient::getFirmware() {
   return Firmware;
 }
 
-void PersoClient::applySettings(UserSettings* settings) {
-  PersoServerAddress = settings->getPersoServerAddress();
-  PersoServerPort = settings->getPersoServerPort();
+void PersoClient::applySettings() {
+  QSettings settings;
+
+  PersoServerAddress =
+      settings.value("Personalization/ServerIpAddress").toString();
+  PersoServerPort = settings.value("Personalization/ServerPort").toInt();
 }
 
 void PersoClient::connectToPersoServer() {
@@ -46,7 +49,7 @@ void PersoClient::disconnectFromPersoServer() {
   Socket->disconnectFromHost();
 }
 
-void PersoClient::sendEchoRequest() {
+void PersoClient::echoRequest() {
   if (!Socket->isOpen()) {
     emit logging("Соединение с сервером персонализации не установлено. ");
     return;
@@ -54,6 +57,8 @@ void PersoClient::sendEchoRequest() {
 
   Socket->write("EchoTest");
 }
+
+void PersoClient::getFirmwareRequest() {}
 
 void PersoClient::deleteFirmware() {
   if (!Firmware)
@@ -77,7 +82,7 @@ void PersoClient::on_SocketConnected_slot() {
 }
 
 void PersoClient::on_SocketReadyRead_slot() {
-  ReceivedData = Socket->readAll();
+  QByteArray ReceivedData = Socket->readAll();
 
   emit logging("Размер полученных данных: " +
                QString::number(ReceivedData.size()));

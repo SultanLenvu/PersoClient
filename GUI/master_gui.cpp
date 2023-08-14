@@ -22,6 +22,17 @@ void MasterGUI::create() {
 
 void MasterGUI::update() {}
 
+void MasterGUI::displayLogData(const QString& log) {
+  if (GeneralLogs->toPlainText().count() > 100000)
+    GeneralLogs->clear();
+
+  GeneralLogs->appendPlainText(log);
+}
+
+void MasterGUI::clearLogDataDisplay() {
+  GeneralLogs->clear();
+}
+
 void MasterGUI::createServerTab() {
   ServerTab = new QWidget();
   Tabs->addTab(ServerTab, "Сервер");
@@ -113,6 +124,8 @@ void MasterGUI::createProgrammatorTab() {
 void MasterGUI::createSettingsTab() {
   SettingsTab = new QWidget();
   Tabs->addTab(SettingsTab, "Настройки");
+  // Загружаем настройки приложения
+  QSettings settings;
 
   // Главный макет меню настроек
   SettingsMainLayout = new QHBoxLayout();
@@ -133,20 +146,23 @@ void MasterGUI::createSettingsTab() {
   PersoSettingsMainLayout->addWidget(UsePersoServerLabel, 0, 0, 1, 1);
 
   UsePersoServerCheckBox = new QCheckBox("Вкл/выкл");
+  UsePersoServerCheckBox->setChecked(
+      settings.value("Personalization/UseServerOption").toBool());
   PersoSettingsMainLayout->addWidget(UsePersoServerCheckBox, 0, 1, 1, 1);
 
   PersoServerIpAddressLabel =
       new QLabel("IP адрес или URL сервера персонализации");
   PersoSettingsMainLayout->addWidget(PersoServerIpAddressLabel, 1, 0, 1, 1);
 
-  PersoServerIpAddressLineEdit = new QLineEdit(PERSO_SERVER_DEFAULT_IP);
+  PersoServerIpAddressLineEdit = new QLineEdit(
+      settings.value("Personalization/ServerIpAddress").toString());
   PersoSettingsMainLayout->addWidget(PersoServerIpAddressLineEdit, 1, 1, 1, 1);
 
   PersoServerPortLabel = new QLabel("Порт сервера персонализации");
   PersoSettingsMainLayout->addWidget(PersoServerPortLabel, 2, 0, 1, 1);
 
   PersoServerPortLineEdit =
-      new QLineEdit(QString::number(PERSO_SERVER_DEFAULT_PORT));
+      new QLineEdit(settings.value("Personalization/ServerPort").toString());
   PersoSettingsMainLayout->addWidget(PersoServerPortLineEdit, 2, 1, 1, 1);
 
   // Кнопка сохранения настроек
@@ -174,11 +190,4 @@ void MasterGUI::createLogWidgets() {
   GeneralLogs->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
   GeneralLogs->setCenterOnScroll(false);
   GeneralLogLayout->addWidget(GeneralLogs);
-}
-
-void MasterGUI::displayLogData(const QString &log) {
-  if (GeneralLogs->toPlainText().count() > 100000)
-    GeneralLogs->clear();
-
-  GeneralLogs->appendPlainText(log);
 }

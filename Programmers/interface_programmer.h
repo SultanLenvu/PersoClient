@@ -43,6 +43,7 @@ public slots:
   virtual void lockDevice(void) = 0;
 
   virtual void exit(void) = 0;
+  virtual void applySettings() = 0;
 
   void setLoadingFirmware(QFile *firmware);
   void setLoadingUserData(QFile *userData);
