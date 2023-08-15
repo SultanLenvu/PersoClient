@@ -45,7 +45,8 @@ class MasterGUI : public GUI {
 
   QPushButton* PersoServerConnectPushButton;
   QPushButton* PersoServerDisconnectButton;
-  QPushButton* PersoServerSendEchoButton;
+  QPushButton* PersoServerEchoRequestButton;
+  QPushButton* PersoServerFirmwareRequestButton;
 
   QSpacerItem* ButtonVerticalSpacer1;
   //============================================================

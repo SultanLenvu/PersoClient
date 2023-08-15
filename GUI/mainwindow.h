@@ -41,7 +41,8 @@ class MainWindow : public QMainWindow {
  public slots:
   void on_PersoServerConnectPushButton_slot(void);
   void on_PersoServerDisconnectButton_slot(void);
-  void on_PersoServerSendEchoButton_slot(void);
+  void on_PersoServerEchoRequestButton_slot(void);
+  void on_PersoServerFirmwareRequestButton_slot(void);
 
   void on_AutoProgramDeviceButton_slot(void);
   void on_ManualProgramDeviceButton_slot(void);
@@ -60,6 +61,7 @@ class MainWindow : public QMainWindow {
   void on_ProductionInterfaceRequestAct_slot(void);
 
  private:
+  void proxyLogging(const QString& log);
   void loadSettings(void);
   bool checkNewSettings(void);
 
@@ -73,6 +75,7 @@ class MainWindow : public QMainWindow {
   void createTopMenu(void);
 
  signals:
+  void logging(const QString& log);
   void requestMasterPasswordFromUser(QString& pass);
   void notifyUserAboutError(const QString& text);
   void notifyUser(const QString& text);

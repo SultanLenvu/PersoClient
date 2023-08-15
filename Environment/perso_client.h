@@ -2,6 +2,8 @@
 #define PERSOCLIENT_H
 
 #include <QByteArray>
+#include <QDataStream>
+#include <QEventLoop>
 #include <QFile>
 #include <QHostAddress>
 #include <QJsonDocument>
@@ -9,6 +11,7 @@
 #include <QObject>
 #include <QSettings>
 #include <QTcpSocket>
+#include <QTimer>
 
 #include "Environment/definitions.h"
 
@@ -22,8 +25,11 @@ class PersoClient : public QObject {
   QHostAddress PersoServerAddress;
   uint32_t PersoServerPort;
 
-  QJsonDocument* CurrentCommand;
-  QJsonDocument* CurrentResponse;
+  QJsonDocument CurrentCommand;
+  QJsonDocument CurrentResponse;
+
+  QTimer* WaitTimer;
+  QEventLoop* WaitingLoop;
 
  public:
   explicit PersoClient(QObject* parent);
@@ -35,10 +41,17 @@ class PersoClient : public QObject {
   void connectToPersoServer(void);
   void disconnectFromPersoServer(void);
 
-  void echoRequest(void);
-  void getFirmwareRequest(void);
+  void requestEcho(void);
+  void requestFirmware(void);
 
  private:
+  bool processingServerConnection(void);
+  void processingReceivedDataBlock(QByteArray* dataBlock);
+  void transmitSerializedData();
+
+  void processingEchoResponse(QJsonObject* responseJson);
+  void processingFirmwareResponse(QByteArray* firmware);
+
   void deleteFirmware(void);
 
  private slots:
@@ -47,6 +60,8 @@ class PersoClient : public QObject {
 
   void on_SocketReadyRead_slot(void);
   void on_SocketError_slot(QAbstractSocket::SocketError socketError);
+
+  void on_WaitTimerTimeout_slot(void);
 
  signals:
   void logging(const QString& log);

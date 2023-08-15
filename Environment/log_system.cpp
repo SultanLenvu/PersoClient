@@ -1,23 +1,29 @@
 #include "log_system.h"
 
-LogSystem::LogSystem(QObject *parent) : QObject(parent) { IsEnable = true; }
-
-void LogSystem::setEnable(bool flag) {
-  IsEnable = flag;
+LogSystem::LogSystem(QObject* parent) : QObject(parent) {
+  EnableIndicator = true;
 }
 
-void LogSystem::clear() {
-  if (!IsEnable) {
-    return;
-  }
+LogSystem::~LogSystem() {}
 
+void LogSystem::clear() {
   emit requestClearDisplayLog();
 }
 
-void LogSystem::generateLog(const QString& log) {
-  if (!IsEnable) {
+void LogSystem::setEnable(bool option) {
+  EnableIndicator = option;
+}
+
+void LogSystem::generate(const QString& log) {
+  if (!EnableIndicator) {
     return;
   }
 
-  emit requestDisplayLog(QString("Manager - ") + log);
+  QTime time = QDateTime::currentDateTime().time();
+  QString LogData = time.toString("hh:mm:ss.zzz - ") + log;
+  emit requestDisplayLog(LogData);
 }
+
+/*
+ * Приватные методы
+ */

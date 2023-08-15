@@ -20,6 +20,7 @@ MainWindow::MainWindow() {
 
   // Менеджер для взаимодействия с программатором
   Manager = new ClientManager(this);
+  connect(Manager, &ClientManager::logging, this, &MainWindow::proxyLogging);
   connect(Manager, &ClientManager::notifyUser, UserInteraction,
           &UserInteractionSystem::generateMessage);
   connect(Manager, &ClientManager::notifyUserAboutError, UserInteraction,
@@ -33,7 +34,7 @@ MainWindow::MainWindow() {
 
   // Создаем логгер
   Logger = new LogSystem(this);
-  connect(Manager, &ClientManager::logging, Logger, &LogSystem::generateLog);
+  connect(this, &MainWindow::logging, Logger, &LogSystem::generate);
 
   // Создаем графический интерфейс
   createProductionInterface();
@@ -130,10 +131,16 @@ void MainWindow::on_PersoServerDisconnectButton_slot() {
   Manager->performServerDisconnecting();
 }
 
-void MainWindow::on_PersoServerSendEchoButton_slot() {
+void MainWindow::on_PersoServerEchoRequestButton_slot() {
   Logger->clear();
 
   Manager->performServerEchoRequest();
+}
+
+void MainWindow::on_PersoServerFirmwareRequestButton_slot() {
+  Logger->clear();
+
+  Manager->performServerFirmwareRequest();
 }
 
 void MainWindow::on_MasterInterfaceRequestAct_slot() {
@@ -144,6 +151,13 @@ void MainWindow::on_ProductionInterfaceRequestAct_slot() {
   createProductionInterface();
 
   Logger->setEnable(false);
+}
+
+void MainWindow::proxyLogging(const QString& log) {
+  if (sender()->objectName() == QString("ClientManager"))
+    emit logging(QString("Manager - ") + log);
+  else
+    emit logging(QString("Unknown - ") + log);
 }
 
 void MainWindow::loadSettings() {
@@ -203,8 +217,10 @@ void MainWindow::connectMasterInterface() {
           &MainWindow::on_PersoServerConnectPushButton_slot);
   connect(gui->PersoServerDisconnectButton, &QPushButton::clicked, this,
           &MainWindow::on_PersoServerDisconnectButton_slot);
-  connect(gui->PersoServerSendEchoButton, &QPushButton::clicked, this,
-          &MainWindow::on_PersoServerSendEchoButton_slot);
+  connect(gui->PersoServerEchoRequestButton, &QPushButton::clicked, this,
+          &MainWindow::on_PersoServerEchoRequestButton_slot);
+  connect(gui->PersoServerFirmwareRequestButton, &QPushButton::clicked, this,
+          &MainWindow::on_PersoServerFirmwareRequestButton_slot);
 
   connect(gui->AutoProgramDeviceButton, &QPushButton::clicked, this,
           &MainWindow::on_AutoProgramDeviceButton_slot);

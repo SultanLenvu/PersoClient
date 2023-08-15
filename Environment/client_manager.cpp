@@ -195,7 +195,20 @@ void ClientManager::performServerEchoRequest() {
     ReadyIndicator = false;
 
   emit logging("Отправка эхо-запроса. ");
-  Client->sendEchoRequest();
+  Client->requestEcho();
+
+  ReadyIndicator = true;
+}
+
+void ClientManager::performServerFirmwareRequest() {
+  // Проверяем готовность к выполнению операции
+  if (ReadyIndicator == false)
+    return;
+  else
+    ReadyIndicator = false;
+
+  emit logging("Отправка запроса на получение прошивки. ");
+  Client->requestFirmware();
 
   ReadyIndicator = true;
 }

@@ -50,6 +50,7 @@ class ClientManager : public QObject {
   void performServerConnecting(void);
   void performServerDisconnecting(void);
   void performServerEchoRequest(void);
+  void performServerFirmwareRequest(void);
 
   void setFirmwareFile(const QString& path);
   void applySettings(void);

@@ -57,9 +57,14 @@ void MasterGUI::createServerTab() {
   PersoServerDisconnectButton->setFont(QFont("Arial", 14, QFont::Bold));
   ServerControlPanelLayout->addWidget(PersoServerDisconnectButton);
 
-  PersoServerSendEchoButton = new QPushButton(QString("Отправить эхо-запрос"));
-  PersoServerSendEchoButton->setFont(QFont("Arial", 14, QFont::Bold));
-  ServerControlPanelLayout->addWidget(PersoServerSendEchoButton);
+  PersoServerEchoRequestButton = new QPushButton(QString("Отправить эхо-запрос"));
+  PersoServerEchoRequestButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ServerControlPanelLayout->addWidget(PersoServerEchoRequestButton);
+
+  PersoServerFirmwareRequestButton =
+      new QPushButton(QString("Запрос прошивки"));
+  PersoServerFirmwareRequestButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ServerControlPanelLayout->addWidget(PersoServerFirmwareRequestButton);
 
   ButtonVerticalSpacer1 =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
