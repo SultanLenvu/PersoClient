@@ -25,6 +25,10 @@ class PersoClient : public QObject {
   QHostAddress PersoServerAddress;
   uint32_t PersoServerPort;
 
+  uint32_t ReceivedDataBlockSize;
+  QByteArray ReceivedDataBlock;
+  QByteArray TransmittedDataBlock;
+
   QJsonDocument CurrentCommand;
   QJsonDocument CurrentResponse;
 
@@ -46,11 +50,13 @@ class PersoClient : public QObject {
 
  private:
   bool processingServerConnection(void);
-  void processingReceivedDataBlock(QByteArray* dataBlock);
-  void transmitSerializedData();
+
+  void processingDataBlock(void);
+  void createDataBlock(void);
+  void transmitDataBlock(void);
 
   void processingEchoResponse(QJsonObject* responseJson);
-  void processingFirmwareResponse(QByteArray* firmware);
+  void processingFirmwareResponse(QJsonObject* responseJson);
 
   void deleteFirmware(void);
 
@@ -65,6 +71,7 @@ class PersoClient : public QObject {
 
  signals:
   void logging(const QString& log);
+  void stopWaiting(void);
 };
 
 #endif  // PERSOCLIENT_H

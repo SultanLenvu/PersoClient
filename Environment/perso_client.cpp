@@ -32,12 +32,12 @@ PersoClient::PersoClient(QObject *parent) : QObject(parent)
 
   WaitingLoop = new QEventLoop(this);
   connect(Socket, &QTcpSocket::connected, WaitingLoop, &QEventLoop::quit);
-  connect(Socket, &QTcpSocket::readyRead, WaitingLoop, &QEventLoop::quit);
   connect(Socket, &QTcpSocket::disconnected, WaitingLoop, &QEventLoop::quit);
   connect(Socket,
           QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error),
           WaitingLoop, &QEventLoop::quit);
   connect(WaitTimer, &QTimer::timeout, WaitingLoop, &QEventLoop::quit);
+  connect(this, &PersoClient::stopWaiting, WaitingLoop, &QEventLoop::quit);
 }
 
 PersoClient::~PersoClient() {
@@ -84,8 +84,14 @@ void PersoClient::requestEcho() {
 
   CurrentCommand.setObject(json);
 
-  // Сериализуем и отправляем команду
-  transmitSerializedData();
+  // Ответный блок данных еще не получен
+  ReceivedDataBlockSize = 0;
+
+  // Создаем блок данных для команды
+  createDataBlock();
+
+  // Отправляем сформированный блок данных
+  transmitDataBlock();
 
   // Отключаемся от сервера
   Socket->close();
@@ -108,8 +114,14 @@ void PersoClient::requestFirmware() {
 
   CurrentCommand.setObject(json);
 
-  // Сериализуем и отправляем команду
-  transmitSerializedData();
+  // Ответный блок данных еще не получен
+  ReceivedDataBlockSize = 0;
+
+  // Создаем блок данных для команды
+  createDataBlock();
+
+  // Отправляем сформированный блок данных
+  transmitDataBlock();
 
   // Отключаемся от сервера
   Socket->close();
@@ -135,9 +147,9 @@ bool PersoClient::processingServerConnection() {
   return true;
 }
 
-void PersoClient::processingReceivedDataBlock(QByteArray* dataBlock) {
+void PersoClient::processingDataBlock() {
   QJsonParseError status;
-  CurrentResponse = QJsonDocument::fromJson(*dataBlock, &status);
+  CurrentResponse = QJsonDocument::fromJson(ReceivedDataBlock, &status);
 
   // Если пришел некорректный JSON
   if (status.error != QJsonParseError::NoError) {
@@ -159,9 +171,8 @@ void PersoClient::processingReceivedDataBlock(QByteArray* dataBlock) {
   // Вызываем соответствующий обработчик команды
   if (json.value("CommandName").toString() == "EchoResponse") {
     processingEchoResponse(&json);
-  } else if (CurrentCommand.object().value("CommandName").toString() ==
-             "FirmwareRequest") {
-    processingFirmwareResponse(dataBlock);
+  } else if (json.value("CommandName").toString() == "FirmwareResponse") {
+    processingFirmwareResponse(&json);
   } else {
     emit logging(
         "Обнаружена синтаксическая ошибка: получена неизвестная команда. ");
@@ -169,31 +180,41 @@ void PersoClient::processingReceivedDataBlock(QByteArray* dataBlock) {
   }
 }
 
-void PersoClient::transmitSerializedData() {
-  QByteArray serializedData;
-  QDataStream serializator(&serializedData, QIODevice::WriteOnly);
+void PersoClient::createDataBlock() {
+  emit logging("Формирование блока данных для команды. ");
+  emit logging(
+      QString("Размер команды: %1. Содержание команды: %2. ")
+          .arg(QString::number(
+              CurrentCommand.toJson(QJsonDocument::Compact).size()))
+          .arg(QString(CurrentCommand.toJson(QJsonDocument::Compact))));
+
+  // Инициализируем блок данных и сериализатор
+  TransmittedDataBlock.clear();
+  QDataStream serializator(&TransmittedDataBlock, QIODevice::WriteOnly);
   serializator.setVersion(QDataStream::Qt_5_12);
 
-  emit logging("Отправляемый блок данных: " +
-               CurrentCommand.toJson(QJsonDocument::Compact));
-
-  emit logging(
-      QString::number(CurrentCommand.toJson(QJsonDocument::Compact).size()));
-
-  // Формируем блок данных для отправки
-  serializator << uint32_t(0);
-  serializator << CurrentCommand.toJson(QJsonDocument::Compact);
+  // Формируем единый блок данных для отправки
+  serializator << uint32_t(0) << CurrentCommand.toJson(QJsonDocument::Compact);
   serializator.device()->seek(0);
-  serializator << uint32_t(serializedData.size() - sizeof(uint32_t));
+  serializator << uint32_t(TransmittedDataBlock.size() - sizeof(uint32_t));
+}
 
-  emit logging(
-      QString::number(uint32_t(serializedData.size() - sizeof(uint32_t))));
+void PersoClient::transmitDataBlock() {
+  // Если размер блок не превышает максимального размера данных для единоразовой
+  // передачи
+  if (TransmittedDataBlock.size() < ONETIME_TRANSMIT_DATA_SIZE) {
+    // Отправляем блок данных
+    Socket->write(TransmittedDataBlock);
+  } else {
+    // В противном случае дробим блок данных на части и последовательно
+    // отправляем
+    for (int32_t i = 0; i < TransmittedDataBlock.size();
+         i += ONETIME_TRANSMIT_DATA_SIZE) {
+      Socket->write(TransmittedDataBlock.mid(i, ONETIME_TRANSMIT_DATA_SIZE));
+    }
+  }
 
-  // Отправляем сформируем блок данных
-  Socket->write(serializedData);
-
-  // Ожидаем ответа или отказа
-  emit logging("Ожидание ответа от сервера. ");
+  // Ожидаем ответ
   WaitTimer->start();
   WaitingLoop->exec();
 }
@@ -212,12 +233,22 @@ void PersoClient::processingEchoResponse(QJsonObject* responseJson) {
   }
 }
 
-void PersoClient::processingFirmwareResponse(QByteArray* firmware) {
+void PersoClient::processingFirmwareResponse(QJsonObject* responseJson) {
   emit logging("Обработка ответа на команду FirmwareRequest. ");
 
+  // Синтаксическая проверка
+  if (responseJson->value("FirmwareFile") == QJsonValue::Undefined) {
+    emit logging(
+        "Обнаружена синтаксическая ошибка в ответе FirmwareResponse: "
+        "отсутствует файл прошивки. ");
+    return;
+  }
+
+  // Сохраняем присланный файл прошивки
   Firmware = new QFile("firmware.hex", this);
   if (Firmware->open(QIODevice::WriteOnly)) {
-    Firmware->write(*firmware);
+    Firmware->write(QByteArray::fromBase64(
+        responseJson->value("FirmwareFile").toString().toUtf8()));
     Firmware->close();
   } else {
     emit logging("Не удалось сохранить файл прошивки. ");
@@ -225,6 +256,8 @@ void PersoClient::processingFirmwareResponse(QByteArray* firmware) {
 
   delete Firmware;
   Firmware = nullptr;
+
+  emit logging("Команда FirmwareRequest успешно выполнена. ");
 }
 
 void PersoClient::deleteFirmware() {
@@ -249,86 +282,65 @@ void PersoClient::on_SocketConnected_slot() {
 }
 
 void PersoClient::on_SocketReadyRead_slot() {
-  QByteArray ReceivedDataBlock;
-  uint32_t blockSize = 0;              // Размер блока
   QDataStream deserializator(Socket);  // Дессериализатор
   deserializator.setVersion(
       QDataStream::Qt_5_12);  // Настраиваем версию десериализатора
 
-  // Цикл формирования блока данных
-  while (true) {
-    // Если блок данных еще не начал формироваться
-    if (!blockSize) {
-      // Если размер поступивших байт меньше размера поля с размером байт, то
-      // блок поступившие данные отбрасываются
-      if (Socket->bytesAvailable() < sizeof(uint32_t)) {
-        break;
-      }
-      deserializator >> blockSize;
-
-      emit logging(QString("Размер полученного блока данных: %1.")
-                       .arg(QString::number(blockSize)));
-    }
-
-    emit logging(QString("Размер принятых данных: %1. ")
-                     .arg(QString::number(Socket->bytesAvailable())));
-
-    // Дожидаемся пока весь блок данных придет целиком
-    if (Socket->bytesAvailable() < blockSize) {
+  // Если блок данных еще не начал формироваться
+  if (ReceivedDataBlockSize == 0) {
+    // Если размер поступивших байт меньше размера поля с размером байт, то
+    // блок поступившие данные отбрасываются
+    if (Socket->bytesAvailable() < sizeof(uint32_t)) {
       emit logging(
-          "Блок получен не целиком. Ожидается прием следующих частей. ");
-      break;
+          "Размер полученных данных слишком мал. Ожидается прием следующих "
+          "частей. ");
+      // Перезапускаем таймер ожидания для следующих частей
+      WaitTimer->start();
+      return;
     }
+    // Сохраняем размер блока данных
+    deserializator >> ReceivedDataBlockSize;
 
-    // Если блок был получен целиком, то осуществляем его дессериализацию
-    deserializator >> ReceivedDataBlock;
-    emit logging("Блок полученных данных: " + ReceivedDataBlock);
+    emit logging(QString("Размер ожидаемого блока данных: %1.")
+                     .arg(QString::number(ReceivedDataBlockSize)));
 
-    // Выходим
-    break;
+    // Если размер блока данных слишком большой, то весь блок отбрасывается
+    if (ReceivedDataBlockSize > DATA_BLOCK_MAX_SIZE) {
+      emit logging("Размер блока данных слишком большой. Сброс. ");
+      // Останавливаем цикл ожидания
+      emit stopWaiting();
+      ReceivedDataBlockSize = 0;
+    }
   }
 
+  emit logging(QString("Размер принятых данных: %1. ")
+                   .arg(QString::number(Socket->bytesAvailable())));
+
+  // Дожидаемся пока весь блок данных придет целиком
+  if (Socket->bytesAvailable() < ReceivedDataBlockSize) {
+    emit logging("Блок получен не целиком. Ожидается прием следующих частей. ");
+    // Перезапускаем таймер ожидания для следующих частей
+    WaitTimer->start();
+    return;
+  }
+
+  // Если блок был получен целиком, то осуществляем его дессериализацию
+  deserializator >> ReceivedDataBlock;
+  emit logging("Блок полученных данных: " + ReceivedDataBlock);
+
+  // Останавливаем цикл ожидания
+  emit stopWaiting();
+
   // Осуществляем обработку полученных данных
-  processingReceivedDataBlock(&ReceivedDataBlock);
+  processingDataBlock();
 }
 
 void PersoClient::on_SocketError_slot(
     QAbstractSocket::SocketError socketError) {
-  switch (socketError) {
-    case QAbstractSocket::ConnectionRefusedError:
-      emit logging("Ошибка сети: запрос на подключение отклонен сервером. ");
-      break;
-
-    case QAbstractSocket::RemoteHostClosedError:
-      emit logging("Ошибка сети: сервер закрыл соединение. ");
-      break;
-
-    case QAbstractSocket::HostNotFoundError:
-      emit logging("Ошибка сети: сервер не найден. ");
-      break;
-
-    case QAbstractSocket::SocketAccessError:
-      emit logging(
-          "Ошибка сети: подключение к серверу не выполнено из-за нехватки прав "
-          "доступа. ");
-      break;
-
-    case QAbstractSocket::SocketResourceError:
-      emit logging(
-          "Ошибка сети: подключение к серверу не выполнено из-за перезгрузки "
-          "операционной "
-          "системы. ");
-      break;
-
-    case QAbstractSocket::QAbstractSocket::SocketTimeoutError:
-      emit logging(
-          "Ошибка сети: исстекло время на выполнение сетевой операции. ");
-      break;
-
-    default:
-      emit logging("Ошибка сети: неизвестная ошибка. ");
-      break;
-  }
+  emit logging(
+      QString("Ошибка сети: Код: %1. Описание: %2.")
+          .arg(QString::number(socketError).arg(Socket->errorString())));
+  Socket->close();
 }
 
 void PersoClient::on_WaitTimerTimeout_slot() {

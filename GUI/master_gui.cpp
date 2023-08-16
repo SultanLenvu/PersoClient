@@ -23,7 +23,7 @@ void MasterGUI::create() {
 void MasterGUI::update() {}
 
 void MasterGUI::displayLogData(const QString& log) {
-  if (GeneralLogs->toPlainText().count() > 100000)
+  if (GeneralLogs->toPlainText().count() > 500000)
     GeneralLogs->clear();
 
   GeneralLogs->appendPlainText(log);
