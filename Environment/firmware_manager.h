@@ -1,5 +1,5 @@
-#ifndef CLIENT_MANAGER_H
-#define CLIENT_MANAGER_H
+#ifndef FIRMWARE_MANAGER_H
+#define FIRMWARE_MANAGER_H
 
 #include <QApplication>
 #include <QObject>
@@ -12,12 +12,13 @@
 #include "log_system.h"
 #include "perso_client.h"
 
-class ClientManager : public QObject {
+class FirmwareManager : public QObject {
   Q_OBJECT
  public:
   enum PerfomingStatus { Completed, Failed };
 
  private:
+  QThread* ClientThread;
   PersoClient* Client;
   QThread* ProgrammerThread;
   InterfaceProgrammer* Programmer;
@@ -28,12 +29,14 @@ class ClientManager : public QObject {
   QFileInfo* UserDataFileInfo;
   QFile* UserDataFile;
 
+  QTimer* WaitTimer;
+  QEventLoop WaitingLoop;
   bool ReadyIndicator;
   PerfomingStatus LastStatus;
 
  public:
-  explicit ClientManager(QObject* parent);
-  ~ClientManager();
+  explicit FirmwareManager(QObject* parent);
+  ~FirmwareManager();
 
   InterfaceProgrammer* programmer(void) const;
 
@@ -58,19 +61,31 @@ class ClientManager : public QObject {
  private:
   void processingFirmwarePath(const QString& path);
   void processingUserDataPath(const QString& path);
-  void buildProgrammerInstance(void);
+
+  void createProgrammerInstance(void);
+  void creareClientInstance(void);
 
  private slots:
   void proxyLogging(const QString& log);
 
-  void performingFinished(void);
-  void performingCompleted(void);
-  void performingFailed(void);
+  void on_ProgrammerOperationFinished_slot(PerfomingStatus status);
 
  signals:
   void logging(const QString& log);
   void notifyUser(const QString& log);
   void notifyUserAboutError(const QString& log);
+
+  // Сигналы для программатора
+  void loadFirmware_signal(const QString& firmwareFileName);
+  void loadFirmwareWithUnlock_signal(const QString& firmwareFileName);
+  void readFirmware_signal(void);
+  void eraseFirmware_signal(void);
+
+  void readUserData_signal(void);
+  void loadUserData_signal(const QString& userDataFileName);
+
+  void unlockDevice_signal(void);
+  void lockDevice_signal(void);
 };
 
-#endif  // CLIENT_MANAGER_H
+#endif  // FIRMWARE_MANAGER_H

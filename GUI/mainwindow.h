@@ -5,7 +5,7 @@
 #include <QSettings>
 #include <QtWidgets>
 
-#include "../Environment/client_manager.h"
+#include "../Environment/firmware_manager.h"
 #include "../Environment/definitions.h"
 #include "../Environment/log_system.h"
 #include "../Environment/user_Interaction_system.h"
@@ -32,7 +32,7 @@ class MainWindow : public QMainWindow {
 
   LogSystem* Logger;
   UserInteractionSystem* UserInteraction;
-  ClientManager* Manager;
+  FirmwareManager* Manager;
 
  public:
   MainWindow();

@@ -1,58 +1,48 @@
 #ifndef ABSTRACTPROGRAMMER_H
 #define ABSTRACTPROGRAMMER_H
 
-#include <QFile>
+#include <QFileInfo>
 #include <QMutex>
 #include <QObject>
 #include <QString>
 
 #include "../Environment/definitions.h"
 
-class InterfaceProgrammer : public QObject
-{
+class InterfaceProgrammer : public QObject {
   Q_OBJECT
-public:
+ public:
   enum ProgrammerType { JLink };
+  enum OperationStatus { Success, Failed };
 
-protected:
-  QFile *LoadingFirmware;
-  QFile *LoadingUserData;
-
+ protected:
   ProgrammerType Type;
 
-public:
-  explicit InterfaceProgrammer(QObject *parent, ProgrammerType type);
+ public:
+  explicit InterfaceProgrammer(QObject* parent, ProgrammerType type);
   virtual ~InterfaceProgrammer();
 
   ProgrammerType type() const;
 
-public slots:
-  virtual void connectDevice(void) = 0;
-  virtual void resetDevice(void) = 0;
-  virtual void runDevice(void) = 0;
-
-  virtual void loadFirmware(void) = 0;
-  virtual void loadFirmwareWithUnlock(void) = 0;
+ public slots:
+  virtual void loadFirmware(const QString& firmwareFileName) = 0;
+  virtual void loadFirmwareWithUnlock(const QString& firmwareFileName) = 0;
   virtual void readFirmware(void) = 0;
   virtual void eraseFirmware(void) = 0;
 
-  virtual void loadUserData(void) = 0;
+  virtual void loadUserData(const QString& userDataFileName) = 0;
   virtual void readUserData(void) = 0;
 
   virtual void unlockDevice(void) = 0;
   virtual void lockDevice(void) = 0;
 
-  virtual void exit(void) = 0;
   virtual void applySettings() = 0;
 
-  void setLoadingFirmware(QFile *firmware);
-  void setLoadingUserData(QFile *userData);
+ protected:
+  bool checkFileName(const QString& name);
 
-signals:
-  void logging(const QString &log);
-  void operationFinished(void);
-  void operationCompleted(void);
-  void operationFailed(void);
+ signals:
+  void logging(const QString& log);
+  void operationFinished(OperationStatus status);
 };
 
-#endif // ABSTRACTPROGRAMMER_H
+#endif  // ABSTRACTPROGRAMMER_H

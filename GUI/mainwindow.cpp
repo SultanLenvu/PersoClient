@@ -19,11 +19,11 @@ MainWindow::MainWindow() {
           &UserInteractionSystem::generateErrorMessage);
 
   // Менеджер для взаимодействия с программатором
-  Manager = new ClientManager(this);
-  connect(Manager, &ClientManager::logging, this, &MainWindow::proxyLogging);
-  connect(Manager, &ClientManager::notifyUser, UserInteraction,
+  Manager = new FirmwareManager(this);
+  connect(Manager, &FirmwareManager::logging, this, &MainWindow::proxyLogging);
+  connect(Manager, &FirmwareManager::notifyUser, UserInteraction,
           &UserInteractionSystem::generateMessage);
-  connect(Manager, &ClientManager::notifyUserAboutError, UserInteraction,
+  connect(Manager, &FirmwareManager::notifyUserAboutError, UserInteraction,
           &UserInteractionSystem::generateErrorMessage);
 
   // Настраиваем размер главного окна
@@ -154,7 +154,7 @@ void MainWindow::on_ProductionInterfaceRequestAct_slot() {
 }
 
 void MainWindow::proxyLogging(const QString& log) {
-  if (sender()->objectName() == QString("ClientManager"))
+  if (sender()->objectName() == QString("FirmwareManager"))
     emit logging(QString("Manager - ") + log);
   else
     emit logging(QString("Unknown - ") + log);

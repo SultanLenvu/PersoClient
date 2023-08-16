@@ -3,9 +3,6 @@
 InterfaceProgrammer::InterfaceProgrammer(QObject *parent, ProgrammerType type)
     : QObject(parent) {
   Type = type;
-
-  LoadingFirmware = nullptr;
-  LoadingUserData = nullptr;
 }
 
 InterfaceProgrammer::~InterfaceProgrammer() {}
@@ -14,10 +11,11 @@ InterfaceProgrammer::ProgrammerType InterfaceProgrammer::type() const {
   return Type;
 }
 
-void InterfaceProgrammer::setLoadingFirmware(QFile *firmware) {
-  LoadingFirmware = firmware;
-}
+bool InterfaceProgrammer::checkFileName(const QString& name) {
+  QFileInfo info(name);
 
-void InterfaceProgrammer::setLoadingUserData(QFile *userData) {
-  LoadingUserData = userData;
+  if ((!info.exists()) || (!info.isFile()))
+    return false;
+  else
+    return true;
 }
