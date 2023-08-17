@@ -85,15 +85,20 @@ void MasterGUI::createProgrammatorTab() {
   ProgrammatorControlPanelLayout = new QVBoxLayout();
   ProgrammatorControlPanel->setLayout(ProgrammatorControlPanelLayout);
 
-  AutoProgramDeviceButton =
-      new QPushButton(QString("Автоматическая зарузка прошивки"));
-  AutoProgramDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
-  ProgrammatorControlPanelLayout->addWidget(AutoProgramDeviceButton);
+  ServerProgramDeviceButton =
+      new QPushButton(QString("Серверная зарузка прошивки"));
+  ServerProgramDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ProgrammatorControlPanelLayout->addWidget(ServerProgramDeviceButton);
 
   ManualProgramDeviceButton =
       new QPushButton(QString("Ручная зарузка прошивки"));
   ManualProgramDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(ManualProgramDeviceButton);
+
+  AutoProgramDeviceButton =
+      new QPushButton(QString("Автоматическая зарузка прошивки"));
+  AutoProgramDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ProgrammatorControlPanelLayout->addWidget(AutoProgramDeviceButton);
 
   ReadDeviceFirmwareButton = new QPushButton(QString("Считать прошивку"));
   ReadDeviceFirmwareButton->setFont(QFont("Arial", 14, QFont::Bold));

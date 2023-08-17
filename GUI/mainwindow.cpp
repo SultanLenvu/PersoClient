@@ -72,14 +72,14 @@ void MainWindow::on_EraseDeviceButton_slot() {
 void MainWindow::on_ProgramDeviceUserDataButton_slot() {
   Logger->clear();
 
-  Manager->performUserDataLoading(QFileDialog::getOpenFileName(
+  Manager->performDataLoading(QFileDialog::getOpenFileName(
       nullptr, "Выберите файл", "", "Все файлы (*.*)"));
 }
 
 void MainWindow::on_ReadDeviceUserDataButton_slot() {
   Logger->clear();
 
-  Manager->performUserDataReading();
+  Manager->performDataReading();
 }
 
 void MainWindow::on_UnlockDeviceButton_slot() {
@@ -141,6 +141,11 @@ void MainWindow::on_PersoServerFirmwareRequestButton_slot() {
   Logger->clear();
 
   Manager->performServerFirmwareRequest();
+}
+
+void MainWindow::on_ServerProgramDeviceButton_slot() {
+  Logger->clear();
+  Manager->performServerFirmwareLoading();
 }
 
 void MainWindow::on_MasterInterfaceRequestAct_slot() {
@@ -222,6 +227,8 @@ void MainWindow::connectMasterInterface() {
   connect(gui->PersoServerFirmwareRequestButton, &QPushButton::clicked, this,
           &MainWindow::on_PersoServerFirmwareRequestButton_slot);
 
+  connect(gui->ServerProgramDeviceButton, &QPushButton::clicked, this,
+          &MainWindow::on_ServerProgramDeviceButton_slot);
   connect(gui->AutoProgramDeviceButton, &QPushButton::clicked, this,
           &MainWindow::on_AutoProgramDeviceButton_slot);
   connect(gui->ManualProgramDeviceButton, &QPushButton::clicked, this,

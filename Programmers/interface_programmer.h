@@ -6,13 +6,13 @@
 #include <QObject>
 #include <QString>
 
-#include "../Environment/definitions.h"
+#include "General/definitions.h"
+#include "General/types.h"
 
 class InterfaceProgrammer : public QObject {
   Q_OBJECT
  public:
   enum ProgrammerType { JLink };
-  enum OperationStatus { Success, Failed };
 
  protected:
   ProgrammerType Type;
@@ -24,13 +24,13 @@ class InterfaceProgrammer : public QObject {
   ProgrammerType type() const;
 
  public slots:
-  virtual void loadFirmware(const QString& firmwareFileName) = 0;
-  virtual void loadFirmwareWithUnlock(const QString& firmwareFileName) = 0;
+  virtual void loadFirmware(QFile* firmware) = 0;
+  virtual void loadFirmwareWithUnlock(QFile* firmware) = 0;
   virtual void readFirmware(void) = 0;
   virtual void eraseFirmware(void) = 0;
 
-  virtual void loadUserData(const QString& userDataFileName) = 0;
-  virtual void readUserData(void) = 0;
+  virtual void loadData(QFile* data) = 0;
+  virtual void readData(void) = 0;
 
   virtual void unlockDevice(void) = 0;
   virtual void lockDevice(void) = 0;
@@ -38,7 +38,8 @@ class InterfaceProgrammer : public QObject {
   virtual void applySettings() = 0;
 
  protected:
-  bool checkFileName(const QString& name);
+  bool checkFirmwareFile(QFile* firmware);
+  bool checkDataFile(QFile* data);
 
  signals:
   void logging(const QString& log);

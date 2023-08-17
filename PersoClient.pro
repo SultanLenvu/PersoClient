@@ -1,4 +1,4 @@
-QT       += core gui network
+QT += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,7 +22,6 @@ SOURCES += \
     GUI/mainwindow.cpp
 
 HEADERS += \
-    Environment/definitions.h \
     Environment/firmware_manager.h \
     Environment/log_system.h \
     Environment/perso_client.h \
@@ -31,6 +30,8 @@ HEADERS += \
     GUI/mainwindow.h \
     GUI/master_gui.h \
     GUI/production_gui.h \
+    General/types.h \
+    General/definitions.h \
     Programmers/interface_programmer.h \
     Programmers/jlink_exe_programmer.h
 

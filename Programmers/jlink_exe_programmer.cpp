@@ -7,29 +7,28 @@ JLinkExeProgrammer::JLinkExeProgrammer(QObject *parent)
 }
 
 JLinkExeProgrammer::~JLinkExeProgrammer() {
-  delete JLinkExeInfo;
-  delete JLinkScriptInfo;
 }
 
-void JLinkExeProgrammer::loadFirmware(
-    const QString& firmwareFileName) {  // Проверка на существование прошивки
-  if (!checkFileName(firmwareFileName)) {
-    emit logging(QString("Invalid file. "));
-    emit operationFinished(Failed);
+void JLinkExeProgrammer::loadFirmware(QFile* firmware) {
+  // Блокируем доступ к файлу
+  Mutex.lock();
+
+  // Проверка корректности присланной прошивки
+  if (!checkFirmwareFile(firmware)) {
+    emit logging(QString("Получен некорректный файл прошивки. Сброс. "));
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(
-        QString("The JLink.exe file is missing in the default directory, "
-                "select it manually."));
-    emit operationFinished(Failed);
+    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
   // Логгирование
-  emit logging(QString("Program firmware."));
+  emit logging(QString("Загрузка прошивки."));
 
   // Формируем скрипт JLink
   initScript();
@@ -37,7 +36,7 @@ void JLinkExeProgrammer::loadFirmware(
   JLinkScript->write(QByteArray("Erase\n"));
   // Загружаем прошивку
   QString temp =
-      QString("LoadFile ") + firmwareFileName + QString(", 0x08000000\n");
+      QString("LoadFile ") + firmware->fileName() + QString(", 0x08000000\n");
   JLinkScript->write(temp.toUtf8());
 
   // Запускаем выполнение скрипта JLink
@@ -45,31 +44,36 @@ void JLinkExeProgrammer::loadFirmware(
 
   // Обрабатываем вывод JLink.exe
   if ((ProcessOutput.indexOf("O.K.") > -1) &&
-      (ProcessOutput.indexOf("Erasing done.") > -1))
-    emit operationFinished(Success);
-  else
-    emit operationFinished(Failed);
+      (ProcessOutput.indexOf("Erasing done.") > -1)) {
+    emit operationFinished(OperationStatus::Success);
+  } else {
+    emit operationFinished(OperationStatus::Failed);
+  }
+
+  // Разблокируем доступ к файлу
+  Mutex.unlock();
 }
 
-void JLinkExeProgrammer::loadFirmwareWithUnlock(
-    const QString& firmwareFileName) {
-  if (!checkFileName(firmwareFileName)) {
-    emit logging(QString("Invalid file. "));
-    emit operationFinished(Failed);
+void JLinkExeProgrammer::loadFirmwareWithUnlock(QFile* firmware) {
+  // Блокируем доступ к файлу
+  Mutex.lock();
+
+  // Проверка корректности присланной прошивки
+  if (!checkFirmwareFile(firmware)) {
+    emit logging(QString("Получен некорректный файл прошивки. Сброс. "));
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(
-        QString("The JLink.exe file is missing in the default directory, "
-                "select it manually."));
-    emit operationFinished(Failed);
+    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
   // Логгирование
-  emit logging(QString("Unlock device and program firmware."));
+  emit logging(QString("Разблокировка памяти и загрузка прошивки."));
 
   // Формируем скрипт JLink
   initScript();
@@ -91,7 +95,7 @@ void JLinkExeProgrammer::loadFirmwareWithUnlock(
 
   // Загружаем прошивку
   QString temp =
-      QString("LoadFile ") + firmwareFileName + QString(", 0x08000000\n");
+      QString("LoadFile ") + firmware->fileName() + QString(", 0x08000000\n");
   JLinkScript->write(temp.toUtf8());
 
   // Запускаем выполнение скрипта JLink
@@ -101,24 +105,26 @@ void JLinkExeProgrammer::loadFirmwareWithUnlock(
   if ((ProcessOutput.indexOf("O.K.") > -1) &&
       (ProcessOutput.indexOf("Erasing done.") > -1) &&
       (ProcessOutput.indexOf("1FFFF800 = A5 5A FF 00                           "
-                             "            .Z..") > -1))
-    emit operationFinished(Success);
-  else
-    emit operationFinished(Failed);
+                             "            .Z..") > -1)) {
+    emit operationFinished(OperationStatus::Success);
+  } else {
+    emit operationFinished(OperationStatus::Failed);
+  }
+
+  // Разблокируем доступ к файлу
+  Mutex.unlock();
 }
 
 void JLinkExeProgrammer::readFirmware(void) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(
-        QString("The JLink.exe file is missing in the default directory, "
-                "select it manually."));
-    emit operationFinished(Failed);
+    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
   // Логгирование
-  emit logging(QString("Read device firmware."));
+  emit logging(QString("Считывание прошивки."));
 
   // Формируем скрипт JLink
   initScript();
@@ -131,24 +137,23 @@ void JLinkExeProgrammer::readFirmware(void) {
 
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf(
-          "Reading 65536 bytes from addr 0x08000000 into file...O.K.") > -1)
-    emit operationFinished(Success);
-  else
-    emit operationFinished(Failed);
+          "Reading 65536 bytes from addr 0x08000000 into file...O.K.") > -1) {
+    emit operationFinished(OperationStatus::Success);
+  } else {
+    emit operationFinished(OperationStatus::Failed);
+  }
 }
 
 void JLinkExeProgrammer::eraseFirmware() {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(
-        QString("The JLink.exe file is missing in the default directory, "
-                "select it manually."));
-    emit operationFinished(Failed);
+    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
   // Логгирование
-  emit logging(QString("Erase firmware."));
+  emit logging(QString("Стирание прошивки."));
 
   // Формируем скрипт JLink
   initScript();
@@ -159,23 +164,21 @@ void JLinkExeProgrammer::eraseFirmware() {
 
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf("Erasing done.") > -1)
-    emit operationFinished(Success);
+    emit operationFinished(OperationStatus::Success);
   else
-    emit operationFinished(Failed);
+    emit operationFinished(OperationStatus::Failed);
 }
 
-void JLinkExeProgrammer::readUserData(void) {
+void JLinkExeProgrammer::readData(void) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(
-        QString("The JLink.exe file is missing in the default directory, "
-                "select it manually."));
-    emit operationFinished(Failed);
+    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
   // Логгирование
-  emit logging(QString("Read device user data."));
+  emit logging(QString("Чтение данных."));
 
   // Формируем скрипт JLink
   initScript();
@@ -193,25 +196,28 @@ void JLinkExeProgrammer::readUserData(void) {
                             QString::number(USER_DATA_FLASH_SIZE, 10) +
                             QString(" bytes from addr ") +
                             QString(USER_DATA_FLASH_START_ADDRESS) +
-                            QString(" into file...O.K.")) > -1)
-    emit operationFinished(Success);
-  else
-    emit operationFinished(Failed);
+                            QString(" into file...O.K.")) > -1) {
+    emit operationFinished(OperationStatus::Success);
+  } else {
+    emit operationFinished(OperationStatus::Failed);
+  }
 }
 
-void JLinkExeProgrammer::loadUserData(const QString& userDataFileName) {
-  if (!checkFileName(userDataFileName)) {
-    emit logging(QString("Invalid file. "));
-    emit operationFinished(Failed);
+void JLinkExeProgrammer::loadData(QFile* data) {
+  // Блокируем доступ к файлу
+  Mutex.lock();
+
+  // Проверка корректности присланной прошивки
+  if (!checkDataFile(data)) {
+    emit logging(QString("Получен некорректный файл с данными. Сброс. "));
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(
-        QString("The JLink.exe file is missing in the default directory, "
-                "select it manually."));
-    emit operationFinished(Failed);
+    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
@@ -224,7 +230,7 @@ void JLinkExeProgrammer::loadUserData(const QString& userDataFileName) {
                  QString("\n");
   JLinkScript->write(temp.toUtf8());
   // Загружаем новые пользовательских данных
-  temp = QString("LoadFile ") + userDataFileName + QString(", ") +
+  temp = QString("LoadFile ") + data->fileName() + QString(", ") +
          QString(USER_DATA_FLASH_START_ADDRESS) + QString("\n");
   JLinkScript->write(temp.toUtf8());
 
@@ -233,23 +239,26 @@ void JLinkExeProgrammer::loadUserData(const QString& userDataFileName) {
 
   // Обрабатываем вывод JLink.exe
   if ((ProcessOutput.indexOf("O.K.") > -1) &&
-      (ProcessOutput.indexOf("Erasing done.") > -1))
-    emit operationFinished(Success);
-  else
-    emit operationFinished(Failed);
+      (ProcessOutput.indexOf("Erasing done.") > -1)) {
+    emit operationFinished(OperationStatus::Success);
+  } else {
+    emit operationFinished(OperationStatus::Failed);
+  }
+
+  // Блокируем доступ к файлу
+  Mutex.lock();
 }
 
 void JLinkExeProgrammer::unlockDevice() {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(
-        QString("The JLink.exe file is missing in the default directory, "
-                "select it manually."));
+    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
   // Логгирование
-  emit logging(QString("Unlock device."));
+  emit logging(QString("Разблокирование памяти."));
 
   // Формируем скрипт JLink
   initScript();
@@ -269,23 +278,23 @@ void JLinkExeProgrammer::unlockDevice() {
 
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf("1FFFF800 = A5 5A FF 00                           "
-                            "            .Z..") > -1)
-    emit operationFinished(Success);
-  else
-    emit operationFinished(Failed);
+                            "            .Z..") > -1) {
+    emit operationFinished(OperationStatus::Success);
+  } else {
+    emit operationFinished(OperationStatus::Failed);
+  }
 }
 
 void JLinkExeProgrammer::lockDevice() { // Проверка на существование программы
                                         // адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(
-        QString("The JLink.exe file is missing in the default directory, "
-                "select it manually."));
+    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
   // Логгирование
-  emit logging(QString("Lock device."));
+  emit logging(QString("Блокировка памяти."));
 
   // Формируем скрипт JLink
   initScript();
@@ -306,10 +315,11 @@ void JLinkExeProgrammer::lockDevice() { // Проверка на существ�
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf(
           "1FFFF800 = 00 FF FF 00                                       ....") >
-      -1)
-    emit operationFinished(Success);
-  else
-    emit operationFinished(Failed);
+      -1) {
+    emit operationFinished(OperationStatus::Success);
+  } else {
+    emit operationFinished(OperationStatus::Failed);
+  }
 }
 
 void JLinkExeProgrammer::applySettings() {}
@@ -319,9 +329,9 @@ void JLinkExeProgrammer::applySettings() {}
 */
 
 void JLinkExeProgrammer::processingJLinkExePath(const QString &path) {
-  JLinkExeInfo = new QFileInfo(path);
+  QFileInfo info(path);
 
-  if ((JLinkExeInfo->exists()) && (JLinkExeInfo->isFile())) {
+  if ((info.exists()) && (info.isFile())) {
     JLinkProcess = new QProcess(this);
     JLinkProcess->setProgram(path);
   } else
@@ -361,14 +371,14 @@ void JLinkExeProgrammer::excuteJLinkScript() {
 
 void JLinkExeProgrammer::initScript() {
   // Удаляем старый скрипт для адаптера
-  JLinkScriptInfo = new QFileInfo(DEFAULT_JLINK_SCRIPT_FILE_NAME);
-  if ((JLinkScriptInfo->exists()) && (JLinkScriptInfo->isFile()))
-    QFile::remove(DEFAULT_JLINK_SCRIPT_FILE_NAME);
+  QFileInfo info(JLINK_COMMAND_SCRIPT_DEFAULT_NAME);
+  if ((info.exists()) && (info.isFile()))
+    QFile::remove(JLINK_COMMAND_SCRIPT_DEFAULT_NAME);
 
   // Создаем новый скрипт для адаптера
-  JLinkScript = new QFile(DEFAULT_JLINK_SCRIPT_FILE_NAME, this);
+  JLinkScript = new QFile(JLINK_COMMAND_SCRIPT_DEFAULT_NAME, this);
   if (JLinkScript->open(QIODevice::WriteOnly)) {
-    emit logging("JLink command script created. ");
+    emit logging("Командный скрипт JLink создан. ");
 
     // Добавляем иницирующие команды в скрипт
 
@@ -382,6 +392,6 @@ void JLinkExeProgrammer::initScript() {
     JLinkScript->write(QByteArray("halt\n"));
     JLinkScript->write(QByteArray("connect\n"));
   } else {
-    emit logging("JLink command script creation failed. ");
+    emit logging("Не удалось создать командный скрипт JLink. ");
   }
 }

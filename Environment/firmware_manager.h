@@ -7,32 +7,38 @@
 #include <QThread>
 #include <QVector>
 
-#include "../Programmers/interface_programmer.h"
-#include "../Programmers/jlink_exe_programmer.h"
+#include "Programmers/interface_programmer.h"
+#include "Programmers/jlink_exe_programmer.h"
 #include "log_system.h"
 #include "perso_client.h"
+
+#include "General/definitions.h"
+#include "General/types.h"
 
 class FirmwareManager : public QObject {
   Q_OBJECT
  public:
-  enum PerfomingStatus { Completed, Failed };
+  enum OperatingState {
+    Ready,
+    WaitingProgrammerProcessing,
+    WaitingClientProcessing,
+  };
 
  private:
+  OperatingState State;
+
   QThread* ClientThread;
   PersoClient* Client;
   QThread* ProgrammerThread;
   InterfaceProgrammer* Programmer;
 
-  QFileInfo* FirmwareFileInfo;
   QFile* FirmwareFile;
+  QFile* DataFile;
 
-  QFileInfo* UserDataFileInfo;
-  QFile* UserDataFile;
-
+  QMutex FirmwareMutex;
   QTimer* WaitTimer;
-  QEventLoop WaitingLoop;
+  QEventLoop* WaitingLoop;
   bool ReadyIndicator;
-  PerfomingStatus LastStatus;
 
  public:
   explicit FirmwareManager(QObject* parent);
@@ -44,8 +50,8 @@ class FirmwareManager : public QObject {
   void performFirmwareReading(void);
   void performFirmwareErasing(void);
 
-  void performUserDataReading(void);
-  void performUserDataLoading(const QString& path);
+  void performDataReading(void);
+  void performDataLoading(const QString& path);
 
   void performDeviceUnlock(void);
   void performDeviceLock(void);
@@ -55,12 +61,13 @@ class FirmwareManager : public QObject {
   void performServerEchoRequest(void);
   void performServerFirmwareRequest(void);
 
-  void setFirmwareFile(const QString& path);
+  void performServerFirmwareLoading(void);
+
   void applySettings(void);
 
  private:
-  void processingFirmwarePath(const QString& path);
-  void processingUserDataPath(const QString& path);
+  void deleteFirmwareFile(void);
+  void deleteDataFile(void);
 
   void createProgrammerInstance(void);
   void creareClientInstance(void);
@@ -68,7 +75,8 @@ class FirmwareManager : public QObject {
  private slots:
   void proxyLogging(const QString& log);
 
-  void on_ProgrammerOperationFinished_slot(PerfomingStatus status);
+  void on_ProgrammerOperationFinished_slot(OperationStatus status);
+  void on_ClientOperationFinished_slot(OperationStatus status);
 
  signals:
   void logging(const QString& log);
@@ -76,16 +84,21 @@ class FirmwareManager : public QObject {
   void notifyUserAboutError(const QString& log);
 
   // Сигналы для программатора
-  void loadFirmware_signal(const QString& firmwareFileName);
-  void loadFirmwareWithUnlock_signal(const QString& firmwareFileName);
+  void loadFirmware_signal(QFile* firmware);
+  void loadFirmwareWithUnlock_signal(QFile* firmware);
   void readFirmware_signal(void);
   void eraseFirmware_signal(void);
-
-  void readUserData_signal(void);
-  void loadUserData_signal(const QString& userDataFileName);
-
+  void readData_signal(void);
+  void loadData_signal(QFile* data);
   void unlockDevice_signal(void);
   void lockDevice_signal(void);
+
+  // Сигналы для клиента
+  void connectToPersoServer_signal(void);
+  void disconnectFromPersoServer_signal(void);
+
+  void requestEcho_signal(void);
+  void requestFirmware_signal(QFile* firmware);
 };
 
 #endif  // FIRMWARE_MANAGER_H

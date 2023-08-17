@@ -6,43 +6,40 @@
 #include <QThread>
 
 #include "interface_programmer.h"
-#include "../Environment/definitions.h"
 
 class JLinkExeProgrammer : public InterfaceProgrammer {
-
-private:
-  QFileInfo *JLinkExeInfo;
+ private:
   QProcess *JLinkProcess;
 
-  QFileInfo *JLinkScriptInfo;
   QFile *JLinkScript;
 
   QStringList ProcessArguments;
   QStringList ProcessOutput;
 
-public:
-  explicit JLinkExeProgrammer(QObject *parent = nullptr);
+  QMutex Mutex;
+
+ public:
+  explicit JLinkExeProgrammer(QObject* parent);
   ~JLinkExeProgrammer();
 
-public slots:
- virtual void loadFirmware(const QString& firmwareFileName) override;
- virtual void loadFirmwareWithUnlock(const QString& firmwareFileName) override;
- virtual void readFirmware(void) override;
- virtual void eraseFirmware(void) override;
+ public slots:
+  virtual void loadFirmware(QFile* firmware) override;
+  virtual void loadFirmwareWithUnlock(QFile* firmware) override;
+  virtual void readFirmware(void) override;
+  virtual void eraseFirmware(void) override;
 
- virtual void readUserData(void) override;
- virtual void loadUserData(const QString& userDataFileName) override;
+  virtual void readData(void) override;
+  virtual void loadData(QFile* data) override;
 
- virtual void unlockDevice(void) override;
- virtual void lockDevice(void) override;
+  virtual void unlockDevice(void) override;
+  virtual void lockDevice(void) override;
 
- virtual void exit(void) override;
- virtual void applySettings() override;
+  virtual void applySettings() override;
 
-private:
- void processingJLinkExePath(const QString& path);
- void excuteJLinkScript(void);
- void initScript(void);
+ private:
+  void processingJLinkExePath(const QString& path);
+  void excuteJLinkScript(void);
+  void initScript(void);
 };
 
 #endif // JLINKMANUALPROGRAMMER_H

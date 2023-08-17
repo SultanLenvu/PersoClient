@@ -6,7 +6,7 @@
 #include <QMessageBox>
 #include <QObject>
 
-#include "../Environment/firmware_manager.h"
+#include "Environment/firmware_manager.h"
 
 class UserInteractionSystem : public QObject {
   Q_OBJECT

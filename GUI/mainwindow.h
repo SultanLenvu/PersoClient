@@ -5,12 +5,12 @@
 #include <QSettings>
 #include <QtWidgets>
 
-#include "../Environment/firmware_manager.h"
-#include "../Environment/definitions.h"
-#include "../Environment/log_system.h"
-#include "../Environment/user_Interaction_system.h"
-#include "../GUI/master_gui.h"
-#include "../GUI/production_gui.h"
+#include "Environment/firmware_manager.h"
+#include "Environment/log_system.h"
+#include "Environment/user_Interaction_system.h"
+#include "GUI/master_gui.h"
+#include "GUI/production_gui.h"
+#include "General/definitions.h"
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -44,6 +44,7 @@ class MainWindow : public QMainWindow {
   void on_PersoServerEchoRequestButton_slot(void);
   void on_PersoServerFirmwareRequestButton_slot(void);
 
+  void on_ServerProgramDeviceButton_slot(void);
   void on_AutoProgramDeviceButton_slot(void);
   void on_ManualProgramDeviceButton_slot(void);
   void on_ReadDeviceFirmwareButton_slot(void);

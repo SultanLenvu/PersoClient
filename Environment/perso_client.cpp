@@ -5,7 +5,7 @@ PersoClient::PersoClient(QObject *parent) : QObject(parent)
   setObjectName("PersoClient");
   applySettings();
 
-  Firmware = nullptr;
+  FirmwareFile = nullptr;
 
   Socket = new QTcpSocket(this);
   connect(Socket, &QTcpSocket::connected, this,
@@ -38,15 +38,14 @@ PersoClient::PersoClient(QObject *parent) : QObject(parent)
           WaitingLoop, &QEventLoop::quit);
   connect(WaitTimer, &QTimer::timeout, WaitingLoop, &QEventLoop::quit);
   connect(this, &PersoClient::stopWaiting, WaitingLoop, &QEventLoop::quit);
+
+  // Команды еще не выполнялись
+  CurrentCommandStatus = NotExecuted;
 }
 
 PersoClient::~PersoClient() {
   if (Socket->isOpen())
     Socket->disconnectFromHost();
-}
-
-QFile* PersoClient::getFirmware() {
-  return Firmware;
 }
 
 void PersoClient::applySettings() {
@@ -58,18 +57,29 @@ void PersoClient::applySettings() {
 }
 
 void PersoClient::connectToPersoServer() {
-  processingServerConnection();
+  // Подключаемся к серверу персонализации
+  if (!processingServerConnection()) {
+    emit operationFinished(OperationStatus::Failed);
+  } else {
+    emit operationFinished(OperationStatus::Success);
+  }
 }
 
 void PersoClient::disconnectFromPersoServer() {
-  emit logging("Отключение от сервера персонализации. ");
-
-  Socket->disconnectFromHost();
+  if (Socket->isOpen()) {
+    Socket->disconnectFromHost();
+    emit logging("Отключение от сервера персонализации. ");
+    emit operationFinished(OperationStatus::Success);
+  } else {
+    emit logging("Подключение не было установлено. ");
+    emit operationFinished(OperationStatus::Failed);
+  }
 }
 
 void PersoClient::requestEcho() {
   // Подключаемся к серверу персонализации
   if (!processingServerConnection()) {
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
@@ -95,11 +105,28 @@ void PersoClient::requestEcho() {
 
   // Отключаемся от сервера
   Socket->close();
+
+  // Возвращаем статус выполнения команды
+  if (CurrentCommandStatus == Completed) {
+    emit operationFinished(OperationStatus::Success);
+  } else {
+    emit operationFinished(OperationStatus::Failed);
+  }
 }
 
-void PersoClient::requestFirmware() {
+void PersoClient::requestFirmware(QFile* firmware) {
+  // Проверка файла
+  if (!checkFirmwareFile(firmware)) {
+    emit operationFinished(OperationStatus::Failed);
+    return;
+  }
+
+  // Запоминаем файл
+  FirmwareFile = firmware;
+
   // Подключаемся к серверу персонализации
   if (!processingServerConnection()) {
+    emit operationFinished(OperationStatus::Failed);
     return;
   }
 
@@ -125,6 +152,13 @@ void PersoClient::requestFirmware() {
 
   // Отключаемся от сервера
   Socket->close();
+
+  // Возвращаем статус выполнения команды
+  if (CurrentCommandStatus == Completed) {
+    emit operationFinished(OperationStatus::Success);
+  } else {
+    emit operationFinished(OperationStatus::Failed);
+  }
 }
 
 bool PersoClient::processingServerConnection() {
@@ -140,7 +174,7 @@ bool PersoClient::processingServerConnection() {
   // Если соединение не удалось установить
   if (!Socket->isOpen()) {
     emit logging(
-        "Не удалось установить соединение с сервером персонализации. ");
+        "Не удалось установить соединение с сервером персонализации. Сброс. ");
     return false;
   }
 
@@ -226,6 +260,7 @@ void PersoClient::processingEchoResponse(QJsonObject* responseJson) {
     emit logging(QString("Полученные эхо-данные: %1.")
                      .arg(responseJson->value("EchoData").toString()));
     emit logging("Команда EchoRequest успешно выполнена. ");
+    CurrentCommandStatus = Completed;
   } else {
     emit logging(
         "Обнаружена синтаксическая ошибка в команде EchoRequest: отсутствуют "
@@ -234,6 +269,9 @@ void PersoClient::processingEchoResponse(QJsonObject* responseJson) {
 }
 
 void PersoClient::processingFirmwareResponse(QJsonObject* responseJson) {
+  // Блокируем доступ к файлу
+  Mutex.lock();
+
   emit logging("Обработка ответа на команду FirmwareRequest. ");
 
   // Синтаксическая проверка
@@ -245,32 +283,43 @@ void PersoClient::processingFirmwareResponse(QJsonObject* responseJson) {
   }
 
   // Сохраняем присланный файл прошивки
-  Firmware = new QFile("firmware.hex", this);
-  if (Firmware->open(QIODevice::WriteOnly)) {
-    Firmware->write(QByteArray::fromBase64(
+  if (FirmwareFile->open(QIODevice::WriteOnly)) {
+    FirmwareFile->write(QByteArray::fromBase64(
         responseJson->value("FirmwareFile").toString().toUtf8()));
-    Firmware->close();
+    FirmwareFile->close();
   } else {
     emit logging("Не удалось сохранить файл прошивки. ");
   }
 
-  delete Firmware;
-  Firmware = nullptr;
-
+  CurrentCommandStatus = Completed;
   emit logging("Команда FirmwareRequest успешно выполнена. ");
+
+  // Разблокирует доступ к файлу
+  Mutex.unlock();
 }
 
-void PersoClient::deleteFirmware() {
-  if (!Firmware)
-    return;
+bool PersoClient::checkFirmwareFile(QFile* firmware) {
+  if (firmware == nullptr) {
+    emit logging("Файл прошивки не был создан. ");
+    return false;
+  }
 
-  if (!Firmware->exists())
-    return;
+  QFileInfo info(*firmware);
 
-  emit logging("Файл прошивки удален. ");
-  Firmware->remove();
-  delete Firmware;
-  Firmware = nullptr;
+  // Проверка на существование
+  if ((!info.exists()) || (!info.isFile())) {
+    emit logging("Файл прошивки не корректен. ");
+    return false;
+  }
+
+  // Проврека на размер
+  if ((info.size() > FIRMWARE_FILE_MAX_SIZE) || (info.size() == 0)) {
+    emit logging("Файл прошивки имеет слишком большой размер. ");
+    return false;
+  }
+
+  emit logging("Файл прошивки корректен. ");
+  return true;
 }
 
 void PersoClient::on_SocketDisconnected_slot() {
@@ -341,9 +390,11 @@ void PersoClient::on_SocketError_slot(
       QString("Ошибка сети: Код: %1. Описание: %2.")
           .arg(QString::number(socketError).arg(Socket->errorString())));
   Socket->close();
+  CurrentCommandStatus = Failed;
 }
 
 void PersoClient::on_WaitTimerTimeout_slot() {
   emit logging("Время ожидания вышло. ");
+  CurrentCommandStatus = Failed;
   Socket->close();
 }

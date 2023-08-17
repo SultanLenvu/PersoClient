@@ -5,21 +5,26 @@
 #include <QDataStream>
 #include <QEventLoop>
 #include <QFile>
+#include <QFileInfo>
 #include <QHostAddress>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMutex>
 #include <QObject>
 #include <QSettings>
 #include <QTcpSocket>
 #include <QTimer>
 
-#include "Environment/definitions.h"
+#include "General/definitions.h"
+#include "General/types.h"
 
 class PersoClient : public QObject {
   Q_OBJECT
 
+  enum CommandExecutionStatus { NotExecuted, Completed, Failed };
+
  private:
-  QFile* Firmware;
+  QFile* FirmwareFile;
 
   QTcpSocket* Socket;
   QHostAddress PersoServerAddress;
@@ -31,22 +36,24 @@ class PersoClient : public QObject {
 
   QJsonDocument CurrentCommand;
   QJsonDocument CurrentResponse;
+  CommandExecutionStatus CurrentCommandStatus;
 
   QTimer* WaitTimer;
   QEventLoop* WaitingLoop;
+
+  QMutex Mutex;
 
  public:
   explicit PersoClient(QObject* parent);
   ~PersoClient();
 
-  QFile* getFirmware(void);
   void applySettings(void);
 
   void connectToPersoServer(void);
   void disconnectFromPersoServer(void);
 
   void requestEcho(void);
-  void requestFirmware(void);
+  void requestFirmware(QFile* firmware);
 
  private:
   bool processingServerConnection(void);
@@ -58,6 +65,7 @@ class PersoClient : public QObject {
   void processingEchoResponse(QJsonObject* responseJson);
   void processingFirmwareResponse(QJsonObject* responseJson);
 
+  bool checkFirmwareFile(QFile* firmware);
   void deleteFirmware(void);
 
  private slots:
@@ -72,6 +80,7 @@ class PersoClient : public QObject {
  signals:
   void logging(const QString& log);
   void stopWaiting(void);
+  void operationFinished(OperationStatus status);
 };
 
 #endif  // PERSOCLIENT_H

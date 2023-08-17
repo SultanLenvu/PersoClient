@@ -1,7 +1,7 @@
 #ifndef MASTERGUI_H
 #define MASTERGUI_H
 
-#include "Environment/definitions.h"
+#include "General/definitions.h"
 #include "gui.h"
 
 class MasterGUI : public GUI {
@@ -21,6 +21,7 @@ class MasterGUI : public GUI {
   QGroupBox* ProgrammatorControlPanel;
   QVBoxLayout* ProgrammatorControlPanelLayout;
 
+  QPushButton* ServerProgramDeviceButton;
   QPushButton* AutoProgramDeviceButton;
   QPushButton* ManualProgramDeviceButton;
   QPushButton* ReadDeviceFirmwareButton;
