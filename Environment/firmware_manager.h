@@ -21,21 +21,22 @@ class FirmwareManager : public QObject {
   enum OperatingState {
     Ready,
     WaitingProgrammerProcessing,
+    ProgrammerFailed,
+    ProgrammerCompleted,
     WaitingClientProcessing,
+    ClientFailed,
+    ClientCompleted
   };
 
  private:
-  OperatingState State;
+  OperatingState CurrentState;
+  QString NotificarionText;
 
   QThread* ClientThread;
   PersoClient* Client;
   QThread* ProgrammerThread;
-  InterfaceProgrammer* Programmer;
+  IProgrammer* Programmer;
 
-  QFile* FirmwareFile;
-  QFile* DataFile;
-
-  QMutex FirmwareMutex;
   QTimer* WaitTimer;
   QEventLoop* WaitingLoop;
   bool ReadyIndicator;
@@ -44,7 +45,7 @@ class FirmwareManager : public QObject {
   explicit FirmwareManager(QObject* parent);
   ~FirmwareManager();
 
-  InterfaceProgrammer* programmer(void) const;
+  IProgrammer* programmer(void) const;
 
   void performFirmwareLoading(const QString& path, bool unlockOption);
   void performFirmwareReading(void);
@@ -66,22 +67,24 @@ class FirmwareManager : public QObject {
   void applySettings(void);
 
  private:
-  void deleteFirmwareFile(void);
-  void deleteDataFile(void);
-
   void createProgrammerInstance(void);
   void creareClientInstance(void);
+  void createWaitingLoop(void);
+
+  void processingProgrammerStatus(IProgrammer::ExecutionStatus status);
+  void processingClientStatus(PersoClient::ExecutionStatus status);
 
  private slots:
   void proxyLogging(const QString& log);
 
-  void on_ProgrammerOperationFinished_slot(OperationStatus status);
-  void on_ClientOperationFinished_slot(OperationStatus status);
+  void on_ProgrammerOperationFinished_slot(IProgrammer::ExecutionStatus status);
+  void on_ClientOperationFinished_slot(PersoClient::ExecutionStatus status);
 
  signals:
   void logging(const QString& log);
   void notifyUser(const QString& log);
   void notifyUserAboutError(const QString& log);
+  void waitingEnd(void);
 
   // Сигналы для программатора
   void loadFirmware_signal(QFile* firmware);

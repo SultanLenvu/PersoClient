@@ -9,8 +9,17 @@
 #include "General/definitions.h"
 #include "General/types.h"
 
-class InterfaceProgrammer : public QObject {
+class IProgrammer : public QObject {
   Q_OBJECT
+ public:
+  enum ExecutionStatus {
+    NotExecuted,
+    FirmwareFileError,
+    DataFileError,
+    ProgrammatorError,
+    CompletedSuccessfully
+  };
+
  public:
   enum ProgrammerType { JLink };
 
@@ -18,8 +27,8 @@ class InterfaceProgrammer : public QObject {
   ProgrammerType Type;
 
  public:
-  explicit InterfaceProgrammer(QObject* parent, ProgrammerType type);
-  virtual ~InterfaceProgrammer();
+  explicit IProgrammer(QObject* parent, ProgrammerType type);
+  virtual ~IProgrammer();
 
   ProgrammerType type() const;
 
@@ -38,12 +47,12 @@ class InterfaceProgrammer : public QObject {
   virtual void applySettings() = 0;
 
  protected:
-  bool checkFirmwareFile(QFile* firmware);
-  bool checkDataFile(QFile* data);
+  bool checkFirmwareFile(const QFile* firmware);
+  bool checkDataFile(const QFile* data);
 
  signals:
   void logging(const QString& log);
-  void operationFinished(OperationStatus status);
+  void operationFinished(ExecutionStatus status);
 };
 
 #endif  // ABSTRACTPROGRAMMER_H

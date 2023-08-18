@@ -40,7 +40,13 @@ PersoClient::PersoClient(QObject *parent) : QObject(parent)
   connect(this, &PersoClient::stopWaiting, WaitingLoop, &QEventLoop::quit);
 
   // Команды еще не выполнялись
-  CurrentCommandStatus = NotExecuted;
+  ReturnStatus = NotExecuted;
+
+  // Готовы к выполнению команд
+  CurrentState = Ready;
+
+  // Регистрация в мета-объектной системе Qt пользовательские типы
+  qRegisterMetaType<ExecutionStatus>("ExecutionStatus");
 }
 
 PersoClient::~PersoClient() {
@@ -57,11 +63,15 @@ void PersoClient::applySettings() {
 }
 
 void PersoClient::connectToPersoServer() {
+  CurrentState = Ready;
+
   // Подключаемся к серверу персонализации
   if (!processingServerConnection()) {
-    emit operationFinished(OperationStatus::Failed);
+    CurrentState = DisconnectedFromServer;
+    emit operationFinished(ServerConnectionError);
   } else {
-    emit operationFinished(OperationStatus::Success);
+    CurrentState = ConnectedToServer;
+    emit operationFinished(CompletedSuccessfully);
   }
 }
 
@@ -69,96 +79,82 @@ void PersoClient::disconnectFromPersoServer() {
   if (Socket->isOpen()) {
     Socket->disconnectFromHost();
     emit logging("Отключение от сервера персонализации. ");
-    emit operationFinished(OperationStatus::Success);
   } else {
     emit logging("Подключение не было установлено. ");
-    emit operationFinished(OperationStatus::Failed);
   }
+
+  CurrentState = DisconnectedFromServer;
+  emit operationFinished(CompletedSuccessfully);
 }
 
 void PersoClient::requestEcho() {
+  CurrentState = Ready;
+
+  // Создаем запрос
+  createEchoRequest();
+
+  CurrentState = RequestCreated;
+
   // Подключаемся к серверу персонализации
   if (!processingServerConnection()) {
-    emit operationFinished(OperationStatus::Failed);
+    CurrentState = DisconnectedFromServer;
+    emit operationFinished(ServerConnectionError);
     return;
   }
 
-  QJsonObject json;
-  emit logging("Формирование команды EchoRequest. ");
-
-  // Заголовок команды
-  json["CommandName"] = "EchoRequest";
-
-  // Тело команды
-  json["EchoData"] = "TestData";
-
-  CurrentCommand.setObject(json);
-
-  // Ответный блок данных еще не получен
-  ReceivedDataBlockSize = 0;
-
-  // Создаем блок данных для команды
-  createDataBlock();
+  CurrentState = ConnectedToServer;
 
   // Отправляем сформированный блок данных
   transmitDataBlock();
 
+  CurrentState = RequestTransmitted;
+
   // Отключаемся от сервера
   Socket->close();
+  CurrentState = DisconnectedFromServer;
 
   // Возвращаем статус выполнения команды
-  if (CurrentCommandStatus == Completed) {
-    emit operationFinished(OperationStatus::Success);
-  } else {
-    emit operationFinished(OperationStatus::Failed);
-  }
+  emit operationFinished(ReturnStatus);
 }
 
 void PersoClient::requestFirmware(QFile* firmware) {
-  // Проверка файла
-  if (!checkFirmwareFile(firmware)) {
-    emit operationFinished(OperationStatus::Failed);
+  CurrentState = Ready;
+
+  // Проверка на существование
+  if (!firmware) {
+    emit logging("Файл прошивки не создан. Сброс.");
+    emit operationFinished(FirmwareFileError);
     return;
   }
 
   // Запоминаем файл
   FirmwareFile = firmware;
 
+  // Создаем запрос
+  createFirmwareRequest();
+
+  CurrentState = RequestCreated;
+
   // Подключаемся к серверу персонализации
   if (!processingServerConnection()) {
-    emit operationFinished(OperationStatus::Failed);
+    CurrentState = DisconnectedFromServer;
+    emit operationFinished(ServerConnectionError);
     return;
   }
 
-  QJsonObject json;
-  emit logging("Формирование команды FirmwareRequest. ");
-
-  // Заголовок команды
-  json["CommandName"] = "FirmwareRequest";
-
-  // Тело команды
-  json["UCID"] = "123456789";
-
-  CurrentCommand.setObject(json);
-
-  // Ответный блок данных еще не получен
-  ReceivedDataBlockSize = 0;
-
-  // Создаем блок данных для команды
-  createDataBlock();
+  CurrentState = ConnectedToServer;
 
   // Отправляем сформированный блок данных
   transmitDataBlock();
 
+  CurrentState = RequestTransmitted;
+
   // Отключаемся от сервера
   Socket->close();
+  CurrentState = DisconnectedFromServer;
 
   // Возвращаем статус выполнения команды
-  if (CurrentCommandStatus == Completed) {
-    emit operationFinished(OperationStatus::Success);
-  } else {
-    emit operationFinished(OperationStatus::Failed);
-  }
+  emit operationFinished(ReturnStatus);
 }
 
 bool PersoClient::processingServerConnection() {
@@ -168,6 +164,7 @@ bool PersoClient::processingServerConnection() {
 
   // Ожидаем подключения или отказа
   emit logging("Ожидание ответа от сервера. ");
+  CurrentState = WaitingConnectionWithServer;
   WaitTimer->start();
   WaitingLoop->exec();
 
@@ -188,6 +185,7 @@ void PersoClient::processingDataBlock() {
   // Если пришел некорректный JSON
   if (status.error != QJsonParseError::NoError) {
     emit logging("Ошибка парсинга JSON команды. ");
+    ReturnStatus = ResponseProcessingError;
     return;
   }
 
@@ -199,6 +197,7 @@ void PersoClient::processingDataBlock() {
     emit logging(
         "Обнаружена синтаксическая ошибка: в запросе отсутствует название "
         "команды. ");
+    ReturnStatus = ResponseProcessingError;
     return;
   }
 
@@ -210,6 +209,7 @@ void PersoClient::processingDataBlock() {
   } else {
     emit logging(
         "Обнаружена синтаксическая ошибка: получена неизвестная команда. ");
+    ReturnStatus = ResponseProcessingError;
     return;
   }
 }
@@ -253,6 +253,44 @@ void PersoClient::transmitDataBlock() {
   WaitingLoop->exec();
 }
 
+void PersoClient::createEchoRequest() {
+  QJsonObject json;
+  emit logging("Формирование команды EchoRequest. ");
+
+  // Заголовок команды
+  json["CommandName"] = "EchoRequest";
+
+  // Тело команды
+  json["EchoData"] = "TestData";
+
+  CurrentCommand.setObject(json);
+
+  // Ответный блок данных еще не получен
+  ReceivedDataBlockSize = 0;
+
+  // Создаем блок данных для команды
+  createDataBlock();
+}
+
+void PersoClient::createFirmwareRequest() {
+  QJsonObject json;
+  emit logging("Формирование команды FirmwareRequest. ");
+
+  // Заголовок команды
+  json["CommandName"] = "FirmwareRequest";
+
+  // Тело команды
+  json["UCID"] = "123456789";
+
+  CurrentCommand.setObject(json);
+
+  // Ответный блок данных еще не получен
+  ReceivedDataBlockSize = 0;
+
+  // Создаем блок данных для команды
+  createDataBlock();
+}
+
 void PersoClient::processingEchoResponse(QJsonObject* responseJson) {
   emit logging("Обработка ответа на команду EchoRequest. ");
 
@@ -260,17 +298,18 @@ void PersoClient::processingEchoResponse(QJsonObject* responseJson) {
     emit logging(QString("Полученные эхо-данные: %1.")
                      .arg(responseJson->value("EchoData").toString()));
     emit logging("Команда EchoRequest успешно выполнена. ");
-    CurrentCommandStatus = Completed;
+    ReturnStatus = CompletedSuccessfully;
   } else {
     emit logging(
         "Обнаружена синтаксическая ошибка в команде EchoRequest: отсутствуют "
         "эхо-данные. ");
+    ReturnStatus = ResponseProcessingError;
   }
 }
 
 void PersoClient::processingFirmwareResponse(QJsonObject* responseJson) {
   // Блокируем доступ к файлу
-  Mutex.lock();
+  QMutexLocker locker(&Mutex);
 
   emit logging("Обработка ответа на команду FirmwareRequest. ");
 
@@ -279,47 +318,24 @@ void PersoClient::processingFirmwareResponse(QJsonObject* responseJson) {
     emit logging(
         "Обнаружена синтаксическая ошибка в ответе FirmwareResponse: "
         "отсутствует файл прошивки. ");
+    ReturnStatus = ResponseProcessingError;
     return;
   }
 
   // Сохраняем присланный файл прошивки
-  if (FirmwareFile->open(QIODevice::WriteOnly)) {
-    FirmwareFile->write(QByteArray::fromBase64(
-        responseJson->value("FirmwareFile").toString().toUtf8()));
-    FirmwareFile->close();
-  } else {
+  if (!FirmwareFile->open(QIODevice::WriteOnly)) {
     emit logging("Не удалось сохранить файл прошивки. ");
+    ReturnStatus = FirmwareFileError;
+    return;
   }
 
-  CurrentCommandStatus = Completed;
+  // Сохраняем прошивку в файл
+  FirmwareFile->write(QByteArray::fromBase64(
+      responseJson->value("FirmwareFile").toString().toUtf8()));
+  FirmwareFile->close();
+
+  ReturnStatus = CompletedSuccessfully;
   emit logging("Команда FirmwareRequest успешно выполнена. ");
-
-  // Разблокирует доступ к файлу
-  Mutex.unlock();
-}
-
-bool PersoClient::checkFirmwareFile(QFile* firmware) {
-  if (firmware == nullptr) {
-    emit logging("Файл прошивки не был создан. ");
-    return false;
-  }
-
-  QFileInfo info(*firmware);
-
-  // Проверка на существование
-  if ((!info.exists()) || (!info.isFile())) {
-    emit logging("Файл прошивки не корректен. ");
-    return false;
-  }
-
-  // Проврека на размер
-  if ((info.size() > FIRMWARE_FILE_MAX_SIZE) || (info.size() == 0)) {
-    emit logging("Файл прошивки имеет слишком большой размер. ");
-    return false;
-  }
-
-  emit logging("Файл прошивки корректен. ");
-  return true;
 }
 
 void PersoClient::on_SocketDisconnected_slot() {
@@ -386,15 +402,30 @@ void PersoClient::on_SocketReadyRead_slot() {
 
 void PersoClient::on_SocketError_slot(
     QAbstractSocket::SocketError socketError) {
+  ReturnStatus = ServerConnectionTerminated;
+  CurrentState = DisconnectedFromServer;
+
   emit logging(
       QString("Ошибка сети: Код: %1. Описание: %2.")
           .arg(QString::number(socketError).arg(Socket->errorString())));
   Socket->close();
-  CurrentCommandStatus = Failed;
+
+  emit operationFinished(ReturnStatus);
 }
 
 void PersoClient::on_WaitTimerTimeout_slot() {
+  CurrentState = DisconnectedFromServer;
+
+  if (CurrentState == WaitingConnectionWithServer) {
+    ReturnStatus = ServerConnectionError;
+  } else if (CurrentState == WaitingResponse) {
+    ReturnStatus = ServerNotResponding;
+  } else {
+    ReturnStatus = UnknownError;
+  }
+
   emit logging("Время ожидания вышло. ");
-  CurrentCommandStatus = Failed;
   Socket->close();
+
+  emit operationFinished(ReturnStatus);
 }

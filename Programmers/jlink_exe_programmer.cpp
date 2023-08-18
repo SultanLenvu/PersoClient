@@ -1,7 +1,7 @@
 #include "jlink_exe_programmer.h"
 
-JLinkExeProgrammer::JLinkExeProgrammer(QObject *parent)
-    : InterfaceProgrammer(parent, JLink) {
+JLinkExeProgrammer::JLinkExeProgrammer(QObject* parent)
+    : IProgrammer(parent, JLink) {
   setObjectName("JLinkExeProgrammer");
   processingJLinkExePath(DEFAULT_JLINKEXE_FILE_PATH);
 }
@@ -11,19 +11,19 @@ JLinkExeProgrammer::~JLinkExeProgrammer() {
 
 void JLinkExeProgrammer::loadFirmware(QFile* firmware) {
   // Блокируем доступ к файлу
-  Mutex.lock();
+  QMutexLocker lock(&Mutex);
 
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
     emit logging(QString("Получен некорректный файл прошивки. Сброс. "));
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(FirmwareFileError);
     return;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     emit logging(QString("Отсутсвует JLink.exe. Сброс."));
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
     return;
   }
 
@@ -45,30 +45,27 @@ void JLinkExeProgrammer::loadFirmware(QFile* firmware) {
   // Обрабатываем вывод JLink.exe
   if ((ProcessOutput.indexOf("O.K.") > -1) &&
       (ProcessOutput.indexOf("Erasing done.") > -1)) {
-    emit operationFinished(OperationStatus::Success);
+    emit operationFinished(CompletedSuccessfully);
   } else {
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
   }
-
-  // Разблокируем доступ к файлу
-  Mutex.unlock();
 }
 
 void JLinkExeProgrammer::loadFirmwareWithUnlock(QFile* firmware) {
   // Блокируем доступ к файлу
-  Mutex.lock();
+  QMutexLocker lock(&Mutex);
 
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
     emit logging(QString("Получен некорректный файл прошивки. Сброс. "));
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(FirmwareFileError);
     return;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     emit logging(QString("Отсутсвует JLink.exe. Сброс."));
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
     return;
   }
 
@@ -106,20 +103,17 @@ void JLinkExeProgrammer::loadFirmwareWithUnlock(QFile* firmware) {
       (ProcessOutput.indexOf("Erasing done.") > -1) &&
       (ProcessOutput.indexOf("1FFFF800 = A5 5A FF 00                           "
                              "            .Z..") > -1)) {
-    emit operationFinished(OperationStatus::Success);
+    emit operationFinished(CompletedSuccessfully);
   } else {
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
   }
-
-  // Разблокируем доступ к файлу
-  Mutex.unlock();
 }
 
 void JLinkExeProgrammer::readFirmware(void) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     emit logging(QString("Отсутсвует JLink.exe. Сброс."));
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
     return;
   }
 
@@ -138,9 +132,9 @@ void JLinkExeProgrammer::readFirmware(void) {
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf(
           "Reading 65536 bytes from addr 0x08000000 into file...O.K.") > -1) {
-    emit operationFinished(OperationStatus::Success);
+    emit operationFinished(CompletedSuccessfully);
   } else {
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
   }
 }
 
@@ -148,7 +142,7 @@ void JLinkExeProgrammer::eraseFirmware() {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     emit logging(QString("Отсутсвует JLink.exe. Сброс."));
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
     return;
   }
 
@@ -164,16 +158,16 @@ void JLinkExeProgrammer::eraseFirmware() {
 
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf("Erasing done.") > -1)
-    emit operationFinished(OperationStatus::Success);
+    emit operationFinished(CompletedSuccessfully);
   else
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
 }
 
 void JLinkExeProgrammer::readData(void) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     emit logging(QString("Отсутсвует JLink.exe. Сброс."));
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
     return;
   }
 
@@ -197,27 +191,27 @@ void JLinkExeProgrammer::readData(void) {
                             QString(" bytes from addr ") +
                             QString(USER_DATA_FLASH_START_ADDRESS) +
                             QString(" into file...O.K.")) > -1) {
-    emit operationFinished(OperationStatus::Success);
+    emit operationFinished(CompletedSuccessfully);
   } else {
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
   }
 }
 
 void JLinkExeProgrammer::loadData(QFile* data) {
   // Блокируем доступ к файлу
-  Mutex.lock();
+  QMutexLocker lock(&Mutex);
 
   // Проверка корректности присланной прошивки
   if (!checkDataFile(data)) {
     emit logging(QString("Получен некорректный файл с данными. Сброс. "));
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(DataFileError);
     return;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     emit logging(QString("Отсутсвует JLink.exe. Сброс."));
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
     return;
   }
 
@@ -240,20 +234,17 @@ void JLinkExeProgrammer::loadData(QFile* data) {
   // Обрабатываем вывод JLink.exe
   if ((ProcessOutput.indexOf("O.K.") > -1) &&
       (ProcessOutput.indexOf("Erasing done.") > -1)) {
-    emit operationFinished(OperationStatus::Success);
+    emit operationFinished(CompletedSuccessfully);
   } else {
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
   }
-
-  // Блокируем доступ к файлу
-  Mutex.lock();
 }
 
 void JLinkExeProgrammer::unlockDevice() {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     emit logging(QString("Отсутсвует JLink.exe. Сброс."));
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
     return;
   }
 
@@ -279,9 +270,9 @@ void JLinkExeProgrammer::unlockDevice() {
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf("1FFFF800 = A5 5A FF 00                           "
                             "            .Z..") > -1) {
-    emit operationFinished(OperationStatus::Success);
+    emit operationFinished(CompletedSuccessfully);
   } else {
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
   }
 }
 
@@ -289,7 +280,7 @@ void JLinkExeProgrammer::lockDevice() { // Проверка на существ�
                                         // адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     emit logging(QString("Отсутсвует JLink.exe. Сброс."));
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
     return;
   }
 
@@ -316,9 +307,9 @@ void JLinkExeProgrammer::lockDevice() { // Проверка на существ�
   if (ProcessOutput.indexOf(
           "1FFFF800 = 00 FF FF 00                                       ....") >
       -1) {
-    emit operationFinished(OperationStatus::Success);
+    emit operationFinished(CompletedSuccessfully);
   } else {
-    emit operationFinished(OperationStatus::Failed);
+    emit operationFinished(ProgrammatorError);
   }
 }
 

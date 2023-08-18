@@ -1,19 +1,23 @@
 #include "interface_programmer.h"
 
-InterfaceProgrammer::InterfaceProgrammer(QObject *parent, ProgrammerType type)
+IProgrammer::IProgrammer(QObject* parent, ProgrammerType type)
     : QObject(parent) {
   Type = type;
+
+  // Регистрация в мета-объектной системе Qt пользовательские типы
+  qRegisterMetaType<ExecutionStatus>("ExecutionStatus");
 }
 
-InterfaceProgrammer::~InterfaceProgrammer() {}
+IProgrammer::~IProgrammer() {}
 
-InterfaceProgrammer::ProgrammerType InterfaceProgrammer::type() const {
+IProgrammer::ProgrammerType IProgrammer::type() const {
   return Type;
 }
 
-bool InterfaceProgrammer::checkFirmwareFile(QFile* firmware) {
-  if (firmware == nullptr)
+bool IProgrammer::checkFirmwareFile(const QFile* firmware) {
+  if (!firmware) {
     return false;
+  }
 
   QFileInfo info(*firmware);
 
@@ -28,9 +32,10 @@ bool InterfaceProgrammer::checkFirmwareFile(QFile* firmware) {
   return true;
 }
 
-bool InterfaceProgrammer::checkDataFile(QFile* data) {
-  if (data == nullptr)
+bool IProgrammer::checkDataFile(const QFile* data) {
+  if (!data) {
     return false;
+  }
 
   QFileInfo info(*data);
 

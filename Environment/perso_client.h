@@ -20,10 +20,34 @@
 
 class PersoClient : public QObject {
   Q_OBJECT
-
-  enum CommandExecutionStatus { NotExecuted, Completed, Failed };
+ public:
+  enum ExecutionStatus {
+    NotExecuted,
+    FirmwareFileError,
+    ServerConnectionError,
+    ServerNotResponding,
+    ServerConnectionTerminated,
+    ResponseProcessingError,
+    UnknownError,
+    CompletedSuccessfully
+  };
 
  private:
+  enum InstanceState {
+    Ready,
+    RequestCreated,
+    WaitingConnectionWithServer,
+    ConnectedToServer,
+    RequestTransmitted,
+    WaitingResponse,
+    ResponseReceived,
+    ResponseProcessed,
+    DisconnectedFromServer
+  };
+
+ private:
+  InstanceState CurrentState;
+  ExecutionStatus ReturnStatus;
   QFile* FirmwareFile;
 
   QTcpSocket* Socket;
@@ -36,7 +60,6 @@ class PersoClient : public QObject {
 
   QJsonDocument CurrentCommand;
   QJsonDocument CurrentResponse;
-  CommandExecutionStatus CurrentCommandStatus;
 
   QTimer* WaitTimer;
   QEventLoop* WaitingLoop;
@@ -62,11 +85,10 @@ class PersoClient : public QObject {
   void createDataBlock(void);
   void transmitDataBlock(void);
 
+  void createEchoRequest(void);
+  void createFirmwareRequest(void);
   void processingEchoResponse(QJsonObject* responseJson);
   void processingFirmwareResponse(QJsonObject* responseJson);
-
-  bool checkFirmwareFile(QFile* firmware);
-  void deleteFirmware(void);
 
  private slots:
   void on_SocketConnected_slot(void);
@@ -80,7 +102,7 @@ class PersoClient : public QObject {
  signals:
   void logging(const QString& log);
   void stopWaiting(void);
-  void operationFinished(OperationStatus status);
+  void operationFinished(ExecutionStatus status);
 };
 
 #endif  // PERSOCLIENT_H

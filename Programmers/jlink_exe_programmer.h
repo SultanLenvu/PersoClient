@@ -7,7 +7,8 @@
 
 #include "interface_programmer.h"
 
-class JLinkExeProgrammer : public InterfaceProgrammer {
+class JLinkExeProgrammer : public IProgrammer {
+  Q_OBJECT
  private:
   QProcess *JLinkProcess;
 
