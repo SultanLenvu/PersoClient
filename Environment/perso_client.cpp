@@ -405,9 +405,9 @@ void PersoClient::on_SocketError_slot(
   ReturnStatus = ServerConnectionTerminated;
   CurrentState = DisconnectedFromServer;
 
-  emit logging(
-      QString("Ошибка сети: Код: %1. Описание: %2.")
-          .arg(QString::number(socketError).arg(Socket->errorString())));
+  emit logging(QString("Ошибка сети: Код: %1. Описание: %2.")
+                   .arg(QString::number(socketError))
+                   .arg(Socket->errorString()));
   Socket->close();
 
   emit operationFinished(ReturnStatus);

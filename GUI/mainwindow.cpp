@@ -3,28 +3,11 @@
 MainWindow::MainWindow() {
   setObjectName("MainWindow");
 
-  // Загружаем настройки приложения
-  loadSettings();
-
-  // Интерфейс пока не создан
+  // Графический интерфейс пока не создан
   CurrentGUI = nullptr;
 
-  // Система для взаимодействия с пользователем
-  UserInteraction = new UserInteractionSystem(this, this);
-  connect(this, &MainWindow::requestMasterPasswordFromUser, UserInteraction,
-          &UserInteractionSystem::getMasterPassword);
-  connect(this, &MainWindow::notifyUser, UserInteraction,
-          &UserInteractionSystem::generateMessage);
-  connect(this, &MainWindow::notifyUserAboutError, UserInteraction,
-          &UserInteractionSystem::generateErrorMessage);
-
-  // Менеджер для взаимодействия с программатором
-  Manager = new FirmwareManager(this);
-  connect(Manager, &FirmwareManager::logging, this, &MainWindow::proxyLogging);
-  connect(Manager, &FirmwareManager::notifyUser, UserInteraction,
-          &UserInteractionSystem::generateMessage);
-  connect(Manager, &FirmwareManager::notifyUserAboutError, UserInteraction,
-          &UserInteractionSystem::generateErrorMessage);
+  // Загружаем настройки приложения
+  loadSettings();
 
   // Настраиваем размер главного окна
   DesktopGeometry = QApplication::desktop()->screenGeometry();
@@ -32,9 +15,14 @@ MainWindow::MainWindow() {
               DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
   setLayoutDirection(Qt::LeftToRight);
 
+  // Система для взаимодействия с пользователем
+  createInteractor();
+
+  // Менеджер для взаимодействия с программатором
+  createManager();
+
   // Создаем логгер
-  Logger = new LogSystem(this);
-  connect(this, &MainWindow::logging, Logger, &LogSystem::generate);
+  createLogger();
 
   // Создаем графический интерфейс
   createProductionInterface();
@@ -319,4 +307,34 @@ void MainWindow::createTopMenu() {
   HelpMenu = menuBar()->addMenu("Справка");
   HelpMenu->addAction(AboutProgramAct);
   HelpMenu->addAction(AboutProgramAct);
+}
+
+void MainWindow::createManager() {
+  Manager = new FirmwareManager(this);
+  connect(Manager, &FirmwareManager::logging, this, &MainWindow::proxyLogging);
+  connect(Manager, &FirmwareManager::notifyUser, Interactor,
+          &UserInteractionSystem::generateMessage);
+  connect(Manager, &FirmwareManager::notifyUserAboutError, Interactor,
+          &UserInteractionSystem::generateErrorMessage);
+  connect(Manager, &FirmwareManager::operationPerfomingStarted, Interactor,
+          &UserInteractionSystem::generateProgressDialog);
+  connect(Manager, &FirmwareManager::operationStepPerfomed, Interactor,
+          &UserInteractionSystem::performeProgressDialogStep);
+  connect(Manager, &FirmwareManager::operationPerformingEnded, Interactor,
+          &UserInteractionSystem::completeProgressDialog);
+}
+
+void MainWindow::createInteractor() {
+  Interactor = new UserInteractionSystem(this, this);
+  connect(this, &MainWindow::requestMasterPasswordFromUser, Interactor,
+          &UserInteractionSystem::getMasterPassword);
+  connect(this, &MainWindow::notifyUser, Interactor,
+          &UserInteractionSystem::generateMessage);
+  connect(this, &MainWindow::notifyUserAboutError, Interactor,
+          &UserInteractionSystem::generateErrorMessage);
+}
+
+void MainWindow::createLogger() {
+  Logger = new LogSystem(this);
+  connect(this, &MainWindow::logging, Logger, &LogSystem::generate);
 }

@@ -2,9 +2,11 @@
 #define FIRMWARE_MANAGER_H
 
 #include <QApplication>
+#include <QElapsedTimer>
 #include <QObject>
 #include <QSettings>
 #include <QThread>
+#include <QTimer>
 #include <QVector>
 
 #include "Programmers/interface_programmer.h"
@@ -18,18 +20,10 @@
 class FirmwareManager : public QObject {
   Q_OBJECT
  public:
-  enum OperatingState {
-    Ready,
-    WaitingProgrammerProcessing,
-    ProgrammerFailed,
-    ProgrammerCompleted,
-    WaitingClientProcessing,
-    ClientFailed,
-    ClientCompleted
-  };
+  enum OperationState { Ready, WaitingExecution, Failed, Completed };
 
  private:
-  OperatingState CurrentState;
+  OperationState CurrentState;
   QString NotificarionText;
 
   QThread* ClientThread;
@@ -37,9 +31,10 @@ class FirmwareManager : public QObject {
   QThread* ProgrammerThread;
   IProgrammer* Programmer;
 
-  QTimer* WaitTimer;
   QEventLoop* WaitingLoop;
-  bool ReadyIndicator;
+  QTimer* ODQTimer;
+  QTimer* ODTimer;
+  QElapsedTimer* ODMeter;
 
  public:
   explicit FirmwareManager(QObject* parent);
@@ -68,22 +63,32 @@ class FirmwareManager : public QObject {
 
  private:
   void createProgrammerInstance(void);
-  void creareClientInstance(void);
+  void createClientInstance(void);
   void createWaitingLoop(void);
+  void createTimers(void);
+  void setupODQTimer(uint32_t msecs);
 
-  void processingProgrammerStatus(IProgrammer::ExecutionStatus status);
-  void processingClientStatus(PersoClient::ExecutionStatus status);
+  bool startOperationExecution(void);
+  void endOperationExecution(void);
+
+  void deleteHardClientInstance(void);
+  void deleteHardProgrammerInstance(void);
 
  private slots:
   void proxyLogging(const QString& log);
 
   void on_ProgrammerOperationFinished_slot(IProgrammer::ExecutionStatus status);
   void on_ClientOperationFinished_slot(PersoClient::ExecutionStatus status);
+  void on_ODTimerTimeout_slot(void);
+  void on_ODQTimerTimeout_slot(void);
 
  signals:
   void logging(const QString& log);
   void notifyUser(const QString& log);
   void notifyUserAboutError(const QString& log);
+  void operationPerfomingStarted(void);
+  void operationStepPerfomed(void);
+  void operationPerformingEnded(void);
   void waitingEnd(void);
 
   // Сигналы для программатора

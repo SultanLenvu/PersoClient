@@ -1,8 +1,10 @@
 #include "user_Interaction_system.h"
 
-UserInteractionSystem::UserInteractionSystem(QObject *parent, QWidget *window)
+UserInteractionSystem::UserInteractionSystem(QObject* parent, QWidget* window)
     : QObject(parent) {
   ParentWindow = window;
+  ProgressDialog = nullptr;
+  CurrentOperationStep = 0;
 }
 
 void UserInteractionSystem::generateMessage(const QString& data) {
@@ -15,6 +17,38 @@ void UserInteractionSystem::getMasterPassword(QString& pass) {
                             "Введите пароль:", QLineEdit::Normal, "", nullptr);
 }
 
-void UserInteractionSystem::generateErrorMessage(const QString &text) {
+void UserInteractionSystem::generateErrorMessage(const QString& text) {
   QMessageBox::critical(ParentWindow, "Ошибка", text, QMessageBox::Ok);
+}
+
+void UserInteractionSystem::generateProgressDialog(void) {
+  ProgressDialog =
+      new QProgressDialog("Выполнение операции...", "Закрыть", 0, 100);
+
+  ProgressDialog->show();
+}
+
+void UserInteractionSystem::completeProgressDialog() {
+  closeProgressDialog();
+}
+
+void UserInteractionSystem::performeProgressDialogStep() {
+  if (!ProgressDialog)
+    return;
+
+  CurrentOperationStep++;
+  ProgressDialog->setValue(CurrentOperationStep);
+}
+
+void UserInteractionSystem::closeProgressDialog() {
+  ProgressDialog->close();
+  delete ProgressDialog;
+  ProgressDialog = nullptr;
+  CurrentOperationStep = 0;
+}
+
+void UserInteractionSystem::on_ProgressDialogCanceled_slot() {
+  closeProgressDialog();
+
+  emit abortCurrentOperation();
 }

@@ -31,7 +31,7 @@ class MainWindow : public QMainWindow {
   //==================================================
 
   LogSystem* Logger;
-  UserInteractionSystem* UserInteraction;
+  UserInteractionSystem* Interactor;
   FirmwareManager* Manager;
 
  public:
@@ -74,6 +74,10 @@ class MainWindow : public QMainWindow {
 
   void createTopMenuActions(void);
   void createTopMenu(void);
+
+  void createManager(void);
+  void createInteractor(void);
+  void createLogger(void);
 
  signals:
   void logging(const QString& log);
