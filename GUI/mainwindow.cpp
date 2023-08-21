@@ -30,12 +30,6 @@ MainWindow::MainWindow() {
 
 MainWindow::~MainWindow() {}
 
-void MainWindow::on_AutoProgramDeviceButton_slot() {
-  Logger->clear();
-
-  Manager->performFirmwareLoading(DEFAULT_FIRMWARE_FILE_PATH, true);
-}
-
 void MainWindow::on_ManualProgramDeviceButton_slot() {
   Logger->clear();
 
@@ -217,8 +211,6 @@ void MainWindow::connectMasterInterface() {
 
   connect(gui->ServerProgramDeviceButton, &QPushButton::clicked, this,
           &MainWindow::on_ServerProgramDeviceButton_slot);
-  connect(gui->AutoProgramDeviceButton, &QPushButton::clicked, this,
-          &MainWindow::on_AutoProgramDeviceButton_slot);
   connect(gui->ManualProgramDeviceButton, &QPushButton::clicked, this,
           &MainWindow::on_ManualProgramDeviceButton_slot);
   connect(gui->ReadDeviceFirmwareButton, &QPushButton::clicked, this,
@@ -268,7 +260,7 @@ void MainWindow::connectProductionInterface() {
   ProductionGUI *gui = dynamic_cast<ProductionGUI *>(CurrentGUI);
 
   connect(gui->ProgramDeviceButton, &QPushButton::clicked, this,
-          &MainWindow::on_AutoProgramDeviceButton_slot);
+          &MainWindow::on_ServerProgramDeviceButton_slot);
 }
 
 void MainWindow::createTopMenuActions() {

@@ -25,6 +25,7 @@ void UserInteractionSystem::generateProgressDialog(void) {
   ProgressDialog =
       new QProgressDialog("Выполнение операции...", "Закрыть", 0, 100);
 
+  ProgressDialog->setWindowModality(Qt::ApplicationModal);
   ProgressDialog->show();
 }
 

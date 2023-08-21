@@ -39,12 +39,10 @@ IProgrammer* FirmwareManager::programmer() const {
 
 void FirmwareManager::performFirmwareLoading(const QString& path,
                                              bool unlockOption) {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  // Начинаем операцию
+  if (!startOperationExecution("performFirmwareLoading")) {
     return;
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
+  }
 
   // Создаем файл
   QFile firmware(path);
@@ -62,24 +60,15 @@ void FirmwareManager::performFirmwareLoading(const QString& path,
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
-  } else {
-    emit notifyUserAboutError(NotificarionText);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  // Завершаем операцию
+  endOperationExecution("performFirmwareLoading");
 }
 
 void FirmwareManager::performFirmwareReading() {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  // Начинаем операцию
+  if (!startOperationExecution("performFirmwareReading")) {
     return;
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
+  }
 
   emit logging("Считывание прошивки микроконтроллера. ");
   emit readFirmware_signal();
@@ -87,24 +76,15 @@ void FirmwareManager::performFirmwareReading() {
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
-  } else {
-    emit notifyUserAboutError(NotificarionText);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  // Завершаем операцию
+  endOperationExecution("performFirmwareReading");
 }
 
 void FirmwareManager::performFirmwareErasing() {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  // Начинаем операцию
+  if (!startOperationExecution("performFirmwareErasing")) {
     return;
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
+  }
 
   emit logging("Стирание прошивки микроконтроллера. ");
   emit eraseFirmware_signal();
@@ -112,24 +92,15 @@ void FirmwareManager::performFirmwareErasing() {
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
-  } else {
-    emit notifyUserAboutError(NotificarionText);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  // Завершаем операцию
+  endOperationExecution("performFirmwareErasing");
 }
 
 void FirmwareManager::performDataReading() {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  // Начинаем операцию
+  if (!startOperationExecution("performDataReading")) {
     return;
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
+  }
 
   emit logging("Считывание данных в память микроконтроллера. ");
   emit readData_signal();
@@ -137,24 +108,15 @@ void FirmwareManager::performDataReading() {
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
-  } else {
-    emit notifyUserAboutError(NotificarionText);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  // Завершаем операцию
+  endOperationExecution("performDataReading");
 }
 
 void FirmwareManager::performDataLoading(const QString& path) {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  // Начинаем операцию
+  if (!startOperationExecution("performDataLoading")) {
     return;
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
+  }
 
   // Создаем файл с данными
   QFile dataFile(path);
@@ -165,24 +127,15 @@ void FirmwareManager::performDataLoading(const QString& path) {
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
-  } else {
-    emit notifyUserAboutError(NotificarionText);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  // Завершаем операцию
+  endOperationExecution("performDataLoading");
 }
 
 void FirmwareManager::performDeviceUnlock() {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  // Начинаем операцию
+  if (!startOperationExecution("performDeviceUnlock")) {
     return;
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
+  }
 
   emit logging("Разблокирование памяти микроконтроллера. ");
   emit unlockDevice_signal();
@@ -190,24 +143,15 @@ void FirmwareManager::performDeviceUnlock() {
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
-  } else {
-    emit notifyUserAboutError(NotificarionText);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  // Завершаем операцию
+  endOperationExecution("performDeviceUnlock");
 }
 
 void FirmwareManager::performDeviceLock() {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  // Начинаем операцию
+  if (!startOperationExecution("performDeviceLock")) {
     return;
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
+  }
 
   emit logging("Блокирование памяти микроконтроллера. ");
   emit lockDevice_signal();
@@ -215,24 +159,15 @@ void FirmwareManager::performDeviceLock() {
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
-  } else {
-    emit notifyUserAboutError(NotificarionText);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  // Завершаем операцию
+  endOperationExecution("performDeviceLock");
 }
 
 void FirmwareManager::performServerConnecting() {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  // Начинаем операцию
+  if (!startOperationExecution("performServerConnecting")) {
     return;
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
+  }
 
   emit logging("Подключение к серверу персонализации. ");
   emit connectToPersoServer_signal();
@@ -240,24 +175,15 @@ void FirmwareManager::performServerConnecting() {
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
-  } else {
-    emit notifyUserAboutError(NotificarionText);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  // Завершаем операцию
+  endOperationExecution("performServerConnecting");
 }
 
 void FirmwareManager::performServerDisconnecting() {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  // Начинаем операцию
+  if (!startOperationExecution("performServerDisconnecting")) {
     return;
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
+  }
 
   emit logging("Отключение от сервера персонализации. ");
   emit disconnectFromPersoServer_signal();
@@ -265,24 +191,15 @@ void FirmwareManager::performServerDisconnecting() {
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
-  } else {
-    emit notifyUserAboutError(NotificarionText);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  // Завершаем операцию
+  endOperationExecution("performServerDisconnecting");
 }
 
 void FirmwareManager::performServerEchoRequest() {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  // Начинаем операцию
+  if (!startOperationExecution("performServerEchoRequest")) {
     return;
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
+  }
 
   emit logging("Отправка эхо-запроса на сервер персонализации. ");
   emit requestEcho_signal();
@@ -290,24 +207,15 @@ void FirmwareManager::performServerEchoRequest() {
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
-  } else {
-    emit notifyUserAboutError(NotificarionText);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  // Завершаем операцию
+  endOperationExecution("performServerEchoRequest");
 }
 
 void FirmwareManager::performServerFirmwareRequest() {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  // Начинаем операцию
+  if (!startOperationExecution("performServerFirmwareRequest")) {
     return;
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
+  }
 
   // Создаем файл прошивки
   QFile firmware("firmware.hex", this);
@@ -318,15 +226,8 @@ void FirmwareManager::performServerFirmwareRequest() {
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
-  } else {
-    emit notifyUserAboutError(NotificarionText);
-  }
-
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  // Завершаем операцию
+  endOperationExecution("performServerFirmwareRequest");
 }
 
 void FirmwareManager::performServerFirmwareLoading() {
@@ -496,6 +397,8 @@ bool FirmwareManager::startOperationExecution(const QString& operationName) {
           .toInt();
   uint32_t operationQuantDuration = operationDuration / 100;
   operationQuantDuration++;
+  emit logging(QString("Длительность кванта операции: %1.")
+                   .arg(QString::number(operationQuantDuration)));
   setupODQTimer(operationQuantDuration);
   ODQTimer->start();
 
@@ -536,20 +439,22 @@ void FirmwareManager::endOperationExecution(const QString& operationName) {
   CurrentState = Ready;
 }
 
-void FirmwareManager::deleteHardClientInstance() {
+void FirmwareManager::deleteClientInstance() {
   if (!ClientThread->isRunning())
     return;
 
-  ClientThread->terminate();
+  ClientThread->quit();
+  ClientThread->wait();
   delete ClientThread;
   delete Client;
 }
 
-void FirmwareManager::deleteHardProgrammerInstance() {
+void FirmwareManager::deleteProgrammerInstance() {
   if (!ProgrammerThread->isRunning())
     return;
 
-  ProgrammerThread->terminate();
+  ProgrammerThread->quit();
+  ProgrammerThread->wait();
   delete ProgrammerThread;
   delete Programmer;
 }
@@ -639,11 +544,11 @@ void FirmwareManager::on_ODTimerTimeout_slot() {
   emit logging("Операция выполняется слишком долго. Сброс. ");
   emit notifyUserAboutError("Операция выполняется слишком долго. Сброс. ");
 
-  //  deleteHardClientInstance();
-  //  createClientInstance();
+  deleteClientInstance();
+  createClientInstance();
 
-  //  deleteHardProgrammerInstance();
-  //  createProgrammerInstance();
+  deleteProgrammerInstance();
+  createProgrammerInstance();
 }
 
 void FirmwareManager::on_ODQTimerTimeout_slot() {

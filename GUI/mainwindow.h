@@ -45,7 +45,6 @@ class MainWindow : public QMainWindow {
   void on_PersoServerFirmwareRequestButton_slot(void);
 
   void on_ServerProgramDeviceButton_slot(void);
-  void on_AutoProgramDeviceButton_slot(void);
   void on_ManualProgramDeviceButton_slot(void);
   void on_ReadDeviceFirmwareButton_slot(void);
   void on_EraseDeviceButton_slot(void);

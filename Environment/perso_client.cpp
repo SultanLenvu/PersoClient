@@ -391,7 +391,6 @@ void PersoClient::on_SocketReadyRead_slot() {
 
   // Если блок был получен целиком, то осуществляем его дессериализацию
   deserializator >> ReceivedDataBlock;
-  emit logging("Блок полученных данных: " + ReceivedDataBlock);
 
   // Останавливаем цикл ожидания
   emit stopWaiting();

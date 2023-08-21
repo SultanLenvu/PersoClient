@@ -71,8 +71,8 @@ class FirmwareManager : public QObject {
   bool startOperationExecution(const QString& operationName);
   void endOperationExecution(const QString& operationName);
 
-  void deleteHardClientInstance(void);
-  void deleteHardProgrammerInstance(void);
+  void deleteClientInstance(void);
+  void deleteProgrammerInstance(void);
 
  private slots:
   void proxyLogging(const QString& log);

@@ -22,7 +22,6 @@ class MasterGUI : public GUI {
   QVBoxLayout* ProgrammatorControlPanelLayout;
 
   QPushButton* ServerProgramDeviceButton;
-  QPushButton* AutoProgramDeviceButton;
   QPushButton* ManualProgramDeviceButton;
   QPushButton* ReadDeviceFirmwareButton;
   QPushButton* EraseDeviceButton;
