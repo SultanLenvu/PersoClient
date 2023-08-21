@@ -331,7 +331,7 @@ void FirmwareManager::performServerFirmwareRequest() {
 
 void FirmwareManager::performServerFirmwareLoading() {
   // Начинаем операцию
-  if (!startOperationExecution()) {
+  if (!startOperationExecution("performServerFirmwareLoading")) {
     return;
   }
 
@@ -365,7 +365,7 @@ void FirmwareManager::performServerFirmwareLoading() {
   // firmware.remove();
 
   // Завершаем операцию
-  endOperationExecution();
+  endOperationExecution("performServerFirmwareLoading");
 }
 
 void FirmwareManager::applySettings() {
@@ -479,7 +479,7 @@ void FirmwareManager::setupODQTimer(uint32_t msecs) {
           &QTimer::stop);
 }
 
-bool FirmwareManager::startOperationExecution() {
+bool FirmwareManager::startOperationExecution(const QString& operationName) {
   // Проверяем готовность к выполнению операции
   if (CurrentState != Ready)
     return false;
@@ -488,8 +488,19 @@ bool FirmwareManager::startOperationExecution() {
   CurrentState = WaitingExecution;
 
   // Настраиваем и запускаем таймер для измерения квантов времени
-  setupODQTimer(10);
+  QSettings settings;
+  uint64_t operationDuration =
+      settings
+          .value(QString("FirmwareManager/Operations/") + operationName +
+                 QString("/Duration"))
+          .toInt();
+  uint32_t operationQuantDuration = operationDuration / 100;
+  operationQuantDuration++;
+  setupODQTimer(operationQuantDuration);
   ODQTimer->start();
+
+  // Запускаем таймер для контроля максимальной длительности операции
+  ODTimer->start();
 
   // Запускаем измеритель длительности операции
   ODMeter->start();
@@ -500,21 +511,26 @@ bool FirmwareManager::startOperationExecution() {
   return true;
 }
 
-void FirmwareManager::endOperationExecution() {
+void FirmwareManager::endOperationExecution(const QString& operationName) {
+  QSettings settings;
+
+  // Измеряем и сохраняем длительность операции
+  uint64_t duration = ODMeter->elapsed();
+  emit logging(
+      QString("Длительность операции: %1.").arg(QString::number(duration)));
+  settings.setValue(QString("FirmwareManager/Operations/") + operationName +
+                        QString("/Duration"),
+                    duration);
+
+  // Сигнал о завершении текущей операции
+  emit operationPerformingEnded();
+
   // Оповещаем пользователя о результатах
   if (CurrentState == Completed) {
     emit notifyUser(NotificarionText);
   } else {
     emit notifyUserAboutError(NotificarionText);
   }
-
-  // Измеряем длительность операции
-  uint64_t duration = ODMeter->elapsed();
-  emit logging(
-      QString("Длительность операции: %1.").arg(QString::number(duration)));
-
-  // Сигнал о завершении текущей операции
-  emit operationPerformingEnded();
 
   // Готовы к следующей операции
   CurrentState = Ready;

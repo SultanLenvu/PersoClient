@@ -68,8 +68,8 @@ class FirmwareManager : public QObject {
   void createTimers(void);
   void setupODQTimer(uint32_t msecs);
 
-  bool startOperationExecution(void);
-  void endOperationExecution(void);
+  bool startOperationExecution(const QString& operationName);
+  void endOperationExecution(const QString& operationName);
 
   void deleteHardClientInstance(void);
   void deleteHardProgrammerInstance(void);
