@@ -2,12 +2,13 @@
 #define GUI_H
 
 #include <QObject>
+#include <QSettings>
 #include <QtWidgets>
 
 class GUI : public QWidget {
   Q_OBJECT
  public:
-  enum GuiType { Master, Production };
+  enum GuiType { Authorization, Master, Production };
 
  public:
   QHBoxLayout* MainLayout;

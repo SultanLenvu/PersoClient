@@ -7,7 +7,8 @@
 
 #include "Environment/firmware_manager.h"
 #include "Environment/log_system.h"
-#include "Environment/user_Interaction_system.h"
+#include "Environment/user_interaction_system.h"
+#include "GUI/authorization_gui.h"
 #include "GUI/master_gui.h"
 #include "GUI/production_gui.h"
 #include "General/definitions.h"
@@ -39,6 +40,8 @@ class MainWindow : public QMainWindow {
   ~MainWindow();
 
  public slots:
+  void on_AuthorizePushButton_slot(void);
+
   void on_PersoServerConnectPushButton_slot(void);
   void on_PersoServerDisconnectButton_slot(void);
   void on_PersoServerEchoRequestButton_slot(void);
@@ -67,6 +70,9 @@ class MainWindow : public QMainWindow {
 
   void createMasterInterface(void);
   void connectMasterInterface(void);
+
+  void createAuthorizationInterface(void);
+  void connectAuthorizationInterface(void);
 
   void createProductionInterface(void);
   void connectProductionInterface(void);

@@ -18,13 +18,13 @@
 
 /* Определения клиента */
 //===============================================================
-#define PERSO_SERVER_CONNECTION_WAITING_TIME 5000
+#define PERSO_SERVER_CONNECTION_WAITING_TIME 100
 #define PERSO_SERVER_DEFAULT_IP "127.0.0.1"
 #define PERSO_SERVER_DEFAULT_PORT 6666
 #define IP_PORT_MAX_VALUE 65535
 #define IP_PORT_MIN_VALUE 0
 
-#define DATA_BLOCK_PART_WAIT_TIME 500
+#define DATA_BLOCK_PART_WAIT_TIME 100
 #define ONETIME_TRANSMIT_DATA_SIZE 10240
 #define DATA_BLOCK_MAX_SIZE 250000
 //===============================================================

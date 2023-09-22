@@ -248,8 +248,8 @@ void FirmwareManager::performServerFirmwareLoading() {
 
   // Оповещаем пользователя о результатах
   if (CurrentState != Completed) {
-    emit notifyUserAboutError(NotificarionText);
-    CurrentState = Ready;
+    // Завершаем операцию
+    endOperationExecution("performServerFirmwareLoading");
     return;
   }
 
@@ -473,7 +473,7 @@ void FirmwareManager::on_ProgrammerOperationFinished_slot(
   switch (status) {
     case IProgrammer::NotExecuted:
       CurrentState = Failed;
-      NotificarionText = "Ошибка программатора: операция не была запущена. ";
+      NotificarionText = "Программатор: операция не была запущена. ";
       emit break;
     case IProgrammer::FirmwareFileError:
       CurrentState = Failed;
@@ -527,7 +527,7 @@ void FirmwareManager::on_ClientOperationFinished_slot(
       NotificarionText = "Клиент: получен некорректный ответ от сервера. ";
       break;
     case PersoClient::UnknownError:
-      CurrentState = Completed;
+      CurrentState = Failed;
       NotificarionText = "Клиент: неизвестная ошибка. ";
       break;
     case PersoClient::CompletedSuccessfully:

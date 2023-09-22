@@ -8,8 +8,6 @@
 #include <QProgressBar>
 #include <QProgressDialog>
 
-#include "Environment/firmware_manager.h"
-
 class UserInteractionSystem : public QObject {
   Q_OBJECT
 

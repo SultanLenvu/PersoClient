@@ -9,12 +9,6 @@ MainWindow::MainWindow() {
   // Загружаем настройки приложения
   loadSettings();
 
-  // Настраиваем размер главного окна
-  DesktopGeometry = QApplication::desktop()->screenGeometry();
-  setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
-              DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
-  setLayoutDirection(Qt::LeftToRight);
-
   // Система для взаимодействия с пользователем
   createInteractor();
 
@@ -24,11 +18,22 @@ MainWindow::MainWindow() {
   // Создаем логгер
   createLogger();
 
-  // Создаем графический интерфейс
-  createProductionInterface();
+  // Создаем графический интерфейс для авторизации
+  createAuthorizationInterface();
 }
 
 MainWindow::~MainWindow() {}
+
+void MainWindow::on_AuthorizePushButton_slot() {
+  // Настраиваем размер главного окна
+  DesktopGeometry = QApplication::desktop()->screenGeometry();
+  setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
+              DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
+  setLayoutDirection(Qt::LeftToRight);
+
+  // Создаем графический интерфейс
+  createProductionInterface();
+}
 
 void MainWindow::on_ManualProgramDeviceButton_slot() {
   Logger->clear();
@@ -177,23 +182,31 @@ void MainWindow::createMasterInterface() {
   QString pass;
   emit requestMasterPasswordFromUser(pass);
 
-  if (pass == QString(MASTER_ACCESS_PASSWORD)) {
-    // Создаем интерфейс
-    delete CurrentGUI;
-    CurrentGUI = new MasterGUI(this);
-    CurrentGUI->create();
-    setCentralWidget(CurrentGUI);
-
-    // Подключаем интерфейс
-    connectMasterInterface();
-
-    // Создаем верхнее меню
-    createTopMenu();
-
-    // Включаем систему логгирования
-    Logger->setEnable(true);
-  } else
+  if (pass != QString(MASTER_ACCESS_PASSWORD)) {
     emit notifyUserAboutError("Неверный пароль");
+    return;
+  }
+
+  // Настраиваем размер главного окна
+  DesktopGeometry = QApplication::desktop()->screenGeometry();
+  setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
+              DesktopGeometry.width() * 0.4, DesktopGeometry.height() * 0.4);
+  setLayoutDirection(Qt::LeftToRight);
+
+  // Создаем интерфейс
+  delete CurrentGUI;
+  CurrentGUI = new MasterGUI(this);
+  CurrentGUI->create();
+  setCentralWidget(CurrentGUI);
+
+  // Подключаем интерфейс
+  connectMasterInterface();
+
+  // Создаем верхнее меню
+  createTopMenu();
+
+  // Включаем систему логгирования
+  Logger->setEnable(true);
 }
 
 void MainWindow::connectMasterInterface() {
@@ -237,6 +250,33 @@ void MainWindow::connectMasterInterface() {
   connect(Logger, &LogSystem::requestClearDisplayLog,
           dynamic_cast<MasterGUI*>(CurrentGUI),
           &MasterGUI::clearLogDataDisplay);
+}
+
+void MainWindow::createAuthorizationInterface() {
+  // Настраиваем размер главного окна
+  DesktopGeometry = QApplication::desktop()->screenGeometry();
+  setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
+              DesktopGeometry.width() * 0.4, DesktopGeometry.height() * 0.4);
+  setLayoutDirection(Qt::LeftToRight);
+
+  // Создаем интерфейс
+  delete CurrentGUI;
+  CurrentGUI = new AuthorizationGUI(this);
+  CurrentGUI->create();
+  setCentralWidget(CurrentGUI);
+
+  // Подключаем интерфейс
+  connectAuthorizationInterface();
+
+  // Отключаем систему логгирования
+  Logger->setEnable(false);
+}
+
+void MainWindow::connectAuthorizationInterface() {
+  AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
+
+  connect(gui->AuthorizePushButton, &QPushButton::clicked, this,
+          &MainWindow::on_AuthorizePushButton_slot);
 }
 
 void MainWindow::createProductionInterface() {

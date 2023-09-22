@@ -330,8 +330,7 @@ void PersoClient::processingFirmwareResponse(QJsonObject* responseJson) {
   }
 
   // Сохраняем прошивку в файл
-  FirmwareFile->write(QByteArray::fromBase64(
-      responseJson->value("FirmwareFile").toString().toUtf8()));
+  FirmwareFile->write(responseJson->value("FirmwareFile").toString().toUtf8());
   FirmwareFile->close();
 
   ReturnStatus = CompletedSuccessfully;
@@ -413,8 +412,6 @@ void PersoClient::on_SocketError_slot(
 }
 
 void PersoClient::on_WaitTimerTimeout_slot() {
-  CurrentState = DisconnectedFromServer;
-
   if (CurrentState == WaitingConnectionWithServer) {
     ReturnStatus = ServerConnectionError;
   } else if (CurrentState == WaitingResponse) {
@@ -423,8 +420,10 @@ void PersoClient::on_WaitTimerTimeout_slot() {
     ReturnStatus = UnknownError;
   }
 
+  CurrentState = DisconnectedFromServer;
+
   emit logging("Время ожидания вышло. ");
-  Socket->close();
+  Socket->abort();
 
   emit operationFinished(ReturnStatus);
 }

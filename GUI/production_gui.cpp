@@ -3,7 +3,6 @@
 ProductionGUI::ProductionGUI(QWidget* parent) : GUI(parent, Production) {}
 
 void ProductionGUI::create(void) {
-  // Группа основных кнопок
   MainButtonGroup = new QGroupBox("Панель управления");
   MainLayout->addWidget(MainButtonGroup);
 
