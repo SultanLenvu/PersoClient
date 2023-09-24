@@ -1,18 +1,22 @@
 #ifndef PRODUCTION_GUI_H
 #define PRODUCTION_GUI_H
 
-#include <QtWidgets>
+#include <QTableView>
 
 #include "gui.h"
 
 class ProductionGUI : public GUI {
  public:
-  QGroupBox* MainButtonGroup;
-  QVBoxLayout* MainButtonLayout;
+  QGroupBox* ControlPanelGroup;
+  QVBoxLayout* ControlPanelLayout;
 
-  QPushButton* ProgramDeviceButton;
-
+  QPushButton* LoadTransponderFirmwareButton;
   QSpacerItem* ButtonVerticalSpacer;
+  QPushButton* ReloadTransponderFirmwareButton;
+
+  QGroupBox* TransponderSeedGroup;
+  QVBoxLayout* TransponderSeedLayout;
+  QTableView* TransponderSeedView;
 
  public:
   ProductionGUI(QWidget* parent);

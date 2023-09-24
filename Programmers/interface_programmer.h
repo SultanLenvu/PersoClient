@@ -14,7 +14,7 @@ class IProgrammer : public QObject {
  public:
   enum ExecutionStatus {
     NotExecuted,
-    FirmwareFileError,
+    RequestParameterError,
     DataFileError,
     ProgrammatorError,
     CompletedSuccessfully

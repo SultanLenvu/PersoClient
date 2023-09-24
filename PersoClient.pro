@@ -9,29 +9,33 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    Environment/firmware_manager.cpp \
+    Environment/client_manager.cpp \
     Environment/log_system.cpp \
     Environment/perso_client.cpp \
-    Environment/user_interaction_system.cpp \
+    Environment/transponder_seed_model.cpp \
+    GUI/user_interaction_system.cpp \
     GUI/authorization_gui.cpp \
     GUI/gui.cpp \
+    GUI/mainwindow_kernel.cpp \
     GUI/master_gui.cpp \
     GUI/production_gui.cpp \
+    GUI/transponder_sticker_dialog.cpp \
     Programmers/interface_programmer.cpp \
     Programmers/jlink_exe_programmer.cpp \
-    main.cpp \
-    GUI/mainwindow.cpp
+    main.cpp
 
 HEADERS += \
-    Environment/firmware_manager.h \
+    Environment/client_manager.h \
     Environment/log_system.h \
     Environment/perso_client.h \
-    Environment/user_interaction_system.h \
+    Environment/transponder_seed_model.h \
+    GUI/user_interaction_system.h \
     GUI/authorization_gui.h \
     GUI/gui.h \
-    GUI/mainwindow.h \
+    GUI/mainwindow_kernel.h \
     GUI/master_gui.h \
     GUI/production_gui.h \
+    GUI/transponder_sticker_dialog.h \
     General/types.h \
     General/definitions.h \
     Programmers/interface_programmer.h \

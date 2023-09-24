@@ -21,17 +21,13 @@ class MasterGUI : public GUI {
   QGroupBox* ProgrammatorControlPanel;
   QVBoxLayout* ProgrammatorControlPanelLayout;
 
-  QPushButton* ServerProgramDeviceButton;
-  QPushButton* ManualProgramDeviceButton;
+  QPushButton* ProgramDeviceButton;
   QPushButton* ReadDeviceFirmwareButton;
   QPushButton* EraseDeviceButton;
-
   QPushButton* ProgramDeviceUserDataButton;
   QPushButton* ReadDeviceUserDataButton;
-
   QPushButton* UnlockDeviceButton;
   QPushButton* LockDeviceButton;
-
   QSpacerItem* ButtonVerticalSpacer;
   //============================================================
 
@@ -46,9 +42,13 @@ class MasterGUI : public GUI {
   QPushButton* PersoServerConnectPushButton;
   QPushButton* PersoServerDisconnectButton;
   QPushButton* PersoServerEchoRequestButton;
-  QPushButton* PersoServerFirmwareRequestButton;
-
+  QPushButton* LoadTransponderFirmwareButton;
+  QPushButton* ReloadTransponderFirmwareButton;
   QSpacerItem* ButtonVerticalSpacer1;
+
+  QGroupBox* TransponderSeedGroup;
+  QVBoxLayout* TransponderSeedLayout;
+  QTableView* TransponderSeedView;
   //============================================================
 
   /* Настройки клиента */

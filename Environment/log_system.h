@@ -11,7 +11,6 @@ class LogSystem : public QObject {
   Q_OBJECT
 
  private:
-  bool EnableIndicator;
 
  public:
   LogSystem(QObject* parent);
@@ -19,7 +18,6 @@ class LogSystem : public QObject {
 
  public:
   void clear(void);
-  void setEnable(bool option);
 
  public slots:
   void generate(const QString& log);

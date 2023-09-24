@@ -8,11 +8,15 @@
 #include <QProgressBar>
 #include <QProgressDialog>
 
+#include "transponder_sticker_dialog.h"
+
 class UserInteractionSystem : public QObject {
   Q_OBJECT
 
  private:
   QWidget* ParentWindow;
+  QDialog* UserInputDialog;
+
   QProgressDialog* ProgressDialog;
   uint32_t CurrentOperationStep;
 
@@ -21,8 +25,11 @@ class UserInteractionSystem : public QObject {
 
  public slots:
   void generateMessage(const QString& pass);
-  void getMasterPassword(QString& pass);
   void generateErrorMessage(const QString& text);
+
+  void getMasterPassword(QString& pass);
+  void getTransponderStickerData(QStringList& data);
+
   void generateProgressDialog(void);
   void completeProgressDialog(void);
   void performeProgressDialogStep(void);

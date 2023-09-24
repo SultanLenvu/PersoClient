@@ -1,5 +1,5 @@
-#ifndef FIRMWARE_MANAGER_H
-#define FIRMWARE_MANAGER_H
+#ifndef CLIENT_MANAGER_H
+#define CLIENT_MANAGER_H
 
 #include <QApplication>
 #include <QElapsedTimer>
@@ -13,11 +13,12 @@
 #include "Programmers/jlink_exe_programmer.h"
 #include "log_system.h"
 #include "perso_client.h"
+#include "transponder_seed_model.h"
 
 #include "General/definitions.h"
 #include "General/types.h"
 
-class FirmwareManager : public QObject {
+class ClientManager : public QObject {
   Q_OBJECT
  public:
   enum OperationState { Ready, WaitingExecution, Failed, Completed };
@@ -37,12 +38,21 @@ class FirmwareManager : public QObject {
   QElapsedTimer* ODMeter;
 
  public:
-  explicit FirmwareManager(QObject* parent);
-  ~FirmwareManager();
+  explicit ClientManager(QObject* parent);
+  ~ClientManager();
 
   IProgrammer* programmer(void) const;
 
-  void performFirmwareLoading(const QString& path, bool unlockOption);
+  bool performServerAuthorization(const QString& login,
+                                  const QString& password);
+  void performServerConnecting(void);
+  void performServerDisconnecting(void);
+  void performServerEcho(void);
+  void performTransponderFirmwareLoading(TransponderSeedModel* model);
+  void performTransponderFirmwareReloading(TransponderSeedModel* model,
+                                           const QString& pan);
+
+  void performLocalFirmwareLoading(const QString& path, bool unlockOption);
   void performFirmwareReading(void);
   void performFirmwareErasing(void);
 
@@ -51,13 +61,6 @@ class FirmwareManager : public QObject {
 
   void performDeviceUnlock(void);
   void performDeviceLock(void);
-
-  void performServerConnecting(void);
-  void performServerDisconnecting(void);
-  void performServerEchoRequest(void);
-  void performServerFirmwareRequest(void);
-
-  void performServerFirmwareLoading(void);
 
   void applySettings(void);
 
@@ -105,8 +108,16 @@ class FirmwareManager : public QObject {
   void connectToPersoServer_signal(void);
   void disconnectFromPersoServer_signal(void);
 
+  void requestAuthorize_signal(const QString& login, const QString& password);
   void requestEcho_signal(void);
-  void requestFirmware_signal(QFile* firmware);
+  void requestTransponderRelease_signal(QFile* firmware);
+  void requestTransponderReleaseConfirm_signal(
+      const QMap<QString, QString>* requestAttributes,
+      QMap<QString, QString>* responseAttributes);
+  void requestTransponderRerelease_signal(QFile* firmware, const QString& pan);
+  void requestTransponderRereleaseConfirm_signal(
+      const QMap<QString, QString>* requestAttributes,
+      QMap<QString, QString>* responseAttributes);
 };
 
-#endif  // FIRMWARE_MANAGER_H
+#endif  // CLIENT_MANAGER_H

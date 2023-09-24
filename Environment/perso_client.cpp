@@ -5,8 +5,6 @@ PersoClient::PersoClient(QObject *parent) : QObject(parent)
   setObjectName("PersoClient");
   applySettings();
 
-  FirmwareFile = nullptr;
-
   Socket = new QTcpSocket(this);
   connect(Socket, &QTcpSocket::connected, this,
           &PersoClient::on_SocketConnected_slot);
@@ -37,7 +35,8 @@ PersoClient::PersoClient(QObject *parent) : QObject(parent)
           QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error),
           WaitingLoop, &QEventLoop::quit);
   connect(WaitTimer, &QTimer::timeout, WaitingLoop, &QEventLoop::quit);
-  connect(this, &PersoClient::stopWaiting, WaitingLoop, &QEventLoop::quit);
+  connect(this, &PersoClient::stopResponseWaiting, WaitingLoop,
+          &QEventLoop::quit);
 
   // Команды еще не выполнялись
   ReturnStatus = NotExecuted;
@@ -87,12 +86,12 @@ void PersoClient::disconnectFromPersoServer() {
   emit operationFinished(CompletedSuccessfully);
 }
 
-void PersoClient::requestEcho() {
+void PersoClient::requestAuthorize(const QString& login,
+                                   const QString& password) {
   CurrentState = Ready;
 
   // Создаем запрос
-  createEchoRequest();
-
+  createAuthorizationRequest(login, password);
   CurrentState = RequestCreated;
 
   // Подключаемся к серверу персонализации
@@ -101,38 +100,27 @@ void PersoClient::requestEcho() {
     emit operationFinished(ServerConnectionError);
     return;
   }
-
   CurrentState = ConnectedToServer;
 
   // Отправляем сформированный блок данных
   transmitDataBlock();
 
-  CurrentState = RequestTransmitted;
-
   // Отключаемся от сервера
   Socket->close();
   CurrentState = DisconnectedFromServer;
+
+  // Обрабатываем полученный ответ
+  processAuthorizationResponse();
 
   // Возвращаем статус выполнения команды
   emit operationFinished(ReturnStatus);
 }
 
-void PersoClient::requestFirmware(QFile* firmware) {
+void PersoClient::requestEcho() {
   CurrentState = Ready;
 
-  // Проверка на существование
-  if (!firmware) {
-    emit logging("Файл прошивки не создан. Сброс.");
-    emit operationFinished(FirmwareFileError);
-    return;
-  }
-
-  // Запоминаем файл
-  FirmwareFile = firmware;
-
   // Создаем запрос
-  createFirmwareRequest();
-
+  createEchoRequest();
   CurrentState = RequestCreated;
 
   // Подключаемся к серверу персонализации
@@ -147,11 +135,165 @@ void PersoClient::requestFirmware(QFile* firmware) {
   // Отправляем сформированный блок данных
   transmitDataBlock();
 
-  CurrentState = RequestTransmitted;
+  // Отключаемся от сервера
+  Socket->close();
+  CurrentState = DisconnectedFromServer;
+
+  // Обрабатываем полученный ответ
+  processEchoResponse();
+
+  // Возвращаем статус выполнения команды
+  emit operationFinished(ReturnStatus);
+}
+
+void PersoClient::requestTransponderRelease(QFile* firmware) {
+  CurrentState = Ready;
+
+  // Проверка на существование
+  if (!firmware) {
+    emit logging("Файл прошивки не создан. Сброс.");
+    emit operationFinished(RequestParameterError);
+    return;
+  }
+
+  // Создаем запрос
+  createTransponderRelease();
+  CurrentState = RequestCreated;
+
+  // Подключаемся к серверу персонализации
+  if (!processingServerConnection()) {
+    CurrentState = DisconnectedFromServer;
+    emit operationFinished(ServerConnectionError);
+    return;
+  }
+
+  CurrentState = ConnectedToServer;
+
+  // Отправляем сформированный блок данных
+  transmitDataBlock();
 
   // Отключаемся от сервера
   Socket->close();
   CurrentState = DisconnectedFromServer;
+
+  // Обрабатываем полученный ответ
+  processTransponderReleaseResponse(firmware);
+
+  // Возвращаем статус выполнения команды
+  emit operationFinished(ReturnStatus);
+}
+
+void PersoClient::requestTransponderReleaseConfirm(
+    const QMap<QString, QString>* requestAttributes,
+    QMap<QString, QString>* responseAttributes) {
+  CurrentState = Ready;
+
+  // Проверка на существование
+  if ((!requestAttributes) || (!responseAttributes)) {
+    emit logging("Получены не корректные параметры запроса. Сброс.");
+    emit operationFinished(RequestParameterError);
+    return;
+  }
+
+  // Создаем запрос
+  createTransponderReleaseConfirm();
+  CurrentState = RequestCreated;
+
+  // Подключаемся к серверу персонализации
+  if (!processingServerConnection()) {
+    CurrentState = DisconnectedFromServer;
+    emit operationFinished(ServerConnectionError);
+    return;
+  }
+
+  CurrentState = ConnectedToServer;
+
+  // Отправляем сформированный блок данных
+  transmitDataBlock();
+
+  // Отключаемся от сервера
+  Socket->close();
+  CurrentState = DisconnectedFromServer;
+
+  // Обрабатываем полученный ответ
+  processTransponderReleaseConfirmResponse(responseAttributes);
+
+  // Возвращаем статус выполнения команды
+  emit operationFinished(ReturnStatus);
+}
+
+void PersoClient::requestTransponderRerelease(QFile* firmware,
+                                              const QString& pan) {
+  CurrentState = Ready;
+
+  // Проверка на существование
+  if ((!firmware) || (pan.isEmpty())) {
+    emit logging("Получены не корректные параметры запроса. Сброс.");
+    emit operationFinished(RequestParameterError);
+    return;
+  }
+
+  // Создаем запрос
+  createTransponderRelease();
+  CurrentState = RequestCreated;
+
+  // Подключаемся к серверу персонализации
+  if (!processingServerConnection()) {
+    CurrentState = DisconnectedFromServer;
+    emit operationFinished(ServerConnectionError);
+    return;
+  }
+
+  CurrentState = ConnectedToServer;
+
+  // Отправляем сформированный блок данных
+  transmitDataBlock();
+
+  // Отключаемся от сервера
+  Socket->close();
+  CurrentState = DisconnectedFromServer;
+
+  // Обрабатываем полученный ответ
+  processTransponderReleaseResponse(firmware);
+
+  // Возвращаем статус выполнения команды
+  emit operationFinished(ReturnStatus);
+}
+
+void PersoClient::requestTransponderRereleaseConfirm(
+    const QMap<QString, QString>* requestAttributes,
+    QMap<QString, QString>* responseAttributes) {
+  CurrentState = Ready;
+
+  // Проверка на существование
+  if ((!requestAttributes) || (!responseAttributes)) {
+    emit logging("Получены не корректные параметры запроса. Сброс.");
+    emit operationFinished(RequestParameterError);
+    return;
+  }
+
+  // Создаем запрос
+  createTransponderReleaseConfirm();
+  CurrentState = RequestCreated;
+
+  // Подключаемся к серверу персонализации
+  if (!processingServerConnection()) {
+    CurrentState = DisconnectedFromServer;
+    emit operationFinished(ServerConnectionError);
+    return;
+  }
+
+  CurrentState = ConnectedToServer;
+
+  // Отправляем сформированный блок данных
+  transmitDataBlock();
+
+  // Отключаемся от сервера
+  Socket->close();
+  CurrentState = DisconnectedFromServer;
+
+  // Обрабатываем полученный ответ
+  processTransponderRereleaseConfirmResponse(responseAttributes);
 
   // Возвращаем статус выполнения команды
   emit operationFinished(ReturnStatus);
@@ -180,7 +322,7 @@ bool PersoClient::processingServerConnection() {
 
 void PersoClient::processingDataBlock() {
   QJsonParseError status;
-  CurrentResponse = QJsonDocument::fromJson(ReceivedDataBlock, &status);
+  CurrentResponseDocument = QJsonDocument::fromJson(ReceivedDataBlock, &status);
 
   // Если пришел некорректный JSON
   if (status.error != QJsonParseError::NoError) {
@@ -189,38 +331,20 @@ void PersoClient::processingDataBlock() {
     return;
   }
 
+  emit logging(
+      QString("Размер ответа на команду: %1. Содержание ответа: %2. ")
+          .arg(QString::number(CurrentResponseDocument.toJson().size()),
+               QString(CurrentResponseDocument.toJson())));
+
   // Выделяем список пар ключ-значение из JSON-файла
-  QJsonObject json = CurrentResponse.object();
-
-  // Синтаксическая проверка
-  if (json.value("CommandName") == QJsonValue::Undefined) {
-    emit logging(
-        "Обнаружена синтаксическая ошибка: в запросе отсутствует название "
-        "команды. ");
-    ReturnStatus = ResponseProcessingError;
-    return;
-  }
-
-  // Вызываем соответствующий обработчик команды
-  if (json.value("CommandName").toString() == "EchoResponse") {
-    processingEchoResponse(&json);
-  } else if (json.value("CommandName").toString() == "FirmwareResponse") {
-    processingFirmwareResponse(&json);
-  } else {
-    emit logging(
-        "Обнаружена синтаксическая ошибка: получена неизвестная команда. ");
-    ReturnStatus = ResponseProcessingError;
-    return;
-  }
+  CurrentResponse = CurrentResponseDocument.object();
 }
 
-void PersoClient::createDataBlock() {
+void PersoClient::createDataBlock(void) {
   emit logging("Формирование блока данных для команды. ");
-  emit logging(
-      QString("Размер команды: %1. Содержание команды: %2. ")
-          .arg(QString::number(
-              CurrentCommand.toJson(QJsonDocument::Compact).size()))
-          .arg(QString(CurrentCommand.toJson(QJsonDocument::Compact))));
+  emit logging(QString("Размер команды: %1. Содержание команды: %2. ")
+                   .arg(QString::number(CurrentCommandDocument.toJson().size()),
+                        QString(CurrentCommandDocument.toJson())));
 
   // Инициализируем блок данных и сериализатор
   TransmittedDataBlock.clear();
@@ -228,12 +352,15 @@ void PersoClient::createDataBlock() {
   serializator.setVersion(QDataStream::Qt_5_12);
 
   // Формируем единый блок данных для отправки
-  serializator << uint32_t(0) << CurrentCommand.toJson(QJsonDocument::Compact);
+  serializator << uint32_t(0) << CurrentCommandDocument.toJson();
   serializator.device()->seek(0);
   serializator << uint32_t(TransmittedDataBlock.size() - sizeof(uint32_t));
 }
 
 void PersoClient::transmitDataBlock() {
+  // Ответный блок данных еще не получен
+  ReceivedDataBlockSize = 0;
+
   // Если размер блок не превышает максимального размера данных для единоразовой
   // передачи
   if (TransmittedDataBlock.size() < ONETIME_TRANSMIT_DATA_SIZE) {
@@ -247,23 +374,25 @@ void PersoClient::transmitDataBlock() {
       Socket->write(TransmittedDataBlock.mid(i, ONETIME_TRANSMIT_DATA_SIZE));
     }
   }
+  CurrentState = WaitingResponse;
 
   // Ожидаем ответ
   WaitTimer->start();
   WaitingLoop->exec();
+  CurrentState = ResponseReceived;
 }
 
-void PersoClient::createEchoRequest() {
-  QJsonObject json;
+void PersoClient::createAuthorizationRequest(const QString& login,
+                                             const QString& password) {
   emit logging("Формирование команды EchoRequest. ");
 
   // Заголовок команды
-  json["CommandName"] = "EchoRequest";
+  CurrentCommand["CommandName"] = "Authorization";
 
   // Тело команды
-  json["EchoData"] = "TestData";
-
-  CurrentCommand.setObject(json);
+  CurrentCommand["Login"] = login;
+  CurrentCommand["Password"] = password;
+  CurrentCommandDocument.setObject(CurrentCommand);
 
   // Ответный блок данных еще не получен
   ReceivedDataBlockSize = 0;
@@ -272,17 +401,29 @@ void PersoClient::createEchoRequest() {
   createDataBlock();
 }
 
-void PersoClient::createFirmwareRequest() {
-  QJsonObject json;
+void PersoClient::createEchoRequest(void) {
+  emit logging("Формирование команды EchoRequest. ");
+
+  // Заголовок команды
+  CurrentCommand["CommandName"] = "Echo";
+
+  // Тело команды
+  CurrentCommand["EchoData"] = "TestData";
+  CurrentCommandDocument.setObject(CurrentCommand);
+
+  // Создаем блок данных для команды
+  createDataBlock();
+}
+
+void PersoClient::createTransponderRelease(void) {
   emit logging("Формирование команды FirmwareRequest. ");
 
   // Заголовок команды
-  json["CommandName"] = "FirmwareRequest";
+  CurrentCommand["CommandName"] = "FirmwareRequest";
 
   // Тело команды
-  json["UCID"] = "123456789";
-
-  CurrentCommand.setObject(json);
+  CurrentCommand["UCID"] = "123456789";
+  CurrentCommandDocument.setObject(CurrentCommand);
 
   // Ответный блок данных еще не получен
   ReceivedDataBlockSize = 0;
@@ -291,12 +432,20 @@ void PersoClient::createFirmwareRequest() {
   createDataBlock();
 }
 
-void PersoClient::processingEchoResponse(QJsonObject* responseJson) {
+void PersoClient::createTransponderReleaseConfirm(void) {}
+
+void PersoClient::createTransponderRerelease(void) {}
+
+void PersoClient::createTransponderRereleaseConfirm(void) {}
+
+void PersoClient::processAuthorizationResponse(void) {}
+
+void PersoClient::processEchoResponse(void) {
   emit logging("Обработка ответа на команду EchoRequest. ");
 
-  if (responseJson->value("EchoData") != QJsonValue::Undefined) {
+  if (CurrentResponse.value("EchoData") != QJsonValue::Undefined) {
     emit logging(QString("Полученные эхо-данные: %1.")
-                     .arg(responseJson->value("EchoData").toString()));
+                     .arg(CurrentResponse.value("EchoData").toString()));
     emit logging("Команда EchoRequest успешно выполнена. ");
     ReturnStatus = CompletedSuccessfully;
   } else {
@@ -307,14 +456,14 @@ void PersoClient::processingEchoResponse(QJsonObject* responseJson) {
   }
 }
 
-void PersoClient::processingFirmwareResponse(QJsonObject* responseJson) {
+void PersoClient::processTransponderReleaseResponse(QFile* firmware) {
   // Блокируем доступ к файлу
   QMutexLocker locker(&Mutex);
 
   emit logging("Обработка ответа на команду FirmwareRequest. ");
 
   // Синтаксическая проверка
-  if (responseJson->value("FirmwareFile") == QJsonValue::Undefined) {
+  if (CurrentResponse.value("FirmwareFile") == QJsonValue::Undefined) {
     emit logging(
         "Обнаружена синтаксическая ошибка в ответе FirmwareResponse: "
         "отсутствует файл прошивки. ");
@@ -323,19 +472,27 @@ void PersoClient::processingFirmwareResponse(QJsonObject* responseJson) {
   }
 
   // Сохраняем присланный файл прошивки
-  if (!FirmwareFile->open(QIODevice::WriteOnly)) {
+  if (!firmware->open(QIODevice::WriteOnly)) {
     emit logging("Не удалось сохранить файл прошивки. ");
-    ReturnStatus = FirmwareFileError;
+    ReturnStatus = RequestParameterError;
     return;
   }
 
   // Сохраняем прошивку в файл
-  FirmwareFile->write(responseJson->value("FirmwareFile").toString().toUtf8());
-  FirmwareFile->close();
+  firmware->write(CurrentResponse.value("FirmwareFile").toString().toUtf8());
+  firmware->close();
 
   ReturnStatus = CompletedSuccessfully;
   emit logging("Команда FirmwareRequest успешно выполнена. ");
 }
+
+void PersoClient::processTransponderReleaseConfirmResponse(
+    QMap<QString, QString>* responseAttributes) {}
+
+void PersoClient::processTransponderRereleaseResponse(QFile* firmware) {}
+
+void PersoClient::processTransponderRereleaseConfirmResponse(
+    QMap<QString, QString>* responseAttributes) {}
 
 void PersoClient::on_SocketDisconnected_slot() {
   emit logging("Соединение с сервером персонализации отключено. ");
@@ -354,7 +511,7 @@ void PersoClient::on_SocketReadyRead_slot() {
   if (ReceivedDataBlockSize == 0) {
     // Если размер поступивших байт меньше размера поля с размером байт, то
     // блок поступившие данные отбрасываются
-    if (Socket->bytesAvailable() < sizeof(uint32_t)) {
+    if (Socket->bytesAvailable() < static_cast<int64_t>(sizeof(uint32_t))) {
       emit logging(
           "Размер полученных данных слишком мал. Ожидается прием следующих "
           "частей. ");
@@ -372,7 +529,7 @@ void PersoClient::on_SocketReadyRead_slot() {
     if (ReceivedDataBlockSize > DATA_BLOCK_MAX_SIZE) {
       emit logging("Размер блока данных слишком большой. Сброс. ");
       // Останавливаем цикл ожидания
-      emit stopWaiting();
+      emit stopResponseWaiting();
       ReceivedDataBlockSize = 0;
     }
   }
@@ -391,11 +548,11 @@ void PersoClient::on_SocketReadyRead_slot() {
   // Если блок был получен целиком, то осуществляем его дессериализацию
   deserializator >> ReceivedDataBlock;
 
-  // Останавливаем цикл ожидания
-  emit stopWaiting();
-
-  // Осуществляем обработку полученных данных
+  // Осуществляем первичную обработку полученных данных
   processingDataBlock();
+
+  // Останавливаем цикл ожидания
+  emit stopResponseWaiting();
 }
 
 void PersoClient::on_SocketError_slot(
@@ -404,8 +561,7 @@ void PersoClient::on_SocketError_slot(
   CurrentState = DisconnectedFromServer;
 
   emit logging(QString("Ошибка сети: Код: %1. Описание: %2.")
-                   .arg(QString::number(socketError))
-                   .arg(Socket->errorString()));
+                   .arg(QString::number(socketError), Socket->errorString()));
   Socket->close();
 
   emit operationFinished(ReturnStatus);

@@ -1,7 +1,7 @@
-#include "firmware_manager.h"
+#include "client_manager.h"
 
-FirmwareManager::FirmwareManager(QObject* parent) : QObject(parent) {
-  setObjectName("FirmwareManager");
+ClientManager::ClientManager(QObject* parent) : QObject(parent) {
+  setObjectName("ClientManager");
 
   // Создаем программатор и среду его выполнения
   createProgrammerInstance();
@@ -19,7 +19,7 @@ FirmwareManager::FirmwareManager(QObject* parent) : QObject(parent) {
   CurrentState = Ready;
 }
 
-FirmwareManager::~FirmwareManager() {
+ClientManager::~ClientManager() {
   if (ProgrammerThread->isRunning()) {
     ProgrammerThread->quit();
     ProgrammerThread->wait();
@@ -33,14 +33,171 @@ FirmwareManager::~FirmwareManager() {
   delete ODMeter;
 }
 
-IProgrammer* FirmwareManager::programmer() const {
+IProgrammer* ClientManager::programmer() const {
   return Programmer;
 }
 
-void FirmwareManager::performFirmwareLoading(const QString& path,
-                                             bool unlockOption) {
+bool ClientManager::performServerAuthorization(const QString& login,
+                                               const QString& password) {
+  return true;
   // Начинаем операцию
-  if (!startOperationExecution("performFirmwareLoading")) {
+  if (!startOperationExecution("performServerAuthorization")) {
+    return false;
+  }
+
+  emit logging("Авторизация на сервере персонализации. ");
+  emit requestAuthorize_signal(login, password);
+
+  // Запуск цикла ожидания
+  WaitingLoop->exec();
+
+  // Завершаем операцию
+  endOperationExecution("performServerAuthorization");
+
+  return true;
+}
+
+void ClientManager::performServerConnecting() {
+  // Начинаем операцию
+  if (!startOperationExecution("performServerConnecting")) {
+    return;
+  }
+
+  emit logging("Подключение к серверу персонализации. ");
+  emit connectToPersoServer_signal();
+
+  // Запуск цикла ожидания
+  WaitingLoop->exec();
+
+  // Завершаем операцию
+  endOperationExecution("performServerConnecting");
+}
+
+void ClientManager::performServerDisconnecting() {
+  // Начинаем операцию
+  if (!startOperationExecution("performServerDisconnecting")) {
+    return;
+  }
+
+  emit logging("Отключение от сервера персонализации. ");
+  emit disconnectFromPersoServer_signal();
+
+  // Запуск цикла ожидания
+  WaitingLoop->exec();
+
+  // Завершаем операцию
+  endOperationExecution("performServerDisconnecting");
+}
+
+void ClientManager::performServerEcho() {
+  // Начинаем операцию
+  if (!startOperationExecution("performServerEcho")) {
+    return;
+  }
+
+  emit logging("Отправка эхо-запроса на сервер персонализации. ");
+  emit requestEcho_signal();
+
+  // Запуск цикла ожидания
+  WaitingLoop->exec();
+
+  // Завершаем операцию
+  endOperationExecution("performServerEcho");
+}
+
+void ClientManager::performTransponderFirmwareLoading(
+    TransponderSeedModel* model) {
+  // Начинаем операцию
+  if (!startOperationExecution("performTransponderFirmwareLoading")) {
+    return;
+  }
+
+  // Создаем файл прошивки
+  QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
+
+  emit logging("Отправка запроса на выпуск транспондера. ");
+  emit requestTransponderRelease_signal(&firmware);
+
+  // Запуск цикла ожидания
+  WaitingLoop->exec();
+
+  // Создаем структуру данных транспондера
+  QMap<QString, QString> requestAttributes;
+  QMap<QString, QString>* responseAttributes = new QMap<QString, QString>;
+
+  emit logging("Отправка запроса на подтверждение выпуска транспондера. ");
+  emit requestTransponderReleaseConfirm_signal(&requestAttributes,
+                                               responseAttributes);
+
+  // Запуск цикла ожидания
+  WaitingLoop->exec();
+
+  // Строим модель для представления
+  model->build(responseAttributes);
+
+  // Завершаем операцию
+  endOperationExecution("performTransponderFirmwareLoading");
+}
+
+void ClientManager::performTransponderFirmwareReloading(
+    TransponderSeedModel* model,
+    const QString& pan) {
+  // Начинаем операцию
+  if (!startOperationExecution("performTransponderFirmwareReloading")) {
+    return;
+  }
+
+  // Создаем файл прошивки
+  QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
+
+  // Запрашиваем файл прошивки у сервера
+  emit logging("Отправка запроса на выпуск транспондера. ");
+  emit requestTransponderRerelease_signal(&firmware, pan);
+
+  // Запуск цикла ожидания
+  WaitingLoop->exec();
+
+  // Создаем структуры данных транспондера
+  QMap<QString, QString> requestAttributes;
+  QMap<QString, QString>* responseAttributes = new QMap<QString, QString>;
+
+  emit logging("Отправка запроса на подтверждение выпуска транспондера. ");
+  emit requestTransponderRereleaseConfirm_signal(&requestAttributes,
+                                                 responseAttributes);
+
+  // Запуск цикла ожидания
+  WaitingLoop->exec();
+
+  // Строим модель для представления
+  model->build(responseAttributes);
+
+  // Оповещаем пользователя о результатах
+  if (CurrentState != Completed) {
+    // Завершаем операцию
+    endOperationExecution("performTransponderFirmwareReloading");
+    return;
+  }
+
+  emit logging("Разблокирование памяти и загрузка прошивки микроконтроллера. ");
+  emit loadFirmwareWithUnlock_signal(&firmware);
+
+  // Переходим в состояние ожидания конца обработки
+  CurrentState = WaitingExecution;
+
+  // Запуск цикла ожидания
+  WaitingLoop->exec();
+
+  // Удаляем файл прошивки
+  // firmware.remove();
+
+  // Завершаем операцию
+  endOperationExecution("performTransponderFirmwareReloading");
+}
+
+void ClientManager::performLocalFirmwareLoading(const QString& path,
+                                                bool unlockOption) {
+  // Начинаем операцию
+  if (!startOperationExecution("performLocalFirmwareLoading")) {
     return;
   }
 
@@ -61,10 +218,10 @@ void FirmwareManager::performFirmwareLoading(const QString& path,
   WaitingLoop->exec();
 
   // Завершаем операцию
-  endOperationExecution("performFirmwareLoading");
+  endOperationExecution("performLocalFirmwareLoading");
 }
 
-void FirmwareManager::performFirmwareReading() {
+void ClientManager::performFirmwareReading() {
   // Начинаем операцию
   if (!startOperationExecution("performFirmwareReading")) {
     return;
@@ -80,7 +237,7 @@ void FirmwareManager::performFirmwareReading() {
   endOperationExecution("performFirmwareReading");
 }
 
-void FirmwareManager::performFirmwareErasing() {
+void ClientManager::performFirmwareErasing() {
   // Начинаем операцию
   if (!startOperationExecution("performFirmwareErasing")) {
     return;
@@ -96,7 +253,7 @@ void FirmwareManager::performFirmwareErasing() {
   endOperationExecution("performFirmwareErasing");
 }
 
-void FirmwareManager::performDataReading() {
+void ClientManager::performDataReading() {
   // Начинаем операцию
   if (!startOperationExecution("performDataReading")) {
     return;
@@ -112,7 +269,7 @@ void FirmwareManager::performDataReading() {
   endOperationExecution("performDataReading");
 }
 
-void FirmwareManager::performDataLoading(const QString& path) {
+void ClientManager::performDataLoading(const QString& path) {
   // Начинаем операцию
   if (!startOperationExecution("performDataLoading")) {
     return;
@@ -131,7 +288,7 @@ void FirmwareManager::performDataLoading(const QString& path) {
   endOperationExecution("performDataLoading");
 }
 
-void FirmwareManager::performDeviceUnlock() {
+void ClientManager::performDeviceUnlock() {
   // Начинаем операцию
   if (!startOperationExecution("performDeviceUnlock")) {
     return;
@@ -147,7 +304,7 @@ void FirmwareManager::performDeviceUnlock() {
   endOperationExecution("performDeviceUnlock");
 }
 
-void FirmwareManager::performDeviceLock() {
+void ClientManager::performDeviceLock() {
   // Начинаем операцию
   if (!startOperationExecution("performDeviceLock")) {
     return;
@@ -163,118 +320,12 @@ void FirmwareManager::performDeviceLock() {
   endOperationExecution("performDeviceLock");
 }
 
-void FirmwareManager::performServerConnecting() {
-  // Начинаем операцию
-  if (!startOperationExecution("performServerConnecting")) {
-    return;
-  }
-
-  emit logging("Подключение к серверу персонализации. ");
-  emit connectToPersoServer_signal();
-
-  // Запуск цикла ожидания
-  WaitingLoop->exec();
-
-  // Завершаем операцию
-  endOperationExecution("performServerConnecting");
-}
-
-void FirmwareManager::performServerDisconnecting() {
-  // Начинаем операцию
-  if (!startOperationExecution("performServerDisconnecting")) {
-    return;
-  }
-
-  emit logging("Отключение от сервера персонализации. ");
-  emit disconnectFromPersoServer_signal();
-
-  // Запуск цикла ожидания
-  WaitingLoop->exec();
-
-  // Завершаем операцию
-  endOperationExecution("performServerDisconnecting");
-}
-
-void FirmwareManager::performServerEchoRequest() {
-  // Начинаем операцию
-  if (!startOperationExecution("performServerEchoRequest")) {
-    return;
-  }
-
-  emit logging("Отправка эхо-запроса на сервер персонализации. ");
-  emit requestEcho_signal();
-
-  // Запуск цикла ожидания
-  WaitingLoop->exec();
-
-  // Завершаем операцию
-  endOperationExecution("performServerEchoRequest");
-}
-
-void FirmwareManager::performServerFirmwareRequest() {
-  // Начинаем операцию
-  if (!startOperationExecution("performServerFirmwareRequest")) {
-    return;
-  }
-
-  // Создаем файл прошивки
-  QFile firmware("firmware.hex", this);
-
-  emit logging("Отправка запроса на получение прошивки. ");
-  emit requestFirmware_signal(&firmware);
-
-  // Запуск цикла ожидания
-  WaitingLoop->exec();
-
-  // Завершаем операцию
-  endOperationExecution("performServerFirmwareRequest");
-}
-
-void FirmwareManager::performServerFirmwareLoading() {
-  // Начинаем операцию
-  if (!startOperationExecution("performServerFirmwareLoading")) {
-    return;
-  }
-
-  // Создаем файл прошивки
-  QFile firmware("firmware.hex", this);
-
-  // Запрашиваем файл прошивки у сервера
-  emit logging("Отправка запроса на получение прошивки. ");
-  emit requestFirmware_signal(&firmware);
-
-  // Запуск цикла ожидания
-  WaitingLoop->exec();
-
-  // Оповещаем пользователя о результатах
-  if (CurrentState != Completed) {
-    // Завершаем операцию
-    endOperationExecution("performServerFirmwareLoading");
-    return;
-  }
-
-  emit logging("Разблокирование памяти и загрузка прошивки микроконтроллера. ");
-  emit loadFirmwareWithUnlock_signal(&firmware);
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
-
-  // Запуск цикла ожидания
-  WaitingLoop->exec();
-
-  // Удаляем файл прошивки
-  // firmware.remove();
-
-  // Завершаем операцию
-  endOperationExecution("performServerFirmwareLoading");
-}
-
-void FirmwareManager::applySettings() {
+void ClientManager::applySettings() {
   Client->applySettings();
   Programmer->applySettings();
 }
 
-void FirmwareManager::createProgrammerInstance() {
+void ClientManager::createProgrammerInstance() {
   // Создаем поток для программатора
   ProgrammerThread = new QThread(this);
 
@@ -284,7 +335,7 @@ void FirmwareManager::createProgrammerInstance() {
 
   // Подключаем логгирование к Programmer'у
   connect(Programmer, &IProgrammer::logging, this,
-          &FirmwareManager::proxyLogging);
+          &ClientManager::proxyLogging);
   // Когда поток завершит работу, объект Programmer будет удален
   connect(ProgrammerThread, &QThread::finished, Programmer,
           &QObject::deleteLater);
@@ -293,31 +344,31 @@ void FirmwareManager::createProgrammerInstance() {
           &QObject::deleteLater);
   // Когда программатор завершит операцию, можно будет приступить к следующей
   connect(Programmer, &IProgrammer::operationFinished, this,
-          &FirmwareManager::on_ProgrammerOperationFinished_slot);
+          &ClientManager::on_ProgrammerOperationFinished_slot);
 
   // Подключаем функционал
-  connect(this, &FirmwareManager::loadFirmware_signal, Programmer,
+  connect(this, &ClientManager::loadFirmware_signal, Programmer,
           &IProgrammer::loadFirmware);
-  connect(this, &FirmwareManager::loadFirmwareWithUnlock_signal, Programmer,
+  connect(this, &ClientManager::loadFirmwareWithUnlock_signal, Programmer,
           &IProgrammer::loadFirmwareWithUnlock);
-  connect(this, &FirmwareManager::readFirmware_signal, Programmer,
+  connect(this, &ClientManager::readFirmware_signal, Programmer,
           &IProgrammer::readFirmware);
-  connect(this, &FirmwareManager::eraseFirmware_signal, Programmer,
+  connect(this, &ClientManager::eraseFirmware_signal, Programmer,
           &IProgrammer::eraseFirmware);
-  connect(this, &FirmwareManager::loadData_signal, Programmer,
+  connect(this, &ClientManager::loadData_signal, Programmer,
           &IProgrammer::loadData);
-  connect(this, &FirmwareManager::readData_signal, Programmer,
+  connect(this, &ClientManager::readData_signal, Programmer,
           &IProgrammer::readData);
-  connect(this, &FirmwareManager::unlockDevice_signal, Programmer,
+  connect(this, &ClientManager::unlockDevice_signal, Programmer,
           &IProgrammer::unlockDevice);
-  connect(this, &FirmwareManager::lockDevice_signal, Programmer,
+  connect(this, &ClientManager::lockDevice_signal, Programmer,
           &IProgrammer::lockDevice);
 
   // Запускаем поток програматора
   ProgrammerThread->start();
 }
 
-void FirmwareManager::createClientInstance() {
+void ClientManager::createClientInstance() {
   // Создаем поток для программатора
   ClientThread = new QThread(this);
 
@@ -326,7 +377,7 @@ void FirmwareManager::createClientInstance() {
   Client->moveToThread(ClientThread);
 
   // Подключаем логгирование к клиенту
-  connect(Client, &PersoClient::logging, this, &FirmwareManager::proxyLogging);
+  connect(Client, &PersoClient::logging, this, &ClientManager::proxyLogging);
   // Когда поток завершит работу, клиент будет удален
   connect(ClientThread, &QThread::finished, Programmer, &QObject::deleteLater);
   // Когда поток завершит работу, он будет удален
@@ -334,56 +385,59 @@ void FirmwareManager::createClientInstance() {
           &QObject::deleteLater);
   // Когда клиент завершит операцию, можно будет приступить к следующей
   connect(Client, &PersoClient::operationFinished, this,
-          &FirmwareManager::on_ClientOperationFinished_slot);
+          &ClientManager::on_ClientOperationFinished_slot);
 
   // Подключаем функционал
-  connect(this, &FirmwareManager::connectToPersoServer_signal, Client,
+  connect(this, &ClientManager::requestAuthorize_signal, Client,
+          &PersoClient::requestAuthorize);
+  connect(this, &ClientManager::connectToPersoServer_signal, Client,
           &PersoClient::connectToPersoServer);
-  connect(this, &FirmwareManager::disconnectFromPersoServer_signal, Client,
+  connect(this, &ClientManager::disconnectFromPersoServer_signal, Client,
           &PersoClient::disconnectFromPersoServer);
-  connect(this, &FirmwareManager::requestEcho_signal, Client,
+  connect(this, &ClientManager::requestEcho_signal, Client,
           &PersoClient::requestEcho);
-  connect(this, &FirmwareManager::requestFirmware_signal, Client,
-          &PersoClient::requestFirmware);
+  connect(this, &ClientManager::requestTransponderRelease_signal, Client,
+          &PersoClient::requestTransponderRelease);
 
   // Запускаем поток клиента
   ClientThread->start();
 }
 
-void FirmwareManager::createWaitingLoop() {
+void ClientManager::createWaitingLoop() {
   WaitingLoop = new QEventLoop(this);
-  connect(this, &FirmwareManager::waitingEnd, WaitingLoop, &QEventLoop::quit);
+  connect(this, &ClientManager::waitingEnd, WaitingLoop, &QEventLoop::quit);
 }
 
-void FirmwareManager::createTimers() {
+void ClientManager::createTimers() {
   // Таймер, отслеживающий длительность выполняющихся операций
   ODTimer = new QTimer(this);
   ODTimer->setInterval(FIRMWARE_MANAGER_OPERATION_MAX_DURATION);
   connect(ODTimer, &QTimer::timeout, this,
-          &FirmwareManager::on_ODTimerTimeout_slot);
+          &ClientManager::on_ODTimerTimeout_slot);
   connect(ODTimer, &QTimer::timeout, ODTimer, &QTimer::stop);
-  connect(this, &FirmwareManager::operationPerformingEnded, ODTimer,
+  connect(this, &ClientManager::operationPerformingEnded, ODTimer,
           &QTimer::stop);
 
   // Таймер для измерения длительности операции
   ODMeter = new QElapsedTimer();
 }
 
-void FirmwareManager::setupODQTimer(uint32_t msecs) {
+void ClientManager::setupODQTimer(uint32_t msecs) {
   // Таймер, отслеживающий квант длительности операции
   ODQTimer = new QTimer(this);
   ODQTimer->setInterval(msecs);
 
   connect(ODQTimer, &QTimer::timeout, this,
-          &FirmwareManager::on_ODQTimerTimeout_slot);
-  connect(this, &FirmwareManager::operationPerformingEnded, ODQTimer,
+          &ClientManager::on_ODQTimerTimeout_slot);
+  connect(this, &ClientManager::operationPerformingEnded, ODQTimer,
           &QTimer::stop);
 }
 
-bool FirmwareManager::startOperationExecution(const QString& operationName) {
+bool ClientManager::startOperationExecution(const QString& operationName) {
   // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready)
+  if (CurrentState != Ready) {
     return false;
+  }
 
   // Переходим в состояние ожидания конца обработки
   CurrentState = WaitingExecution;
@@ -392,7 +446,7 @@ bool FirmwareManager::startOperationExecution(const QString& operationName) {
   QSettings settings;
   uint64_t operationDuration =
       settings
-          .value(QString("FirmwareManager/Operations/") + operationName +
+          .value(QString("ClientManager/Operations/") + operationName +
                  QString("/Duration"))
           .toInt();
   uint32_t operationQuantDuration = operationDuration / 100;
@@ -414,14 +468,14 @@ bool FirmwareManager::startOperationExecution(const QString& operationName) {
   return true;
 }
 
-void FirmwareManager::endOperationExecution(const QString& operationName) {
+void ClientManager::endOperationExecution(const QString& operationName) {
   QSettings settings;
 
   // Измеряем и сохраняем длительность операции
   uint64_t duration = ODMeter->elapsed();
   emit logging(
       QString("Длительность операции: %1.").arg(QString::number(duration)));
-  settings.setValue(QString("FirmwareManager/Operations/") + operationName +
+  settings.setValue(QString("ClientManager/Operations/") + operationName +
                         QString("/Duration"),
                     duration);
 
@@ -439,7 +493,7 @@ void FirmwareManager::endOperationExecution(const QString& operationName) {
   CurrentState = Ready;
 }
 
-void FirmwareManager::deleteClientInstance() {
+void ClientManager::deleteClientInstance() {
   if (!ClientThread->isRunning())
     return;
 
@@ -449,7 +503,7 @@ void FirmwareManager::deleteClientInstance() {
   delete Client;
 }
 
-void FirmwareManager::deleteProgrammerInstance() {
+void ClientManager::deleteProgrammerInstance() {
   if (!ProgrammerThread->isRunning())
     return;
 
@@ -459,7 +513,7 @@ void FirmwareManager::deleteProgrammerInstance() {
   delete Programmer;
 }
 
-void FirmwareManager::proxyLogging(const QString& log) {
+void ClientManager::proxyLogging(const QString& log) {
   if (sender()->objectName() == "JLinkExeProgrammer")
     emit logging("JLink.exe - " + log);
   else if (sender()->objectName() == "PersoClient")
@@ -468,14 +522,14 @@ void FirmwareManager::proxyLogging(const QString& log) {
     emit logging("Unknown - " + log);
 }
 
-void FirmwareManager::on_ProgrammerOperationFinished_slot(
+void ClientManager::on_ProgrammerOperationFinished_slot(
     IProgrammer::ExecutionStatus status) {
   switch (status) {
     case IProgrammer::NotExecuted:
       CurrentState = Failed;
       NotificarionText = "Программатор: операция не была запущена. ";
       emit break;
-    case IProgrammer::FirmwareFileError:
+    case IProgrammer::RequestParameterError:
       CurrentState = Failed;
       NotificarionText = "Программатор: некорректный файл прошивки. ";
       break;
@@ -499,14 +553,14 @@ void FirmwareManager::on_ProgrammerOperationFinished_slot(
   emit waitingEnd();
 }
 
-void FirmwareManager::on_ClientOperationFinished_slot(
+void ClientManager::on_ClientOperationFinished_slot(
     PersoClient::ExecutionStatus status) {
   switch (status) {
     case PersoClient::NotExecuted:
       CurrentState = Failed;
       NotificarionText = "Клиент: операция не была запущена. ";
       emit break;
-    case PersoClient::FirmwareFileError:
+    case PersoClient::RequestParameterError:
       CurrentState = Failed;
       NotificarionText = "Клиент: некорректный файл прошивки. ";
       break;
@@ -540,7 +594,7 @@ void FirmwareManager::on_ClientOperationFinished_slot(
   emit waitingEnd();
 }
 
-void FirmwareManager::on_ODTimerTimeout_slot() {
+void ClientManager::on_ODTimerTimeout_slot() {
   emit logging("Операция выполняется слишком долго. Сброс. ");
   emit notifyUserAboutError("Операция выполняется слишком долго. Сброс. ");
 
@@ -551,6 +605,6 @@ void FirmwareManager::on_ODTimerTimeout_slot() {
   createProgrammerInstance();
 }
 
-void FirmwareManager::on_ODQTimerTimeout_slot() {
+void ClientManager::on_ODQTimerTimeout_slot() {
   emit operationStepPerfomed();
 }

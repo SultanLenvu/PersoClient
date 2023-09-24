@@ -7,6 +7,7 @@ void AuthorizationGUI::create() {
   QSettings settings;
 
   ControlPanelGroup = new QGroupBox("Авторизация");
+  ControlPanelGroup->setAlignment(Qt::AlignCenter);
   MainLayout->addWidget(ControlPanelGroup);
 
   ControlPanelLayout = new QGridLayout();
@@ -21,10 +22,11 @@ void AuthorizationGUI::create() {
   PasswordLabel = new QLabel("Пароль");
   ControlPanelLayout->addWidget(PasswordLabel, 1, 0, 1, 1);
   PasswordLineEdit = new QLineEdit();
+  PasswordLineEdit->setEchoMode(QLineEdit::Password);
   ControlPanelLayout->addWidget(PasswordLineEdit, 1, 1, 1, 1);
 
   AuthorizePushButton = new QPushButton("Войти");
-  ControlPanelLayout->addWidget(PasswordLineEdit, 2, 0, 1, 2);
+  ControlPanelLayout->addWidget(AuthorizePushButton, 2, 0, 1, 2);
 
   ControlPanelVS =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);

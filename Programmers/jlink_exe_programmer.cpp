@@ -16,7 +16,7 @@ void JLinkExeProgrammer::loadFirmware(QFile* firmware) {
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
     emit logging(QString("Получен некорректный файл прошивки. Сброс. "));
-    emit operationFinished(FirmwareFileError);
+    emit operationFinished(RequestParameterError);
     return;
   }
 
@@ -58,7 +58,7 @@ void JLinkExeProgrammer::loadFirmwareWithUnlock(QFile* firmware) {
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
     emit logging(QString("Получен некорректный файл прошивки. Сброс. "));
-    emit operationFinished(FirmwareFileError);
+    emit operationFinished(RequestParameterError);
     return;
   }
 

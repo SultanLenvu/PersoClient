@@ -3,21 +3,39 @@
 ProductionGUI::ProductionGUI(QWidget* parent) : GUI(parent, Production) {}
 
 void ProductionGUI::create(void) {
-  MainButtonGroup = new QGroupBox("Панель управления");
-  MainLayout->addWidget(MainButtonGroup);
+  ControlPanelGroup = new QGroupBox("Панель управления");
+  MainLayout->addWidget(ControlPanelGroup);
 
-  MainButtonLayout = new QVBoxLayout();
-  MainButtonGroup->setLayout(MainButtonLayout);
+  ControlPanelLayout = new QVBoxLayout();
+  ControlPanelGroup->setLayout(ControlPanelLayout);
 
-  ProgramDeviceButton = new QPushButton(QString("Загрузить прошивку"));
-  ProgramDeviceButton->setSizePolicy(QSizePolicy::Expanding,
-                                     QSizePolicy::Expanding);
-  ProgramDeviceButton->setFont(QFont("Arial", 16, QFont::Bold));
-  MainButtonLayout->addWidget(ProgramDeviceButton);
+  LoadTransponderFirmwareButton =
+      new QPushButton(QString("Выпуск транспондера"));
+  LoadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
+  ControlPanelLayout->addWidget(LoadTransponderFirmwareButton);
 
   ButtonVerticalSpacer =
-      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Minimum);
-  MainButtonLayout->addItem(ButtonVerticalSpacer);
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  ControlPanelLayout->addItem(ButtonVerticalSpacer);
+
+  ReloadTransponderFirmwareButton =
+      new QPushButton(QString("Перевыпуск транспондера"));
+  ReloadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
+  ControlPanelLayout->addWidget(ReloadTransponderFirmwareButton);
+
+  TransponderSeedGroup = new QGroupBox("Данные о выпущенном транспондере");
+  MainLayout->addWidget(TransponderSeedGroup);
+
+  TransponderSeedLayout = new QVBoxLayout();
+  TransponderSeedGroup->setLayout(TransponderSeedLayout);
+
+  TransponderSeedView = new QTableView();
+  TransponderSeedLayout->addWidget(TransponderSeedView);
+
+  MainLayout->setStretch(0, 1);
+  MainLayout->setStretch(1, 3);
 }
 
-void ProductionGUI::update() {}
+void ProductionGUI::update() {
+  TransponderSeedView->resizeColumnsToContents();
+}

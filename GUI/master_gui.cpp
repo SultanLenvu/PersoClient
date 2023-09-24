@@ -18,9 +18,16 @@ void MasterGUI::create() {
 
   // Виджеты для отображения логов
   createLogWidgets();
+
+  // Настройка пропорции между объектами на макете
+  MainLayout->setStretch(0, 3);
+  MainLayout->setStretch(1, 2);
 }
 
-void MasterGUI::update() {}
+void MasterGUI::update() {
+  TransponderSeedView->resizeColumnsToContents();
+  TransponderSeedView->update();
+}
 
 void MasterGUI::displayLogData(const QString& log) {
   if (GeneralLogs->toPlainText().count() > 500000)
@@ -49,26 +56,45 @@ void MasterGUI::createServerTab() {
 
   PersoServerConnectPushButton =
       new QPushButton(QString("Подключиться к серверу персонализации"));
-  PersoServerConnectPushButton->setFont(QFont("Arial", 14, QFont::Bold));
+  PersoServerConnectPushButton->setFont(QFont("Arial", 12, QFont::Bold));
   ServerControlPanelLayout->addWidget(PersoServerConnectPushButton);
 
   PersoServerDisconnectButton =
       new QPushButton(QString("Отключиться от сервера персонализации"));
-  PersoServerDisconnectButton->setFont(QFont("Arial", 14, QFont::Bold));
+  PersoServerDisconnectButton->setFont(QFont("Arial", 12, QFont::Bold));
   ServerControlPanelLayout->addWidget(PersoServerDisconnectButton);
 
   PersoServerEchoRequestButton = new QPushButton(QString("Отправить эхо-запрос"));
-  PersoServerEchoRequestButton->setFont(QFont("Arial", 14, QFont::Bold));
+  PersoServerEchoRequestButton->setFont(QFont("Arial", 12, QFont::Bold));
   ServerControlPanelLayout->addWidget(PersoServerEchoRequestButton);
-
-  PersoServerFirmwareRequestButton =
-      new QPushButton(QString("Запрос прошивки"));
-  PersoServerFirmwareRequestButton->setFont(QFont("Arial", 14, QFont::Bold));
-  ServerControlPanelLayout->addWidget(PersoServerFirmwareRequestButton);
 
   ButtonVerticalSpacer1 =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ServerControlPanelLayout->addItem(ButtonVerticalSpacer1);
+
+  LoadTransponderFirmwareButton =
+      new QPushButton(QString("Выпуск транспондера"));
+  LoadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
+  ServerControlPanelLayout->addWidget(LoadTransponderFirmwareButton);
+
+  ReloadTransponderFirmwareButton =
+      new QPushButton(QString("Перевыпуск транспондера"));
+  ReloadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
+  ServerControlPanelLayout->addWidget(ReloadTransponderFirmwareButton);
+
+  // Представление данных о транспондере
+  TransponderSeedGroup = new QGroupBox("Данные о выпущенном транспондере");
+  ServerTabMainLayout->addWidget(TransponderSeedGroup);
+
+  TransponderSeedLayout = new QVBoxLayout();
+  TransponderSeedGroup->setLayout(TransponderSeedLayout);
+
+  TransponderSeedView = new QTableView();
+  TransponderSeedLayout->addWidget(TransponderSeedView);
+
+  // Настройка пропорции между объектами на макете
+  ServerTabMainLayout->setStretch(0, 1);
+  ServerTabMainLayout->setStretch(1, 3);
 }
 
 void MasterGUI::createProgrammatorTab() {
@@ -85,40 +111,28 @@ void MasterGUI::createProgrammatorTab() {
   ProgrammatorControlPanelLayout = new QVBoxLayout();
   ProgrammatorControlPanel->setLayout(ProgrammatorControlPanelLayout);
 
-  ServerProgramDeviceButton =
-      new QPushButton(QString("Серверная зарузка прошивки"));
-  ServerProgramDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
-  ProgrammatorControlPanelLayout->addWidget(ServerProgramDeviceButton);
-
-  ManualProgramDeviceButton =
-      new QPushButton(QString("Ручная зарузка прошивки"));
-  ManualProgramDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
-  ProgrammatorControlPanelLayout->addWidget(ManualProgramDeviceButton);
-
+  ProgramDeviceButton = new QPushButton(QString("Ручная зарузка прошивки"));
+  ProgramDeviceButton->setFont(QFont("Arial", 12, QFont::Bold));
+  ProgrammatorControlPanelLayout->addWidget(ProgramDeviceButton);
   ReadDeviceFirmwareButton = new QPushButton(QString("Считать прошивку"));
-  ReadDeviceFirmwareButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ReadDeviceFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(ReadDeviceFirmwareButton);
-
   EraseDeviceButton = new QPushButton(QString("Стереть прошивку"));
-  EraseDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
+  EraseDeviceButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(EraseDeviceButton);
-
   ProgramDeviceUserDataButton =
       new QPushButton(QString("Загрузить  пользовательские данные"));
-  ProgramDeviceUserDataButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ProgramDeviceUserDataButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(ProgramDeviceUserDataButton);
-
   ReadDeviceUserDataButton =
       new QPushButton(QString("Считать  пользовательские данные"));
-  ReadDeviceUserDataButton->setFont(QFont("Arial", 14, QFont::Bold));
+  ReadDeviceUserDataButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(ReadDeviceUserDataButton);
-
   UnlockDeviceButton = new QPushButton(QString("Разблокировать память"));
-  UnlockDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
+  UnlockDeviceButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(UnlockDeviceButton);
-
   LockDeviceButton = new QPushButton(QString("Заблокировать память"));
-  LockDeviceButton->setFont(QFont("Arial", 14, QFont::Bold));
+  LockDeviceButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(LockDeviceButton);
 
   ButtonVerticalSpacer =
