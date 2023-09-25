@@ -13,6 +13,7 @@ SOURCES += \
     Environment/log_system.cpp \
     Environment/perso_client.cpp \
     Environment/transponder_seed_model.cpp \
+    GUI/authorization_dialog.cpp \
     GUI/user_interaction_system.cpp \
     GUI/authorization_gui.cpp \
     GUI/gui.cpp \
@@ -29,6 +30,7 @@ HEADERS += \
     Environment/log_system.h \
     Environment/perso_client.h \
     Environment/transponder_seed_model.h \
+    GUI/authorization_dialog.h \
     GUI/user_interaction_system.h \
     GUI/authorization_gui.h \
     GUI/gui.h \

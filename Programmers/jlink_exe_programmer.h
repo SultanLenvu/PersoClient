@@ -3,6 +3,7 @@
 
 #include <QDir>
 #include <QProcess>
+#include <QSettings>
 #include <QThread>
 
 #include "interface_programmer.h"
@@ -17,13 +18,12 @@ class JLinkExeProgrammer : public IProgrammer {
   QStringList ProcessArguments;
   QStringList ProcessOutput;
 
-  QMutex Mutex;
-
  public:
   explicit JLinkExeProgrammer(QObject* parent);
   ~JLinkExeProgrammer();
 
  public slots:
+  virtual void getUcid(QString* ucid) override;
   virtual void loadFirmware(QFile* firmware) override;
   virtual void loadFirmwareWithUnlock(QFile* firmware) override;
   virtual void readFirmware(void) override;
@@ -38,7 +38,7 @@ class JLinkExeProgrammer : public IProgrammer {
   virtual void applySettings() override;
 
  private:
-  void processingJLinkExePath(const QString& path);
+  void loadSettings(void);
   void excuteJLinkScript(void);
   void initScript(void);
 };

@@ -15,27 +15,29 @@ void UserInteractionSystem::generateErrorMessage(const QString& text) {
   QMessageBox::critical(ParentWindow, "Ошибка", text, QMessageBox::Ok);
 }
 
+void UserInteractionSystem::getAuthorizationData(QMap<QString, QString>* data) {
+  AuthorizationDialog* dialog = new AuthorizationDialog(ParentWindow);
+
+  if (dialog->exec() == QDialog::Accepted) {
+    dialog->getData(data);
+  }
+}
+
 void UserInteractionSystem::getMasterPassword(QString& pass) {
   pass = QInputDialog::getText(ParentWindow, "Мастер доступ",
                                "Введите пароль:", QLineEdit::Password, "",
                                nullptr);
 }
 
-void UserInteractionSystem::getTransponderStickerData(QStringList& data) {
+void UserInteractionSystem::getTransponderStickerData(QStringList* data) {
   QString rawData;
-  UserInputDialog = new TransponderStickerDialog(ParentWindow);
+  TransponderStickerDialog* dialog = new TransponderStickerDialog(ParentWindow);
 
-  TransponderStickerDialog* cd =
-      dynamic_cast<TransponderStickerDialog*>(ParentWindow);
-
-  if (cd->exec() == QDialog::Accepted) {
-    rawData = cd->getData();
+  if (dialog->exec() == QDialog::Accepted) {
+    rawData = dialog->getData();
   }
 
-  data = rawData.split("\n");
-
-  delete UserInputDialog;
-  UserInputDialog = nullptr;
+  *data = rawData.split("\n");
 }
 
 void UserInteractionSystem::generateProgressDialog(void) {

@@ -1,5 +1,5 @@
-#ifndef TransponderStickerDialog_H
-#define TransponderStickerDialog_H
+#ifndef TRANSPONDERSTICKERDIALOG_H
+#define TRANSPONDERSTICKERDIALOG_H
 
 #include <QDialog>
 #include <QtWidgets>
@@ -21,4 +21,4 @@ class TransponderStickerDialog : public QDialog {
   QString getData(void);
 };
 
-#endif  // TransponderStickerDialog_H
+#endif  // TRANSPONDERSTICKERDIALOG_H

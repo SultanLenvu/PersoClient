@@ -26,13 +26,12 @@ MainWindow::MainWindow() {
 MainWindow::~MainWindow() {}
 
 void MainWindow::on_AuthorizePushButton_slot() {
+  QMap<QString, QString> data;
   AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
-  QString login = gui->LoginLineEdit->text();
-  QString password = gui->PasswordLineEdit->text();
+  data.insert("Login", gui->LoginLineEdit->text());
+  data.insert("Password", gui->PasswordLineEdit->text());
 
-  if (!Manager->performServerAuthorization(login, password)) {
-    return;
-  }
+  Manager->performServerAuthorization(&data);
 
   // Настраиваем размер главного окна
   DesktopGeometry = QApplication::desktop()->screenGeometry();
@@ -103,12 +102,12 @@ void MainWindow::on_ApplySettingsPushButton_slot() {
   }
 
   // Считывание пользовательского ввода
-  Settings->setValue("Personalization/UseServerOption",
-                     gui->UsePersoServerCheckBox->isChecked());
   Settings->setValue("Personalization/ServerIpAddress",
                      gui->PersoServerIpAddressLineEdit->text());
   Settings->setValue("Personalization/ServerPort",
                      gui->PersoServerPortLineEdit->text().toInt());
+  Settings->setValue("JLinkExeProgrammer/ExeFile/Path",
+                     gui->ProgrammerExeFilePathLineEdit->text());
 
   // Применение новых настроек
   Manager->applySettings();
@@ -134,6 +133,13 @@ void MainWindow::on_PersoServerEchoRequestButton_slot() {
   Manager->performServerEcho();
 }
 
+void MainWindow::on_MasterAuthorizePushButton_slot() {
+  QMap<QString, QString> data;
+  Interactor->getAuthorizationData(&data);
+
+  Manager->performServerAuthorization(&data);
+}
+
 void MainWindow::on_LoadTransponderFirmwareButton_slot() {
   Logger->clear();
 
@@ -153,7 +159,7 @@ void MainWindow::on_ReloadTransponderFirmwareButton_slot() {
   Manager->performTransponderFirmwareReloading(SeedModel, pan);
 }
 
-void MainWindow::on_MasterInterfaceRequestAct_slot() {
+void MainWindow::on_MasterInterfaceRequest_slot() {
   QString pass;
   Interactor->getMasterPassword(pass);
 
@@ -166,7 +172,7 @@ void MainWindow::on_MasterInterfaceRequestAct_slot() {
   createMasterInterface();
 }
 
-void MainWindow::on_ProductionInterfaceRequestAct_slot() {
+void MainWindow::on_ProductionInterfaceRequest_slot() {
   createProductionInterface();
 }
 
@@ -201,13 +207,18 @@ bool MainWindow::checkNewSettings() {
     return false;
   }
 
+  QFileInfo info(gui->ProgrammerExeFilePathLineEdit->text());
+  if ((!info.exists()) || (!info.isExecutable())) {
+    return false;
+  }
+
   return true;
 }
 
 QString MainWindow::getStickerPan(void) {
   QStringList stickerData;
 
-  Interactor->getTransponderStickerData(stickerData);
+  Interactor->getTransponderStickerData(&stickerData);
 
   if (stickerData.size() > 2) {
     return QString();
@@ -281,6 +292,8 @@ void MainWindow::connectMasterInterface() {
           &MainWindow::on_PersoServerDisconnectButton_slot);
   connect(gui->PersoServerEchoRequestButton, &QPushButton::clicked, this,
           &MainWindow::on_PersoServerEchoRequestButton_slot);
+  connect(gui->MasterAuthorizePushButton, &QPushButton::clicked, this,
+          &MainWindow::on_MasterAuthorizePushButton_slot);
   connect(gui->LoadTransponderFirmwareButton, &QPushButton::clicked, this,
           &MainWindow::on_LoadTransponderFirmwareButton_slot);
   connect(gui->ReloadTransponderFirmwareButton, &QPushButton::clicked, this,
@@ -348,14 +361,14 @@ void MainWindow::createTopMenuActions() {
     MasterInterfaceRequestAct = new QAction("Мастер интерфейс", this);
     MasterInterfaceRequestAct->setStatusTip("Открыть мастер интерфейс");
     connect(MasterInterfaceRequestAct, &QAction::triggered, this,
-            &MainWindow::on_MasterInterfaceRequestAct_slot);
+            &MainWindow::on_MasterInterfaceRequest_slot);
   } else {
     ProductionInterfaceRequestAct =
         new QAction("Производственный интерфейс", this);
     ProductionInterfaceRequestAct->setStatusTip(
         "Открыть производственный интерфейс");
     connect(ProductionInterfaceRequestAct, &QAction::triggered, this,
-            &MainWindow::on_ProductionInterfaceRequestAct_slot);
+            &MainWindow::on_ProductionInterfaceRequest_slot);
   }
 
   AboutProgramAct = new QAction("О программе", this);
@@ -396,4 +409,6 @@ void MainWindow::createManager() {
           &UserInteractionSystem::performeProgressDialogStep);
   connect(Manager, &ClientManager::operationPerformingEnded, Interactor,
           &UserInteractionSystem::completeProgressDialog);
+  connect(Manager, &ClientManager::createProductionInterface_signal, this,
+          &MainWindow::on_ProductionInterfaceRequest_slot);
 }

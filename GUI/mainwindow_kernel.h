@@ -8,6 +8,7 @@
 #include "Environment/client_manager.h"
 #include "Environment/log_system.h"
 #include "Environment/transponder_seed_model.h"
+
 #include "GUI/authorization_gui.h"
 #include "GUI/master_gui.h"
 #include "GUI/production_gui.h"
@@ -48,6 +49,7 @@ class MainWindow : public QMainWindow {
   void on_PersoServerConnectPushButton_slot(void);
   void on_PersoServerDisconnectButton_slot(void);
   void on_PersoServerEchoRequestButton_slot(void);
+  void on_MasterAuthorizePushButton_slot(void);
   void on_LoadTransponderFirmwareButton_slot(void);
   void on_ReloadTransponderFirmwareButton_slot(void);
 
@@ -61,8 +63,8 @@ class MainWindow : public QMainWindow {
 
   void on_ApplySettingsPushButton_slot(void);
 
-  void on_MasterInterfaceRequestAct_slot(void);
-  void on_ProductionInterfaceRequestAct_slot(void);
+  void on_MasterInterfaceRequest_slot(void);
+  void on_ProductionInterfaceRequest_slot(void);
 
  private:
   void proxyLogging(const QString& log);

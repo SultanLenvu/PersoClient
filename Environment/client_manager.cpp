@@ -40,37 +40,39 @@ IProgrammer* ClientManager::programmer() const {
   return Programmer;
 }
 
-void ClientManager::performServerAuthorization(const QString& login,
-                                               const QString& password) {
-  // DEBUG
-  return;
+void ClientManager::performServerAuthorization(
+    const QMap<QString, QString>* data) {
+  QMap<QString, QString> responseParameters;
 
   // Начинаем операцию
   if (!startOperationExecution("performServerAuthorization")) {
     return;
   }
 
-  QMap<QString, QString> requestParameters;
-  QMap<QString, QString> responseParameters;
-  requestParameters.insert("Login", login);
-  requestParameters.insert("Password", password);
-
   emit logging("Авторизация на сервере персонализации. ");
-  emit requestAuthorize_signal(&requestParameters, &responseParameters);
+  emit requestAuthorize_signal(data, &responseParameters);
 
   // Запуск цикла ожидания
   WaitingLoop->exec();
+  if (CurrentState != Completed) {
+    emit logging("Получена ошбока при авторизации на сервере. ");
+    endOperationExecution("performServerAuthorization");
+    return;
+  }
 
   // Если авторизация прошла успешно, то сохраняем логин и пароль
   if (responseParameters.value("Access") == "Allowed") {
-    CurrentLogin = login;
-    CurrentPassword = password;
-  } else {
     emit notifyUserAboutError("Ошибка авторизации. ");
+    return;
   }
 
   // Завершаем операцию
   endOperationExecution("performServerAuthorization");
+
+  // Сохраняем данные и вызываем производственный интерфейс
+  CurrentLogin = data->value("Login");
+  CurrentPassword = data->value("Password");
+  emit createProductionInterface_signal();
 }
 
 void ClientManager::performServerConnecting() {
@@ -123,38 +125,67 @@ void ClientManager::performServerEcho() {
 
 void ClientManager::performTransponderFirmwareLoading(
     TransponderSeedModel* model) {
+  QString ucid;
+  QMap<QString, QString> requestParameters;
+  QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
+
   // Начинаем операцию
   if (!startOperationExecution("performTransponderFirmwareLoading")) {
     return;
   }
 
-  // Считываем
+  emit logging("Разблокирование памяти транспондера. ");
+  emit unlockDevice_signal();
+  WaitingLoop->exec();
+  if (CurrentState != Completed) {
+    emit logging("Получена ошбока при разблокировании памяти транспондера. ");
+    endOperationExecution("performTransponderFirmwareLoading");
+    return;
+  }
 
-  // Создаем файл прошивки
-  QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
-  QMap<QString, QString> requestParameters;
+  emit logging("Считывание UCID транспондера. ");
+  emit getUcid_signal(&ucid);
+  WaitingLoop->exec();
+  if (CurrentState != Completed) {
+    emit logging("Получена ошбока при считывании UCID с транспондера. ");
+    endOperationExecution("performTransponderFirmwareLoading");
+    return;
+  }
+
   requestParameters.insert("Login", CurrentLogin);
   requestParameters.insert("Password", CurrentPassword);
-
-  emit logging("Отправка запроса на выпуск транспондера. ");
+  requestParameters.insert("UCID", ucid);
+  emit logging("Запрос прошивки транспондера. ");
   emit requestTransponderRelease_signal(&requestParameters, &firmware);
-
-  // Запуск цикла ожидания
   WaitingLoop->exec();
+  if (CurrentState != Completed) {
+    emit logging("Получена ошбока при запросе прошивки транспондера. ");
+    endOperationExecution("performTransponderFirmwareLoading");
+    return;
+  }
+  requestParameters.clear();
 
-  // Создаем структуру данных транспондера
-  QMap<QString, QString> requestAttributes;
-  QMap<QString, QString>* responseAttributes = new QMap<QString, QString>;
-
-  emit logging("Отправка запроса на подтверждение выпуска транспондера. ");
-  emit requestTransponderReleaseConfirm_signal(&requestAttributes,
-                                               responseAttributes);
-
-  // Запуск цикла ожидания
+  emit logging("Загрузка прошивки в транспондер. ");
+  emit loadFirmware_signal(&firmware);
   WaitingLoop->exec();
+  if (CurrentState != Completed) {
+    emit logging("Получена ошибка при загрузке прошивки в транспондер. ");
+    endOperationExecution("performTransponderFirmwareLoading");
+    return;
+  }
 
-  // Строим модель для представления
-  model->build(responseAttributes);
+  QMap<QString, QString>* responseParameters = new QMap<QString, QString>;
+  emit logging(
+      "Отправка запроса на подтверждение загрузки прошивки в транспондер. ");
+  emit requestTransponderReleaseConfirm_signal(&requestParameters,
+                                               responseParameters);
+  WaitingLoop->exec();
+  if (CurrentState != Completed) {
+    emit logging("Получена ошибка при загрузке прошивки в транспондер. ");
+  }
+
+  // Строим модель для представления данных транспондера
+  model->build(responseParameters);
 
   // Завершаем операцию
   endOperationExecution("performTransponderFirmwareLoading");
@@ -163,34 +194,31 @@ void ClientManager::performTransponderFirmwareLoading(
 void ClientManager::performTransponderFirmwareReloading(
     TransponderSeedModel* model,
     const QString& pan) {
+  QString ucid;
+  QMap<QString, QString> requestParameters;
+  QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
+
   // Начинаем операцию
   if (!startOperationExecution("performTransponderFirmwareReloading")) {
     return;
   }
 
-  // Создаем файл прошивки
-  QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
-
-  // Запрашиваем файл прошивки у сервера
+  requestParameters.insert("Login", CurrentLogin);
+  requestParameters.insert("Password", CurrentPassword);
+  requestParameters.insert("PAN", pan);
   emit logging("Отправка запроса на выпуск транспондера. ");
-  emit requestTransponderRerelease_signal(&firmware, pan);
-
-  // Запуск цикла ожидания
+  emit requestTransponderRerelease_signal(&requestParameters, &firmware);
   WaitingLoop->exec();
 
   // Создаем структуры данных транспондера
-  QMap<QString, QString> requestAttributes;
-  QMap<QString, QString>* responseAttributes = new QMap<QString, QString>;
-
+  QMap<QString, QString>* responseParameters = new QMap<QString, QString>;
   emit logging("Отправка запроса на подтверждение выпуска транспондера. ");
-  emit requestTransponderRereleaseConfirm_signal(&requestAttributes,
-                                                 responseAttributes);
-
-  // Запуск цикла ожидания
+  emit requestTransponderRereleaseConfirm_signal(&requestParameters,
+                                                 responseParameters);
   WaitingLoop->exec();
 
   // Строим модель для представления
-  model->build(responseAttributes);
+  model->build(responseParameters);
 
   // Оповещаем пользователя о результатах
   if (CurrentState != Completed) {
@@ -342,9 +370,14 @@ void ClientManager::performDeviceLock() {
 }
 
 void ClientManager::applySettings() {
+  emit logging("Применение новых настроек. ");
+  loadSettings();
+
   Client->applySettings();
   Programmer->applySettings();
 }
+
+void ClientManager::loadSettings() {}
 
 void ClientManager::createProgrammerInstance() {
   // Создаем поток для программатора
@@ -368,6 +401,8 @@ void ClientManager::createProgrammerInstance() {
           &ClientManager::on_ProgrammerOperationFinished_slot);
 
   // Подключаем функционал
+  connect(this, &ClientManager::getUcid_signal, Programmer,
+          &IProgrammer::getUcid);
   connect(this, &ClientManager::loadFirmware_signal, Programmer,
           &IProgrammer::loadFirmware);
   connect(this, &ClientManager::loadFirmwareWithUnlock_signal, Programmer,
@@ -619,11 +654,11 @@ void ClientManager::on_ODTimerTimeout_slot() {
   emit logging("Операция выполняется слишком долго. Сброс. ");
   emit notifyUserAboutError("Операция выполняется слишком долго. Сброс. ");
 
-  deleteClientInstance();
-  createClientInstance();
+  //  deleteClientInstance();
+  //  createClientInstance();
 
-  deleteProgrammerInstance();
-  createProgrammerInstance();
+  //  deleteProgrammerInstance();
+  //  createProgrammerInstance();
 }
 
 void ClientManager::on_ODQTimerTimeout_slot() {

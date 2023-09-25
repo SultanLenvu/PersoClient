@@ -3,16 +3,54 @@
 JLinkExeProgrammer::JLinkExeProgrammer(QObject* parent)
     : IProgrammer(parent, JLink) {
   setObjectName("JLinkExeProgrammer");
-  processingJLinkExePath(DEFAULT_JLINKEXE_FILE_PATH);
+  loadSettings();
 }
 
 JLinkExeProgrammer::~JLinkExeProgrammer() {
 }
 
-void JLinkExeProgrammer::loadFirmware(QFile* firmware) {
-  // Блокируем доступ к файлу
-  QMutexLocker lock(&Mutex);
+void JLinkExeProgrammer::getUcid(QString* ucid) {
+  // Проверка на существование программы адаптера для программатора JLink
+  if (JLinkProcess == nullptr) {
+    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    emit operationFinished(ProgrammatorError);
+    return;
+  }
 
+  // Логгирование
+  emit logging(QString("Считывание UCID микроконтроллера."));
+
+  // Формируем скрипт JLink
+  initScript();
+  // Формируем сценарий команд
+  JLinkScript->write(
+      QByteArray(QString("mem %1, %2\n")
+                     .arg(UCID_START_ADDRESS, QString::number(UCID_SIZE, 16))
+                     .toUtf8()));
+
+  // Запускаем выполнение скрипта JLink
+  excuteJLinkScript();
+
+  // Обрабатываем вывод JLink.exe
+  if (ProcessOutput.indexOf("Script processing completed.") == -1) {
+    ucid->clear();
+    emit operationFinished(ProgrammatorError);
+    return;
+  }
+
+  for (int32_t i = 0; i < ProcessOutput.size(); i++) {
+    if (ProcessOutput.at(i).contains(
+            QString(UCID_START_ADDRESS).remove("0x"))) {
+      *ucid = ProcessOutput.at(i).mid(11, 50);
+      ucid->remove(' ');
+      break;
+    }
+  }
+
+  emit operationFinished(CompletedSuccessfully);
+}
+
+void JLinkExeProgrammer::loadFirmware(QFile* firmware) {
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
     emit logging(QString("Получен некорректный файл прошивки. Сброс. "));
@@ -52,9 +90,6 @@ void JLinkExeProgrammer::loadFirmware(QFile* firmware) {
 }
 
 void JLinkExeProgrammer::loadFirmwareWithUnlock(QFile* firmware) {
-  // Блокируем доступ к файлу
-  QMutexLocker lock(&Mutex);
-
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
     emit logging(QString("Получен некорректный файл прошивки. Сброс. "));
@@ -198,9 +233,6 @@ void JLinkExeProgrammer::readData(void) {
 }
 
 void JLinkExeProgrammer::loadData(QFile* data) {
-  // Блокируем доступ к файлу
-  QMutexLocker lock(&Mutex);
-
   // Проверка корректности присланной прошивки
   if (!checkDataFile(data)) {
     emit logging(QString("Получен некорректный файл с данными. Сброс. "));
@@ -313,18 +345,23 @@ void JLinkExeProgrammer::lockDevice() { // Проверка на существ�
   }
 }
 
-void JLinkExeProgrammer::applySettings() {}
+void JLinkExeProgrammer::applySettings() {
+  emit logging("Применение новых настроек. ");
+  loadSettings();
+}
 
 /*
   Приватные методы
 */
 
-void JLinkExeProgrammer::processingJLinkExePath(const QString &path) {
-  QFileInfo info(path);
+void JLinkExeProgrammer::loadSettings() {
+  QSettings settings;
+  QFileInfo info(settings.value("JLinkExeProgrammer/ExeFile/Path").toString());
 
   if ((info.exists()) && (info.isFile())) {
     JLinkProcess = new QProcess(this);
-    JLinkProcess->setProgram(path);
+    JLinkProcess->setProgram(
+        settings.value("JLinkExeProgrammer/ExeFile/Path").toString());
   } else
     JLinkProcess = nullptr;
 }

@@ -33,6 +33,7 @@ class IProgrammer : public QObject {
   ProgrammerType type() const;
 
  public slots:
+  virtual void getUcid(QString* ucid) = 0;
   virtual void loadFirmware(QFile* firmware) = 0;
   virtual void loadFirmwareWithUnlock(QFile* firmware) = 0;
   virtual void readFirmware(void) = 0;

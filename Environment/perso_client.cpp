@@ -55,6 +55,7 @@ PersoClient::~PersoClient() {
 
 void PersoClient::applySettings() {
   QSettings settings;
+  emit logging("Применение новых настроек. ");
 
   PersoServerAddress =
       settings.value("Personalization/ServerIpAddress").toString();
@@ -148,7 +149,7 @@ void PersoClient::requestAuthorize(
   CurrentState = DisconnectedFromServer;
 
   // Обрабатываем полученный ответ
-  processAuthorizationResponse();
+  processAuthorizationResponse(responseAttributes);
 
   // Возвращаем статус выполнения команды
   emit operationFinished(ReturnStatus);
@@ -352,10 +353,9 @@ void PersoClient::processingDataBlock() {
 }
 
 void PersoClient::createDataBlock(void) {
+  emit logging(QString("Содержание команды: %1 ")
+                   .arg(QString(CurrentCommandDocument.toJson())));
   emit logging("Формирование блока данных для команды. ");
-  emit logging(QString("Размер команды: %1. Содержание команды: %2. ")
-                   .arg(QString::number(CurrentCommandDocument.toJson().size()),
-                        QString(CurrentCommandDocument.toJson())));
 
   // Инициализируем блок данных и сериализатор
   TransmittedDataBlock.clear();

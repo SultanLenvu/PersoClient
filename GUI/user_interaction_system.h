@@ -8,6 +8,7 @@
 #include <QProgressBar>
 #include <QProgressDialog>
 
+#include "authorization_dialog.h"
 #include "transponder_sticker_dialog.h"
 
 class UserInteractionSystem : public QObject {
@@ -15,7 +16,6 @@ class UserInteractionSystem : public QObject {
 
  private:
   QWidget* ParentWindow;
-  QDialog* UserInputDialog;
 
   QProgressDialog* ProgressDialog;
   uint32_t CurrentOperationStep;
@@ -27,8 +27,9 @@ class UserInteractionSystem : public QObject {
   void generateMessage(const QString& pass);
   void generateErrorMessage(const QString& text);
 
+  void getAuthorizationData(QMap<QString, QString>* data);
   void getMasterPassword(QString& pass);
-  void getTransponderStickerData(QStringList& data);
+  void getTransponderStickerData(QStringList* data);
 
   void generateProgressDialog(void);
   void completeProgressDialog(void);

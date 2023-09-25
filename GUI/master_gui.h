@@ -42,9 +42,11 @@ class MasterGUI : public GUI {
   QPushButton* PersoServerConnectPushButton;
   QPushButton* PersoServerDisconnectButton;
   QPushButton* PersoServerEchoRequestButton;
+  QSpacerItem* ButtonVerticalSpacer1;
+
+  QPushButton* MasterAuthorizePushButton;
   QPushButton* LoadTransponderFirmwareButton;
   QPushButton* ReloadTransponderFirmwareButton;
-  QSpacerItem* ButtonVerticalSpacer1;
 
   QGroupBox* TransponderSeedGroup;
   QVBoxLayout* TransponderSeedLayout;
@@ -61,12 +63,17 @@ class MasterGUI : public GUI {
   // Персонализация
   QGroupBox* PersoSettingsGroupBox;
   QGridLayout* PersoSettingsMainLayout;
-  QLabel* UsePersoServerLabel;
-  QCheckBox* UsePersoServerCheckBox;
   QLabel* PersoServerIpAddressLabel;
   QLineEdit* PersoServerIpAddressLineEdit;
   QLabel* PersoServerPortLabel;
   QLineEdit* PersoServerPortLineEdit;
+
+  // Программатор
+  QGroupBox* ProgrammerSettingsGroupBox;
+  QGridLayout* ProgrammerSettingsMainLayout;
+  QLabel* ProgrammerExeFilePathLabel;
+  QLineEdit* ProgrammerExeFilePathLineEdit;
+  QPushButton* ProgrammerExeFilePathPushButton;
 
   QSpacerItem* SettingsVerticalSpacer1;
   //============================================================
@@ -86,6 +93,9 @@ class MasterGUI : public GUI {
   void createProgrammatorTab(void);
   void createSettingsTab(void);
   void createLogWidgets(void);
+
+ private slots:
+  void on_ProgrammerExeFilePathPushButton_slot(void);
 };
 
 #endif  // MASTERGUI_H

@@ -46,8 +46,7 @@ class ClientManager : public QObject {
 
   IProgrammer* programmer(void) const;
 
-  void performServerAuthorization(const QString& login,
-                                  const QString& password);
+  void performServerAuthorization(const QMap<QString, QString>* data);
   void performServerConnecting(void);
   void performServerDisconnecting(void);
   void performServerEcho(void);
@@ -68,6 +67,7 @@ class ClientManager : public QObject {
   void applySettings(void);
 
  private:
+  void loadSettings(void);
   void createProgrammerInstance(void);
   void createClientInstance(void);
   void createWaitingLoop(void);
@@ -96,8 +96,10 @@ class ClientManager : public QObject {
   void operationStepPerfomed(void);
   void operationPerformingEnded(void);
   void waitingEnd(void);
+  void createProductionInterface_signal(void);
 
   // Сигналы для программатора
+  void getUcid_signal(QString* ucid);
   void loadFirmware_signal(QFile* firmware);
   void loadFirmwareWithUnlock_signal(QFile* firmware);
   void readFirmware_signal(void);
@@ -112,20 +114,20 @@ class ClientManager : public QObject {
   void disconnectFromPersoServer_signal(void);
 
   void requestEcho_signal(void);
-  void requestAuthorize_signal(const QMap<QString, QString>* requestAttributes,
-                               QMap<QString, QString>* responseAttributes);
+  void requestAuthorize_signal(const QMap<QString, QString>* requestParameters,
+                               QMap<QString, QString>* responseParameters);
   void requestTransponderRelease_signal(
-      const QMap<QString, QString>* requestAttributes,
+      const QMap<QString, QString>* requestParameters,
       QFile* firmware);
   void requestTransponderReleaseConfirm_signal(
-      const QMap<QString, QString>* requestAttributes,
-      QMap<QString, QString>* responseAttributes);
+      const QMap<QString, QString>* requestParameters,
+      QMap<QString, QString>* responseParameters);
   void requestTransponderRerelease_signal(
-      const QMap<QString, QString>* requestAttributes,
+      const QMap<QString, QString>* requestParameters,
       QFile* firmware);
   void requestTransponderRereleaseConfirm_signal(
-      const QMap<QString, QString>* requestAttributes,
-      QMap<QString, QString>* responseAttributes);
+      const QMap<QString, QString>* requestParameters,
+      QMap<QString, QString>* responseParameters);
 };
 
 #endif  // CLIENT_MANAGER_H

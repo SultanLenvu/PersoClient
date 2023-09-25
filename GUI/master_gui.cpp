@@ -72,6 +72,10 @@ void MasterGUI::createServerTab() {
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ServerControlPanelLayout->addItem(ButtonVerticalSpacer1);
 
+  MasterAuthorizePushButton = new QPushButton(QString("Авторизироваться"));
+  MasterAuthorizePushButton->setFont(QFont("Arial", 12, QFont::Bold));
+  ServerControlPanelLayout->addWidget(MasterAuthorizePushButton);
+
   LoadTransponderFirmwareButton =
       new QPushButton(QString("Выпуск транспондера"));
   LoadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
@@ -155,34 +159,44 @@ void MasterGUI::createSettingsTab() {
 
   // Настройки персонализации
   QGroupBox* PersoSettingsGroupBox =
-      new QGroupBox(QString("Настройки персонализации"));
+      new QGroupBox(QString("Сервер персонализации"));
   SettingsMainSubLayout->addWidget(PersoSettingsGroupBox);
 
   PersoSettingsMainLayout = new QGridLayout();
   PersoSettingsGroupBox->setLayout(PersoSettingsMainLayout);
 
-  UsePersoServerLabel = new QLabel("Использование сервера персонализации");
-  PersoSettingsMainLayout->addWidget(UsePersoServerLabel, 0, 0, 1, 1);
-
-  UsePersoServerCheckBox = new QCheckBox("Вкл/выкл");
-  UsePersoServerCheckBox->setChecked(
-      settings.value("Personalization/UseServerOption").toBool());
-  PersoSettingsMainLayout->addWidget(UsePersoServerCheckBox, 0, 1, 1, 1);
-
   PersoServerIpAddressLabel =
       new QLabel("IP адрес или URL сервера персонализации");
-  PersoSettingsMainLayout->addWidget(PersoServerIpAddressLabel, 1, 0, 1, 1);
-
+  PersoSettingsMainLayout->addWidget(PersoServerIpAddressLabel, 0, 0, 1, 1);
   PersoServerIpAddressLineEdit = new QLineEdit(
       settings.value("Personalization/ServerIpAddress").toString());
-  PersoSettingsMainLayout->addWidget(PersoServerIpAddressLineEdit, 1, 1, 1, 1);
-
+  PersoSettingsMainLayout->addWidget(PersoServerIpAddressLineEdit, 0, 1, 1, 1);
   PersoServerPortLabel = new QLabel("Порт сервера персонализации");
-  PersoSettingsMainLayout->addWidget(PersoServerPortLabel, 2, 0, 1, 1);
-
+  PersoSettingsMainLayout->addWidget(PersoServerPortLabel, 1, 0, 1, 1);
   PersoServerPortLineEdit =
       new QLineEdit(settings.value("Personalization/ServerPort").toString());
-  PersoSettingsMainLayout->addWidget(PersoServerPortLineEdit, 2, 1, 1, 1);
+  PersoSettingsMainLayout->addWidget(PersoServerPortLineEdit, 1, 1, 1, 1);
+
+  // Настройки программатора
+  QGroupBox* ProgrammerSettingsGroupBox =
+      new QGroupBox(QString("Программатор"));
+  SettingsMainSubLayout->addWidget(ProgrammerSettingsGroupBox);
+
+  ProgrammerSettingsMainLayout = new QGridLayout();
+  ProgrammerSettingsGroupBox->setLayout(ProgrammerSettingsMainLayout);
+
+  ProgrammerExeFilePathLabel = new QLabel("Путь к JLink.exe");
+  ProgrammerSettingsMainLayout->addWidget(ProgrammerExeFilePathLabel, 0, 0, 1,
+                                          1);
+  ProgrammerExeFilePathLineEdit = new QLineEdit(
+      settings.value("JLinkExeProgrammer/ExeFile/Path").toString());
+  ProgrammerSettingsMainLayout->addWidget(ProgrammerExeFilePathLineEdit, 0, 1,
+                                          1, 1);
+  ProgrammerExeFilePathPushButton = new QPushButton("Обзор");
+  ProgrammerSettingsMainLayout->addWidget(ProgrammerExeFilePathPushButton, 0, 2,
+                                          1, 1);
+  connect(ProgrammerExeFilePathPushButton, &QPushButton::clicked, this,
+          &MasterGUI::on_ProgrammerExeFilePathPushButton_slot);
 
   // Кнопка сохранения настроек
   ApplySettingsPushButton = new QPushButton("Применить изменения");
@@ -209,4 +223,10 @@ void MasterGUI::createLogWidgets() {
   GeneralLogs->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
   GeneralLogs->setCenterOnScroll(false);
   GeneralLogLayout->addWidget(GeneralLogs);
+}
+
+void MasterGUI::on_ProgrammerExeFilePathPushButton_slot() {
+  QString filePath =
+      QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.exe");
+  ProgrammerExeFilePathLineEdit->setText(filePath);
 }

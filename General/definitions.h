@@ -37,13 +37,15 @@
 #define FIRMWARE_TEMP_FILE_NAME "data.bin"
 #define FIRMWARE_FILE_MAX_SIZE 131072
 
-#define DEFAULT_FIRMWARE_FILE_PATH "../Firmware/firmware.hex"
-#define DEFAULT_JLINKEXE_FILE_PATH "../JLink/JLink.exe"
 #define JLINK_COMMAND_SCRIPT_DEFAULT_NAME "JLinkScript.jlink"
 
 #define USER_DATA_FLASH_START_ADDRESS "0x0801F000"
 #define USER_DATA_FLASH_SIZE 0x1000
 #define USER_DATA_FLASH_END_ADDRESS "0x0801FFFF"
+
+#define UCID_START_ADDRESS "0x1FFFF7C0"
+#define UCID_CHAR_LENGTH 32
+#define UCID_SIZE 16
 //===============================================================
 
 /* Определения для данных транспондера */
