@@ -128,6 +128,8 @@ void ClientManager::performTransponderFirmwareLoading(
     return;
   }
 
+  // Считываем
+
   // Создаем файл прошивки
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
   QMap<QString, QString> requestParameters;
