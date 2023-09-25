@@ -17,6 +17,9 @@ ClientManager::ClientManager(QObject* parent) : QObject(parent) {
 
   // Инициализируем текущее состояние
   CurrentState = Ready;
+
+  CurrentLogin = PRODUCTION_LINE_DEFAULT_LOGIN;
+  CurrentPassword = PRODUCTION_LINE_DEFAULT_PASSWORD;
 }
 
 ClientManager::~ClientManager() {
@@ -37,24 +40,37 @@ IProgrammer* ClientManager::programmer() const {
   return Programmer;
 }
 
-bool ClientManager::performServerAuthorization(const QString& login,
+void ClientManager::performServerAuthorization(const QString& login,
                                                const QString& password) {
-  return true;
+  // DEBUG
+  return;
+
   // Начинаем операцию
   if (!startOperationExecution("performServerAuthorization")) {
-    return false;
+    return;
   }
 
+  QMap<QString, QString> requestParameters;
+  QMap<QString, QString> responseParameters;
+  requestParameters.insert("Login", login);
+  requestParameters.insert("Password", password);
+
   emit logging("Авторизация на сервере персонализации. ");
-  emit requestAuthorize_signal(login, password);
+  emit requestAuthorize_signal(&requestParameters, &responseParameters);
 
   // Запуск цикла ожидания
   WaitingLoop->exec();
 
+  // Если авторизация прошла успешно, то сохраняем логин и пароль
+  if (responseParameters.value("Access") == "Allowed") {
+    CurrentLogin = login;
+    CurrentPassword = password;
+  } else {
+    emit notifyUserAboutError("Ошибка авторизации. ");
+  }
+
   // Завершаем операцию
   endOperationExecution("performServerAuthorization");
-
-  return true;
 }
 
 void ClientManager::performServerConnecting() {
@@ -114,9 +130,12 @@ void ClientManager::performTransponderFirmwareLoading(
 
   // Создаем файл прошивки
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
+  QMap<QString, QString> requestParameters;
+  requestParameters.insert("Login", CurrentLogin);
+  requestParameters.insert("Password", CurrentPassword);
 
   emit logging("Отправка запроса на выпуск транспондера. ");
-  emit requestTransponderRelease_signal(&firmware);
+  emit requestTransponderRelease_signal(&requestParameters, &firmware);
 
   // Запуск цикла ожидания
   WaitingLoop->exec();

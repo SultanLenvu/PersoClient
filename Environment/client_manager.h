@@ -24,6 +24,9 @@ class ClientManager : public QObject {
   enum OperationState { Ready, WaitingExecution, Failed, Completed };
 
  private:
+  QString CurrentLogin;
+  QString CurrentPassword;
+
   OperationState CurrentState;
   QString NotificarionText;
 
@@ -43,7 +46,7 @@ class ClientManager : public QObject {
 
   IProgrammer* programmer(void) const;
 
-  bool performServerAuthorization(const QString& login,
+  void performServerAuthorization(const QString& login,
                                   const QString& password);
   void performServerConnecting(void);
   void performServerDisconnecting(void);
@@ -108,13 +111,18 @@ class ClientManager : public QObject {
   void connectToPersoServer_signal(void);
   void disconnectFromPersoServer_signal(void);
 
-  void requestAuthorize_signal(const QString& login, const QString& password);
   void requestEcho_signal(void);
-  void requestTransponderRelease_signal(QFile* firmware);
+  void requestAuthorize_signal(const QMap<QString, QString>* requestAttributes,
+                               QMap<QString, QString>* responseAttributes);
+  void requestTransponderRelease_signal(
+      const QMap<QString, QString>* requestAttributes,
+      QFile* firmware);
   void requestTransponderReleaseConfirm_signal(
       const QMap<QString, QString>* requestAttributes,
       QMap<QString, QString>* responseAttributes);
-  void requestTransponderRerelease_signal(QFile* firmware, const QString& pan);
+  void requestTransponderRerelease_signal(
+      const QMap<QString, QString>* requestAttributes,
+      QFile* firmware);
   void requestTransponderRereleaseConfirm_signal(
       const QMap<QString, QString>* requestAttributes,
       QMap<QString, QString>* responseAttributes);

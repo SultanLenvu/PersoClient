@@ -27,11 +27,14 @@
 #define DATA_BLOCK_PART_WAIT_TIME 100
 #define ONETIME_TRANSMIT_DATA_SIZE 10240
 #define DATA_BLOCK_MAX_SIZE 250000
+
+#define PRODUCTION_LINE_DEFAULT_LOGIN "Admin"
+#define PRODUCTION_LINE_DEFAULT_PASSWORD "Password"
 //===============================================================
 
 /* Определения программатора */
 //===============================================================
-#define FIRMWARE_TEMP_FILE_NAME "temp.hex"
+#define FIRMWARE_TEMP_FILE_NAME "data.bin"
 #define FIRMWARE_FILE_MAX_SIZE 131072
 
 #define DEFAULT_FIRMWARE_FILE_PATH "../Firmware/firmware.hex"

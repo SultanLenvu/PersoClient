@@ -64,8 +64,6 @@ class PersoClient : public QObject {
   QTimer* WaitTimer;
   QEventLoop* WaitingLoop;
 
-  QMutex Mutex;
-
  public:
   explicit PersoClient(QObject* parent);
   ~PersoClient();
@@ -76,13 +74,18 @@ class PersoClient : public QObject {
   void connectToPersoServer(void);
   void disconnectFromPersoServer(void);
 
-  void requestAuthorize(const QString& login, const QString& password);
   void requestEcho(void);
-  void requestTransponderRelease(QFile* firmware);
+  void requestAuthorize(const QMap<QString, QString>* requestAttributes,
+                        QMap<QString, QString>* responseAttributes);
+  void requestTransponderRelease(
+      const QMap<QString, QString>* requestAttributes,
+      QFile* firmware);
   void requestTransponderReleaseConfirm(
       const QMap<QString, QString>* requestAttributes,
       QMap<QString, QString>* responseAttributes);
-  void requestTransponderRerelease(QFile* firmware, const QString& pan);
+  void requestTransponderRerelease(
+      const QMap<QString, QString>* requestAttributes,
+      QFile* firmware);
   void requestTransponderRereleaseConfirm(
       const QMap<QString, QString>* requestAttributes,
       QMap<QString, QString>* responseAttributes);
@@ -94,16 +97,20 @@ class PersoClient : public QObject {
   void createDataBlock(void);
   void transmitDataBlock(void);
 
-  void createAuthorizationRequest(const QString& login,
-                                  const QString& password);
-  void createEchoRequest();
-  void createTransponderRelease(void);
-  void createTransponderReleaseConfirm(void);
-  void createTransponderRerelease(void);
-  void createTransponderRereleaseConfirm(void);
+  void createEchoRequest(void);
+  void createAuthorizationRequest(
+      const QMap<QString, QString>* requestAttributes);
+  void createTransponderRelease(
+      const QMap<QString, QString>* requestAttributes);
+  void createTransponderReleaseConfirm(
+      const QMap<QString, QString>* requestAttributes);
+  void createTransponderRerelease(
+      const QMap<QString, QString>* requestAttributes);
+  void createTransponderRereleaseConfirm(
+      const QMap<QString, QString>* requestAttributes);
 
-  void processAuthorizationResponse(void);
   void processEchoResponse(void);
+  void processAuthorizationResponse(QMap<QString, QString>* responseAttributes);
   void processTransponderReleaseResponse(QFile* firmware);
   void processTransponderReleaseConfirmResponse(
       QMap<QString, QString>* responseAttributes);
