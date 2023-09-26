@@ -75,6 +75,13 @@ class MasterGUI : public GUI {
   QLineEdit* ProgrammerExeFilePathLineEdit;
   QPushButton* ProgrammerExeFilePathPushButton;
 
+  // Принтер
+  QGroupBox* PrinterSettingsGroupBox;
+  QGridLayout* PrinterSettingsMainLayout;
+  QLabel* PrinterDllPathLabel;
+  QLineEdit* PrinterDllPathLineEdit;
+  QPushButton* PrinterDllPathPushButton;
+
   QSpacerItem* SettingsVerticalSpacer1;
   //============================================================
 
@@ -96,6 +103,7 @@ class MasterGUI : public GUI {
 
  private slots:
   void on_ProgrammerExeFilePathPushButton_slot(void);
+  void on_PrinterDllPathPushButton_slot(void);
 };
 
 #endif  // MASTERGUI_H

@@ -3,11 +3,14 @@
 ClientManager::ClientManager(QObject* parent) : QObject(parent) {
   setObjectName("ClientManager");
 
-  // Создаем программатор и среду его выполнения
+  // Создаем программатор
   createProgrammerInstance();
 
-  // Создаем клиент и среду его выполнения
+  // Создаем клиент
   createClientInstance();
+
+  // Создаем принтер
+  createPrinterInstance();
 
   // Создаем цикл ожидания
   createWaitingLoop();
@@ -55,7 +58,7 @@ void ClientManager::performServerAuthorization(
   // Запуск цикла ожидания
   WaitingLoop->exec();
   if (CurrentState != Completed) {
-    emit logging("Получена ошбока при авторизации на сервере. ");
+    emit logging("Получена ошибка при авторизации на сервере. ");
     endOperationExecution("performServerAuthorization");
     return;
   }
@@ -129,6 +132,11 @@ void ClientManager::performTransponderFirmwareLoading(
   QMap<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
 
+  // Debug
+  QMap<QString, QString> param;
+  Printer->print(&param);
+  return;
+
   // Начинаем операцию
   if (!startOperationExecution("performTransponderFirmwareLoading")) {
     return;
@@ -138,7 +146,7 @@ void ClientManager::performTransponderFirmwareLoading(
   emit unlockDevice_signal();
   WaitingLoop->exec();
   if (CurrentState != Completed) {
-    emit logging("Получена ошбока при разблокировании памяти транспондера. ");
+    emit logging("Получена ошибка при разблокировании памяти транспондера. ");
     endOperationExecution("performTransponderFirmwareLoading");
     return;
   }
@@ -147,7 +155,7 @@ void ClientManager::performTransponderFirmwareLoading(
   emit getUcid_signal(&ucid);
   WaitingLoop->exec();
   if (CurrentState != Completed) {
-    emit logging("Получена ошбока при считывании UCID с транспондера. ");
+    emit logging("Получена ошибка при считывании UCID с транспондера. ");
     endOperationExecution("performTransponderFirmwareLoading");
     return;
   }
@@ -159,7 +167,7 @@ void ClientManager::performTransponderFirmwareLoading(
   emit requestTransponderRelease_signal(&requestParameters, &firmware);
   WaitingLoop->exec();
   if (CurrentState != Completed) {
-    emit logging("Получена ошбока при запросе прошивки транспондера. ");
+    emit logging("Получена ошибка при выпуске транспондера. ");
     endOperationExecution("performTransponderFirmwareLoading");
     return;
   }
@@ -181,11 +189,14 @@ void ClientManager::performTransponderFirmwareLoading(
                                                responseParameters);
   WaitingLoop->exec();
   if (CurrentState != Completed) {
-    emit logging("Получена ошибка при загрузке прошивки в транспондер. ");
+    emit logging("Получена ошибка при подтверждении выпуска транспондера. ");
   }
 
   // Строим модель для представления данных транспондера
   model->build(responseParameters);
+
+  // Удаляем файл прошивки
+  //  firmware.remove();
 
   // Завершаем операцию
   endOperationExecution("performTransponderFirmwareLoading");
@@ -203,41 +214,61 @@ void ClientManager::performTransponderFirmwareReloading(
     return;
   }
 
-  requestParameters.insert("Login", CurrentLogin);
-  requestParameters.insert("Password", CurrentPassword);
-  requestParameters.insert("PAN", pan);
-  emit logging("Отправка запроса на выпуск транспондера. ");
-  emit requestTransponderRerelease_signal(&requestParameters, &firmware);
+  emit logging("Разблокирование памяти транспондера. ");
+  emit unlockDevice_signal();
   WaitingLoop->exec();
-
-  // Создаем структуры данных транспондера
-  QMap<QString, QString>* responseParameters = new QMap<QString, QString>;
-  emit logging("Отправка запроса на подтверждение выпуска транспондера. ");
-  emit requestTransponderRereleaseConfirm_signal(&requestParameters,
-                                                 responseParameters);
-  WaitingLoop->exec();
-
-  // Строим модель для представления
-  model->build(responseParameters);
-
-  // Оповещаем пользователя о результатах
   if (CurrentState != Completed) {
-    // Завершаем операцию
+    emit logging("Получена ошибка при разблокировании памяти транспондера. ");
     endOperationExecution("performTransponderFirmwareReloading");
     return;
   }
 
-  emit logging("Разблокирование памяти и загрузка прошивки микроконтроллера. ");
-  emit loadFirmwareWithUnlock_signal(&firmware);
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
-
-  // Запуск цикла ожидания
+  emit logging("Считывание UCID транспондера. ");
+  emit getUcid_signal(&ucid);
   WaitingLoop->exec();
+  if (CurrentState != Completed) {
+    emit logging("Получена ошибка при считывании UCID с транспондера. ");
+    endOperationExecution("performTransponderFirmwareReloading");
+    return;
+  }
+
+  requestParameters.insert("Login", CurrentLogin);
+  requestParameters.insert("Password", CurrentPassword);
+  requestParameters.insert("UCID", ucid);
+  requestParameters.insert("PAN", pan);
+  emit logging("Запрос перевыпуска транспондера. ");
+  emit requestTransponderRerelease_signal(&requestParameters, &firmware);
+  WaitingLoop->exec();
+  if (CurrentState != Completed) {
+    emit logging("Получена ошибка при перевыпуске транспондера. ");
+    endOperationExecution("performTransponderFirmwareReloading");
+    return;
+  }
+  requestParameters.clear();
+
+  emit logging("Загрузка прошивки в транспондер. ");
+  emit loadFirmware_signal(&firmware);
+  WaitingLoop->exec();
+  if (CurrentState != Completed) {
+    emit logging("Получена ошибка при загрузке прошивки в транспондер. ");
+    endOperationExecution("performTransponderFirmwareReloading");
+    return;
+  }
+
+  QMap<QString, QString>* responseParameters = new QMap<QString, QString>;
+  emit logging("Отправка запроса на подтверждение перевыпуска транспондера. ");
+  emit requestTransponderRereleaseConfirm_signal(&requestParameters,
+                                                 responseParameters);
+  WaitingLoop->exec();
+  if (CurrentState != Completed) {
+    emit logging("Получена ошибка при загрузке прошивки в транспондер. ");
+  }
+
+  // Строим модель для представления данных транспондера
+  model->build(responseParameters);
 
   // Удаляем файл прошивки
-  // firmware.remove();
+  //  firmware.remove();
 
   // Завершаем операцию
   endOperationExecution("performTransponderFirmwareReloading");
@@ -375,6 +406,7 @@ void ClientManager::applySettings() {
 
   Client->applySettings();
   Programmer->applySettings();
+  Printer->applySetting();
 }
 
 void ClientManager::loadSettings() {}
@@ -457,6 +489,12 @@ void ClientManager::createClientInstance() {
 
   // Запускаем поток клиента
   ClientThread->start();
+}
+
+void ClientManager::createPrinterInstance() {
+  Printer = new TE310Printer(this);
+  connect(Printer, &IStickerPrinter::logging, this,
+          &ClientManager::proxyLogging);
 }
 
 void ClientManager::createWaitingLoop() {
@@ -570,10 +608,12 @@ void ClientManager::deleteProgrammerInstance() {
 }
 
 void ClientManager::proxyLogging(const QString& log) {
-  if (sender()->objectName() == "JLinkExeProgrammer")
-    emit logging("JLink.exe - " + log);
+  if (sender()->objectName() == "IProgrammer")
+    emit logging("Programmer - " + log);
   else if (sender()->objectName() == "PersoClient")
     emit logging("Client - " + log);
+  else if (sender()->objectName() == "IStickerPrinter")
+    emit logging("Printer - " + log);
   else
     emit logging("Unknown - " + log);
 }
@@ -615,6 +655,10 @@ void ClientManager::on_ClientOperationFinished_slot(
     case PersoClient::NotExecuted:
       CurrentState = Failed;
       NotificarionText = "Клиент: операция не была запущена. ";
+      emit break;
+    case PersoClient::AuthorizationError:
+      CurrentState = Failed;
+      NotificarionText = "Клиент: ошибка авторизации. ";
       emit break;
     case PersoClient::RequestParameterError:
       CurrentState = Failed;

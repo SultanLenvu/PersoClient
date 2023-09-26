@@ -352,7 +352,7 @@ void PersoClient::processingDataBlock() {
   CurrentResponse = CurrentResponseDocument.object();
 }
 
-void PersoClient::createDataBlock(void) {
+void PersoClient::createTransmittedDataBlock(void) {
   emit logging(QString("Содержание команды: %1 ")
                    .arg(QString(CurrentCommandDocument.toJson())));
   emit logging("Формирование блока данных для команды. ");
@@ -404,7 +404,7 @@ void PersoClient::createEchoRequest(void) {
   CurrentCommandDocument.setObject(CurrentCommand);
 
   // Создаем блок данных для команды
-  createDataBlock();
+  createTransmittedDataBlock();
 }
 
 void PersoClient::createAuthorizationRequest(
@@ -420,7 +420,7 @@ void PersoClient::createAuthorizationRequest(
   CurrentCommandDocument.setObject(CurrentCommand);
 
   // Создаем блок данных для команды
-  createDataBlock();
+  createTransmittedDataBlock();
 }
 
 void PersoClient::createTransponderRelease(
@@ -437,7 +437,7 @@ void PersoClient::createTransponderRelease(
   CurrentCommandDocument.setObject(CurrentCommand);
 
   // Создаем блок данных для команды
-  createDataBlock();
+  createTransmittedDataBlock();
 }
 
 void PersoClient::createTransponderReleaseConfirm(
@@ -453,7 +453,7 @@ void PersoClient::createTransponderReleaseConfirm(
   CurrentCommandDocument.setObject(CurrentCommand);
 
   // Создаем блок данных для команды
-  createDataBlock();
+  createTransmittedDataBlock();
 }
 
 void PersoClient::createTransponderRerelease(
@@ -471,7 +471,7 @@ void PersoClient::createTransponderRerelease(
   CurrentCommandDocument.setObject(CurrentCommand);
 
   // Создаем блок данных для команды
-  createDataBlock();
+  createTransmittedDataBlock();
 }
 
 void PersoClient::createTransponderRereleaseConfirm(
@@ -489,7 +489,7 @@ void PersoClient::createTransponderRereleaseConfirm(
   CurrentCommandDocument.setObject(CurrentCommand);
 
   // Создаем блок данных для команды
-  createDataBlock();
+  createTransmittedDataBlock();
 }
 
 void PersoClient::processEchoResponse(void) {

@@ -198,6 +198,23 @@ void MasterGUI::createSettingsTab() {
   connect(ProgrammerExeFilePathPushButton, &QPushButton::clicked, this,
           &MasterGUI::on_ProgrammerExeFilePathPushButton_slot);
 
+  // Настройки принтера
+  QGroupBox* PrinterSettingsGroupBox = new QGroupBox(QString("Стикер-принтер"));
+  SettingsMainSubLayout->addWidget(PrinterSettingsGroupBox);
+
+  PrinterSettingsMainLayout = new QGridLayout();
+  PrinterSettingsGroupBox->setLayout(PrinterSettingsMainLayout);
+
+  PrinterDllPathLabel = new QLabel("Путь к DLL стикер-принтера");
+  PrinterSettingsMainLayout->addWidget(PrinterDllPathLabel, 0, 0, 1, 1);
+  PrinterDllPathLineEdit =
+      new QLineEdit(settings.value("StickerPrinter/DLL/Path").toString());
+  PrinterSettingsMainLayout->addWidget(PrinterDllPathLineEdit, 0, 1, 1, 1);
+  PrinterDllPathPushButton = new QPushButton("Обзор");
+  PrinterSettingsMainLayout->addWidget(PrinterDllPathPushButton, 0, 2, 1, 1);
+  connect(PrinterDllPathPushButton, &QPushButton::clicked, this,
+          &MasterGUI::on_PrinterDllPathPushButton_slot);
+
   // Кнопка сохранения настроек
   ApplySettingsPushButton = new QPushButton("Применить изменения");
   SettingsMainSubLayout->addWidget(ApplySettingsPushButton);
@@ -229,4 +246,10 @@ void MasterGUI::on_ProgrammerExeFilePathPushButton_slot() {
   QString filePath =
       QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.exe");
   ProgrammerExeFilePathLineEdit->setText(filePath);
+}
+
+void MasterGUI::on_PrinterDllPathPushButton_slot() {
+  QString filePath =
+      QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.dll");
+  PrinterDllPathLineEdit->setText(filePath);
 }

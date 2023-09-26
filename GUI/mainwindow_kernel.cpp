@@ -108,6 +108,8 @@ void MainWindow::on_ApplySettingsPushButton_slot() {
                      gui->PersoServerPortLineEdit->text().toInt());
   Settings->setValue("JLinkExeProgrammer/ExeFile/Path",
                      gui->ProgrammerExeFilePathLineEdit->text());
+  Settings->setValue("StickerPrinter/DLL/Path",
+                     gui->PrinterDllPathLineEdit->text());
 
   // Применение новых настроек
   Manager->applySettings();
@@ -209,6 +211,11 @@ bool MainWindow::checkNewSettings() {
 
   QFileInfo info(gui->ProgrammerExeFilePathLineEdit->text());
   if ((!info.exists()) || (!info.isExecutable())) {
+    return false;
+  }
+
+  info.setFile(gui->PrinterDllPathLineEdit->text());
+  if ((!info.exists()) || (info.suffix() != "dll")) {
     return false;
   }
 

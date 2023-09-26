@@ -4,6 +4,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
+#LIBS += "C:\Workspace\Development\QT_Sample\TSCLIB.dll"
+
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -23,6 +25,8 @@ SOURCES += \
     GUI/transponder_sticker_dialog.cpp \
     Programmers/interface_programmer.cpp \
     Programmers/jlink_exe_programmer.cpp \
+    StickerPrinter/isticker_printer.cpp \
+    StickerPrinter/te310_printer.cpp \
     main.cpp
 
 HEADERS += \
@@ -41,7 +45,9 @@ HEADERS += \
     General/types.h \
     General/definitions.h \
     Programmers/interface_programmer.h \
-    Programmers/jlink_exe_programmer.h
+    Programmers/jlink_exe_programmer.h \
+    StickerPrinter/isticker_printer.h \
+    StickerPrinter/te310_printer.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

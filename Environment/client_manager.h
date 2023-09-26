@@ -9,14 +9,15 @@
 #include <QTimer>
 #include <QVector>
 
+#include "General/definitions.h"
+#include "General/types.h"
 #include "Programmers/interface_programmer.h"
 #include "Programmers/jlink_exe_programmer.h"
+#include "StickerPrinter/isticker_printer.h"
+#include "StickerPrinter/te310_printer.h"
 #include "log_system.h"
 #include "perso_client.h"
 #include "transponder_seed_model.h"
-
-#include "General/definitions.h"
-#include "General/types.h"
 
 class ClientManager : public QObject {
   Q_OBJECT
@@ -39,6 +40,8 @@ class ClientManager : public QObject {
   QTimer* ODQTimer;
   QTimer* ODTimer;
   QElapsedTimer* ODMeter;
+
+  IStickerPrinter* Printer;
 
  public:
   explicit ClientManager(QObject* parent);
@@ -70,6 +73,7 @@ class ClientManager : public QObject {
   void loadSettings(void);
   void createProgrammerInstance(void);
   void createClientInstance(void);
+  void createPrinterInstance(void);
   void createWaitingLoop(void);
   void createTimers(void);
   void setupODQTimer(uint32_t msecs);

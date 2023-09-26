@@ -94,7 +94,7 @@ class PersoClient : public QObject {
   bool processingServerConnection(void);
 
   void processingDataBlock(void);
-  void createDataBlock(void);
+  void createTransmittedDataBlock(void);
   void transmitDataBlock(void);
 
   void createEchoRequest(void);

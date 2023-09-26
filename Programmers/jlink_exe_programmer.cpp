@@ -2,7 +2,6 @@
 
 JLinkExeProgrammer::JLinkExeProgrammer(QObject* parent)
     : IProgrammer(parent, JLink) {
-  setObjectName("JLinkExeProgrammer");
   loadSettings();
 }
 
