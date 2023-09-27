@@ -101,6 +101,7 @@ class ClientManager : public QObject {
   void operationPerformingEnded(void);
   void waitingEnd(void);
   void createProductionInterface_signal(void);
+  void applySettings_signal(void);
 
   // Сигналы для программатора
   void getUcid_signal(QString* ucid);

@@ -68,8 +68,6 @@ class PersoClient : public QObject {
   explicit PersoClient(QObject* parent);
   ~PersoClient();
 
-  void applySettings(void);
-
  public slots:
   void connectToPersoServer(void);
   void disconnectFromPersoServer(void);
@@ -89,6 +87,8 @@ class PersoClient : public QObject {
   void requestTransponderRereleaseConfirm(
       const QMap<QString, QString>* requestAttributes,
       QMap<QString, QString>* responseAttributes);
+
+  void applySettings(void);
 
  private:
   bool processingServerConnection(void);

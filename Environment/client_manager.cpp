@@ -134,7 +134,7 @@ void ClientManager::performTransponderFirmwareLoading(
 
   // Debug
   QMap<QString, QString> param;
-  Printer->print(&param);
+  Printer->printTransponderSticker(&param);
   return;
 
   // Начинаем операцию
@@ -404,8 +404,7 @@ void ClientManager::applySettings() {
   emit logging("Применение новых настроек. ");
   loadSettings();
 
-  Client->applySettings();
-  Programmer->applySettings();
+  emit applySettings_signal();
   Printer->applySetting();
 }
 
@@ -451,6 +450,8 @@ void ClientManager::createProgrammerInstance() {
           &IProgrammer::unlockDevice);
   connect(this, &ClientManager::lockDevice_signal, Programmer,
           &IProgrammer::lockDevice);
+  connect(this, &ClientManager::applySettings_signal, Programmer,
+          &IProgrammer::applySettings);
 
   // Запускаем поток програматора
   ProgrammerThread->start();
@@ -486,6 +487,8 @@ void ClientManager::createClientInstance() {
           &PersoClient::requestEcho);
   connect(this, &ClientManager::requestTransponderRelease_signal, Client,
           &PersoClient::requestTransponderRelease);
+  connect(this, &ClientManager::applySettings_signal, Client,
+          &PersoClient::applySettings);
 
   // Запускаем поток клиента
   ClientThread->start();
