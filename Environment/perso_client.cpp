@@ -400,7 +400,7 @@ void PersoClient::createEchoRequest(void) {
   CurrentCommand["CommandName"] = "Echo";
 
   // Тело команды
-  CurrentCommand["EchoData"] = "TestData";
+  CurrentCommand["Data"] = "TestData";
   CurrentCommandDocument.setObject(CurrentCommand);
 
   // Создаем блок данных для команды
@@ -495,11 +495,11 @@ void PersoClient::createTransponderRereleaseConfirm(
 void PersoClient::processEchoResponse(void) {
   emit logging("Обработка ответа на команду Echo. ");
 
-  if (CurrentResponse.value("EchoData").isUndefined() ||
+  if (CurrentResponse.value("Data").isUndefined() ||
       CurrentResponse.value("ResponseName").isUndefined() ||
       (CurrentResponse.value("ResponseName").toString() != "Echo")) {
     emit logging(
-        "Обнаружена синтаксическая ошибка в команде EchoRequest: отсутствуют "
+        "Обнаружена синтаксическая ошибка в ответе Echo: отсутствуют "
         "эхо-данные. ");
     ReturnStatus = ResponseProcessingError;
     return;

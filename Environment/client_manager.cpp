@@ -43,40 +43,6 @@ IProgrammer* ClientManager::programmer() const {
   return Programmer;
 }
 
-void ClientManager::performServerAuthorization(
-    const QMap<QString, QString>* data) {
-  QMap<QString, QString> responseParameters;
-
-  // Начинаем операцию
-  if (!startOperationExecution("performServerAuthorization")) {
-    return;
-  }
-
-  emit logging("Авторизация на сервере персонализации. ");
-  emit requestAuthorize_signal(data, &responseParameters);
-
-  // Запуск цикла ожидания
-  WaitingLoop->exec();
-  if (CurrentState != Completed) {
-    emit logging("Получена ошибка при авторизации на сервере. ");
-    endOperationExecution("performServerAuthorization");
-    return;
-  }
-
-  // Если авторизация прошла успешно, то сохраняем логин и пароль
-  if (responseParameters.value("Access") == "Allowed") {
-    emit notifyUserAboutError("Ошибка авторизации. ");
-    return;
-  }
-
-  // Завершаем операцию
-  endOperationExecution("performServerAuthorization");
-
-  // Сохраняем данные и вызываем производственный интерфейс
-  CurrentLogin = data->value("Login");
-  CurrentPassword = data->value("Password");
-  emit createProductionInterface_signal();
-}
 
 void ClientManager::performServerConnecting() {
   // Начинаем операцию
@@ -124,6 +90,41 @@ void ClientManager::performServerEcho() {
 
   // Завершаем операцию
   endOperationExecution("performServerEcho");
+}
+
+void ClientManager::performServerAuthorization(
+    const QMap<QString, QString>* data) {
+  QMap<QString, QString> responseParameters;
+
+  // Начинаем операцию
+  if (!startOperationExecution("performServerAuthorization")) {
+    return;
+  }
+
+  emit logging("Авторизация на сервере персонализации. ");
+  emit requestAuthorize_signal(data, &responseParameters);
+
+  // Запуск цикла ожидания
+  WaitingLoop->exec();
+  if (CurrentState != Completed) {
+    emit logging("Получена ошибка при авторизации на сервере. ");
+    endOperationExecution("performServerAuthorization");
+    return;
+  }
+
+  if (responseParameters.value("Access") != "Allowed") {
+    emit notifyUserAboutError("Ошибка авторизации. ");
+    endOperationExecution("performServerAuthorization");
+    return;
+  }
+
+  // Сохраняем данные и вызываем производственный интерфейс
+  CurrentLogin = data->value("Login");
+  CurrentPassword = data->value("Password");
+  emit createProductionInterface_signal();
+
+  // Завершаем операцию
+  endOperationExecution("performServerAuthorization");
 }
 
 void ClientManager::performTransponderFirmwareLoading(

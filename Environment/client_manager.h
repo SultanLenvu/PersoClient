@@ -49,10 +49,10 @@ class ClientManager : public QObject {
 
   IProgrammer* programmer(void) const;
 
-  void performServerAuthorization(const QMap<QString, QString>* data);
   void performServerConnecting(void);
   void performServerDisconnecting(void);
   void performServerEcho(void);
+  void performServerAuthorization(const QMap<QString, QString>* data);
   void performTransponderFirmwareLoading(TransponderSeedModel* model);
   void performTransponderFirmwareReloading(TransponderSeedModel* model,
                                            const QString& pan);
