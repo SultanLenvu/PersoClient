@@ -28,8 +28,8 @@ MainWindow::~MainWindow() {}
 void MainWindow::on_AuthorizePushButton_slot() {
   QMap<QString, QString> data;
   AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
-  data.insert("Login", gui->LoginLineEdit->text());
-  data.insert("Password", gui->PasswordLineEdit->text());
+  data.insert("login", gui->LoginLineEdit->text());
+  data.insert("password", gui->PasswordLineEdit->text());
 
   Manager->performServerAuthorization(&data);
 
@@ -180,6 +180,10 @@ void MainWindow::on_MasterInterfaceRequest_slot() {
 
 void MainWindow::on_ProductionInterfaceRequest_slot() {
   createProductionInterface();
+}
+
+void MainWindow::on_ExitFromProductionLineAct_slot() {
+  createAuthorizationInterface();
 }
 
 void MainWindow::proxyLogging(const QString& log) {
@@ -373,6 +377,11 @@ void MainWindow::createTopMenuActions() {
     MasterInterfaceRequestAct->setStatusTip("Открыть мастер интерфейс");
     connect(MasterInterfaceRequestAct, &QAction::triggered, this,
             &MainWindow::on_MasterInterfaceRequest_slot);
+    ExitFromProductionLineAct =
+        new QAction("Выйти из производственной линии", this);
+    ExitFromProductionLineAct->setStatusTip("Открыть интерфейс авторизации");
+    connect(ExitFromProductionLineAct, &QAction::triggered, this,
+            &MainWindow::on_ExitFromProductionLineAct_slot);
   } else {
     ProductionInterfaceRequestAct =
         new QAction("Производственный интерфейс", this);
@@ -400,6 +409,11 @@ void MainWindow::createTopMenu() {
     ServiceMenu->addAction(MasterInterfaceRequestAct);
   } else {
     ServiceMenu->addAction(ProductionInterfaceRequestAct);
+  }
+
+  if ((CurrentGUI->type() == GUI::Production) ||
+      (CurrentGUI->type() == GUI::Master)) {
+    ServiceMenu->addAction(ExitFromProductionLineAct);
   }
 
   HelpMenu = menuBar()->addMenu("Справка");

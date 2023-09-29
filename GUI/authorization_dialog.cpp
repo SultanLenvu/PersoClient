@@ -40,6 +40,6 @@ void AuthorizationDialog::getData(QMap<QString, QString>* data) {
     return;
   }
 
-  data->insert("Login", LoginLineEdit->text());
-  data->insert("Password", PasswordLineEdit->text());
+  data->insert("login", LoginLineEdit->text());
+  data->insert("password", PasswordLineEdit->text());
 }

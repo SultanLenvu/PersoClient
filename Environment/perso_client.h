@@ -27,6 +27,7 @@ class PersoClient : public QObject {
     ServerConnectionError,
     ServerNotResponding,
     ServerConnectionTerminated,
+    AuthorizationNotExist,
     AuthorizationAccessDenied,
     AuthorizationNotActive,
     ResponseSyntaxError,

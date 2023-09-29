@@ -424,7 +424,7 @@ void PersoClient::createEchoRequest(void) {
   CurrentCommand["command_name"] = "Echo";
 
   // Тело команды
-  CurrentCommand["Data"] = "Test";
+  CurrentCommand["data"] = "Test";
 
   // Создаем блок данных для команды
   createTransmittedDataBlock();
@@ -513,21 +513,11 @@ void PersoClient::createTransponderRereleaseConfirm(
 void PersoClient::processEchoResponse(void) {
   emit logging("Обработка ответа на команду Echo. ");
 
-<<<<<<< HEAD
-  if (CurrentResponse.value("Data").isUndefined() ||
-      CurrentResponse.value("ResponseName").isUndefined() ||
-      (CurrentResponse.value("ResponseName").toString() != "Echo")) {
-    emit logging(
-        "Обнаружена синтаксическая ошибка в ответе Echo: отсутствуют "
-        "эхо-данные. ");
-    ReturnStatus = ResponseProcessingError;
-=======
   // Проверка статуса возврата
   if (CurrentResponse["return_status"] != "NoError") {
     emit logging(QString("Получена серверная ошибка: %1")
                      .arg(CurrentResponse["return_status"].toString()));
     ReturnStatus = ServerError;
->>>>>>> b3091d933757d72c639b1bea6cef3576bc881340
     return;
   }
 
@@ -566,6 +556,10 @@ void PersoClient::processAuthorizationResponse(void) {
 
   if (CurrentResponse.value("access").toString() == "Allowed") {
     ReturnStatus = CompletedSuccessfully;
+  } else if (CurrentResponse.value("access").toString() == "NotExist") {
+    ReturnStatus = AuthorizationNotExist;
+  } else if (CurrentResponse.value("access").toString() == "NotActive") {
+    ReturnStatus = AuthorizationNotActive;
   } else {
     ReturnStatus = AuthorizationAccessDenied;
   }

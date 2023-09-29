@@ -110,8 +110,8 @@ void ClientManager::performServerAuthorization(
   }
 
   // Сохраняем данные и вызываем производственный интерфейс
-  CurrentLogin = data->value("Login");
-  CurrentPassword = data->value("Password");
+  CurrentLogin = data->value("login");
+  CurrentPassword = data->value("password");
 
   emit createProductionInterface_signal();
 
@@ -148,9 +148,9 @@ void ClientManager::performTransponderFirmwareLoading(
     return;
   }
 
-  requestParameters.insert("Login", CurrentLogin);
-  requestParameters.insert("Password", CurrentPassword);
-  requestParameters.insert("UCID", ucid);
+  requestParameters.insert("login", CurrentLogin);
+  requestParameters.insert("password", CurrentPassword);
+  requestParameters.insert("ucid", ucid);
   emit logging("Запрос прошивки транспондера. ");
   emit requestTransponderRelease_signal(&requestParameters, &firmware);
   WaitingLoop->exec();
@@ -231,10 +231,10 @@ void ClientManager::performTransponderFirmwareReloading(
     return;
   }
 
-  requestParameters.insert("Login", CurrentLogin);
-  requestParameters.insert("Password", CurrentPassword);
-  requestParameters.insert("UCID", ucid);
-  requestParameters.insert("PAN", pan);
+  requestParameters.insert("login", CurrentLogin);
+  requestParameters.insert("password", CurrentPassword);
+  requestParameters.insert("ucid", ucid);
+  requestParameters.insert("pan", pan);
   emit logging("Запрос перевыпуска транспондера. ");
   emit requestTransponderRerelease_signal(&requestParameters, &firmware);
   WaitingLoop->exec();
@@ -674,6 +674,10 @@ void ClientManager::on_ClientOperationFinished_slot(
       CurrentState = Failed;
       NotificationText = "Клиент: соединение с сервером прервалось. ";
       break;
+    case PersoClient::AuthorizationNotExist:
+      CurrentState = Failed;
+      NotificationText = "Клиент: неверный логин или пароль. ";
+      break;
     case PersoClient::AuthorizationAccessDenied:
       CurrentState = Failed;
       NotificationText = "Клиент: доступ запрещен. ";
@@ -697,10 +701,6 @@ void ClientManager::on_ClientOperationFinished_slot(
     case PersoClient::CompletedSuccessfully:
       CurrentState = Completed;
       NotificationText = "Операция успешно выполнена. ";
-      break;
-    default:
-      CurrentState = Failed;
-      NotificationText = "Неизвестная ошибка. ";
       break;
   }
 

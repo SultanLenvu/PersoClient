@@ -30,6 +30,7 @@ class MainWindow : public QMainWindow {
 
   QAction* MasterInterfaceRequestAct;
   QAction* ProductionInterfaceRequestAct;
+  QAction* ExitFromProductionLineAct;
   QAction* AboutProgramAct;
   //==================================================
 
@@ -65,6 +66,7 @@ class MainWindow : public QMainWindow {
 
   void on_MasterInterfaceRequest_slot(void);
   void on_ProductionInterfaceRequest_slot(void);
+  void on_ExitFromProductionLineAct_slot(void);
 
  private:
   void proxyLogging(const QString& log);
