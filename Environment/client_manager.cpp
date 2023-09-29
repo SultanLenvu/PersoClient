@@ -572,16 +572,16 @@ void ClientManager::endOperationExecution(const QString& operationName) {
       QString("Длительность операции: %1.").arg(QString::number(duration)));
   settings.setValue(QString("ClientManager/Operations/") + operationName +
                         QString("/Duration"),
-                    duration);
+                    QVariant::fromValue(duration));
 
   // Сигнал о завершении текущей операции
   emit operationPerformingEnded();
 
   // Оповещаем пользователя о результатах
   if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
+    emit notifyUser(NotificationText);
   } else {
-    emit notifyUserAboutError(NotificarionText);
+    emit notifyUserAboutError(NotificationText);
   }
 
   // Готовы к следующей операции
@@ -624,25 +624,25 @@ void ClientManager::on_ProgrammerOperationFinished_slot(
   switch (status) {
     case IProgrammer::NotExecuted:
       CurrentState = Failed;
-      NotificarionText = "Программатор: операция не была запущена. ";
+      NotificationText = "Программатор: операция не была запущена. ";
       emit break;
     case IProgrammer::RequestParameterError:
       CurrentState = Failed;
-      NotificarionText = "Программатор: некорректный файл прошивки. ";
+      NotificationText = "Программатор: некорректный файл прошивки. ";
       break;
     case IProgrammer::DataFileError:
       CurrentState = Failed;
-      NotificarionText =
+      NotificationText =
           "Программатор: некорректный файл данных для загрузки. ";
       break;
     case IProgrammer::ProgrammatorError:
       CurrentState = Failed;
-      NotificarionText =
+      NotificationText =
           "Программатор: получена ошибка при выполнении операции. ";
       break;
     case IProgrammer::CompletedSuccessfully:
       CurrentState = Completed;
-      NotificarionText = "Операция успешно выполнена. ";
+      NotificationText = "Операция успешно выполнена. ";
       break;
   }
 
@@ -655,23 +655,30 @@ void ClientManager::on_ClientOperationFinished_slot(
   switch (status) {
     case PersoClient::NotExecuted:
       CurrentState = Failed;
-      NotificarionText = "Клиент: операция не была запущена. ";
+      NotificationText = "Клиент: операция не была запущена. ";
       emit break;
+<<<<<<< HEAD
+=======
+    case PersoClient::AuthorizationError:
+      CurrentState = Failed;
+      NotificationText = "Клиент: ошибка авторизации. ";
+      emit break;
+>>>>>>> 1ebb5e4b72824957fb6ff75b060bdb9f43fdb018
     case PersoClient::RequestParameterError:
       CurrentState = Failed;
-      NotificarionText = "Клиент: некорректный файл прошивки. ";
+      NotificationText = "Клиент: некорректный файл прошивки. ";
       break;
     case PersoClient::ServerConnectionError:
       CurrentState = Failed;
-      NotificarionText = "Клиент: не удалось подключиться к серверу. ";
+      NotificationText = "Клиент: не удалось подключиться к серверу. ";
       break;
     case PersoClient::ServerNotResponding:
       CurrentState = Failed;
-      NotificarionText = "Клиент: сервер не отвечает. ";
+      NotificationText = "Клиент: сервер не отвечает. ";
       break;
     case PersoClient::ServerConnectionTerminated:
       CurrentState = Failed;
-      NotificarionText = "Клиент: соединение с сервером прервалось. ";
+      NotificationText = "Клиент: соединение с сервером прервалось. ";
       break;
     case PersoClient::AuthorizationAccessDenied:
       CurrentState = Failed;
@@ -683,7 +690,7 @@ void ClientManager::on_ClientOperationFinished_slot(
       break;
     case PersoClient::ResponseSyntaxError:
       CurrentState = Failed;
-      NotificarionText = "Клиент: получен некорректный ответ от сервера. ";
+      NotificationText = "Клиент: получен некорректный ответ от сервера. ";
       break;
     case PersoClient::ServerError:
       CurrentState = Failed;
@@ -691,11 +698,11 @@ void ClientManager::on_ClientOperationFinished_slot(
       break;
     case PersoClient::UnknownError:
       CurrentState = Failed;
-      NotificarionText = "Клиент: неизвестная ошибка. ";
+      NotificationText = "Клиент: неизвестная ошибка. ";
       break;
     case PersoClient::CompletedSuccessfully:
       CurrentState = Completed;
-      NotificarionText = "Операция успешно выполнена. ";
+      NotificationText = "Операция успешно выполнена. ";
       break;
     default:
       CurrentState = Failed;
