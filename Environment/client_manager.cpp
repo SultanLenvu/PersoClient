@@ -574,7 +574,7 @@ void ClientManager::endOperationExecution(const QString& operationName) {
       QString("Длительность операции: %1.").arg(QString::number(duration)));
   settings.setValue(QString("ClientManager/Operations/") + operationName +
                         QString("/Duration"),
-                    duration);
+                    QVariant::fromValue(duration));
 
   // Сигнал о завершении текущей операции
   emit operationPerformingEnded();
