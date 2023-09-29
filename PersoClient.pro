@@ -16,13 +16,13 @@ SOURCES += \
     Environment/perso_client.cpp \
     Environment/transponder_seed_model.cpp \
     GUI/authorization_dialog.cpp \
+    GUI/transponder_rerelease_dialog.cpp \
     GUI/user_interaction_system.cpp \
     GUI/authorization_gui.cpp \
     GUI/gui.cpp \
     GUI/mainwindow_kernel.cpp \
     GUI/master_gui.cpp \
     GUI/production_gui.cpp \
-    GUI/transponder_sticker_dialog.cpp \
     Programmers/interface_programmer.cpp \
     Programmers/jlink_exe_programmer.cpp \
     StickerPrinter/isticker_printer.cpp \
@@ -35,13 +35,13 @@ HEADERS += \
     Environment/perso_client.h \
     Environment/transponder_seed_model.h \
     GUI/authorization_dialog.h \
+    GUI/transponder_rerelease_dialog.h \
     GUI/user_interaction_system.h \
     GUI/authorization_gui.h \
     GUI/gui.h \
     GUI/mainwindow_kernel.h \
     GUI/master_gui.h \
     GUI/production_gui.h \
-    GUI/transponder_sticker_dialog.h \
     General/types.h \
     General/definitions.h \
     Programmers/interface_programmer.h \

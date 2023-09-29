@@ -43,7 +43,6 @@ IProgrammer* ClientManager::programmer() const {
   return Programmer;
 }
 
-
 void ClientManager::performServerConnecting() {
   // Начинаем операцию
   if (!startOperationExecution("performServerConnecting")) {
@@ -94,15 +93,13 @@ void ClientManager::performServerEcho() {
 
 void ClientManager::performServerAuthorization(
     const QMap<QString, QString>* data) {
-  QMap<QString, QString> responseParameters;
-
   // Начинаем операцию
   if (!startOperationExecution("performServerAuthorization")) {
     return;
   }
 
   emit logging("Авторизация на сервере персонализации. ");
-  emit requestAuthorize_signal(data, &responseParameters);
+  emit requestAuthorize_signal(data);
 
   // Запуск цикла ожидания
   WaitingLoop->exec();
@@ -112,15 +109,10 @@ void ClientManager::performServerAuthorization(
     return;
   }
 
-  if (responseParameters.value("Access") != "Allowed") {
-    emit notifyUserAboutError("Ошибка авторизации. ");
-    endOperationExecution("performServerAuthorization");
-    return;
-  }
-
   // Сохраняем данные и вызываем производственный интерфейс
   CurrentLogin = data->value("Login");
   CurrentPassword = data->value("Password");
+
   emit createProductionInterface_signal();
 
   // Завершаем операцию
@@ -132,11 +124,6 @@ void ClientManager::performTransponderFirmwareLoading(
   QString ucid;
   QMap<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
-
-  // Debug
-  QMap<QString, QString> param;
-  Printer->printTransponderSticker(&param);
-  return;
 
   // Начинаем операцию
   if (!startOperationExecution("performTransponderFirmwareLoading")) {
@@ -191,6 +178,8 @@ void ClientManager::performTransponderFirmwareLoading(
   WaitingLoop->exec();
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при подтверждении выпуска транспондера. ");
+    endOperationExecution("performTransponderFirmwareLoading");
+    return;
   }
 
   // Строим модель для представления данных транспондера
@@ -198,6 +187,15 @@ void ClientManager::performTransponderFirmwareLoading(
 
   // Удаляем файл прошивки
   //  firmware.remove();
+
+  emit logging("Печать стикера для транспондера.");
+  if (!Printer->printTransponderSticker(responseParameters)) {
+    emit logging("Получена ошибка при печати стикера для транспондера.");
+    CurrentState = Failed;
+    NotificationText = "Принтер: ошибка печати.";
+    endOperationExecution("performTransponderFirmwareLoading");
+    return;
+  }
 
   // Завершаем операцию
   endOperationExecution("performTransponderFirmwareLoading");
@@ -575,16 +573,16 @@ void ClientManager::endOperationExecution(const QString& operationName) {
       QString("Длительность операции: %1.").arg(QString::number(duration)));
   settings.setValue(QString("ClientManager/Operations/") + operationName +
                         QString("/Duration"),
-                    duration);
+                    QVariant::fromValue(duration));
 
   // Сигнал о завершении текущей операции
   emit operationPerformingEnded();
 
   // Оповещаем пользователя о результатах
   if (CurrentState == Completed) {
-    emit notifyUser(NotificarionText);
+    emit notifyUser(NotificationText);
   } else {
-    emit notifyUserAboutError(NotificarionText);
+    emit notifyUserAboutError(NotificationText);
   }
 
   // Готовы к следующей операции
@@ -627,25 +625,25 @@ void ClientManager::on_ProgrammerOperationFinished_slot(
   switch (status) {
     case IProgrammer::NotExecuted:
       CurrentState = Failed;
-      NotificarionText = "Программатор: операция не была запущена. ";
+      NotificationText = "Программатор: операция не была запущена. ";
       emit break;
     case IProgrammer::RequestParameterError:
       CurrentState = Failed;
-      NotificarionText = "Программатор: некорректный файл прошивки. ";
+      NotificationText = "Программатор: некорректный файл прошивки. ";
       break;
     case IProgrammer::DataFileError:
       CurrentState = Failed;
-      NotificarionText =
+      NotificationText =
           "Программатор: некорректный файл данных для загрузки. ";
       break;
     case IProgrammer::ProgrammatorError:
       CurrentState = Failed;
-      NotificarionText =
+      NotificationText =
           "Программатор: получена ошибка при выполнении операции. ";
       break;
     case IProgrammer::CompletedSuccessfully:
       CurrentState = Completed;
-      NotificarionText = "Операция успешно выполнена. ";
+      NotificationText = "Операция успешно выполнена. ";
       break;
   }
 
@@ -658,39 +656,51 @@ void ClientManager::on_ClientOperationFinished_slot(
   switch (status) {
     case PersoClient::NotExecuted:
       CurrentState = Failed;
-      NotificarionText = "Клиент: операция не была запущена. ";
-      emit break;
-    case PersoClient::AuthorizationError:
-      CurrentState = Failed;
-      NotificarionText = "Клиент: ошибка авторизации. ";
+      NotificationText = "Клиент: операция не была запущена. ";
       emit break;
     case PersoClient::RequestParameterError:
       CurrentState = Failed;
-      NotificarionText = "Клиент: некорректный файл прошивки. ";
+      NotificationText = "Клиент: некорректный файл прошивки. ";
       break;
     case PersoClient::ServerConnectionError:
       CurrentState = Failed;
-      NotificarionText = "Клиент: не удалось подключиться к серверу. ";
+      NotificationText = "Клиент: не удалось подключиться к серверу. ";
       break;
     case PersoClient::ServerNotResponding:
       CurrentState = Failed;
-      NotificarionText = "Клиент: сервер не отвечает. ";
+      NotificationText = "Клиент: сервер не отвечает. ";
       break;
     case PersoClient::ServerConnectionTerminated:
       CurrentState = Failed;
-      NotificarionText = "Клиент: соединение с сервером прервалось. ";
+      NotificationText = "Клиент: соединение с сервером прервалось. ";
       break;
-    case PersoClient::ResponseProcessingError:
+    case PersoClient::AuthorizationAccessDenied:
       CurrentState = Failed;
-      NotificarionText = "Клиент: получен некорректный ответ от сервера. ";
+      NotificationText = "Клиент: доступ запрещен. ";
+      break;
+    case PersoClient::AuthorizationNotActive:
+      CurrentState = Failed;
+      NotificationText = "Клиент: производственная линия не активна. ";
+      break;
+    case PersoClient::ResponseSyntaxError:
+      CurrentState = Failed;
+      NotificationText = "Клиент: получен некорректный ответ от сервера. ";
+      break;
+    case PersoClient::ServerError:
+      CurrentState = Failed;
+      NotificationText = "Клиент: получена серверная ошибка. ";
       break;
     case PersoClient::UnknownError:
       CurrentState = Failed;
-      NotificarionText = "Клиент: неизвестная ошибка. ";
+      NotificationText = "Клиент: неизвестная ошибка. ";
       break;
     case PersoClient::CompletedSuccessfully:
       CurrentState = Completed;
-      NotificarionText = "Операция успешно выполнена. ";
+      NotificationText = "Операция успешно выполнена. ";
+      break;
+    default:
+      CurrentState = Failed;
+      NotificationText = "Неизвестная ошибка. ";
       break;
   }
 

@@ -9,7 +9,7 @@
 #include <QProgressDialog>
 
 #include "authorization_dialog.h"
-#include "transponder_sticker_dialog.h"
+#include "transponder_rerelease_dialog.h"
 
 class UserInteractionSystem : public QObject {
   Q_OBJECT

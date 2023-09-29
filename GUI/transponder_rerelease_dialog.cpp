@@ -1,6 +1,7 @@
-#include "transponder_sticker_dialog.h"
+#include "transponder_rerelease_dialog.h"
 
-TransponderStickerDialog::TransponderStickerDialog(QWidget* parent) : QDialog(parent) {
+TransponderRereleaseDialog::TransponderRereleaseDialog(QWidget* parent)
+    : QDialog(parent) {
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::desktop()->screenGeometry();
 
@@ -27,6 +28,6 @@ TransponderStickerDialog::TransponderStickerDialog(QWidget* parent) : QDialog(pa
   connect(CancelButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-QString TransponderStickerDialog::getData(void) {
+QString TransponderRereleaseDialog::getData(void) {
   return PersoInitDataInput->toPlainText();
 }

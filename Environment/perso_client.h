@@ -27,8 +27,10 @@ class PersoClient : public QObject {
     ServerConnectionError,
     ServerNotResponding,
     ServerConnectionTerminated,
-    AuthorizationError,
-    ResponseProcessingError,
+    AuthorizationAccessDenied,
+    AuthorizationNotActive,
+    ResponseSyntaxError,
+    ServerError,
     UnknownError,
     CompletedSuccessfully
   };
@@ -57,9 +59,7 @@ class PersoClient : public QObject {
   QByteArray TransmittedDataBlock;
 
   QJsonObject CurrentCommand;
-  QJsonDocument CurrentCommandDocument;
   QJsonObject CurrentResponse;
-  QJsonDocument CurrentResponseDocument;
 
   QTimer* WaitTimer;
   QEventLoop* WaitingLoop;
@@ -73,8 +73,7 @@ class PersoClient : public QObject {
   void disconnectFromPersoServer(void);
 
   void requestEcho(void);
-  void requestAuthorize(const QMap<QString, QString>* requestAttributes,
-                        QMap<QString, QString>* responseAttributes);
+  void requestAuthorize(const QMap<QString, QString>* requestAttributes);
   void requestTransponderRelease(
       const QMap<QString, QString>* requestAttributes,
       QFile* firmware);
@@ -110,7 +109,7 @@ class PersoClient : public QObject {
       const QMap<QString, QString>* requestAttributes);
 
   void processEchoResponse(void);
-  void processAuthorizationResponse(QMap<QString, QString>* responseAttributes);
+  void processAuthorizationResponse(void);
   void processTransponderReleaseResponse(QFile* firmware);
   void processTransponderReleaseConfirmResponse(
       QMap<QString, QString>* responseAttributes);

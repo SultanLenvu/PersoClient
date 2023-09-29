@@ -26,7 +26,7 @@ class TE310Printer : public IStickerPrinter {
  public:
   explicit TE310Printer(QObject* parent);
 
-  virtual void printTransponderSticker(
+  virtual bool printTransponderSticker(
       const QMap<QString, QString>* parameters) override;
   virtual void applySetting(void) override;
 

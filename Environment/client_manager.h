@@ -29,7 +29,7 @@ class ClientManager : public QObject {
   QString CurrentPassword;
 
   OperationState CurrentState;
-  QString NotificarionText;
+  QString NotificationText;
 
   QThread* ClientThread;
   PersoClient* Client;
@@ -119,8 +119,7 @@ class ClientManager : public QObject {
   void disconnectFromPersoServer_signal(void);
 
   void requestEcho_signal(void);
-  void requestAuthorize_signal(const QMap<QString, QString>* requestParameters,
-                               QMap<QString, QString>* responseParameters);
+  void requestAuthorize_signal(const QMap<QString, QString>* requestParameters);
   void requestTransponderRelease_signal(
       const QMap<QString, QString>* requestParameters,
       QFile* firmware);

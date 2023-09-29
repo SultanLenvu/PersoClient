@@ -7,26 +7,27 @@ TE310Printer::TE310Printer(QObject* parent) : IStickerPrinter(parent, TE310) {
   loadTscLib();
 }
 
-void TE310Printer::printTransponderSticker(
+bool TE310Printer::printTransponderSticker(
     const QMap<QString, QString>* parameters) {
   emit logging(QString("Печать стикера транспондера для %1.")
                    .arg(parameters->value("IssuerName")));
 
   if (!TscLib->isLoaded()) {
     emit logging("Библиотека не загружена. Сброс. ");
-    return;
+    return false;
   }
 
-  if (parameters->value("IssuerName") == "Новое качество дорог") {
+  if (parameters->value("issuer_name") == "Новое качество дорог") {
     printNkdSticker(parameters);
-  } else if (parameters->value("IssuerName") == "Магистраль северной столицы") {
+  } else if (parameters->value("issuer_name") ==
+             "Магистраль северной столицы") {
     printZsdSticker(parameters);
   } else {
     emit logging("Получено неизвестное название компании-эмитента. Сброс.");
-    return;
+    return false;
   }
 
-  emit logging("Печать завершена.");
+  return true;
 }
 
 void TE310Printer::applySetting() {
