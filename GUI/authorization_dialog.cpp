@@ -36,6 +36,10 @@ AuthorizationDialog::AuthorizationDialog(QWidget* parent) : QDialog(parent) {
 }
 
 void AuthorizationDialog::getData(QMap<QString, QString>* data) {
+  if (!data) {
+    return;
+  }
+
   data->insert("Login", LoginLineEdit->text());
   data->insert("Password", PasswordLineEdit->text());
 }

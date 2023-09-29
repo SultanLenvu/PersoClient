@@ -45,27 +45,19 @@ IProgrammer* ClientManager::programmer() const {
 
 void ClientManager::performServerAuthorization(
     const QMap<QString, QString>* data) {
-  QMap<QString, QString> responseParameters;
-
   // Начинаем операцию
   if (!startOperationExecution("performServerAuthorization")) {
     return;
   }
 
   emit logging("Авторизация на сервере персонализации. ");
-  emit requestAuthorize_signal(data, &responseParameters);
+  emit requestAuthorize_signal(data);
 
   // Запуск цикла ожидания
   WaitingLoop->exec();
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при авторизации на сервере. ");
     endOperationExecution("performServerAuthorization");
-    return;
-  }
-
-  // Если авторизация прошла успешно, то сохраняем логин и пароль
-  if (responseParameters.value("Access") == "Allowed") {
-    emit notifyUserAboutError("Ошибка авторизации. ");
     return;
   }
 
@@ -132,11 +124,6 @@ void ClientManager::performTransponderFirmwareLoading(
   QMap<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
 
-  // Debug
-  QMap<QString, QString> param;
-  Printer->printTransponderSticker(&param);
-  return;
-
   // Начинаем операцию
   if (!startOperationExecution("performTransponderFirmwareLoading")) {
     return;
@@ -190,6 +177,8 @@ void ClientManager::performTransponderFirmwareLoading(
   WaitingLoop->exec();
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при подтверждении выпуска транспондера. ");
+    endOperationExecution("performTransponderFirmwareLoading");
+    return;
   }
 
   // Строим модель для представления данных транспондера
@@ -197,6 +186,15 @@ void ClientManager::performTransponderFirmwareLoading(
 
   // Удаляем файл прошивки
   //  firmware.remove();
+
+  emit logging("Печать стикера для транспондера.");
+  if (!Printer->printTransponderSticker(responseParameters)) {
+    emit logging("Получена ошибка при печати стикера для транспондера.");
+    CurrentState = Failed;
+    NotificarionText = "Принтер: ошибка печати.";
+    endOperationExecution("performTransponderFirmwareLoading");
+    return;
+  }
 
   // Завершаем операцию
   endOperationExecution("performTransponderFirmwareLoading");
@@ -659,10 +657,6 @@ void ClientManager::on_ClientOperationFinished_slot(
       CurrentState = Failed;
       NotificarionText = "Клиент: операция не была запущена. ";
       emit break;
-    case PersoClient::AuthorizationError:
-      CurrentState = Failed;
-      NotificarionText = "Клиент: ошибка авторизации. ";
-      emit break;
     case PersoClient::RequestParameterError:
       CurrentState = Failed;
       NotificarionText = "Клиент: некорректный файл прошивки. ";
@@ -679,9 +673,21 @@ void ClientManager::on_ClientOperationFinished_slot(
       CurrentState = Failed;
       NotificarionText = "Клиент: соединение с сервером прервалось. ";
       break;
-    case PersoClient::ResponseProcessingError:
+    case PersoClient::AuthorizationAccessDenied:
+      CurrentState = Failed;
+      NotificarionText = "Клиент: доступ запрещен. ";
+      break;
+    case PersoClient::AuthorizationNotActive:
+      CurrentState = Failed;
+      NotificarionText = "Клиент: производственная линия не активна. ";
+      break;
+    case PersoClient::ResponseSyntaxError:
       CurrentState = Failed;
       NotificarionText = "Клиент: получен некорректный ответ от сервера. ";
+      break;
+    case PersoClient::ServerError:
+      CurrentState = Failed;
+      NotificarionText = "Клиент: получена серверная ошибка. ";
       break;
     case PersoClient::UnknownError:
       CurrentState = Failed;
@@ -690,6 +696,10 @@ void ClientManager::on_ClientOperationFinished_slot(
     case PersoClient::CompletedSuccessfully:
       CurrentState = Completed;
       NotificarionText = "Операция успешно выполнена. ";
+      break;
+    default:
+      CurrentState = Failed;
+      NotificarionText = "Неизвестная ошибка. ";
       break;
   }
 

@@ -139,6 +139,10 @@ void MainWindow::on_MasterAuthorizePushButton_slot() {
   QMap<QString, QString> data;
   Interactor->getAuthorizationData(&data);
 
+  if (data.isEmpty()) {
+    return;
+  }
+
   Manager->performServerAuthorization(&data);
 }
 

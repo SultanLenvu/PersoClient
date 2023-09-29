@@ -31,7 +31,8 @@ void UserInteractionSystem::getMasterPassword(QString& pass) {
 
 void UserInteractionSystem::getTransponderStickerData(QStringList* data) {
   QString rawData;
-  TransponderStickerDialog* dialog = new TransponderStickerDialog(ParentWindow);
+  TransponderRereleaseDialog* dialog =
+      new TransponderRereleaseDialog(ParentWindow);
 
   if (dialog->exec() == QDialog::Accepted) {
     rawData = dialog->getData();

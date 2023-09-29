@@ -28,7 +28,7 @@ class IStickerPrinter : public QObject {
  public:
   IStickerPrinter(QObject* parent, PrinterType type);
 
-  virtual void printTransponderSticker(
+  virtual bool printTransponderSticker(
       const QMap<QString, QString>* parameters) = 0;
   virtual void applySetting(void) = 0;
 

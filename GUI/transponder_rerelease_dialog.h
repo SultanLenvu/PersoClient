@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QtWidgets>
 
-class TransponderStickerDialog : public QDialog {
+class TransponderRereleaseDialog : public QDialog {
   Q_OBJECT
 
  private:
@@ -17,7 +17,7 @@ class TransponderStickerDialog : public QDialog {
   QPushButton* CancelButton;
 
  public:
-  TransponderStickerDialog(QWidget* parent);
+  TransponderRereleaseDialog(QWidget* parent);
   QString getData(void);
 };
 
