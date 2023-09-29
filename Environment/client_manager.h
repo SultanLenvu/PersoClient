@@ -29,7 +29,7 @@ class ClientManager : public QObject {
   QString CurrentPassword;
 
   OperationState CurrentState;
-  QString NotificarionText;
+  QString NotificationText;
 
   QThread* ClientThread;
   PersoClient* Client;
