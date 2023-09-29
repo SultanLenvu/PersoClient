@@ -191,7 +191,7 @@ void ClientManager::performTransponderFirmwareLoading(
   if (!Printer->printTransponderSticker(responseParameters)) {
     emit logging("Получена ошибка при печати стикера для транспондера.");
     CurrentState = Failed;
-    NotificarionText = "Принтер: ошибка печати.";
+    NotificationText = "Принтер: ошибка печати.";
     endOperationExecution("performTransponderFirmwareLoading");
     return;
   }
@@ -657,13 +657,6 @@ void ClientManager::on_ClientOperationFinished_slot(
       CurrentState = Failed;
       NotificationText = "Клиент: операция не была запущена. ";
       emit break;
-<<<<<<< HEAD
-=======
-    case PersoClient::AuthorizationError:
-      CurrentState = Failed;
-      NotificationText = "Клиент: ошибка авторизации. ";
-      emit break;
->>>>>>> 1ebb5e4b72824957fb6ff75b060bdb9f43fdb018
     case PersoClient::RequestParameterError:
       CurrentState = Failed;
       NotificationText = "Клиент: некорректный файл прошивки. ";
@@ -682,11 +675,11 @@ void ClientManager::on_ClientOperationFinished_slot(
       break;
     case PersoClient::AuthorizationAccessDenied:
       CurrentState = Failed;
-      NotificarionText = "Клиент: доступ запрещен. ";
+      NotificationText = "Клиент: доступ запрещен. ";
       break;
     case PersoClient::AuthorizationNotActive:
       CurrentState = Failed;
-      NotificarionText = "Клиент: производственная линия не активна. ";
+      NotificationText = "Клиент: производственная линия не активна. ";
       break;
     case PersoClient::ResponseSyntaxError:
       CurrentState = Failed;
@@ -694,7 +687,7 @@ void ClientManager::on_ClientOperationFinished_slot(
       break;
     case PersoClient::ServerError:
       CurrentState = Failed;
-      NotificarionText = "Клиент: получена серверная ошибка. ";
+      NotificationText = "Клиент: получена серверная ошибка. ";
       break;
     case PersoClient::UnknownError:
       CurrentState = Failed;
@@ -706,7 +699,7 @@ void ClientManager::on_ClientOperationFinished_slot(
       break;
     default:
       CurrentState = Failed;
-      NotificarionText = "Неизвестная ошибка. ";
+      NotificationText = "Неизвестная ошибка. ";
       break;
   }
 
