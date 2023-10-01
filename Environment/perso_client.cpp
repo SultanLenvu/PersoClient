@@ -597,7 +597,8 @@ void PersoClient::processTransponderReleaseResponse(QFile* firmware) {
   }
 
   // Сохраняем прошивку в файл
-  firmware->write(CurrentResponse.value("Firmware").toString().toUtf8());
+  firmware->write(QByteArray::fromBase64(
+      CurrentResponse.value("firmware").toString().toUtf8()));
   firmware->close();
 
   ReturnStatus = CompletedSuccessfully;
@@ -686,7 +687,8 @@ void PersoClient::processTransponderRereleaseResponse(QFile* firmware) {
   }
 
   // Сохраняем прошивку в файл
-  firmware->write(CurrentResponse.value("Firmware").toString().toUtf8());
+  firmware->write(QByteArray::fromBase64(
+      CurrentResponse.value("firmware").toString().toUtf8()));
   firmware->close();
 
   ReturnStatus = CompletedSuccessfully;

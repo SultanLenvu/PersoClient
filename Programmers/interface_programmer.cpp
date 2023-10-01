@@ -27,7 +27,7 @@ bool IProgrammer::checkFirmwareFile(const QFile* firmware) {
     return false;
 
   // Проврека на размер
-  if ((info.size() > FIRMWARE_FILE_MAX_SIZE) || (info.size() == 0))
+  if (info.size() != FIRMWARE_SIZE)
     return false;
 
   return true;

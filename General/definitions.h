@@ -26,16 +26,16 @@
 
 #define DATA_BLOCK_PART_WAIT_TIME 100
 #define ONETIME_TRANSMIT_DATA_SIZE 10240
-#define DATA_BLOCK_MAX_SIZE 250000
+#define DATA_BLOCK_MAX_SIZE (FIRMWARE_SIZE * 2)
 
-#define PRODUCTION_LINE_DEFAULT_LOGIN "Admin"
-#define PRODUCTION_LINE_DEFAULT_PASSWORD "Password"
+#define PRODUCTION_LINE_DEFAULT_LOGIN "1"
+#define PRODUCTION_LINE_DEFAULT_PASSWORD "1"
 //===============================================================
 
 /* Определения программатора */
 //===============================================================
 #define FIRMWARE_TEMP_FILE_NAME "data.bin"
-#define FIRMWARE_FILE_MAX_SIZE 131072
+#define FIRMWARE_SIZE 131072
 
 #define JLINK_COMMAND_SCRIPT_DEFAULT_NAME "JLinkScript.jlink"
 

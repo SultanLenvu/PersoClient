@@ -171,6 +171,8 @@ void ClientManager::performTransponderFirmwareLoading(
   }
 
   QMap<QString, QString>* responseParameters = new QMap<QString, QString>;
+  requestParameters.insert("login", CurrentLogin);
+  requestParameters.insert("password", CurrentPassword);
   emit logging(
       "Отправка запроса на подтверждение загрузки прошивки в транспондер. ");
   emit requestTransponderReleaseConfirm_signal(&requestParameters,
@@ -255,6 +257,8 @@ void ClientManager::performTransponderFirmwareReloading(
   }
 
   QMap<QString, QString>* responseParameters = new QMap<QString, QString>;
+  requestParameters.insert("login", CurrentLogin);
+  requestParameters.insert("password", CurrentPassword);
   emit logging("Отправка запроса на подтверждение перевыпуска транспондера. ");
   emit requestTransponderRereleaseConfirm_signal(&requestParameters,
                                                  responseParameters);
@@ -476,16 +480,23 @@ void ClientManager::createClientInstance() {
           &ClientManager::on_ClientOperationFinished_slot);
 
   // Подключаем функционал
-  connect(this, &ClientManager::requestAuthorize_signal, Client,
-          &PersoClient::requestAuthorize);
+
   connect(this, &ClientManager::connectToPersoServer_signal, Client,
           &PersoClient::connectToPersoServer);
   connect(this, &ClientManager::disconnectFromPersoServer_signal, Client,
           &PersoClient::disconnectFromPersoServer);
   connect(this, &ClientManager::requestEcho_signal, Client,
           &PersoClient::requestEcho);
+  connect(this, &ClientManager::requestAuthorize_signal, Client,
+          &PersoClient::requestAuthorize);
   connect(this, &ClientManager::requestTransponderRelease_signal, Client,
           &PersoClient::requestTransponderRelease);
+  connect(this, &ClientManager::requestTransponderReleaseConfirm_signal, Client,
+          &PersoClient::requestTransponderReleaseConfirm);
+  connect(this, &ClientManager::requestTransponderRerelease_signal, Client,
+          &PersoClient::requestTransponderRerelease);
+  connect(this, &ClientManager::requestTransponderRereleaseConfirm_signal,
+          Client, &PersoClient::requestTransponderRereleaseConfirm);
   connect(this, &ClientManager::applySettings_signal, Client,
           &PersoClient::applySettings);
 
