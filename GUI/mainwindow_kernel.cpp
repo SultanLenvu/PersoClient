@@ -1,3 +1,9 @@
+#include <QDateTime>
+#include <QString>
+#include <QFile>
+#include <QIODevice>
+
+#include "General/definitions.h"
 #include "mainwindow_kernel.h"
 
 MainWindow::MainWindow() {
@@ -11,7 +17,19 @@ MainWindow::MainWindow() {
   Interactor = new UserInteractionSystem(this, this);
 
   // Создаем логгер
-  Logger = new LogSystem(this);
+  Logger = new LogSystem(this); 
+  QDateTime datetime = QDateTime::currentDateTime()
+  QString filename = QString(PROGRAM_NAME) + "-"
+    + time.toString("yyyy-MM-dd_HH-mm-ss") + ".log";
+
+  LogFile = new QFile(filename);
+
+  // TODO check for errors
+  LogFile.open(QIODevice::Append | QIODevice::Text);
+
+  LogStream = new QTextStream(LogFile);
+  StreamBackend = new TextStreamBackend(this, LogStream);
+  Logger.addBackend(StreamBackend);
 
   // Создаем модель для представления данных транспондера
   TransponderInfo = new TransponderInfoModel(this);

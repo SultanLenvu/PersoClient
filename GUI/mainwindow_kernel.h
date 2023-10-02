@@ -4,9 +4,14 @@
 #include <QMainWindow>
 #include <QSettings>
 #include <QtWidgets>
+#include <QFile>
+#include <QTextStream>
 
 #include "Environment/client_manager.h"
 #include "Environment/log_system.h"
+#include "Environment/log_backend.h"
+#include "Environment/text_stream_log_backend.h"
+#include "Environment/widget_log_backend.h"
 #include "Environment/transponder_seed_model.h"
 
 #include "GUI/authorization_gui.h"
@@ -34,6 +39,11 @@ class MainWindow : public QMainWindow {
   QAction* AboutProgramAct;
   //==================================================
 
+  QFile *LogFile;
+  QTextStream *LogStream;
+
+  TextStreamLogBackend *StreamBackend;
+  WidgetLogBackend *WidgetBackend;
   LogSystem* Logger;
   UserInteractionSystem* Interactor;
   ClientManager* Manager;
