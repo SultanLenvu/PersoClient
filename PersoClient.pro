@@ -15,6 +15,8 @@ SOURCES += \
     Environment/log_system.cpp \
     Environment/perso_client.cpp \
     Environment/transponder_seed_model.cpp \
+    Environment/log_backend.cpp \
+    Environment/text_stream_log_backend.cpp \
     GUI/authorization_dialog.cpp \
     GUI/transponder_rerelease_dialog.cpp \
     GUI/user_interaction_system.cpp \
@@ -32,6 +34,8 @@ SOURCES += \
 HEADERS += \
     Environment/client_manager.h \
     Environment/log_system.h \
+    Environment/log_backend.h \
+    Environment/text_stream_log_backend.h \
     Environment/perso_client.h \
     Environment/transponder_seed_model.h \
     GUI/authorization_dialog.h \
@@ -47,7 +51,7 @@ HEADERS += \
     Programmers/interface_programmer.h \
     Programmers/jlink_exe_programmer.h \
     StickerPrinter/isticker_printer.h \
-    StickerPrinter/te310_printer.h
+    StickerPrinter/te310_printer.h 
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
