@@ -14,7 +14,7 @@ MainWindow::MainWindow() {
   Logger = new LogSystem(this);
 
   // Создаем модель для представления данных транспондера
-  SeedModel = new TransponderSeedModel(this);
+  TransponderInfo = new TransponderInfoModel(this);
 
   // Менеджер для взаимодействия с программатором
   createManager();
@@ -149,7 +149,7 @@ void MainWindow::on_MasterAuthorizePushButton_slot() {
 void MainWindow::on_LoadTransponderFirmwareButton_slot() {
   Logger->clear();
 
-  Manager->performTransponderFirmwareLoading(SeedModel);
+  Manager->performTransponderFirmwareLoading(TransponderInfo);
 }
 
 void MainWindow::on_ReloadTransponderFirmwareButton_slot() {
@@ -162,7 +162,7 @@ void MainWindow::on_ReloadTransponderFirmwareButton_slot() {
     return;
   }
 
-  Manager->performTransponderFirmwareReloading(SeedModel, pan);
+  Manager->performTransponderFirmwareReloading(TransponderInfo, pan);
 }
 
 void MainWindow::on_MasterInterfaceRequest_slot() {
@@ -339,6 +339,9 @@ void MainWindow::connectMasterInterface() {
   connect(Logger, &LogSystem::requestClearDisplayLog,
           dynamic_cast<MasterGUI*>(CurrentGUI),
           &MasterGUI::clearLogDataDisplay);
+
+  // Связывание моделей и представлений
+  gui->TransponderInfoView->setModel(TransponderInfo);
 }
 
 void MainWindow::createProductionInterface() {
@@ -368,6 +371,9 @@ void MainWindow::connectProductionInterface() {
           &MainWindow::on_LoadTransponderFirmwareButton_slot);
   connect(gui->ReloadTransponderFirmwareButton, &QPushButton::clicked, this,
           &MainWindow::on_ReloadTransponderFirmwareButton_slot);
+
+  // Связывание моделей и представлений
+  gui->TransponderInfoView->setModel(TransponderInfo);
 }
 
 void MainWindow::createTopMenuActions() {

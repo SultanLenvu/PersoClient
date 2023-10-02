@@ -14,9 +14,9 @@ class ProductionGUI : public GUI {
   QSpacerItem* ButtonVerticalSpacer;
   QPushButton* ReloadTransponderFirmwareButton;
 
-  QGroupBox* TransponderSeedGroup;
-  QVBoxLayout* TransponderSeedLayout;
-  QTableView* TransponderSeedView;
+  QGroupBox* TransponderInfoGroup;
+  QVBoxLayout* TransponderInfoLayout;
+  QTableView* TransponderInfoView;
 
  public:
   ProductionGUI(QWidget* parent);

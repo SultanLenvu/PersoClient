@@ -413,7 +413,7 @@ void JLinkExeProgrammer::initScript() {
     JLinkScript->write(QByteArray("usb\n"));
     JLinkScript->write(QByteArray("device N32L403KB\n"));
     JLinkScript->write(QByteArray("si SWD\n"));
-    JLinkScript->write(QByteArray("speed 4000\n"));
+    JLinkScript->write(QByteArray("speed 1000\n"));
     // Подключаемся к МК: сбрасываем и останавливаем ядро
     JLinkScript->write(QByteArray("r\n"));
     JLinkScript->write(QByteArray("halt\n"));

@@ -48,9 +48,9 @@ class MasterGUI : public GUI {
   QPushButton* LoadTransponderFirmwareButton;
   QPushButton* ReloadTransponderFirmwareButton;
 
-  QGroupBox* TransponderSeedGroup;
-  QVBoxLayout* TransponderSeedLayout;
-  QTableView* TransponderSeedView;
+  QGroupBox* TransponderInfoGroup;
+  QVBoxLayout* TransponderInfoLayout;
+  QTableView* TransponderInfoView;
   //============================================================
 
   /* Настройки клиента */

@@ -619,7 +619,7 @@ void PersoClient::processTransponderReleaseConfirmResponse(
 
   // Синтаксическая проверка
   if (CurrentResponse.value("response_name").isUndefined() ||
-      (CurrentResponse.value("response_name").toString() ==
+      (CurrentResponse.value("response_name").toString() !=
        "TransponderReleaseConfirm") ||
       CurrentResponse.value("sn").isUndefined() ||
       CurrentResponse.value("pan").isUndefined() ||
@@ -709,7 +709,7 @@ void PersoClient::processTransponderRereleaseConfirmResponse(
 
   // Синтаксическая проверка
   if (CurrentResponse.value("response_name").isUndefined() ||
-      (CurrentResponse.value("response_name").toString() ==
+      (CurrentResponse.value("response_name").toString() !=
        "TransponderReleaseConfirm") ||
       CurrentResponse.value("sn").isUndefined() ||
       CurrentResponse.value("pan").isUndefined() ||

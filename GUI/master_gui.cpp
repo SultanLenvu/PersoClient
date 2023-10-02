@@ -25,8 +25,8 @@ void MasterGUI::create() {
 }
 
 void MasterGUI::update() {
-  TransponderSeedView->resizeColumnsToContents();
-  TransponderSeedView->update();
+  TransponderInfoView->resizeColumnsToContents();
+  TransponderInfoView->update();
 }
 
 void MasterGUI::displayLogData(const QString& log) {
@@ -87,14 +87,14 @@ void MasterGUI::createServerTab() {
   ServerControlPanelLayout->addWidget(ReloadTransponderFirmwareButton);
 
   // Представление данных о транспондере
-  TransponderSeedGroup = new QGroupBox("Данные о выпущенном транспондере");
-  ServerTabMainLayout->addWidget(TransponderSeedGroup);
+  TransponderInfoGroup = new QGroupBox("Данные о выпущенном транспондере");
+  ServerTabMainLayout->addWidget(TransponderInfoGroup);
 
-  TransponderSeedLayout = new QVBoxLayout();
-  TransponderSeedGroup->setLayout(TransponderSeedLayout);
+  TransponderInfoLayout = new QVBoxLayout();
+  TransponderInfoGroup->setLayout(TransponderInfoLayout);
 
-  TransponderSeedView = new QTableView();
-  TransponderSeedLayout->addWidget(TransponderSeedView);
+  TransponderInfoView = new QTableView();
+  TransponderInfoLayout->addWidget(TransponderInfoView);
 
   // Настройка пропорции между объектами на макете
   ServerTabMainLayout->setStretch(0, 1);

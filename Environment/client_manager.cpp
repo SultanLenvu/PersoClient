@@ -120,7 +120,7 @@ void ClientManager::performServerAuthorization(
 }
 
 void ClientManager::performTransponderFirmwareLoading(
-    TransponderSeedModel* model) {
+    TransponderInfoModel* model) {
   QString ucid;
   QMap<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
@@ -204,7 +204,7 @@ void ClientManager::performTransponderFirmwareLoading(
 }
 
 void ClientManager::performTransponderFirmwareReloading(
-    TransponderSeedModel* model,
+    TransponderInfoModel* model,
     const QString& pan) {
   QString ucid;
   QMap<QString, QString> requestParameters;

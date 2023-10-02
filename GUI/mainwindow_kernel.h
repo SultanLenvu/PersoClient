@@ -38,7 +38,7 @@ class MainWindow : public QMainWindow {
   UserInteractionSystem* Interactor;
   ClientManager* Manager;
 
-  TransponderSeedModel* SeedModel;
+  TransponderInfoModel* TransponderInfo;
 
  public:
   MainWindow();

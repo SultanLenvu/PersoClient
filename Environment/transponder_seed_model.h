@@ -5,14 +5,14 @@
 #include <QMap>
 #include <QString>
 
-class TransponderSeedModel : public QAbstractTableModel {
+class TransponderInfoModel : public QAbstractTableModel {
   Q_OBJECT
  private:
   const QMap<QString, QString>* Attributes;
 
  public:
-  explicit TransponderSeedModel(QObject* parent = nullptr);
-  ~TransponderSeedModel();
+  explicit TransponderInfoModel(QObject* parent = nullptr);
+  ~TransponderInfoModel();
 
   void build(const QMap<QString, QString>* attributes);
   void clear(void);

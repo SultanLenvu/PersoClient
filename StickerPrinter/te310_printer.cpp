@@ -45,18 +45,18 @@ void TE310Printer::printNkdSticker(const QMap<QString, QString>* parameters) {
   sendCommand("DIRECTION 1");
   sendCommand("CLS");
   sendCommand(QString("TEXT 156,24,\"D.FNT\",0,1,1,2,\"PAN: %1\"")
-                  .arg(parameters->value("PAN"))
+                  .arg(parameters->value("pan"))
                   .toUtf8()
                   .constData());
   sendCommand(QString("QRCODE "
                       "54,54,H,10,A,0,X204,J1,M2,\"%1\n%2\"")
-                  .arg(parameters->value("PAN"), parameters->value("SN"))
+                  .arg(parameters->value("pan"), parameters->value("sn"))
                   .toUtf8()
                   .constData());
   sendCommand(QString("TEXT 156,276,\"D.FNT\",0,1,1,2,\"SN: %1 %2 %3\"")
-                  .arg(parameters->value("ManufacturerId"),
-                       parameters->value("BatteryInsertationDate"),
-                       parameters->value("SN"))
+                  .arg(parameters->value("manufacturer_id"),
+                       parameters->value("battery_insertation_date"),
+                       parameters->value("sn"))
                   .toUtf8()
                   .constData());
   sendCommand("PRINT 1");
@@ -72,11 +72,11 @@ void TE310Printer::printZsdSticker(const QMap<QString, QString>* parameters) {
   sendCommand(QString("TEXT 180,12,\"D.FNT\",0,1,1,2,\"SN: %1 %2 %3\"")
                   .arg(parameters->value("ManufacturerId"),
                        parameters->value("BatteryInsertationDate"),
-                       parameters->value("SN"))
+                       parameters->value("sn"))
                   .toUtf8()
                   .constData());
   sendCommand(QString("BARCODE 18,36,\"128\",144,2,0,2,2,\"%1\"")
-                  .arg(parameters->value("PAN"))
+                  .arg(parameters->value("pan"))
                   .toUtf8()
                   .constData());
   sendCommand("PRINT 1");

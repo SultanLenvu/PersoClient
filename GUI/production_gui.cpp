@@ -23,19 +23,19 @@ void ProductionGUI::create(void) {
   ReloadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
   ControlPanelLayout->addWidget(ReloadTransponderFirmwareButton);
 
-  TransponderSeedGroup = new QGroupBox("Данные о выпущенном транспондере");
-  MainLayout->addWidget(TransponderSeedGroup);
+  TransponderInfoGroup = new QGroupBox("Данные о выпущенном транспондере");
+  MainLayout->addWidget(TransponderInfoGroup);
 
-  TransponderSeedLayout = new QVBoxLayout();
-  TransponderSeedGroup->setLayout(TransponderSeedLayout);
+  TransponderInfoLayout = new QVBoxLayout();
+  TransponderInfoGroup->setLayout(TransponderInfoLayout);
 
-  TransponderSeedView = new QTableView();
-  TransponderSeedLayout->addWidget(TransponderSeedView);
+  TransponderInfoView = new QTableView();
+  TransponderInfoLayout->addWidget(TransponderInfoView);
 
   MainLayout->setStretch(0, 1);
   MainLayout->setStretch(1, 3);
 }
 
 void ProductionGUI::update() {
-  TransponderSeedView->resizeColumnsToContents();
+  TransponderInfoView->resizeColumnsToContents();
 }

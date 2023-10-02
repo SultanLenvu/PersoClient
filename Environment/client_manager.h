@@ -53,8 +53,8 @@ class ClientManager : public QObject {
   void performServerDisconnecting(void);
   void performServerEcho(void);
   void performServerAuthorization(const QMap<QString, QString>* data);
-  void performTransponderFirmwareLoading(TransponderSeedModel* model);
-  void performTransponderFirmwareReloading(TransponderSeedModel* model,
+  void performTransponderFirmwareLoading(TransponderInfoModel* model);
+  void performTransponderFirmwareReloading(TransponderInfoModel* model,
                                            const QString& pan);
 
   void performLocalFirmwareLoading(const QString& path, bool unlockOption);
