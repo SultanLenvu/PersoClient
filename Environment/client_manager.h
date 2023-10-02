@@ -52,7 +52,8 @@ class ClientManager : public QObject {
   void performServerConnecting(void);
   void performServerDisconnecting(void);
   void performServerEcho(void);
-  void performServerAuthorization(const QMap<QString, QString>* data);
+  void performServerAuthorization(const QMap<QString, QString>* data,
+                                  bool& result);
   void performTransponderFirmwareLoading(TransponderInfoModel* model);
   void performTransponderFirmwareReloading(TransponderInfoModel* model,
                                            const QString& pan);
@@ -98,7 +99,7 @@ class ClientManager : public QObject {
   void notifyUserAboutError(const QString& log);
   void operationPerfomingStarted(void);
   void operationStepPerfomed(void);
-  void operationPerformingEnded(void);
+  void operationPerformingFinished(void);
   void waitingEnd(void);
   void createProductionInterface_signal(void);
   void applySettings_signal(void);

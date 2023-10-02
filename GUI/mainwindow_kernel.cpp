@@ -20,7 +20,7 @@ MainWindow::MainWindow() {
   createManager();
 
   // Создаем графический интерфейс для авторизации
-  createMasterInterface();
+  createAuthorizationInterface();
 }
 
 MainWindow::~MainWindow() {}
@@ -31,7 +31,11 @@ void MainWindow::on_AuthorizePushButton_slot() {
   data.insert("login", gui->LoginLineEdit->text());
   data.insert("password", gui->PasswordLineEdit->text());
 
-  Manager->performServerAuthorization(&data);
+  bool result = false;
+  Manager->performServerAuthorization(&data, result);
+  if (result == false) {
+    return;
+  }
 
   // Настраиваем размер главного окна
   DesktopGeometry = QApplication::desktop()->screenGeometry();
@@ -143,13 +147,19 @@ void MainWindow::on_MasterAuthorizePushButton_slot() {
     return;
   }
 
-  Manager->performServerAuthorization(&data);
+  bool result = false;
+  Manager->performServerAuthorization(&data, result);
+  if (result == false) {
+    return;
+  }
 }
 
 void MainWindow::on_LoadTransponderFirmwareButton_slot() {
   Logger->clear();
 
   Manager->performTransponderFirmwareLoading(TransponderInfo);
+
+  CurrentGUI->update();
 }
 
 void MainWindow::on_ReloadTransponderFirmwareButton_slot() {
@@ -163,6 +173,8 @@ void MainWindow::on_ReloadTransponderFirmwareButton_slot() {
   }
 
   Manager->performTransponderFirmwareReloading(TransponderInfo, pan);
+
+  CurrentGUI->update();
 }
 
 void MainWindow::on_MasterInterfaceRequest_slot() {
@@ -438,7 +450,7 @@ void MainWindow::createManager() {
           &UserInteractionSystem::generateProgressDialog);
   connect(Manager, &ClientManager::operationStepPerfomed, Interactor,
           &UserInteractionSystem::performeProgressDialogStep);
-  connect(Manager, &ClientManager::operationPerformingEnded, Interactor,
+  connect(Manager, &ClientManager::operationPerformingFinished, Interactor,
           &UserInteractionSystem::completeProgressDialog);
   connect(Manager, &ClientManager::createProductionInterface_signal, this,
           &MainWindow::on_ProductionInterfaceRequest_slot);

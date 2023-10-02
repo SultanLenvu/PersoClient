@@ -38,4 +38,5 @@ void ProductionGUI::create(void) {
 
 void ProductionGUI::update() {
   TransponderInfoView->resizeColumnsToContents();
+  TransponderInfoView->update();
 }

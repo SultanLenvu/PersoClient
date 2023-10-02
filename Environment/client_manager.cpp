@@ -92,7 +92,8 @@ void ClientManager::performServerEcho() {
 }
 
 void ClientManager::performServerAuthorization(
-    const QMap<QString, QString>* data) {
+    const QMap<QString, QString>* data,
+    bool& result) {
   // Начинаем операцию
   if (!startOperationExecution("performServerAuthorization")) {
     return;
@@ -114,6 +115,13 @@ void ClientManager::performServerAuthorization(
   CurrentPassword = data->value("password");
 
   emit createProductionInterface_signal();
+
+  // Формируем регзультат
+  if (CurrentState == Completed) {
+    result = true;
+  } else {
+    result = false;
+  }
 
   // Завершаем операцию
   endOperationExecution("performServerAuthorization");
@@ -522,7 +530,7 @@ void ClientManager::createTimers() {
   connect(ODTimer, &QTimer::timeout, this,
           &ClientManager::on_ODTimerTimeout_slot);
   connect(ODTimer, &QTimer::timeout, ODTimer, &QTimer::stop);
-  connect(this, &ClientManager::operationPerformingEnded, ODTimer,
+  connect(this, &ClientManager::operationPerformingFinished, ODTimer,
           &QTimer::stop);
 
   // Таймер для измерения длительности операции
@@ -536,7 +544,7 @@ void ClientManager::setupODQTimer(uint32_t msecs) {
 
   connect(ODQTimer, &QTimer::timeout, this,
           &ClientManager::on_ODQTimerTimeout_slot);
-  connect(this, &ClientManager::operationPerformingEnded, ODQTimer,
+  connect(this, &ClientManager::operationPerformingFinished, ODQTimer,
           &QTimer::stop);
 }
 
@@ -578,19 +586,19 @@ bool ClientManager::startOperationExecution(const QString& operationName) {
 void ClientManager::endOperationExecution(const QString& operationName) {
   QSettings settings;
 
-  // Измеряем и сохраняем длительность операции
-  uint64_t duration = ODMeter->elapsed();
-  emit logging(
-      QString("Длительность операции: %1.").arg(QString::number(duration)));
-  settings.setValue(QString("ClientManager/Operations/") + operationName +
-                        QString("/Duration"),
-                    QVariant::fromValue(duration));
-
   // Сигнал о завершении текущей операции
-  emit operationPerformingEnded();
+  emit operationPerformingFinished();
 
   // Оповещаем пользователя о результатах
   if (CurrentState == Completed) {
+    // Измеряем и сохраняем длительность операции
+    uint64_t duration = ODMeter->elapsed();
+    emit logging(
+        QString("Длительность операции: %1.").arg(QString::number(duration)));
+    settings.setValue(QString("ClientManager/Operations/") + operationName +
+                          QString("/Duration"),
+                      QVariant::fromValue(duration));
+
     emit notifyUser(NotificationText);
   } else {
     emit notifyUserAboutError(NotificationText);
