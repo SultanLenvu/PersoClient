@@ -17,6 +17,7 @@ SOURCES += \
     Environment/transponder_seed_model.cpp \
     Environment/log_backend.cpp \
     Environment/text_stream_log_backend.cpp \
+    Environment/widget_log_backend.cpp \
     GUI/authorization_dialog.cpp \
     GUI/transponder_rerelease_dialog.cpp \
     GUI/user_interaction_system.cpp \
@@ -36,6 +37,7 @@ HEADERS += \
     Environment/log_system.h \
     Environment/log_backend.h \
     Environment/text_stream_log_backend.h \
+    Environment/widget_log_backend.h \
     Environment/perso_client.h \
     Environment/transponder_seed_model.h \
     GUI/authorization_dialog.h \
