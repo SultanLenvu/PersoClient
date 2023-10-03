@@ -10,10 +10,9 @@ class WidgetLogBackend: public LogBackend {
   Q_OBJECT
   public:
     WidgetLogBackend(QObject *parent, MasterGUI *gui);
-    ~WidgetLogBackend();
 
-    void writeLogLine(const QString &str) override;
-    void clear() override;
+    virtual void writeLogLine(const QString &str) override;
+    virtual void clear() override;
 
   signals:
     void requestDisplayLog(const QString& logData);
