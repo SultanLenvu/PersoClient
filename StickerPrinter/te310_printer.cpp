@@ -41,19 +41,23 @@ void TE310Printer::applySetting() {
 void TE310Printer::printNkdSticker(const QMap<QString, QString>* parameters) {
   openPort("TSC TE310");
   sendCommand("SIZE 27 mm, 27 mm");
-  sendCommand("GAP 2 mm, 1 mm");
+  sendCommand("GAP 2 mm,2 mm");
+  sendCommand("REFERENCE 0,0");
   sendCommand("DIRECTION 1");
   sendCommand("CLS");
-  sendCommand(QString("TEXT 156,24,\"D.FNT\",0,1,1,2,\"PAN: %1\"")
+  sendCommand(QString("TEXT 162,30,\"D.FNT\",0,1,1,2,\"PAN: %1\"")
                   .arg(parameters->value("pan"))
                   .toUtf8()
                   .constData());
   sendCommand(QString("QRCODE "
-                      "54,54,H,10,A,0,X204,J1,M2,\"%1\n%2\"")
-                  .arg(parameters->value("pan"), parameters->value("sn"))
+                      "60,60,H,10,A,0,X204,J1,M2,\"%1\n\r%2%3%4\"")
+                  .arg(parameters->value("pan"),
+                       parameters->value("manufacturer_id"),
+                       parameters->value("battery_insertation_date"),
+                       parameters->value("sn"))
                   .toUtf8()
                   .constData());
-  sendCommand(QString("TEXT 156,276,\"D.FNT\",0,1,1,2,\"SN: %1 %2 %3\"")
+  sendCommand(QString("TEXT 162,276,\"D.FNT\",0,1,1,2,\"SN: %1 %2 %3\"")
                   .arg(parameters->value("manufacturer_id"),
                        parameters->value("battery_insertation_date"),
                        parameters->value("sn"))

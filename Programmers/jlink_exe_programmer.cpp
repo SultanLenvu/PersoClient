@@ -361,8 +361,11 @@ void JLinkExeProgrammer::loadSettings() {
     JLinkProcess = new QProcess(this);
     JLinkProcess->setProgram(
         settings.value("JLinkExeProgrammer/ExeFile/Path").toString());
-  } else
+  } else {
     JLinkProcess = nullptr;
+  }
+
+  Speed = settings.value("JLinkExeProgrammer/Speed").toUInt();
 }
 
 void JLinkExeProgrammer::excuteJLinkScript() {
@@ -410,14 +413,15 @@ void JLinkExeProgrammer::initScript() {
     // Добавляем иницирующие команды в скрипт
 
     // Подключаемся к программатору по USB
-    JLinkScript->write(QByteArray("usb\n"));
-    JLinkScript->write(QByteArray("device N32L403KB\n"));
-    JLinkScript->write(QByteArray("si SWD\n"));
-    JLinkScript->write(QByteArray("speed 1000\n"));
+    JLinkScript->write("usb\n");
+    JLinkScript->write("device N32L403KB\n");
+    JLinkScript->write("si SWD\n");
+    JLinkScript->write(
+        QString("speed %1\n").arg(QString::number(Speed)).toUtf8());
     // Подключаемся к МК: сбрасываем и останавливаем ядро
-    JLinkScript->write(QByteArray("r\n"));
-    JLinkScript->write(QByteArray("halt\n"));
-    JLinkScript->write(QByteArray("connect\n"));
+    JLinkScript->write("r\n");
+    JLinkScript->write("halt\n");
+    JLinkScript->write("connect\n");
   } else {
     emit logging("Не удалось создать командный скрипт JLink. ");
   }

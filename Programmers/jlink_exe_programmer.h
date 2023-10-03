@@ -11,6 +11,7 @@
 class JLinkExeProgrammer : public IProgrammer {
   Q_OBJECT
  private:
+  uint32_t Speed;
   QProcess *JLinkProcess;
 
   QFile *JLinkScript;

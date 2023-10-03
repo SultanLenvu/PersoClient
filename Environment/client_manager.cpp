@@ -158,7 +158,6 @@ void ClientManager::performTransponderFirmwareLoading(
 
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
-  requestParameters.insert("ucid", ucid);
   emit logging("Запрос прошивки транспондера. ");
   emit requestTransponderRelease_signal(&requestParameters, &firmware);
   WaitingLoop->exec();
@@ -181,6 +180,7 @@ void ClientManager::performTransponderFirmwareLoading(
   QMap<QString, QString>* responseParameters = new QMap<QString, QString>;
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
+  requestParameters.insert("ucid", ucid);
   emit logging(
       "Отправка запроса на подтверждение загрузки прошивки в транспондер. ");
   emit requestTransponderReleaseConfirm_signal(&requestParameters,
@@ -243,7 +243,6 @@ void ClientManager::performTransponderFirmwareReloading(
 
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
-  requestParameters.insert("ucid", ucid);
   requestParameters.insert("pan", pan);
   emit logging("Запрос перевыпуска транспондера. ");
   emit requestTransponderRerelease_signal(&requestParameters, &firmware);
@@ -267,12 +266,16 @@ void ClientManager::performTransponderFirmwareReloading(
   QMap<QString, QString>* responseParameters = new QMap<QString, QString>;
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
+  requestParameters.insert("pan", pan);
+  requestParameters.insert("ucid", ucid);
   emit logging("Отправка запроса на подтверждение перевыпуска транспондера. ");
   emit requestTransponderRereleaseConfirm_signal(&requestParameters,
                                                  responseParameters);
   WaitingLoop->exec();
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при загрузке прошивки в транспондер. ");
+    endOperationExecution("performTransponderFirmwareReloading");
+    return;
   }
 
   // Строим модель для представления данных транспондера
@@ -280,6 +283,15 @@ void ClientManager::performTransponderFirmwareReloading(
 
   // Удаляем файл прошивки
   //  firmware.remove();
+
+  emit logging("Печать стикера для транспондера.");
+  if (!Printer->printTransponderSticker(responseParameters)) {
+    emit logging("Получена ошибка при печати стикера для транспондера.");
+    CurrentState = Failed;
+    NotificationText = "Принтер: ошибка печати.";
+    endOperationExecution("performTransponderFirmwareReloading");
+    return;
+  }
 
   // Завершаем операцию
   endOperationExecution("performTransponderFirmwareReloading");

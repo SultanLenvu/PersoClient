@@ -74,6 +74,8 @@ class MasterGUI : public GUI {
   QLabel* ProgrammerExeFilePathLabel;
   QLineEdit* ProgrammerExeFilePathLineEdit;
   QPushButton* ProgrammerExeFilePathPushButton;
+  QLabel* ProgrammerSpeedLabel;
+  QLineEdit* ProgrammerSpeedLineEdit;
 
   // Принтер
   QGroupBox* PrinterSettingsGroupBox;

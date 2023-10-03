@@ -112,6 +112,8 @@ void MainWindow::on_ApplySettingsPushButton_slot() {
                      gui->PersoServerPortLineEdit->text().toInt());
   Settings->setValue("JLinkExeProgrammer/ExeFile/Path",
                      gui->ProgrammerExeFilePathLineEdit->text());
+  Settings->setValue("JLinkExeProgrammer/Speed",
+                     gui->ProgrammerSpeedLineEdit->text());
   Settings->setValue("StickerPrinter/DLL/Path",
                      gui->PrinterDllPathLineEdit->text());
 
@@ -218,6 +220,7 @@ bool MainWindow::checkNewSettings() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
 
   QHostAddress IP = QHostAddress(gui->PersoServerIpAddressLineEdit->text());
+  uint32_t speed = gui->ProgrammerSpeedLineEdit->text().toUInt();
 
   if (IP.isNull()) {
     return false;
@@ -231,6 +234,10 @@ bool MainWindow::checkNewSettings() {
 
   QFileInfo info(gui->ProgrammerExeFilePathLineEdit->text());
   if ((!info.exists()) || (!info.isExecutable())) {
+    return false;
+  }
+
+  if (speed == 0) {
     return false;
   }
 

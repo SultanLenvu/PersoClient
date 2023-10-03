@@ -197,6 +197,11 @@ void MasterGUI::createSettingsTab() {
                                           1, 1);
   connect(ProgrammerExeFilePathPushButton, &QPushButton::clicked, this,
           &MasterGUI::on_ProgrammerExeFilePathPushButton_slot);
+  ProgrammerSpeedLabel = new QLabel("Скорость работы (кГц)");
+  ProgrammerSettingsMainLayout->addWidget(ProgrammerSpeedLabel, 1, 0, 1, 1);
+  ProgrammerSpeedLineEdit =
+      new QLineEdit(settings.value("JLinkExeProgrammer/Speed").toString());
+  ProgrammerSettingsMainLayout->addWidget(ProgrammerSpeedLineEdit, 1, 1, 1, 1);
 
   // Настройки принтера
   QGroupBox* PrinterSettingsGroupBox = new QGroupBox(QString("Стикер-принтер"));

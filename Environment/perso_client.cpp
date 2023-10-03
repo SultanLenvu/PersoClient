@@ -261,7 +261,7 @@ void PersoClient::requestTransponderRerelease(
   }
 
   // Создаем запрос
-  createTransponderRelease(requestAttributes);
+  createTransponderRerelease(requestAttributes);
   CurrentState = RequestCreated;
 
   // Подключаемся к серверу персонализации
@@ -281,7 +281,7 @@ void PersoClient::requestTransponderRerelease(
   CurrentState = DisconnectedFromServer;
 
   // Обрабатываем полученный ответ
-  processTransponderReleaseResponse(firmware);
+  processTransponderRereleaseResponse(firmware);
 
   // Очищаем команду и ответ на нее
   CurrentCommand = QJsonObject();
@@ -304,7 +304,7 @@ void PersoClient::requestTransponderRereleaseConfirm(
   }
 
   // Создаем запрос
-  createTransponderReleaseConfirm(requestAttributes);
+  createTransponderRereleaseConfirm(requestAttributes);
   CurrentState = RequestCreated;
 
   // Подключаемся к серверу персонализации
@@ -455,7 +455,6 @@ void PersoClient::createTransponderRelease(
   // Тело команды
   CurrentCommand["login"] = requestAttributes->value("login");
   CurrentCommand["password"] = requestAttributes->value("password");
-  CurrentCommand["ucid"] = requestAttributes->value("ucid");
 
   // Создаем блок данных для команды
   createTransmittedDataBlock();
@@ -471,6 +470,7 @@ void PersoClient::createTransponderReleaseConfirm(
   // Тело команды
   CurrentCommand["login"] = requestAttributes->value("login");
   CurrentCommand["password"] = requestAttributes->value("password");
+  CurrentCommand["ucid"] = requestAttributes->value("ucid");
 
   // Создаем блок данных для команды
   createTransmittedDataBlock();
@@ -486,7 +486,6 @@ void PersoClient::createTransponderRerelease(
   // Тело команды
   CurrentCommand["login"] = requestAttributes->value("login");
   CurrentCommand["password"] = requestAttributes->value("password");
-  CurrentCommand["ucid"] = requestAttributes->value("ucid");
   CurrentCommand["pan"] = requestAttributes->value("pan");
 
   // Создаем блок данных для команды
@@ -503,8 +502,8 @@ void PersoClient::createTransponderRereleaseConfirm(
   // Тело команды
   CurrentCommand["login"] = requestAttributes->value("login");
   CurrentCommand["password"] = requestAttributes->value("password");
-  CurrentCommand["ucid"] = requestAttributes->value("ucid");
   CurrentCommand["pan"] = requestAttributes->value("pan");
+  CurrentCommand["ucid"] = requestAttributes->value("ucid");
 
   // Создаем блок данных для команды
   createTransmittedDataBlock();
