@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QTime>
-#include <QVector>
+#include <QList>
 
 #include "Environment/log_backend.h"
 
@@ -14,13 +14,14 @@ class LogSystem : public QObject {
   Q_OBJECT
 
  private:
-  QVector<LogBackend*> backends;
+  QList<LogBackend*> backends;
 
  public:
   LogSystem(QObject* parent);
   ~LogSystem();
 
   void addBackend(LogBackend *backend);
+  void removeBackend(LogBackend *backend);
 
   void clear(void);
 
