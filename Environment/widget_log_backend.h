@@ -7,6 +7,7 @@
 #include "GUI/master_gui.h"
 
 class WidgetLogBackend: public LogBackend {
+  Q_OBJECT
   public:
     WidgetLogBackend(QObject *parent, MasterGUI *gui);
     ~WidgetLogBackend();

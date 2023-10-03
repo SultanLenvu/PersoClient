@@ -14,23 +14,25 @@ LogSystem::~LogSystem() {}
 
 void LogSystem::addBackend(LogBackend *backend)
 {
-  backends.insert(backend);
+  backends << backend;
 }
 
 void LogSystem::removeBackend(LogBackend *backend)
 {
-  backends.removeOne(LogBackend *backend);
+  backends.removeOne(backend);
 }
 
 void LogSystem::clear() {
-  for (QList::iterator it = backends.begin(); it != backends.end(); it++)
+  for (QList<LogBackend*>::iterator it = backends.begin(); it != backends.end();
+      it++)
     (*it)->clear();
 }
 
 void LogSystem::generate(const QString& log) {
   QTime time = QDateTime::currentDateTime().time();
   QString LogData = time.toString("hh:mm:ss.zzz - ") + log;
-  for (QList::iterator it = backends.begin(); it != backends.end(); it++)
+  for (QList<LogBackend*>::iterator it = backends.begin(); it != backends.end();
+      it++)
     (*it)->writeLogLine(LogData);
 }
 

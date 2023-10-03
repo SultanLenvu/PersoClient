@@ -8,13 +8,14 @@
 #include "log_backend.h"
 
 class TextStreamLogBackend: public LogBackend {
- private:
-  QTextStream *LogTextStream;
+  Q_OBJECT
+  private:
+    QTextStream *LogTextStream;
 
- public:
-  TextStreamLogBackend(QObject *parent, QTextStream *stream);
-  virtual void writeLogLine(const QString &str) override;
-  virtual void clear() override;
+  public:
+    TextStreamLogBackend(QObject *parent, QTextStream *stream);
+    virtual void writeLogLine(const QString &str) override;
+    virtual void clear() override;
 };
 
 #endif /* FILELOGBACKEND_H */
