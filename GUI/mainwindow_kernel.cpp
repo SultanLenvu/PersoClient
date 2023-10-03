@@ -5,6 +5,8 @@
 
 #include "General/definitions.h"
 #include "mainwindow_kernel.h"
+#include "Environment/text_stream_log_backend.h"
+#include "Environment/widget_log_backend.h"
 
 MainWindow::MainWindow() {
   setObjectName("MainWindow");
@@ -18,18 +20,18 @@ MainWindow::MainWindow() {
 
   // Создаем логгер
   Logger = new LogSystem(this); 
-  QDateTime datetime = QDateTime::currentDateTime()
+  QDateTime datetime = QDateTime::currentDateTime();
   QString filename = QString(PROGRAM_NAME) + "-"
-    + time.toString("yyyy-MM-dd_HH-mm-ss") + ".log";
+    + datetime.toString("yyyy-MM-dd_HH-mm-ss") + ".log";
 
   LogFile = new QFile(filename);
 
   // TODO check for errors
-  LogFile.open(QIODevice::Append | QIODevice::Text);
+  LogFile->open(QIODevice::Append | QIODevice::Text);
 
   LogStream = new QTextStream(LogFile);
-  StreamBackend = new TextStreamBackend(this, LogStream);
-  Logger.addBackend(StreamBackend);
+  StreamBackend = new TextStreamLogBackend(this, LogStream);
+  Logger->addBackend(StreamBackend);
 
   // Создаем модель для представления данных транспондера
   TransponderInfo = new TransponderInfoModel(this);
@@ -51,7 +53,7 @@ void MainWindow::on_AuthorizePushButton_slot() {
 
   bool result = false;
   Manager->performServerAuthorization(&data, result);
-  if (result == false) {
+  if (!result) {
     return;
   }
 
@@ -364,11 +366,8 @@ void MainWindow::connectMasterInterface() {
           &MainWindow::on_ApplySettingsPushButton_slot);
 
   // Система логгирования
-  connect(Logger, &LogSystem::requestDisplayLog,
-          dynamic_cast<MasterGUI*>(CurrentGUI), &MasterGUI::displayLogData);
-  connect(Logger, &LogSystem::requestClearDisplayLog,
-          dynamic_cast<MasterGUI*>(CurrentGUI),
-          &MasterGUI::clearLogDataDisplay);
+  WidgetBackend = new WidgetLogBackend(this, gui);
+  Logger->addBackend(WidgetBackend);
 
   // Связывание моделей и представлений
   gui->TransponderInfoView->setModel(TransponderInfo);
@@ -382,6 +381,11 @@ void MainWindow::createProductionInterface() {
   setLayoutDirection(Qt::LeftToRight);
 
   // Создаем интерфейс
+  if (WidgetBackend) {
+    Logger->removeBackend(WidgetBackend);
+    delete WidgetBackend;
+    WidgetBackend = nullptr;
+  }
   delete CurrentGUI;
   CurrentGUI = new ProductionGUI(this);
   CurrentGUI->create();

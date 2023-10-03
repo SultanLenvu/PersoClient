@@ -13,7 +13,7 @@ TextStreamLogBackend::TextStreamLogBackend(QObject *parent, QTextStream *stream)
 
 void TextStreamLogBackend::writeLogLine(const QString &str)
 {
- *LogTextStream << str << Qt::flush;
+ *LogTextStream << str << "\n" << Qt::flush;
 }
 
 void TextStreamLogBackend::clear() {} /* No-op */
