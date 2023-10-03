@@ -3,7 +3,7 @@
 PersoClient::PersoClient(QObject *parent) : QObject(parent)
 {
   setObjectName("PersoClient");
-  applySettings();
+  loadSettings();
 
   Socket = new QTcpSocket(this);
   connect(Socket, &QTcpSocket::connected, this,
@@ -54,12 +54,18 @@ PersoClient::~PersoClient() {
 }
 
 void PersoClient::applySettings() {
-  QSettings settings;
   emit logging("Применение новых настроек. ");
+  loadSettings();
+}
+
+void PersoClient::loadSettings() {
+  QSettings settings;
 
   PersoServerAddress =
       settings.value("Personalization/ServerIpAddress").toString();
   PersoServerPort = settings.value("Personalization/ServerPort").toInt();
+  ExtendedLoggingEnable =
+      settings.value("General/ExtendedLoggingEnable").toBool();
 }
 
 void PersoClient::connectToPersoServer() {
@@ -367,9 +373,12 @@ void PersoClient::processingDataBlock() {
     return;
   }
 
-  emit logging(QString("Размер ответа на команду: %1. Содержание ответа: %2. ")
-                   .arg(QString::number(responseDocument.toJson().size()),
-                        QString(responseDocument.toJson())));
+  emit logging(QString("Размер ответа на команду: %1.")
+                   .arg(QString::number(responseDocument.toJson().size())));
+  if (ExtendedLoggingEnable == true) {
+    emit logging(QString("Содержание ответа: %1 ")
+                     .arg(QString(responseDocument.toJson())));
+  }
 
   // Выделяем список пар ключ-значение из JSON-файла
   CurrentResponse = responseDocument.object();
@@ -377,8 +386,13 @@ void PersoClient::processingDataBlock() {
 
 void PersoClient::createTransmittedDataBlock(void) {
   QJsonDocument requestDocument(CurrentCommand);
-  emit logging(QString("Содержание команды: %1 ")
-                   .arg(QString(requestDocument.toJson())));
+
+  emit logging(QString("Размер команды: %1 ")
+                   .arg(QString(requestDocument.toJson().size())));
+  if (ExtendedLoggingEnable == true) {
+    emit logging(QString("Содержание команды: %1 ")
+                     .arg(QString(requestDocument.toJson())));
+  }
   emit logging("Формирование блока данных для команды. ");
 
   // Инициализируем блок данных и сериализатор

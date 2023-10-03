@@ -13,6 +13,7 @@ class ProductionGUI : public GUI {
   QPushButton* LoadTransponderFirmwareButton;
   QSpacerItem* ButtonVerticalSpacer;
   QPushButton* ReloadTransponderFirmwareButton;
+  QPushButton* PrintLastTransponderStickerButton;
 
   QGroupBox* TransponderInfoGroup;
   QVBoxLayout* TransponderInfoLayout;

@@ -48,12 +48,14 @@ class PersoClient : public QObject {
   };
 
  private:
+  bool ExtendedLoggingEnable;
+  QHostAddress PersoServerAddress;
+  uint32_t PersoServerPort;
+
   InstanceState CurrentState;
   ExecutionStatus ReturnStatus;
 
   QTcpSocket* Socket;
-  QHostAddress PersoServerAddress;
-  uint32_t PersoServerPort;
 
   uint32_t ReceivedDataBlockSize;
   QByteArray ReceivedDataBlock;
@@ -91,6 +93,7 @@ class PersoClient : public QObject {
   void applySettings(void);
 
  private:
+  void loadSettings(void);
   bool processingServerConnection(void);
 
   void processingDataBlock(void);

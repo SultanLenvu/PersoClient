@@ -17,6 +17,8 @@ class TE310Printer : public IStickerPrinter {
   QString TscLibPath;
   QLibrary* TscLib;
 
+  QMap<QString, QString> LastStickerData;
+
   // Библиотечные функции
   TscAbout about;
   TscOpenPort openPort;
@@ -28,6 +30,8 @@ class TE310Printer : public IStickerPrinter {
 
   virtual bool printTransponderSticker(
       const QMap<QString, QString>* parameters) override;
+  virtual bool printLastTransponderSticker(void) override;
+  virtual bool exec(const QStringList* commandScript) override;
   virtual void applySetting(void) override;
 
  private:

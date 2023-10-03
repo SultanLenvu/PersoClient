@@ -53,6 +53,24 @@ class MasterGUI : public GUI {
   QTableView* TransponderInfoView;
   //============================================================
 
+  /* Интерфейс для взаимодействия с принтером */
+  //============================================================
+  QWidget* StickerPrinterTab;
+  QHBoxLayout* StickerPrinterTabMainLayout;
+
+  QGroupBox* StickerPrinterControlPanel;
+  QVBoxLayout* StickerPrinterControlPanelLayout;
+
+  QPushButton* PrintLastTransponderStickerButton;
+  QPushButton* PrintCustomTransponderStickerButton;
+  QSpacerItem* StickerPrinterControlPanelVS1;
+  QPushButton* ExecuteStickerPrinterCommandScriptButton;
+
+  QGroupBox* StickerPrinterCommandSriptGroup;
+  QVBoxLayout* StickerPrinterCommandSriptLayout;
+  QPlainTextEdit* StickerPrinterCommandSriptTextEdit;
+  //============================================================
+
   /* Настройки клиента */
   //============================================================
   QWidget* SettingsTab;
@@ -60,7 +78,13 @@ class MasterGUI : public GUI {
   QVBoxLayout* SettingsMainSubLayout;
   QPushButton* ApplySettingsPushButton;
 
-  // Персонализация
+  // Общие
+  QGroupBox* GeneralSettingsGroupBox;
+  QGridLayout* GeneralSettingsMainLayout;
+  QLabel* ExtendedLoggingEnableLabel;
+  QCheckBox* ExtendedLoggingEnableCheckBox;
+
+  // Сеть
   QGroupBox* PersoSettingsGroupBox;
   QGridLayout* PersoSettingsMainLayout;
   QLabel* PersoServerIpAddressLabel;
@@ -100,6 +124,7 @@ class MasterGUI : public GUI {
  private:
   void createServerTab(void);
   void createProgrammatorTab(void);
+  void createStickerTab(void);
   void createSettingsTab(void);
   void createLogWidgets(void);
 

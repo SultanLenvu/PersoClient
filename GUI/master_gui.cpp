@@ -56,16 +56,13 @@ void MasterGUI::createServerTab() {
 
   PersoServerConnectPushButton =
       new QPushButton(QString("Подключиться к серверу персонализации"));
-  PersoServerConnectPushButton->setFont(QFont("Arial", 12, QFont::Bold));
   ServerControlPanelLayout->addWidget(PersoServerConnectPushButton);
 
   PersoServerDisconnectButton =
       new QPushButton(QString("Отключиться от сервера персонализации"));
-  PersoServerDisconnectButton->setFont(QFont("Arial", 12, QFont::Bold));
   ServerControlPanelLayout->addWidget(PersoServerDisconnectButton);
 
   PersoServerEchoRequestButton = new QPushButton(QString("Отправить эхо-запрос"));
-  PersoServerEchoRequestButton->setFont(QFont("Arial", 12, QFont::Bold));
   ServerControlPanelLayout->addWidget(PersoServerEchoRequestButton);
 
   ButtonVerticalSpacer1 =
@@ -73,17 +70,14 @@ void MasterGUI::createServerTab() {
   ServerControlPanelLayout->addItem(ButtonVerticalSpacer1);
 
   MasterAuthorizePushButton = new QPushButton(QString("Авторизироваться"));
-  MasterAuthorizePushButton->setFont(QFont("Arial", 12, QFont::Bold));
   ServerControlPanelLayout->addWidget(MasterAuthorizePushButton);
 
   LoadTransponderFirmwareButton =
       new QPushButton(QString("Выпуск транспондера"));
-  LoadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
   ServerControlPanelLayout->addWidget(LoadTransponderFirmwareButton);
 
   ReloadTransponderFirmwareButton =
       new QPushButton(QString("Перевыпуск транспондера"));
-  ReloadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
   ServerControlPanelLayout->addWidget(ReloadTransponderFirmwareButton);
 
   // Представление данных о транспондере
@@ -116,32 +110,58 @@ void MasterGUI::createProgrammatorTab() {
   ProgrammatorControlPanel->setLayout(ProgrammatorControlPanelLayout);
 
   ProgramDeviceButton = new QPushButton(QString("Ручная зарузка прошивки"));
-  ProgramDeviceButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(ProgramDeviceButton);
   ReadDeviceFirmwareButton = new QPushButton(QString("Считать прошивку"));
-  ReadDeviceFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(ReadDeviceFirmwareButton);
   EraseDeviceButton = new QPushButton(QString("Стереть прошивку"));
-  EraseDeviceButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(EraseDeviceButton);
   ProgramDeviceUserDataButton =
       new QPushButton(QString("Загрузить  пользовательские данные"));
-  ProgramDeviceUserDataButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(ProgramDeviceUserDataButton);
   ReadDeviceUserDataButton =
       new QPushButton(QString("Считать  пользовательские данные"));
-  ReadDeviceUserDataButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(ReadDeviceUserDataButton);
   UnlockDeviceButton = new QPushButton(QString("Разблокировать память"));
-  UnlockDeviceButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(UnlockDeviceButton);
   LockDeviceButton = new QPushButton(QString("Заблокировать память"));
-  LockDeviceButton->setFont(QFont("Arial", 12, QFont::Bold));
   ProgrammatorControlPanelLayout->addWidget(LockDeviceButton);
 
   ButtonVerticalSpacer =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ProgrammatorControlPanelLayout->addItem(ButtonVerticalSpacer);
+}
+
+void MasterGUI::createStickerTab() {
+  StickerPrinterTab = new QWidget();
+  Tabs->addTab(StickerPrinterTab, "Стикер принтер");
+  // Загружаем настройки приложения
+  QSettings settings;
+
+  // Главный макет меню настроек
+  StickerPrinterTabMainLayout = new QHBoxLayout();
+  StickerPrinterTab->setLayout(StickerPrinterTabMainLayout);
+
+  QGroupBox* StickerPrinterControlPanel = new QGroupBox(QString("Общие"));
+  StickerPrinterTabMainLayout->addWidget(StickerPrinterControlPanel);
+
+  StickerPrinterControlPanelLayout = new QVBoxLayout();
+  StickerPrinterTabMainLayout->addLayout(StickerPrinterControlPanelLayout);
+
+  PrintLastTransponderStickerButton =
+      new QPushButton(QString("Распечатать последний стикер"));
+  StickerPrinterControlPanelLayout->addWidget(
+      PrintLastTransponderStickerButton);
+  PrintCustomTransponderStickerButton =
+      new QPushButton(QString("Распечатать произвольный стикер"));
+  StickerPrinterControlPanelLayout->addWidget(
+      PrintCustomTransponderStickerButton);
+  StickerPrinterControlPanelVS1 =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  StickerPrinterControlPanelLayout->addItem(StickerPrinterControlPanelVS1);
+  ExecuteStickerPrinterCommandScriptButton =
+      new QPushButton(QString("Выполнить командный скрипт"));
+  StickerPrinterControlPanelLayout->addWidget(
+      ExecuteStickerPrinterCommandScriptButton);
 }
 
 void MasterGUI::createSettingsTab() {
@@ -157,9 +177,25 @@ void MasterGUI::createSettingsTab() {
   SettingsMainSubLayout = new QVBoxLayout();
   SettingsMainLayout->addLayout(SettingsMainSubLayout);
 
-  // Настройки персонализации
+  // Общие
+  QGroupBox* GeneralSettingsGroupBox = new QGroupBox(QString("Общие"));
+  SettingsMainSubLayout->addWidget(GeneralSettingsGroupBox);
+
+  GeneralSettingsMainLayout = new QGridLayout();
+  GeneralSettingsGroupBox->setLayout(GeneralSettingsMainLayout);
+
+  ExtendedLoggingEnableLabel = new QLabel("Расширенное логгирование");
+  GeneralSettingsMainLayout->addWidget(ExtendedLoggingEnableLabel, 0, 0, 1, 1);
+  ExtendedLoggingEnableCheckBox = new QCheckBox();
+  ExtendedLoggingEnableCheckBox->setCheckState(
+      settings.value("General/ExtendedLoggingEnable").toBool() ? Qt::Checked
+                                                               : Qt::Unchecked);
+  GeneralSettingsMainLayout->addWidget(ExtendedLoggingEnableCheckBox, 0, 1, 1,
+                                       1);
+
+  // Сеть
   QGroupBox* PersoSettingsGroupBox =
-      new QGroupBox(QString("Сервер персонализации"));
+      new QGroupBox(QString("Сетевые настройки"));
   SettingsMainSubLayout->addWidget(PersoSettingsGroupBox);
 
   PersoSettingsMainLayout = new QGridLayout();
@@ -210,7 +246,7 @@ void MasterGUI::createSettingsTab() {
   PrinterSettingsMainLayout = new QGridLayout();
   PrinterSettingsGroupBox->setLayout(PrinterSettingsMainLayout);
 
-  PrinterDllPathLabel = new QLabel("Путь к DLL стикер-принтера");
+  PrinterDllPathLabel = new QLabel("Путь к библиотеке");
   PrinterSettingsMainLayout->addWidget(PrinterDllPathLabel, 0, 0, 1, 1);
   PrinterDllPathLineEdit =
       new QLineEdit(settings.value("StickerPrinter/DLL/Path").toString());

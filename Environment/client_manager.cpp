@@ -423,6 +423,50 @@ void ClientManager::performDeviceLock() {
   endOperationExecution("performDeviceLock");
 }
 
+void ClientManager::performPrintingLastTransponderSticker() {
+  // Начинаем операцию
+  if (!startOperationExecution("performPrintingLastTransponderSticker")) {
+    return;
+  }
+
+  emit logging("Печать последнего стикера. ");
+  Printer->printLastTransponderSticker() ? CurrentState = Completed
+                                         : CurrentState = Failed;
+
+  // Завершаем операцию
+  endOperationExecution("performPrintingLastTransponderSticker");
+}
+
+void ClientManager::performPrintingCustomTransponderSticker(
+    const QMap<QString, QString>* parameters) {
+  // Начинаем операцию
+  if (!startOperationExecution("performPrintingCustomTransponderSticker")) {
+    return;
+  }
+
+  emit logging("Печать последнего стикера. ");
+  Printer->printTransponderSticker(parameters) ? CurrentState = Completed
+                                               : CurrentState = Failed;
+
+  // Завершаем операцию
+  endOperationExecution("performPrintingCustomTransponderSticker");
+}
+
+void ClientManager::performExecutingPrinterCommandScript(
+    const QStringList* commandScript) {
+  // Начинаем операцию
+  if (!startOperationExecution("performExecutingPrinterCommandScript")) {
+    return;
+  }
+
+  emit logging("Печать последнего стикера. ");
+  Printer->exec(commandScript) ? CurrentState = Completed
+                               : CurrentState = Failed;
+
+  // Завершаем операцию
+  endOperationExecution("performExecutingPrinterCommandScript");
+}
+
 void ClientManager::applySettings() {
   emit logging("Применение новых настроек. ");
   loadSettings();

@@ -30,6 +30,8 @@ class IStickerPrinter : public QObject {
 
   virtual bool printTransponderSticker(
       const QMap<QString, QString>* parameters) = 0;
+  virtual bool printLastTransponderSticker(void) = 0;
+  virtual bool exec(const QStringList* commandScript) = 0;
   virtual void applySetting(void) = 0;
 
  signals:

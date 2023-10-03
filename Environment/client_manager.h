@@ -49,6 +49,7 @@ class ClientManager : public QObject {
 
   IProgrammer* programmer(void) const;
 
+  // Сервер
   void performServerConnecting(void);
   void performServerDisconnecting(void);
   void performServerEcho(void);
@@ -58,15 +59,20 @@ class ClientManager : public QObject {
   void performTransponderFirmwareReloading(TransponderInfoModel* model,
                                            const QString& pan);
 
+  // Программатор
   void performLocalFirmwareLoading(const QString& path, bool unlockOption);
   void performFirmwareReading(void);
   void performFirmwareErasing(void);
-
   void performDataReading(void);
   void performDataLoading(const QString& path);
-
   void performDeviceUnlock(void);
   void performDeviceLock(void);
+
+  // Стикер принтер
+  void performPrintingLastTransponderSticker(void);
+  void performPrintingCustomTransponderSticker(
+      const QMap<QString, QString>* parameters);
+  void performExecutingPrinterCommandScript(const QStringList* commandScript);
 
   void applySettings(void);
 

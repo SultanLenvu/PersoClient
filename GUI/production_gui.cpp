@@ -10,7 +10,7 @@ void ProductionGUI::create(void) {
   ControlPanelGroup->setLayout(ControlPanelLayout);
 
   LoadTransponderFirmwareButton =
-      new QPushButton(QString("Выпуск транспондера"));
+      new QPushButton(QString("Выпустить транспондер"));
   LoadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
   ControlPanelLayout->addWidget(LoadTransponderFirmwareButton);
 
@@ -18,8 +18,13 @@ void ProductionGUI::create(void) {
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ControlPanelLayout->addItem(ButtonVerticalSpacer);
 
+  PrintLastTransponderStickerButton =
+      new QPushButton(QString("Распечатать последний стикер"));
+  PrintLastTransponderStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
+  ControlPanelLayout->addWidget(PrintLastTransponderStickerButton);
+
   ReloadTransponderFirmwareButton =
-      new QPushButton(QString("Перевыпуск транспондера"));
+      new QPushButton(QString("Перевыпустить транспондера"));
   ReloadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
   ControlPanelLayout->addWidget(ReloadTransponderFirmwareButton);
 

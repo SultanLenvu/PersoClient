@@ -30,6 +30,10 @@ bool TE310Printer::printTransponderSticker(
   return true;
 }
 
+bool TE310Printer::printLastTransponderSticker() {}
+
+bool TE310Printer::exec(const QStringList* commandScript) {}
+
 void TE310Printer::applySetting() {
   emit logging("Применение новых настроек.");
 

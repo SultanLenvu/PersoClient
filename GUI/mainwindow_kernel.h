@@ -21,7 +21,6 @@ class MainWindow : public QMainWindow {
  private:
   QRect DesktopGeometry;
   GUI* CurrentGUI;
-  QSettings* Settings;
 
   // Верхнее меню
   //==================================================
@@ -47,6 +46,7 @@ class MainWindow : public QMainWindow {
  public slots:
   void on_AuthorizePushButton_slot(void);
 
+  // Сервер
   void on_PersoServerConnectPushButton_slot(void);
   void on_PersoServerDisconnectButton_slot(void);
   void on_PersoServerEchoRequestButton_slot(void);
@@ -54,6 +54,7 @@ class MainWindow : public QMainWindow {
   void on_LoadTransponderFirmwareButton_slot(void);
   void on_ReloadTransponderFirmwareButton_slot(void);
 
+  // Программатор
   void on_ProgramDeviceButton_slot(void);
   void on_ReadDeviceFirmwareButton_slot(void);
   void on_EraseDeviceButton_slot(void);
@@ -62,8 +63,15 @@ class MainWindow : public QMainWindow {
   void on_UnlockDeviceButton_slot(void);
   void on_LockDeviceButton_slot(void);
 
+  // Стикер принтер
+  void on_PrintLastTransponderStickerButton_slot(void);
+  void on_PrintCustomTransponderStickerButton_slot(void);
+  void on_ExecuteStickerPrinterCommandScriptButton_slot(void);
+
+  // Настройки
   void on_ApplySettingsPushButton_slot(void);
 
+  // Верхнее меню
   void on_MasterInterfaceRequest_slot(void);
   void on_ProductionInterfaceRequest_slot(void);
   void on_ExitFromProductionLineAct_slot(void);

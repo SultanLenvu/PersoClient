@@ -93,8 +93,31 @@ void MainWindow::on_LockDeviceButton_slot() {
   Manager->performDeviceLock();
 }
 
+void MainWindow::on_PrintLastTransponderStickerButton_slot() {
+  Logger->clear();
+
+  Manager->performPrintingLastTransponderSticker();
+}
+
+void MainWindow::on_PrintCustomTransponderStickerButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  Logger->clear();
+
+  Manager->performPrintingCustomTransponderSticker();
+}
+
+void MainWindow::on_ExecuteStickerPrinterCommandScriptButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  Logger->clear();
+
+  QStringList commandScript =
+      gui->StickerPrinterCommandSriptTextEdit->toPlainText().split("\n\r");
+  Manager->performExecutingPrinterCommandScript(&commandScript);
+}
+
 void MainWindow::on_ApplySettingsPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  QSettings settings;
 
   Logger->clear();
 
@@ -106,16 +129,18 @@ void MainWindow::on_ApplySettingsPushButton_slot() {
   }
 
   // Считывание пользовательского ввода
-  Settings->setValue("Personalization/ServerIpAddress",
-                     gui->PersoServerIpAddressLineEdit->text());
-  Settings->setValue("Personalization/ServerPort",
-                     gui->PersoServerPortLineEdit->text().toInt());
-  Settings->setValue("JLinkExeProgrammer/ExeFile/Path",
-                     gui->ProgrammerExeFilePathLineEdit->text());
-  Settings->setValue("JLinkExeProgrammer/Speed",
-                     gui->ProgrammerSpeedLineEdit->text());
-  Settings->setValue("StickerPrinter/DLL/Path",
-                     gui->PrinterDllPathLineEdit->text());
+  settings.setValue("General/ExtendedLoggingEnable",
+                    gui->ExtendedLoggingEnableCheckBox->isChecked());
+  settings.setValue("Personalization/ServerIpAddress",
+                    gui->PersoServerIpAddressLineEdit->text());
+  settings.setValue("Personalization/ServerPort",
+                    gui->PersoServerPortLineEdit->text().toInt());
+  settings.setValue("JLinkExeProgrammer/ExeFile/Path",
+                    gui->ProgrammerExeFilePathLineEdit->text());
+  settings.setValue("JLinkExeProgrammer/Speed",
+                    gui->ProgrammerSpeedLineEdit->text());
+  settings.setValue("StickerPrinter/DLL/Path",
+                    gui->PrinterDllPathLineEdit->text());
 
   // Применение новых настроек
   Manager->applySettings();
@@ -212,8 +237,6 @@ void MainWindow::loadSettings() {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
   QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
   QCoreApplication::setApplicationName(PROGRAM_NAME);
-
-  Settings = new QSettings(this);
 }
 
 bool MainWindow::checkNewSettings() {
@@ -349,6 +372,15 @@ void MainWindow::connectMasterInterface() {
   connect(gui->LockDeviceButton, &QPushButton::clicked, this,
           &MainWindow::on_LockDeviceButton_slot);
 
+  // Стикер принтер
+  connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
+          &MainWindow::on_PrintLastTransponderStickerButton_slot);
+  connect(gui->PrintCustomTransponderStickerButton, &QPushButton::clicked, this,
+          &MainWindow::on_PrintCustomTransponderStickerButton_slot);
+  connect(gui->ExecuteStickerPrinterCommandScriptButton, &QPushButton::clicked,
+          this, &MainWindow::on_ExecuteStickerPrinterCommandScriptButton_slot);
+
+  // Настройки
   connect(gui->ApplySettingsPushButton, &QPushButton::clicked, this,
           &MainWindow::on_ApplySettingsPushButton_slot);
 
@@ -390,6 +422,8 @@ void MainWindow::connectProductionInterface() {
           &MainWindow::on_LoadTransponderFirmwareButton_slot);
   connect(gui->ReloadTransponderFirmwareButton, &QPushButton::clicked, this,
           &MainWindow::on_ReloadTransponderFirmwareButton_slot);
+  connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
+          &MainWindow::on_PrintLastTransponderStickerButton_slot);
 
   // Связывание моделей и представлений
   gui->TransponderInfoView->setModel(TransponderInfo);
