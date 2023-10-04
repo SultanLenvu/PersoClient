@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include <QTime>
+#include <QList>
+
+#include "Environment/log_backend.h"
 
 /* Глобальная система логгирования */
 //==================================================================================
@@ -11,20 +14,19 @@ class LogSystem : public QObject {
   Q_OBJECT
 
  private:
+  QList<LogBackend*> backends;
 
  public:
   LogSystem(QObject* parent);
   ~LogSystem();
 
- public:
+  void addBackend(LogBackend *backend);
+  void removeBackend(LogBackend *backend);
+
   void clear(void);
 
  public slots:
   void generate(const QString& log);
-
- signals:
-  void requestDisplayLog(const QString& logData);
-  void requestClearDisplayLog(void);
 };
 
 //==================================================================================
