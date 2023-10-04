@@ -1,6 +1,6 @@
-#include "transponder_rerelease_dialog.h"
+#include "transponder_sticker_scan_dialog.h"
 
-TransponderRereleaseDialog::TransponderRereleaseDialog(QWidget* parent)
+TransponderStickerScanDialog::TransponderStickerScanDialog(QWidget* parent)
     : QDialog(parent) {
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::desktop()->screenGeometry();
@@ -8,16 +8,16 @@ TransponderRereleaseDialog::TransponderRereleaseDialog(QWidget* parent)
   // Создаем диалоговое окно
   setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
               DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1);
-  setWindowTitle("Персонализация");
+  setWindowTitle("Перевыпуск по PAN");
 
   MainLayout = new QVBoxLayout();
   setLayout(MainLayout);
 
-  MainLabel = new QLabel("Введите данные для персонализации");
+  MainLabel = new QLabel("Отсканируйте стикер транспондера");
   MainLayout->addWidget(MainLabel);
 
-  PersoInitDataInput = new QPlainTextEdit();
-  MainLayout->addWidget(PersoInitDataInput);
+  StickerDataInput = new QPlainTextEdit();
+  MainLayout->addWidget(StickerDataInput);
 
   OkButton = new QPushButton("Начать");
   MainLayout->addWidget(OkButton);
@@ -28,6 +28,13 @@ TransponderRereleaseDialog::TransponderRereleaseDialog(QWidget* parent)
   connect(CancelButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-QString TransponderRereleaseDialog::getData(void) {
-  return PersoInitDataInput->toPlainText();
+void TransponderStickerScanDialog::getData(QStringList* data) {
+  if (!data) {
+    return;
+  }
+
+  if (StickerDataInput->toPlainText().isEmpty()) {
+    return;
+  }
+  *data = StickerDataInput->toPlainText().split("\n");
 }

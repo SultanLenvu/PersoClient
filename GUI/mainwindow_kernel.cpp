@@ -100,10 +100,22 @@ void MainWindow::on_PrintLastTransponderStickerButton_slot() {
 }
 
 void MainWindow::on_PrintCustomTransponderStickerButton_slot() {
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   Logger->clear();
 
-  Manager->performPrintingCustomTransponderSticker();
+  QMap<QString, QString> data;
+  bool ok = false;
+  Interactor->getCustomTransponderStickerData(&data, ok);
+
+  if (!ok) {
+    return;
+  }
+
+  if (data.isEmpty()) {
+    Interactor->generateErrorMessage("Некорректный ввод данных. ");
+    return;
+  }
+
+  Manager->performPrintingCustomTransponderSticker(&data);
 }
 
 void MainWindow::on_ExecuteStickerPrinterCommandScriptButton_slot() {
@@ -140,7 +152,7 @@ void MainWindow::on_ApplySettingsPushButton_slot() {
   settings.setValue("JLinkExeProgrammer/Speed",
                     gui->ProgrammerSpeedLineEdit->text());
   settings.setValue("StickerPrinter/DLL/Path",
-                    gui->PrinterDllPathLineEdit->text());
+                    gui->PrinterLibPathLineEdit->text());
 
   // Применение новых настроек
   Manager->applySettings();
@@ -192,8 +204,18 @@ void MainWindow::on_LoadTransponderFirmwareButton_slot() {
 void MainWindow::on_ReloadTransponderFirmwareButton_slot() {
   Logger->clear();
 
-  QString pan = getStickerPan();
+  QStringList stickerData;
+  bool ok;
+  Interactor->getTransponderStickerData(&stickerData, ok);
+  if (!ok) {
+    return;
+  }
+  if (stickerData.isEmpty()) {
+    Interactor->generateErrorMessage("Некорректный ввод данных. ");
+    return;
+  }
 
+  QString pan = getStickerPan(stickerData);
   if (pan.isEmpty()) {
     Interactor->generateErrorMessage("Некорректный ввод данных");
     return;
@@ -264,7 +286,7 @@ bool MainWindow::checkNewSettings() {
     return false;
   }
 
-  info.setFile(gui->PrinterDllPathLineEdit->text());
+  info.setFile(gui->PrinterLibPathLineEdit->text());
   if ((!info.exists()) || (info.suffix() != "dll")) {
     return false;
   }
@@ -272,11 +294,7 @@ bool MainWindow::checkNewSettings() {
   return true;
 }
 
-QString MainWindow::getStickerPan(void) {
-  QStringList stickerData;
-
-  Interactor->getTransponderStickerData(&stickerData);
-
+QString MainWindow::getStickerPan(QStringList& stickerData) {
   if (stickerData.size() > 2) {
     return QString();
   }

@@ -10,8 +10,11 @@ void MasterGUI::create() {
   // Интерфейс для взаимодействия с сервером персонализации
   createServerTab();
 
-  // Интерфейс для взаиомдейтсвия с программатором
+  // Интерфейс для взаимодействия с программатором
   createProgrammatorTab();
+
+  // Интерфейс для взаимодействия с принтером стикером
+  createStickerPrinterTab();
 
   // Интерфейс для изменения настроек
   createSettingsTab();
@@ -121,17 +124,17 @@ void MasterGUI::createProgrammatorTab() {
   ReadDeviceUserDataButton =
       new QPushButton(QString("Считать  пользовательские данные"));
   ProgrammatorControlPanelLayout->addWidget(ReadDeviceUserDataButton);
+  ButtonVerticalSpacer =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  ProgrammatorControlPanelLayout->addItem(ButtonVerticalSpacer);
+
   UnlockDeviceButton = new QPushButton(QString("Разблокировать память"));
   ProgrammatorControlPanelLayout->addWidget(UnlockDeviceButton);
   LockDeviceButton = new QPushButton(QString("Заблокировать память"));
   ProgrammatorControlPanelLayout->addWidget(LockDeviceButton);
-
-  ButtonVerticalSpacer =
-      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  ProgrammatorControlPanelLayout->addItem(ButtonVerticalSpacer);
 }
 
-void MasterGUI::createStickerTab() {
+void MasterGUI::createStickerPrinterTab() {
   StickerPrinterTab = new QWidget();
   Tabs->addTab(StickerPrinterTab, "Стикер принтер");
   // Загружаем настройки приложения
@@ -141,11 +144,10 @@ void MasterGUI::createStickerTab() {
   StickerPrinterTabMainLayout = new QHBoxLayout();
   StickerPrinterTab->setLayout(StickerPrinterTabMainLayout);
 
-  QGroupBox* StickerPrinterControlPanel = new QGroupBox(QString("Общие"));
+  StickerPrinterControlPanel = new QGroupBox(QString("Панель управления"));
   StickerPrinterTabMainLayout->addWidget(StickerPrinterControlPanel);
-
   StickerPrinterControlPanelLayout = new QVBoxLayout();
-  StickerPrinterTabMainLayout->addLayout(StickerPrinterControlPanelLayout);
+  StickerPrinterControlPanel->setLayout(StickerPrinterControlPanelLayout);
 
   PrintLastTransponderStickerButton =
       new QPushButton(QString("Распечатать последний стикер"));
@@ -162,6 +164,14 @@ void MasterGUI::createStickerTab() {
       new QPushButton(QString("Выполнить командный скрипт"));
   StickerPrinterControlPanelLayout->addWidget(
       ExecuteStickerPrinterCommandScriptButton);
+
+  StickerPrinterCommandSriptGroup = new QGroupBox(QString("Командный скрипт"));
+  StickerPrinterTabMainLayout->addWidget(StickerPrinterCommandSriptGroup);
+  StickerPrinterCommandSriptLayout = new QVBoxLayout();
+  StickerPrinterCommandSriptGroup->setLayout(StickerPrinterCommandSriptLayout);
+  StickerPrinterCommandSriptTextEdit = new QPlainTextEdit();
+  StickerPrinterCommandSriptLayout->addWidget(
+      StickerPrinterCommandSriptTextEdit);
 }
 
 void MasterGUI::createSettingsTab() {
@@ -178,7 +188,7 @@ void MasterGUI::createSettingsTab() {
   SettingsMainLayout->addLayout(SettingsMainSubLayout);
 
   // Общие
-  QGroupBox* GeneralSettingsGroupBox = new QGroupBox(QString("Общие"));
+  GeneralSettingsGroupBox = new QGroupBox(QString("Общие"));
   SettingsMainSubLayout->addWidget(GeneralSettingsGroupBox);
 
   GeneralSettingsMainLayout = new QGridLayout();
@@ -194,8 +204,7 @@ void MasterGUI::createSettingsTab() {
                                        1);
 
   // Сеть
-  QGroupBox* PersoSettingsGroupBox =
-      new QGroupBox(QString("Сетевые настройки"));
+  PersoSettingsGroupBox = new QGroupBox(QString("Сетевые настройки"));
   SettingsMainSubLayout->addWidget(PersoSettingsGroupBox);
 
   PersoSettingsMainLayout = new QGridLayout();
@@ -214,8 +223,7 @@ void MasterGUI::createSettingsTab() {
   PersoSettingsMainLayout->addWidget(PersoServerPortLineEdit, 1, 1, 1, 1);
 
   // Настройки программатора
-  QGroupBox* ProgrammerSettingsGroupBox =
-      new QGroupBox(QString("Программатор"));
+  ProgrammerSettingsGroupBox = new QGroupBox(QString("Программатор"));
   SettingsMainSubLayout->addWidget(ProgrammerSettingsGroupBox);
 
   ProgrammerSettingsMainLayout = new QGridLayout();
@@ -237,33 +245,36 @@ void MasterGUI::createSettingsTab() {
   ProgrammerSettingsMainLayout->addWidget(ProgrammerSpeedLabel, 1, 0, 1, 1);
   ProgrammerSpeedLineEdit =
       new QLineEdit(settings.value("JLinkExeProgrammer/Speed").toString());
-  ProgrammerSettingsMainLayout->addWidget(ProgrammerSpeedLineEdit, 1, 1, 1, 1);
+  ProgrammerSettingsMainLayout->addWidget(ProgrammerSpeedLineEdit, 1, 1, 1, 2);
 
   // Настройки принтера
-  QGroupBox* PrinterSettingsGroupBox = new QGroupBox(QString("Стикер-принтер"));
+  PrinterSettingsGroupBox = new QGroupBox(QString("Стикер-принтер"));
   SettingsMainSubLayout->addWidget(PrinterSettingsGroupBox);
 
   PrinterSettingsMainLayout = new QGridLayout();
   PrinterSettingsGroupBox->setLayout(PrinterSettingsMainLayout);
 
-  PrinterDllPathLabel = new QLabel("Путь к библиотеке");
-  PrinterSettingsMainLayout->addWidget(PrinterDllPathLabel, 0, 0, 1, 1);
-  PrinterDllPathLineEdit =
+  PrinterLibPathLabel = new QLabel("Путь к библиотеке");
+  PrinterSettingsMainLayout->addWidget(PrinterLibPathLabel, 0, 0, 1, 1);
+  PrinterLibPathLineEdit =
       new QLineEdit(settings.value("StickerPrinter/DLL/Path").toString());
-  PrinterSettingsMainLayout->addWidget(PrinterDllPathLineEdit, 0, 1, 1, 1);
-  PrinterDllPathPushButton = new QPushButton("Обзор");
-  PrinterSettingsMainLayout->addWidget(PrinterDllPathPushButton, 0, 2, 1, 1);
-  connect(PrinterDllPathPushButton, &QPushButton::clicked, this,
-          &MasterGUI::on_PrinterDllPathPushButton_slot);
+  PrinterSettingsMainLayout->addWidget(PrinterLibPathLineEdit, 0, 1, 1, 1);
+  PrinterLibPathPushButton = new QPushButton("Обзор");
+  PrinterSettingsMainLayout->addWidget(PrinterLibPathPushButton, 0, 2, 1, 1);
+  connect(PrinterLibPathPushButton, &QPushButton::clicked, this,
+          &MasterGUI::on_PrinterLibPathPushButton_slot);
 
   // Кнопка сохранения настроек
   ApplySettingsPushButton = new QPushButton("Применить изменения");
   SettingsMainSubLayout->addWidget(ApplySettingsPushButton);
 
   // Сжимаем позиционирование
-  SettingsVerticalSpacer1 =
+  SettingsVS1 =
       new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  SettingsMainSubLayout->addItem(SettingsVerticalSpacer1);
+  SettingsMainSubLayout->addItem(SettingsVS1);
+  SettingsHS1 =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
+  SettingsMainLayout->addItem(SettingsHS1);
 }
 
 void MasterGUI::createLogWidgets() {
@@ -289,8 +300,8 @@ void MasterGUI::on_ProgrammerExeFilePathPushButton_slot() {
   ProgrammerExeFilePathLineEdit->setText(filePath);
 }
 
-void MasterGUI::on_PrinterDllPathPushButton_slot() {
+void MasterGUI::on_PrinterLibPathPushButton_slot() {
   QString filePath =
       QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.dll");
-  PrinterDllPathLineEdit->setText(filePath);
+  PrinterLibPathLineEdit->setText(filePath);
 }

@@ -429,9 +429,15 @@ void ClientManager::performPrintingLastTransponderSticker() {
     return;
   }
 
-  emit logging("Печать последнего стикера. ");
-  Printer->printLastTransponderSticker() ? CurrentState = Completed
-                                         : CurrentState = Failed;
+  emit logging("Печать последнего стикера транспондера. ");
+  if (!Printer->printLastTransponderSticker()) {
+    CurrentState = Failed;
+    NotificationText = "Получена ошибка при печати стикера транспондера. ";
+    endOperationExecution("performPrintingLastTransponderSticker");
+  }
+
+  CurrentState = Completed;
+  NotificationText = "Операция успешно выполнена. ";
 
   // Завершаем операцию
   endOperationExecution("performPrintingLastTransponderSticker");
@@ -444,9 +450,15 @@ void ClientManager::performPrintingCustomTransponderSticker(
     return;
   }
 
-  emit logging("Печать последнего стикера. ");
-  Printer->printTransponderSticker(parameters) ? CurrentState = Completed
-                                               : CurrentState = Failed;
+  emit logging("Печать произвольного стикера транспондера. ");
+  if (!Printer->printTransponderSticker(parameters)) {
+    CurrentState = Failed;
+    NotificationText = "Получена ошибка при печати стикера транспондера. ";
+    endOperationExecution("performPrintingCustomTransponderSticker");
+  }
+
+  CurrentState = Completed;
+  NotificationText = "Операция успешно выполнена. ";
 
   // Завершаем операцию
   endOperationExecution("performPrintingCustomTransponderSticker");
@@ -459,9 +471,8 @@ void ClientManager::performExecutingPrinterCommandScript(
     return;
   }
 
-  emit logging("Печать последнего стикера. ");
-  Printer->exec(commandScript) ? CurrentState = Completed
-                               : CurrentState = Failed;
+  emit logging("Выполнение командного скрипта для принтера. ");
+  Printer->exec(commandScript);
 
   // Завершаем операцию
   endOperationExecution("performExecutingPrinterCommandScript");

@@ -366,6 +366,8 @@ void JLinkExeProgrammer::loadSettings() {
   }
 
   Speed = settings.value("JLinkExeProgrammer/Speed").toUInt();
+  ExtendedLoggingEnable =
+      settings.value("General/ExtendedLoggingEnable").toBool();
 }
 
 void JLinkExeProgrammer::excuteJLinkScript() {
@@ -396,7 +398,9 @@ void JLinkExeProgrammer::excuteJLinkScript() {
   ProcessOutput = QString(rawOutput).split("\r\n");
 
   // Логгирование вывода JLink.exe
-  emit logging(rawOutput);
+  if (ExtendedLoggingEnable == true) {
+    emit logging(rawOutput);
+  }
 }
 
 void JLinkExeProgrammer::initScript() {

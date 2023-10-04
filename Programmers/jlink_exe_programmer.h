@@ -11,6 +11,7 @@
 class JLinkExeProgrammer : public IProgrammer {
   Q_OBJECT
  private:
+  bool ExtendedLoggingEnable;
   uint32_t Speed;
   QProcess *JLinkProcess;
 

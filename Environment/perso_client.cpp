@@ -388,7 +388,7 @@ void PersoClient::createTransmittedDataBlock(void) {
   QJsonDocument requestDocument(CurrentCommand);
 
   emit logging(QString("Размер команды: %1 ")
-                   .arg(QString(requestDocument.toJson().size())));
+                   .arg(QString::number(requestDocument.toJson().size())));
   if (ExtendedLoggingEnable == true) {
     emit logging(QString("Содержание команды: %1 ")
                      .arg(QString(requestDocument.toJson())));
@@ -723,7 +723,7 @@ void PersoClient::processTransponderRereleaseConfirmResponse(
   // Синтаксическая проверка
   if (CurrentResponse.value("response_name").isUndefined() ||
       (CurrentResponse.value("response_name").toString() !=
-       "TransponderReleaseConfirm") ||
+       "TransponderRereleaseConfirm") ||
       CurrentResponse.value("sn").isUndefined() ||
       CurrentResponse.value("pan").isUndefined() ||
       CurrentResponse.value("box_id").isUndefined() ||

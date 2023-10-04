@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QtWidgets>
 
-class TransponderRereleaseDialog : public QDialog {
+class TransponderStickerScanDialog : public QDialog {
   Q_OBJECT
 
  private:
@@ -12,13 +12,13 @@ class TransponderRereleaseDialog : public QDialog {
 
   QVBoxLayout* MainLayout;
   QLabel* MainLabel;
-  QPlainTextEdit* PersoInitDataInput;
+  QPlainTextEdit* StickerDataInput;
   QPushButton* OkButton;
   QPushButton* CancelButton;
 
  public:
-  TransponderRereleaseDialog(QWidget* parent);
-  QString getData(void);
+  TransponderStickerScanDialog(QWidget* parent);
+  void getData(QStringList* data);
 };
 
 #endif  // TRANSPONDERSTICKERDIALOG_H

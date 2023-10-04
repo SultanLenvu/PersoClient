@@ -80,7 +80,7 @@ class MainWindow : public QMainWindow {
   void proxyLogging(const QString& log);
   void loadSettings(void);
   bool checkNewSettings(void);
-  QString getStickerPan(void);
+  QString getStickerPan(QStringList& stickerData);
 
   void createAuthorizationInterface(void);
   void connectAuthorizationInterface(void);

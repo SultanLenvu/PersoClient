@@ -29,16 +29,31 @@ void UserInteractionSystem::getMasterPassword(QString& pass) {
                                nullptr);
 }
 
-void UserInteractionSystem::getTransponderStickerData(QStringList* data) {
-  QString rawData;
-  TransponderRereleaseDialog* dialog =
-      new TransponderRereleaseDialog(ParentWindow);
+void UserInteractionSystem::getTransponderStickerData(QStringList* data,
+                                                      bool& ok) {
+  TransponderStickerScanDialog* dialog =
+      new TransponderStickerScanDialog(ParentWindow);
 
   if (dialog->exec() == QDialog::Accepted) {
-    rawData = dialog->getData();
+    dialog->getData(data);
+    ok = true;
+  } else {
+    ok = false;
   }
+}
 
-  *data = rawData.split("\n");
+void UserInteractionSystem::getCustomTransponderStickerData(
+    QMap<QString, QString>* data,
+    bool& ok) {
+  CustomTransponderStickerScanDialog* dialog =
+      new CustomTransponderStickerScanDialog(ParentWindow);
+
+  if (dialog->exec() == QDialog::Accepted) {
+    dialog->getData(data);
+    ok = true;
+  } else {
+    ok = false;
+  }
 }
 
 void UserInteractionSystem::generateProgressDialog(void) {

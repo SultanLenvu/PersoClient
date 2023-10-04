@@ -27,12 +27,30 @@ bool TE310Printer::printTransponderSticker(
     return false;
   }
 
+  // Сохраняем данные распечатнного стикера
+  LastTransponderSticker = *parameters;
+
   return true;
 }
 
-bool TE310Printer::printLastTransponderSticker() {}
+bool TE310Printer::printLastTransponderSticker() {
+  if (LastTransponderSticker.isEmpty()) {
+    emit logging("Данные о последнем распечанном стикере отсутствуют. Сброс. ");
+    return false;
+  }
 
-bool TE310Printer::exec(const QStringList* commandScript) {}
+  return printTransponderSticker(&LastTransponderSticker);
+}
+
+void TE310Printer::exec(const QStringList* commandScript) {
+  openPort("TSC TE310");
+
+  for (int32_t i = 0; i < commandScript->size(); i++) {
+    sendCommand(commandScript->at(i).toUtf8());
+  }
+
+  closePort();
+}
 
 void TE310Printer::applySetting() {
   emit logging("Применение новых настроек.");

@@ -9,7 +9,8 @@
 #include <QProgressDialog>
 
 #include "authorization_dialog.h"
-#include "transponder_rerelease_dialog.h"
+#include "custom_transponder_sticker_dialog.h"
+#include "transponder_sticker_scan_dialog.h"
 
 class UserInteractionSystem : public QObject {
   Q_OBJECT
@@ -29,7 +30,8 @@ class UserInteractionSystem : public QObject {
 
   void getAuthorizationData(QMap<QString, QString>* data);
   void getMasterPassword(QString& pass);
-  void getTransponderStickerData(QStringList* data);
+  void getTransponderStickerData(QStringList* data, bool& ok);
+  void getCustomTransponderStickerData(QMap<QString, QString>* data, bool& ok);
 
   void generateProgressDialog(void);
   void completeProgressDialog(void);

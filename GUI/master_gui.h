@@ -13,24 +13,6 @@ class MasterGUI : public GUI {
   QVBoxLayout* GeneralLogLayout;
   QPlainTextEdit* GeneralLogs;
 
-  /* Интерфейс для взаимодействия с программатором */
-  //============================================================
-  QWidget* ProgrammatorTab;
-  QHBoxLayout* ProgrammatorTabMainLayout;
-
-  QGroupBox* ProgrammatorControlPanel;
-  QVBoxLayout* ProgrammatorControlPanelLayout;
-
-  QPushButton* ProgramDeviceButton;
-  QPushButton* ReadDeviceFirmwareButton;
-  QPushButton* EraseDeviceButton;
-  QPushButton* ProgramDeviceUserDataButton;
-  QPushButton* ReadDeviceUserDataButton;
-  QPushButton* UnlockDeviceButton;
-  QPushButton* LockDeviceButton;
-  QSpacerItem* ButtonVerticalSpacer;
-  //============================================================
-
   /* Интерфейс для взаимодействия с сервером */
   //============================================================
   QWidget* ServerTab;
@@ -51,6 +33,24 @@ class MasterGUI : public GUI {
   QGroupBox* TransponderInfoGroup;
   QVBoxLayout* TransponderInfoLayout;
   QTableView* TransponderInfoView;
+  //============================================================
+
+  /* Интерфейс для взаимодействия с программатором */
+  //============================================================
+  QWidget* ProgrammatorTab;
+  QHBoxLayout* ProgrammatorTabMainLayout;
+
+  QGroupBox* ProgrammatorControlPanel;
+  QVBoxLayout* ProgrammatorControlPanelLayout;
+
+  QPushButton* ProgramDeviceButton;
+  QPushButton* ReadDeviceFirmwareButton;
+  QPushButton* EraseDeviceButton;
+  QPushButton* ProgramDeviceUserDataButton;
+  QPushButton* ReadDeviceUserDataButton;
+  QSpacerItem* ButtonVerticalSpacer;
+  QPushButton* UnlockDeviceButton;
+  QPushButton* LockDeviceButton;
   //============================================================
 
   /* Интерфейс для взаимодействия с принтером */
@@ -104,11 +104,12 @@ class MasterGUI : public GUI {
   // Принтер
   QGroupBox* PrinterSettingsGroupBox;
   QGridLayout* PrinterSettingsMainLayout;
-  QLabel* PrinterDllPathLabel;
-  QLineEdit* PrinterDllPathLineEdit;
-  QPushButton* PrinterDllPathPushButton;
+  QLabel* PrinterLibPathLabel;
+  QLineEdit* PrinterLibPathLineEdit;
+  QPushButton* PrinterLibPathPushButton;
 
-  QSpacerItem* SettingsVerticalSpacer1;
+  QSpacerItem* SettingsVS1;
+  QSpacerItem* SettingsHS1;
   //============================================================
 
  public:
@@ -124,13 +125,13 @@ class MasterGUI : public GUI {
  private:
   void createServerTab(void);
   void createProgrammatorTab(void);
-  void createStickerTab(void);
+  void createStickerPrinterTab(void);
   void createSettingsTab(void);
   void createLogWidgets(void);
 
  private slots:
   void on_ProgrammerExeFilePathPushButton_slot(void);
-  void on_PrinterDllPathPushButton_slot(void);
+  void on_PrinterLibPathPushButton_slot(void);
 };
 
 #endif  // MASTERGUI_H

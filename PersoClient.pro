@@ -16,7 +16,8 @@ SOURCES += \
     Environment/perso_client.cpp \
     Environment/transponder_seed_model.cpp \
     GUI/authorization_dialog.cpp \
-    GUI/transponder_rerelease_dialog.cpp \
+    GUI/custom_transponder_sticker_dialog.cpp \
+    GUI/transponder_sticker_scan_dialog.cpp \
     GUI/user_interaction_system.cpp \
     GUI/authorization_gui.cpp \
     GUI/gui.cpp \
@@ -35,7 +36,8 @@ HEADERS += \
     Environment/perso_client.h \
     Environment/transponder_seed_model.h \
     GUI/authorization_dialog.h \
-    GUI/transponder_rerelease_dialog.h \
+    GUI/custom_transponder_sticker_dialog.h \
+    GUI/transponder_sticker_scan_dialog.h \
     GUI/user_interaction_system.h \
     GUI/authorization_gui.h \
     GUI/gui.h \
