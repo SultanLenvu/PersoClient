@@ -11,9 +11,9 @@ TextStreamLogBackend::TextStreamLogBackend(QObject *parent, QTextStream *stream)
   LogTextStream = stream;
 }
 
-void TextStreamLogBackend::writeLogLine(const QString &str)
-{
- *LogTextStream << str << "\n" << Qt::flush;
+void TextStreamLogBackend::writeLogLine(const QString& str) {
+  *LogTextStream << str << "\n";
+  LogTextStream->flush();
 }
 
 void TextStreamLogBackend::clear() {} /* No-op */
