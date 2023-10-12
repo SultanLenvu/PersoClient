@@ -10,28 +10,32 @@
 class IStickerPrinter : public QObject {
   Q_OBJECT
  public:
-  enum PrinterType {
+  enum StickerPrinterType {
     Unknown,
     TE310,
   };
+  Q_ENUM(StickerPrinterType);
 
   enum ReturnStatus {
+    ParameterError,
+    LibraryMissing,
+    NotConnected,
     Failed,
-    DllMissing,
-    PrinterNotConnected,
     Completed,
   };
+  Q_ENUM(ReturnStatus);
 
  protected:
-  PrinterType Type;
+  StickerPrinterType Type;
 
  public:
-  IStickerPrinter(QObject* parent, PrinterType type);
+  IStickerPrinter(QObject* parent, StickerPrinterType type);
 
-  virtual bool printTransponderSticker(
+  virtual ReturnStatus printTransponderSticker(
       const QMap<QString, QString>* parameters) = 0;
-  virtual bool printLastTransponderSticker(void) = 0;
-  virtual void exec(const QStringList* commandScript) = 0;
+  virtual ReturnStatus printLastTransponderSticker(void) = 0;
+  virtual ReturnStatus exec(const QStringList* commandScript) = 0;
+
   virtual void applySetting(void) = 0;
 
  signals:

@@ -14,14 +14,14 @@ class IProgrammer : public QObject {
  public:
   enum ReturnStatus {
     NotExecuted,
-    RequestParameterError,
+    FirmwareFileError,
     DataFileError,
+    DriverMissing,
     ProgrammatorError,
     Completed
   };
   Q_ENUM(ReturnStatus);
 
- public:
   enum ProgrammerType { JLink };
   Q_ENUM(ProgrammerType);
 
@@ -34,18 +34,18 @@ class IProgrammer : public QObject {
 
   ProgrammerType type() const;
 
- public slots:
-  virtual void getUcid(QString* ucid) = 0;
-  virtual void loadFirmware(QFile* firmware) = 0;
-  virtual void loadFirmwareWithUnlock(QFile* firmware) = 0;
-  virtual void readFirmware(void) = 0;
-  virtual void eraseFirmware(void) = 0;
+ public:
+  virtual ReturnStatus getUcid(QString* ucid) = 0;
+  virtual ReturnStatus loadFirmware(QFile* firmware) = 0;
+  virtual ReturnStatus loadFirmwareWithUnlock(QFile* firmware) = 0;
+  virtual ReturnStatus readFirmware(void) = 0;
+  virtual ReturnStatus eraseFirmware(void) = 0;
 
-  virtual void loadData(QFile* data) = 0;
-  virtual void readData(void) = 0;
+  virtual ReturnStatus loadData(QFile* data) = 0;
+  virtual ReturnStatus readData(void) = 0;
 
-  virtual void unlockDevice(void) = 0;
-  virtual void lockDevice(void) = 0;
+  virtual ReturnStatus unlockDevice(void) = 0;
+  virtual ReturnStatus lockDevice(void) = 0;
 
   virtual void applySettings() = 0;
 
@@ -58,7 +58,6 @@ class IProgrammer : public QObject {
 
  signals:
   void logging(const QString& log);
-  void operationFinished(ReturnStatus status);
 };
 
 #endif  // ABSTRACTPROGRAMMER_H

@@ -5,11 +5,11 @@ PersoClient::PersoClient(QObject *parent) : QObject(parent)
   setObjectName("PersoClient");
   loadSettings();
 
-  // Создаем таймеры
-  createTimers();
-
   // Создаем сокет
   createSocket();
+
+  // Создаем таймеры
+  createTimers();
 
   // Готовы к выполнению команд
   CurrentState = Ready;
@@ -314,6 +314,12 @@ void PersoClient::applySettings() {
   loadSettings();
 }
 
+void PersoClient::sendLog(const QString& log) {
+  if (LogEnable) {
+    emit logging(log);
+  }
+}
+
 /*
  * Приватные  методы
  */
@@ -321,11 +327,11 @@ void PersoClient::applySettings() {
 void PersoClient::loadSettings() {
   QSettings settings;
 
-  PersoServerAddress =
-      settings.value("Personalization/ServerIpAddress").toString();
-  PersoServerPort = settings.value("Personalization/ServerPort").toInt();
-  ExtendedLoggingEnable =
-      settings.value("General/ExtendedLoggingEnable").toBool();
+  LogEnable = settings.value("log_system/log_enable").toBool();
+  ExtendedLoggingEnable = settings.value("log_system/extended_enable").toBool();
+
+  PersoServerAddress = settings.value("perso_client/server_ip").toString();
+  PersoServerPort = settings.value("perso_client/server_port").toInt();
 }
 
 void PersoClient::createTimers() {

@@ -8,18 +8,10 @@ LogSystem::LogSystem(QObject* parent) : QObject(parent) {
 LogSystem::~LogSystem() {}
 
 void LogSystem::clear() {
-  if (!GlobalEnableOption) {
-    return;
-  }
-
   emit requestClearDisplayLog();
 }
 
 void LogSystem::generate(const QString& log) {
-  if (!GlobalEnableOption) {
-    return;
-  }
-
   QTime time = QDateTime::currentDateTime().time();
   QString LogData = time.toString("hh:mm:ss.zzz - ") + log;
   emit requestDisplayLog(LogData);
@@ -37,5 +29,5 @@ void LogSystem::applySettings() {
 void LogSystem::loadSettings() {
   QSettings settings;
 
-  GlobalEnableOption = settings.value("log_system/global_enable").toBool();
+  SavePath = settings.value("log_system/save_path").toBool();
 }

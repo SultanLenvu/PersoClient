@@ -11,6 +11,7 @@
 class JLinkExeProgrammer : public IProgrammer {
   Q_OBJECT
  private:
+  bool LogEnable;
   bool ExtendedLoggingEnable;
   uint32_t Speed;
   QProcess *JLinkProcess;
@@ -24,22 +25,23 @@ class JLinkExeProgrammer : public IProgrammer {
   explicit JLinkExeProgrammer(QObject* parent);
   ~JLinkExeProgrammer();
 
- public slots:
-  virtual void getUcid(QString* ucid) override;
-  virtual void loadFirmware(QFile* firmware) override;
-  virtual void loadFirmwareWithUnlock(QFile* firmware) override;
-  virtual void readFirmware(void) override;
-  virtual void eraseFirmware(void) override;
+ public:
+  virtual ReturnStatus getUcid(QString* ucid) override;
+  virtual ReturnStatus loadFirmware(QFile* firmware) override;
+  virtual ReturnStatus loadFirmwareWithUnlock(QFile* firmware) override;
+  virtual ReturnStatus readFirmware(void) override;
+  virtual ReturnStatus eraseFirmware(void) override;
 
-  virtual void readData(void) override;
-  virtual void loadData(QFile* data) override;
+  virtual ReturnStatus readData(void) override;
+  virtual ReturnStatus loadData(QFile* data) override;
 
-  virtual void unlockDevice(void) override;
-  virtual void lockDevice(void) override;
+  virtual ReturnStatus unlockDevice(void) override;
+  virtual ReturnStatus lockDevice(void) override;
 
   virtual void applySettings() override;
 
  private:
+  void sendLog(const QString& log);
   void loadSettings(void);
   void excuteJLinkScript(void);
   void initScript(void);

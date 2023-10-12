@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include <QElapsedTimer>
+#include <QMutex>
 #include <QObject>
 #include <QSettings>
 #include <QThread>
@@ -11,11 +12,11 @@
 
 #include "General/definitions.h"
 #include "General/types.h"
+#include "Log/log_system.h"
 #include "Programmers/interface_programmer.h"
 #include "Programmers/jlink_exe_programmer.h"
 #include "StickerPrinter/isticker_printer.h"
 #include "StickerPrinter/te310_printer.h"
-#include "log_system.h"
 #include "perso_client.h"
 #include "transponder_seed_model.h"
 
@@ -37,7 +38,7 @@ class ClientManager : public QObject {
 
   QMutex Mutex;
 
- public slots:
+ public:
   explicit ClientManager(QObject* parent);
   ~ClientManager();
   void on_InsctanceThreadStarted_slot(void);
@@ -46,14 +47,14 @@ class ClientManager : public QObject {
   void performServerConnecting(void);
   void performServerDisconnecting(void);
   void performServerEcho(void);
-  void performServerAuthorization(const QMap<QString, QString>* data,
-                                  bool& result);
+  void performServerAuthorization(
+      const QSharedPointer<QMap<QString, QString>> data);
   void performTransponderFirmwareLoading(TransponderInfoModel* model);
   void performTransponderFirmwareReloading(TransponderInfoModel* model,
                                            const QString& pan);
 
   // Программатор
-  void performLocalFirmwareLoading(const QString& path, bool unlockOption);
+  void performLocalFirmwareLoading(const QString& path);
   void performFirmwareReading(void);
   void performFirmwareErasing(void);
   void performDataReading(void);
@@ -64,8 +65,9 @@ class ClientManager : public QObject {
   // Стикер принтер
   void performPrintingLastTransponderSticker(void);
   void performPrintingCustomTransponderSticker(
-      const QMap<QString, QString>* parameters);
-  void performExecutingPrinterCommandScript(const QStringList* commandScript);
+      const QSharedPointer<QMap<QString, QString>> data);
+  void performStickerPrinterCommandScript(
+      const QSharedPointer<QStringList> commandScript);
 
   void applySettings(void);
 
@@ -76,12 +78,15 @@ class ClientManager : public QObject {
   void createClientInstance(void);
   void createStickerPrinterInstance(void);
 
-  void startOperationExecution(const QString& operationName);
-  void endOperationExecution(const QString& operationName);
+  void startOperationPerforming(const QString& operationName);
+  void finishOperationPerforming(const QString& operationName);
 
-  void processClientReturnStatus(PersoClient::ReturnStatus status);
-  void processProgrammerReturnStatus(IProgrammer::ReturnStatus status);
-  void processStickerPrintersReturnStatus(IStickerPrinter::ReturnStatus status);
+  void processClientError(PersoClient::ReturnStatus status,
+                          const QString& operationName);
+  void processProgrammerError(IProgrammer::ReturnStatus status,
+                              const QString& operationName);
+  void processStickerPrintersError(IStickerPrinter::ReturnStatus status,
+                                   const QString& operationName);
 
  private slots:
   void proxyLogging(const QString& log);
@@ -92,7 +97,7 @@ class ClientManager : public QObject {
   void notifyUserAboutError(const QString& log);
   void operationPerfomingStarted(const QString& operationName);
   void operationPerformingFinished(const QString& operationName);
-  void createProductionInterface_signal(void);
+  void requestProductionInterface_signal(void);
 };
 
 #endif  // CLIENT_MANAGER_H

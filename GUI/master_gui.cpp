@@ -187,21 +187,42 @@ void MasterGUI::createSettingsTab() {
   SettingsMainSubLayout = new QVBoxLayout();
   SettingsMainLayout->addLayout(SettingsMainSubLayout);
 
-  // Общие
-  GeneralSettingsGroupBox = new QGroupBox(QString("Общие"));
-  SettingsMainSubLayout->addWidget(GeneralSettingsGroupBox);
+  // Система логгирования
+  LogSystemSettingsGroupBox = new QGroupBox(QString("Система логгирования"));
+  SettingsMainSubLayout->addWidget(LogSystemSettingsGroupBox);
 
-  GeneralSettingsMainLayout = new QGridLayout();
-  GeneralSettingsGroupBox->setLayout(GeneralSettingsMainLayout);
+  LogSystemSettingsMainLayout = new QGridLayout();
+  LogSystemSettingsGroupBox->setLayout(LogSystemSettingsMainLayout);
 
-  ExtendedLoggingEnableLabel = new QLabel("Расширенное логгирование");
-  GeneralSettingsMainLayout->addWidget(ExtendedLoggingEnableLabel, 0, 0, 1, 1);
-  ExtendedLoggingEnableCheckBox = new QCheckBox();
-  ExtendedLoggingEnableCheckBox->setCheckState(
-      settings.value("General/ExtendedLoggingEnable").toBool() ? Qt::Checked
-                                                               : Qt::Unchecked);
-  GeneralSettingsMainLayout->addWidget(ExtendedLoggingEnableCheckBox, 0, 1, 1,
-                                       1);
+  LogSystemGlobalEnableLabel = new QLabel("Глобальное логгирование вкл/выкл");
+  LogSystemSettingsMainLayout->addWidget(LogSystemGlobalEnableLabel, 0, 0, 1,
+                                         1);
+  LogSystemGlobalEnableCheckBox = new QCheckBox();
+  LogSystemGlobalEnableCheckBox->setCheckState(
+      settings.value("log_system/global_enable").toBool() ? Qt::Checked
+                                                          : Qt::Unchecked);
+  LogSystemSettingsMainLayout->addWidget(LogSystemGlobalEnableCheckBox, 0, 1, 1,
+                                         1);
+  LogSystemExtendedEnableLabel =
+      new QLabel("Расширенное логгирование вкл/выкл");
+  LogSystemSettingsMainLayout->addWidget(LogSystemExtendedEnableLabel, 1, 0, 1,
+                                         1);
+  LogSystemExtendedEnableCheckBox = new QCheckBox();
+  LogSystemExtendedEnableCheckBox->setCheckState(
+      settings.value("log_system/Extended_enable").toBool() ? Qt::Checked
+                                                            : Qt::Unchecked);
+  LogSystemSettingsMainLayout->addWidget(LogSystemExtendedEnableCheckBox, 1, 1,
+                                         1, 1);
+  LogSystemSavePathLabel = new QLabel("Директория для сохранения");
+  LogSystemSettingsMainLayout->addWidget(LogSystemSavePathLabel, 2, 0, 1, 1);
+  LogSystemSavePathLineEdit =
+      new QLineEdit(settings.value("log_system/save_path").toString());
+  LogSystemSettingsMainLayout->addWidget(LogSystemSavePathLineEdit, 2, 1, 1, 1);
+  LogSystemSavePathPushButton = new QPushButton("Обзор");
+  LogSystemSettingsMainLayout->addWidget(LogSystemSavePathPushButton, 2, 2, 1,
+                                         1);
+  connect(LogSystemSavePathPushButton, &QPushButton::clicked, this,
+          &MasterGUI::on_LogSystemSavePathPushButton_slot);
 
   // Сеть
   PersoSettingsGroupBox = new QGroupBox(QString("Сетевые настройки"));
@@ -213,13 +234,13 @@ void MasterGUI::createSettingsTab() {
   PersoServerIpAddressLabel =
       new QLabel("IP адрес или URL сервера персонализации");
   PersoSettingsMainLayout->addWidget(PersoServerIpAddressLabel, 0, 0, 1, 1);
-  PersoServerIpAddressLineEdit = new QLineEdit(
-      settings.value("Personalization/ServerIpAddress").toString());
+  PersoServerIpAddressLineEdit =
+      new QLineEdit(settings.value("perso_client/server_ip").toString());
   PersoSettingsMainLayout->addWidget(PersoServerIpAddressLineEdit, 0, 1, 1, 1);
   PersoServerPortLabel = new QLabel("Порт сервера персонализации");
   PersoSettingsMainLayout->addWidget(PersoServerPortLabel, 1, 0, 1, 1);
   PersoServerPortLineEdit =
-      new QLineEdit(settings.value("Personalization/ServerPort").toString());
+      new QLineEdit(settings.value("perso_client/server_port").toString());
   PersoSettingsMainLayout->addWidget(PersoServerPortLineEdit, 1, 1, 1, 1);
 
   // Настройки программатора
@@ -233,7 +254,7 @@ void MasterGUI::createSettingsTab() {
   ProgrammerSettingsMainLayout->addWidget(ProgrammerExeFilePathLabel, 0, 0, 1,
                                           1);
   ProgrammerExeFilePathLineEdit = new QLineEdit(
-      settings.value("JLinkExeProgrammer/ExeFile/Path").toString());
+      settings.value("jlink_exe_programmer/exe_file_path").toString());
   ProgrammerSettingsMainLayout->addWidget(ProgrammerExeFilePathLineEdit, 0, 1,
                                           1, 1);
   ProgrammerExeFilePathPushButton = new QPushButton("Обзор");
@@ -244,7 +265,7 @@ void MasterGUI::createSettingsTab() {
   ProgrammerSpeedLabel = new QLabel("Скорость работы (кГц)");
   ProgrammerSettingsMainLayout->addWidget(ProgrammerSpeedLabel, 1, 0, 1, 1);
   ProgrammerSpeedLineEdit =
-      new QLineEdit(settings.value("JLinkExeProgrammer/Speed").toString());
+      new QLineEdit(settings.value("jlink_exe_programmer/speed").toString());
   ProgrammerSettingsMainLayout->addWidget(ProgrammerSpeedLineEdit, 1, 1, 1, 2);
 
   // Настройки принтера
@@ -258,7 +279,7 @@ void MasterGUI::createSettingsTab() {
   StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLabel, 0, 0,
                                               1, 1);
   StickerPrinterLibPathLineEdit =
-      new QLineEdit(settings.value("StickerPrinter/DLL/Path").toString());
+      new QLineEdit(settings.value("sticker_printer/library_path").toString());
   StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLineEdit, 0,
                                               1, 1, 1);
   StickerPrinterLibPathPushButton = new QPushButton("Обзор");
@@ -295,6 +316,12 @@ void MasterGUI::createLogWidgets() {
   GeneralLogs->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
   GeneralLogs->setCenterOnScroll(false);
   GeneralLogLayout->addWidget(GeneralLogs);
+}
+
+void MasterGUI::on_LogSystemSavePathPushButton_slot() {
+  QString dirPath =
+      QFileDialog::getExistingDirectory(this, "Выберите директорию", "");
+  LogSystemSavePathLineEdit->setText(dirPath);
 }
 
 void MasterGUI::on_ProgrammerExeFilePathPushButton_slot() {

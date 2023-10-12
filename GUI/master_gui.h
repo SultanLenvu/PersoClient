@@ -78,11 +78,16 @@ class MasterGUI : public GUI {
   QVBoxLayout* SettingsMainSubLayout;
   QPushButton* ApplySettingsPushButton;
 
-  // Общие
-  QGroupBox* GeneralSettingsGroupBox;
-  QGridLayout* GeneralSettingsMainLayout;
-  QLabel* ExtendedLoggingEnableLabel;
-  QCheckBox* ExtendedLoggingEnableCheckBox;
+  // Настойки логгирования
+  QGroupBox* LogSystemSettingsGroupBox;
+  QGridLayout* LogSystemSettingsMainLayout;
+  QLabel* LogSystemGlobalEnableLabel;
+  QCheckBox* LogSystemGlobalEnableCheckBox;
+  QLabel* LogSystemExtendedEnableLabel;
+  QCheckBox* LogSystemExtendedEnableCheckBox;
+  QLabel* LogSystemSavePathLabel;
+  QLineEdit* LogSystemSavePathLineEdit;
+  QPushButton* LogSystemSavePathPushButton;
 
   // Сеть
   QGroupBox* PersoSettingsGroupBox;
@@ -130,6 +135,7 @@ class MasterGUI : public GUI {
   void createLogWidgets(void);
 
  private slots:
+  void on_LogSystemSavePathPushButton_slot(void);
   void on_ProgrammerExeFilePathPushButton_slot(void);
   void on_StickerPrinterLibPathPushButton_slot(void);
 };

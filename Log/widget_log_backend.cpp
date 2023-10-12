@@ -1,8 +1,4 @@
-#include <QObject>
-
-#include "Environment/log_backend.h"
-#include "Environment/widget_log_backend.h"
-#include "GUI/master_gui.h"
+#include "widget_log_backend.h"
 
 WidgetLogBackend::WidgetLogBackend(QObject *parent, MasterGUI *gui)
   : LogBackend(parent)

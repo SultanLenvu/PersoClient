@@ -5,21 +5,19 @@
 
 #include "General/definitions.h"
 #include "mainwindow_kernel.h"
-#include "Environment/text_stream_log_backend.h"
-#include "Environment/widget_log_backend.h"
 
-MainWindowKernel::MainWindowKernel() {
+MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   setObjectName("MainWindowKernel");
   CurrentGUI = nullptr;
 
   // Загружаем настройки приложения
   loadSettings();
 
-  // Система для взаимодействия с пользователем
-  createInteractorInstance();
-
   // Создаем логгер
   createLoggerInstance();
+
+  // Система для взаимодействия с пользователем
+  createInteractorInstance();
 
   // Менеджер для взаимодействия с программатором
   createManagerInstance();
@@ -31,37 +29,28 @@ MainWindowKernel::MainWindowKernel() {
   createAuthorizationInterface();
 }
 
-MainWindowKernel::~MainWindowKernel() {}
+MainWindowKernel::~MainWindowKernel() {
+  ManagerThread->exit();
+  ManagerThread->wait();
+
+  LoggerThread->exit();
+  LoggerThread->wait();
+}
 
 void MainWindowKernel::on_AuthorizePushButton_slot() {
-  QSharedPointer<QMap<QString, QString>> data;
+  QSharedPointer<QMap<QString, QString>> data(new QMap<QString, QString>);
   AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
   data->insert("login", gui->LoginLineEdit->text());
   data->insert("password", gui->PasswordLineEdit->text());
 
-  bool result = false;
-  emit performServerAuthorization_signal(data, result);
-  if (!result) {
-    return;
-  }
-
-  // Настраиваем размер главного окна
-  DesktopGeometry = QApplication::desktop()->screenGeometry();
-  setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
-              DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
-  setLayoutDirection(Qt::LeftToRight);
-
-  // Создаем графический интерфейс
-  createProductionInterface();
+  emit performServerAuthorization_signal(data);
 }
 
 void MainWindowKernel::on_ProgramDeviceButton_slot() {
   emit loggerClear_signal();
 
-  emit performLocalFirmwareLoading_signal(
-      QFileDialog::getOpenFileName(nullptr, "Выберите файл", "",
-                                   "Все файлы (*.*)"),
-      false);
+  emit performLocalFirmwareLoading_signal(QFileDialog::getOpenFileName(
+      nullptr, "Выберите файл", "", "Все файлы (*.*)"));
 }
 
 void MainWindowKernel::on_ReadDeviceFirmwareButton_slot() {
@@ -110,7 +99,7 @@ void MainWindowKernel::on_PrintLastTransponderStickerButton_slot() {
 void MainWindowKernel::on_PrintCustomTransponderStickerButton_slot() {
   emit loggerClear_signal();
 
-  QSharedPointer<QMap<QString, QString>> data;
+  QSharedPointer<QMap<QString, QString>> data(new QMap<QString, QString>);
   bool ok = false;
   Interactor->getCustomTransponderStickerData(data.get(), ok);
 
@@ -132,7 +121,7 @@ void MainWindowKernel::on_ExecuteStickerPrinterCommandScriptButton_slot() {
 
   QSharedPointer<QStringList> commandScript(new QStringList(
       gui->StickerPrinterCommandSriptTextEdit->toPlainText().split("\n\r")));
-  emit performExecutingPrinterCommandScript_signal(commandScript);
+  emit performStickerPrinterCommandScript_signal(commandScript);
 }
 
 void MainWindowKernel::on_ApplySettingsPushButton_slot() {
@@ -148,23 +137,28 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
     return;
   }
 
-  // Считывание пользовательского ввода
-  settings.setValue("General/ExtendedLoggingEnable",
-                    gui->ExtendedLoggingEnableCheckBox->isChecked());
-  settings.setValue("Personalization/ServerIpAddress",
+  settings.setValue("log_system/global_enable",
+                    gui->LogSystemGlobalEnableCheckBox->isChecked());
+  settings.setValue("log_system/extended_enable",
+                    gui->LogSystemExtendedEnableCheckBox->isChecked());
+  settings.setValue("log_system/save_path",
+                    gui->LogSystemSavePathLineEdit->text());
+
+  settings.setValue("perso_client/server_ip",
                     gui->PersoServerIpAddressLineEdit->text());
-  settings.setValue("Personalization/ServerPort",
+  settings.setValue("perso_client/server_port",
                     gui->PersoServerPortLineEdit->text().toInt());
-  settings.setValue("JLinkExeProgrammer/ExeFile/Path",
+
+  settings.setValue("jlink_exe_programmer/exe_file_path",
                     gui->ProgrammerExeFilePathLineEdit->text());
-  settings.setValue("JLinkExeProgrammer/Speed",
+  settings.setValue("jlink_exe_programmer/speed",
                     gui->ProgrammerSpeedLineEdit->text());
-  settings.setValue("StickerPrinter/DLL/Path",
+
+  settings.setValue("sticker_printer/library_path",
                     gui->StickerPrinterLibPathLineEdit->text());
 
   // Применение новых настроек
   emit applySettings_signal();
-
   Interactor->generateMessage("Новые настройки успешно применены. ");
 }
 
@@ -187,18 +181,14 @@ void MainWindowKernel::on_PersoServerEchoRequestButton_slot() {
 }
 
 void MainWindowKernel::on_MasterAuthorizePushButton_slot() {
-  QSharedPointer<QMap<QString, QString>> data;
+  QSharedPointer<QMap<QString, QString>> data(new QMap<QString, QString>);
   Interactor->getAuthorizationData(data.get());
 
   if (data->isEmpty()) {
     return;
   }
 
-  bool result = false;
-  emit performServerAuthorization_signal(data, result);
-  if (result == false) {
-    return;
-  }
+  emit performServerAuthorization_signal(data);
 }
 
 void MainWindowKernel::on_LoadTransponderFirmwareButton_slot() {
@@ -255,14 +245,6 @@ void MainWindowKernel::on_ExitFromProductionLineAct_slot() {
   createAuthorizationInterface();
 }
 
-void MainWindowKernel::proxyLogging(const QString& log) {
-  if (sender()->objectName() == QString("ClientManager")) {
-    Logger->generate(QString("Manager - ") + log);
-  } else {
-    Logger->generate(QString("Unknown - ") + log);
-  }
-}
-
 void MainWindowKernel::loadSettings() {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
   QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
@@ -300,6 +282,11 @@ bool MainWindowKernel::checkNewSettings() {
 
   info.setFile(gui->StickerPrinterLibPathLineEdit->text());
   if ((!info.exists()) || (info.suffix() != "dll")) {
+    return false;
+  }
+
+  info.setFile(gui->LogSystemSavePathLineEdit->text());
+  if (!info.isDir()) {
     return false;
   }
 
@@ -371,6 +358,10 @@ void MainWindowKernel::createMasterInterface() {
 
 void MainWindowKernel::connectMasterInterface() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  connect(Logger, &LogSystem::requestDisplayLog, gui,
+          &MasterGUI::displayLogData);
+  connect(Logger, &LogSystem::requestClearDisplayLog, gui,
+          &MasterGUI::clearLogDataDisplay);
 
   // Сервер
   connect(gui->PersoServerConnectPushButton, &QPushButton::clicked, this,
@@ -504,9 +495,8 @@ void MainWindowKernel::createTopMenu() {
 }
 
 void MainWindowKernel::createManagerInstance() {
-  Manager = new ClientManager(this);
-  connect(Manager, &ClientManager::logging, this,
-          &MainWindowKernel::proxyLogging);
+  Manager = new ClientManager(nullptr);
+  connect(Manager, &ClientManager::logging, Logger, &LogSystem::generate);
   connect(Manager, &ClientManager::notifyUser, Interactor,
           &UserInteractionSystem::generateMessage);
   connect(Manager, &ClientManager::notifyUserAboutError, Interactor,
@@ -515,8 +505,8 @@ void MainWindowKernel::createManagerInstance() {
           &UserInteractionSystem::startOperationProgressDialog);
   connect(Manager, &ClientManager::operationPerformingFinished, Interactor,
           &UserInteractionSystem::finishOperationProgressDialog);
-  connect(Manager, &ClientManager::createProductionInterface_signal, this,
-          &MainWindowKernel::on_ProductionInterfaceRequest_slot);
+  connect(Manager, &ClientManager::requestProductionInterface_signal, this,
+          &MainWindowKernel::on_RequestProductionInterface_slot);
 
   // Подключаем функционал
   connect(this, &MainWindowKernel::performServerConnecting_signal, Manager,
@@ -550,8 +540,10 @@ void MainWindowKernel::createManagerInstance() {
   connect(this,
           &MainWindowKernel::performPrintingCustomTransponderSticker_signal,
           Manager, &ClientManager::performPrintingCustomTransponderSticker);
-  connect(this, &MainWindowKernel::performExecutingPrinterCommandScript_signal,
-          Manager, &ClientManager::performExecutingPrinterCommandScript);
+  connect(this, &MainWindowKernel::performStickerPrinterCommandScript_signal,
+          Manager, &ClientManager::performStickerPrinterCommandScript);
+  connect(this, &MainWindowKernel::applySettings_signal, Manager,
+          &ClientManager::applySettings);
 
   // Создаем отдельный поток
   ManagerThread = new QThread(this);
@@ -562,7 +554,7 @@ void MainWindowKernel::createManagerInstance() {
   connect(ManagerThread, &QThread::started, Manager,
           &ClientManager::on_InsctanceThreadStarted_slot);
 
-  emit moveToThread(ManagerThread);
+  Manager->moveToThread(ManagerThread);
   ManagerThread->start();
 }
 
@@ -572,8 +564,6 @@ void MainWindowKernel::createLoggerInstance() {
           &LogSystem::applySettings);
   connect(this, &MainWindowKernel::loggerClear_signal, Logger,
           &LogSystem::clear);
-  connect(this, &MainWindowKernel::loggerGenerate_signal, Logger,
-          &LogSystem::generate);
 
   LoggerThread = new QThread(this);
   connect(LoggerThread, &QThread::finished, LoggerThread,
@@ -590,4 +580,8 @@ void MainWindowKernel::createInteractorInstance() {
           &LogSystem::generate);
   connect(this, &MainWindowKernel::applySettings_signal, Interactor,
           &UserInteractionSystem::applySettings);
+}
+
+void MainWindowKernel::on_RequestProductionInterface_slot() {
+  createProductionInterface();
 }

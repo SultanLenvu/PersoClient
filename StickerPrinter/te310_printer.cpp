@@ -1,21 +1,31 @@
 #include "te310_printer.h"
 
 TE310Printer::TE310Printer(QObject* parent) : IStickerPrinter(parent, TE310) {
+  setObjectName("TE310Printer");
   loadSetting();
 
   TscLib = new QLibrary(TscLibPath, this);
   loadTscLib();
 }
 
-bool TE310Printer::printTransponderSticker(
+TE310Printer::ReturnStatus TE310Printer::printTransponderSticker(
     const QMap<QString, QString>* parameters) {
+  // Проврека параметров
+  if (parameters->value("issuer_name").isEmpty() ||
+      parameters->value("sn").isEmpty() || parameters->value("pan").isEmpty()) {
+    emit logging(QString("Получены некорректные параметры. Сброс."));
+    return ParameterError;
+  }
   emit logging(QString("Печать стикера транспондера для %1.")
-                   .arg(parameters->value("IssuerName")));
+                   .arg(parameters->value("issuer_name")));
 
   if (!TscLib->isLoaded()) {
     emit logging("Библиотека не загружена. Сброс. ");
-    return false;
+    return LibraryMissing;
   }
+
+  // Сохраняем данные стикера
+  LastTransponderSticker = *parameters;
 
   if (parameters->value("issuer_name") == "Новое качество дорог") {
     printNkdSticker(parameters);
@@ -24,25 +34,23 @@ bool TE310Printer::printTransponderSticker(
     printZsdSticker(parameters);
   } else {
     emit logging("Получено неизвестное название компании-эмитента. Сброс.");
-    return false;
+    return ParameterError;
   }
 
-  // Сохраняем данные распечатнного стикера
-  LastTransponderSticker = *parameters;
-
-  return true;
+  return Completed;
 }
 
-bool TE310Printer::printLastTransponderSticker() {
+TE310Printer::ReturnStatus TE310Printer::printLastTransponderSticker() {
   if (LastTransponderSticker.isEmpty()) {
     emit logging("Данные о последнем распечанном стикере отсутствуют. Сброс. ");
-    return false;
+    return ParameterError;
   }
 
   return printTransponderSticker(&LastTransponderSticker);
 }
 
-void TE310Printer::exec(const QStringList* commandScript) {
+IStickerPrinter::ReturnStatus TE310Printer::exec(
+    const QStringList* commandScript) {
   openPort("TSC TE310");
 
   for (int32_t i = 0; i < commandScript->size(); i++) {
@@ -50,6 +58,8 @@ void TE310Printer::exec(const QStringList* commandScript) {
   }
 
   closePort();
+
+  return Completed;
 }
 
 void TE310Printer::applySetting() {
@@ -60,59 +70,15 @@ void TE310Printer::applySetting() {
   loadTscLib();
 }
 
-void TE310Printer::printNkdSticker(const QMap<QString, QString>* parameters) {
-  openPort("TSC TE310");
-  sendCommand("SIZE 27 mm, 27 mm");
-  sendCommand("GAP 2 mm,2 mm");
-  sendCommand("REFERENCE 0,0");
-  sendCommand("DIRECTION 1");
-  sendCommand("CLS");
-  sendCommand(QString("TEXT 162,30,\"D.FNT\",0,1,1,2,\"PAN: %1\"")
-                  .arg(parameters->value("pan"))
-                  .toUtf8()
-                  .constData());
-  sendCommand(QString("QRCODE "
-                      "60,60,H,10,A,0,X204,J1,M2,\"%1\n\r%2%3%4\"")
-                  .arg(parameters->value("pan"),
-                       parameters->value("manufacturer_id"),
-                       parameters->value("battery_insertation_date"),
-                       parameters->value("sn"))
-                  .toUtf8()
-                  .constData());
-  sendCommand(QString("TEXT 162,276,\"D.FNT\",0,1,1,2,\"SN: %1 %2 %3\"")
-                  .arg(parameters->value("manufacturer_id"),
-                       parameters->value("battery_insertation_date"),
-                       parameters->value("sn"))
-                  .toUtf8()
-                  .constData());
-  sendCommand("PRINT 1");
-  closePort();
-}
-
-void TE310Printer::printZsdSticker(const QMap<QString, QString>* parameters) {
-  openPort("TSC TE310");
-  sendCommand("SIZE 30 mm, 20 mm");
-  sendCommand("GAP 2 mm, 1 mm");
-  sendCommand("DIRECTION 1");
-  sendCommand("CLS");
-  sendCommand(QString("TEXT 180,12,\"D.FNT\",0,1,1,2,\"SN: %1 %2 %3\"")
-                  .arg(parameters->value("ManufacturerId"),
-                       parameters->value("BatteryInsertationDate"),
-                       parameters->value("sn"))
-                  .toUtf8()
-                  .constData());
-  sendCommand(QString("BARCODE 18,36,\"128\",144,2,0,2,2,\"%1\"")
-                  .arg(parameters->value("pan"))
-                  .toUtf8()
-                  .constData());
-  sendCommand("PRINT 1");
-  closePort();
-}
+/*
+ * Приватные методы
+ */
 
 void TE310Printer::loadSetting() {
   QSettings settings;
 
-  TscLibPath = settings.value("StickerPrinter/DLL/Path").toString();
+  LogEnable = settings.value("log_system/global_enable").toBool();
+  TscLibPath = settings.value("sticker_printer/library_path").toString();
 }
 
 void TE310Printer::loadTscLib() {
@@ -130,4 +96,46 @@ void TE310Printer::loadTscLib() {
     sendCommand = nullptr;
     closePort = nullptr;
   }
+}
+
+void TE310Printer::printNkdSticker(const QMap<QString, QString>* parameters) {
+  openPort("TSC TE310");
+  sendCommand("SIZE 27 mm, 27 mm");
+  sendCommand("GAP 2 mm,2 mm");
+  sendCommand("REFERENCE 0,0");
+  sendCommand("DIRECTION 1");
+  sendCommand("CLS");
+  sendCommand(QString("TEXT 162,30,\"D.FNT\",0,1,1,2,\"PAN: %1\"")
+                  .arg(parameters->value("pan"))
+                  .toUtf8()
+                  .constData());
+  sendCommand(QString("QRCODE "
+                      "60,60,H,10,A,0,X204,J1,M2,\"%1\n\r%2\"")
+                  .arg(parameters->value("pan"), parameters->value("sn"))
+                  .toUtf8()
+                  .constData());
+  sendCommand(QString("TEXT 162,276,\"D.FNT\",0,1,1,2,\"SN: %1\"")
+                  .arg(parameters->value("sn"))
+                  .toUtf8()
+                  .constData());
+  sendCommand("PRINT 1");
+  closePort();
+}
+
+void TE310Printer::printZsdSticker(const QMap<QString, QString>* parameters) {
+  openPort("TSC TE310");
+  sendCommand("SIZE 30 mm, 20 mm");
+  sendCommand("GAP 2 mm, 1 mm");
+  sendCommand("DIRECTION 1");
+  sendCommand("CLS");
+  sendCommand(QString("TEXT 180,12,\"D.FNT\",0,1,1,2,\"SN: %1\"")
+                  .arg(parameters->value("sn"))
+                  .toUtf8()
+                  .constData());
+  sendCommand(QString("BARCODE 18,36,\"128\",144,2,0,2,2,\"%1\"")
+                  .arg(parameters->value("pan"))
+                  .toUtf8()
+                  .constData());
+  sendCommand("PRINT 1");
+  closePort();
 }

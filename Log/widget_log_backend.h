@@ -3,8 +3,8 @@
 
 #include <QObject>
 
-#include "Environment/log_backend.h"
 #include "GUI/master_gui.h"
+#include "Log/log_backend.h"
 
 class WidgetLogBackend: public LogBackend {
   Q_OBJECT

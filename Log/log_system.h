@@ -15,7 +15,7 @@ class LogSystem : public QObject {
   Q_OBJECT
 
  private:
-  bool GlobalEnableOption;
+  QString SavePath;
 
  public:
   LogSystem(QObject* parent);

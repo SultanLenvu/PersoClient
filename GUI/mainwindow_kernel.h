@@ -9,11 +9,8 @@
 #include <QtWidgets>
 
 #include "Environment/client_manager.h"
-#include "Environment/log_system.h"
-#include "Environment/log_backend.h"
-#include "Environment/text_stream_log_backend.h"
-#include "Environment/widget_log_backend.h"
 #include "Environment/transponder_seed_model.h"
+#include "Log/log_system.h"
 
 #include "GUI/authorization_gui.h"
 #include "GUI/master_gui.h"
@@ -50,7 +47,7 @@ class MainWindowKernel : public QMainWindow {
   TransponderInfoModel* TransponderInfo;
 
  public:
-  MainWindowKernel();
+  explicit MainWindowKernel(QWidget* parent = nullptr);
   ~MainWindowKernel();
 
  public slots:
@@ -87,7 +84,6 @@ class MainWindowKernel : public QMainWindow {
   void on_ExitFromProductionLineAct_slot(void);
 
  private:
-  void proxyLogging(const QString& log);
   void loadSettings(void);
   bool checkNewSettings(void);
   QString getStickerPan(QStringList& stickerData);
@@ -108,25 +104,25 @@ class MainWindowKernel : public QMainWindow {
   void createLoggerInstance(void);
   void createInteractorInstance(void);
 
+ private slots:
+  void on_RequestProductionInterface_slot(void);
+
  signals:
   void applySettings_signal(void);
 
   // Сигналы для логгера
   void loggerClear_signal(void);
-  void loggerGenerate_signal(const QString& log);
 
   // Сигналы для менеджера
   void performServerConnecting_signal(void);
   void performServerDisconnecting_signal(void);
   void performServerEcho_signal(void);
   void performServerAuthorization_signal(
-      const QSharedPointer<QMap<QString, QString>> data,
-      bool& result);
+      const QSharedPointer<QMap<QString, QString>> data);
   void performTransponderFirmwareLoading_signal(TransponderInfoModel* model);
   void performTransponderFirmwareReloading_signal(TransponderInfoModel* model,
                                                   const QString& pan);
-  void performLocalFirmwareLoading_signal(const QString& path,
-                                          bool unlockOption);
+  void performLocalFirmwareLoading_signal(const QString& path);
   void performFirmwareReading_signal(void);
   void performFirmwareErasing_signal(void);
   void performDataReading_signal(void);
@@ -136,7 +132,7 @@ class MainWindowKernel : public QMainWindow {
   void performPrintingLastTransponderSticker_signal(void);
   void performPrintingCustomTransponderSticker_signal(
       const QSharedPointer<QMap<QString, QString>> data);
-  void performExecutingPrinterCommandScript_signal(
+  void performStickerPrinterCommandScript_signal(
       const QSharedPointer<QStringList> commandScript);
 };
 

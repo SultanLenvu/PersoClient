@@ -37,7 +37,6 @@ class PersoClient : public QObject {
   };
   Q_ENUM(ReturnStatus);
 
- private:
   enum InstanceState {
     Ready,
     CreatingRequest,
@@ -48,6 +47,7 @@ class PersoClient : public QObject {
   Q_ENUM(InstanceState);
 
  private:
+  bool LogEnable;
   bool ExtendedLoggingEnable;
   QHostAddress PersoServerAddress;
   uint32_t PersoServerPort;
@@ -96,6 +96,7 @@ class PersoClient : public QObject {
 
  private:
   Q_DISABLE_COPY(PersoClient);
+  void sendLog(const QString& log);
   void loadSettings(void);
   void createTimers(void);
   void createSocket(void);
