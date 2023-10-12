@@ -8,51 +8,39 @@
 #include "Environment/text_stream_log_backend.h"
 #include "Environment/widget_log_backend.h"
 
-MainWindow::MainWindow() {
-  setObjectName("MainWindow");
+MainWindowKernel::MainWindowKernel() {
+  setObjectName("MainWindowKernel");
   CurrentGUI = nullptr;
 
   // Загружаем настройки приложения
   loadSettings();
 
   // Система для взаимодействия с пользователем
-  Interactor = new UserInteractionSystem(this, this);
+  createInteractorInstance();
 
   // Создаем логгер
-  Logger = new LogSystem(this); 
-  QDateTime datetime = QDateTime::currentDateTime();
-  QString filename = QString(PROGRAM_NAME) + "-"
-    + datetime.toString("yyyy-MM-dd_HH-mm-ss") + ".log";
+  createLoggerInstance();
 
-  LogFile = new QFile(filename);
-
-  // TODO check for errors
-  LogFile->open(QIODevice::Append | QIODevice::Text);
-
-  LogStream = new QTextStream(LogFile);
-  StreamBackend = new TextStreamLogBackend(this, LogStream);
-  Logger->addBackend(StreamBackend);
+  // Менеджер для взаимодействия с программатором
+  createManagerInstance();
 
   // Создаем модель для представления данных транспондера
   TransponderInfo = new TransponderInfoModel(this);
-
-  // Менеджер для взаимодействия с программатором
-  createManager();
 
   // Создаем графический интерфейс для авторизации
   createAuthorizationInterface();
 }
 
-MainWindow::~MainWindow() {}
+MainWindowKernel::~MainWindowKernel() {}
 
-void MainWindow::on_AuthorizePushButton_slot() {
-  QMap<QString, QString> data;
+void MainWindowKernel::on_AuthorizePushButton_slot() {
+  QSharedPointer<QMap<QString, QString>> data;
   AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
-  data.insert("login", gui->LoginLineEdit->text());
-  data.insert("password", gui->PasswordLineEdit->text());
+  data->insert("login", gui->LoginLineEdit->text());
+  data->insert("password", gui->PasswordLineEdit->text());
 
   bool result = false;
-  Manager->performServerAuthorization(&data, result);
+  emit performServerAuthorization_signal(data, result);
   if (!result) {
     return;
   }
@@ -67,91 +55,91 @@ void MainWindow::on_AuthorizePushButton_slot() {
   createProductionInterface();
 }
 
-void MainWindow::on_ProgramDeviceButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_ProgramDeviceButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performLocalFirmwareLoading(
+  emit performLocalFirmwareLoading_signal(
       QFileDialog::getOpenFileName(nullptr, "Выберите файл", "",
                                    "Все файлы (*.*)"),
       false);
 }
 
-void MainWindow::on_ReadDeviceFirmwareButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_ReadDeviceFirmwareButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performFirmwareReading();
+  emit performFirmwareReading_signal();
 }
 
-void MainWindow::on_EraseDeviceButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_EraseDeviceButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performFirmwareErasing();
+  emit performFirmwareErasing_signal();
 }
 
-void MainWindow::on_ProgramDeviceUserDataButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_ProgramDeviceUserDataButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performDataLoading(QFileDialog::getOpenFileName(
+  emit performDataLoading_signal(QFileDialog::getOpenFileName(
       nullptr, "Выберите файл", "", "Все файлы (*.*)"));
 }
 
-void MainWindow::on_ReadDeviceUserDataButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_ReadDeviceUserDataButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performDataReading();
+  emit performDataReading_signal();
 }
 
-void MainWindow::on_UnlockDeviceButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_UnlockDeviceButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performDeviceUnlock();
+  emit performDeviceUnlock_signal();
 }
 
-void MainWindow::on_LockDeviceButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_LockDeviceButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performDeviceLock();
+  emit performDeviceLock_signal();
 }
 
-void MainWindow::on_PrintLastTransponderStickerButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_PrintLastTransponderStickerButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performPrintingLastTransponderSticker();
+  emit performPrintingLastTransponderSticker_signal();
 }
 
-void MainWindow::on_PrintCustomTransponderStickerButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_PrintCustomTransponderStickerButton_slot() {
+  emit loggerClear_signal();
 
-  QMap<QString, QString> data;
+  QSharedPointer<QMap<QString, QString>> data;
   bool ok = false;
-  Interactor->getCustomTransponderStickerData(&data, ok);
+  Interactor->getCustomTransponderStickerData(data.get(), ok);
 
   if (!ok) {
     return;
   }
 
-  if (data.isEmpty()) {
+  if (data->isEmpty()) {
     Interactor->generateErrorMessage("Некорректный ввод данных. ");
     return;
   }
 
-  Manager->performPrintingCustomTransponderSticker(&data);
+  emit performPrintingCustomTransponderSticker_signal(data);
 }
 
-void MainWindow::on_ExecuteStickerPrinterCommandScriptButton_slot() {
+void MainWindowKernel::on_ExecuteStickerPrinterCommandScriptButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  Logger->clear();
+  emit loggerClear_signal();
 
-  QStringList commandScript =
-      gui->StickerPrinterCommandSriptTextEdit->toPlainText().split("\n\r");
-  Manager->performExecutingPrinterCommandScript(&commandScript);
+  QSharedPointer<QStringList> commandScript(new QStringList(
+      gui->StickerPrinterCommandSriptTextEdit->toPlainText().split("\n\r")));
+  emit performExecutingPrinterCommandScript_signal(commandScript);
 }
 
-void MainWindow::on_ApplySettingsPushButton_slot() {
+void MainWindowKernel::on_ApplySettingsPushButton_slot() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   QSettings settings;
 
-  Logger->clear();
+  emit loggerClear_signal();
 
   // Проверка пользовательского ввода
   if (!checkNewSettings()) {
@@ -172,57 +160,57 @@ void MainWindow::on_ApplySettingsPushButton_slot() {
   settings.setValue("JLinkExeProgrammer/Speed",
                     gui->ProgrammerSpeedLineEdit->text());
   settings.setValue("StickerPrinter/DLL/Path",
-                    gui->PrinterLibPathLineEdit->text());
+                    gui->StickerPrinterLibPathLineEdit->text());
 
   // Применение новых настроек
-  Manager->applySettings();
+  emit applySettings_signal();
 
   Interactor->generateMessage("Новые настройки успешно применены. ");
 }
 
-void MainWindow::on_PersoServerConnectPushButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_PersoServerConnectPushButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performServerConnecting();
+  emit performServerConnecting_signal();
 }
 
-void MainWindow::on_PersoServerDisconnectButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_PersoServerDisconnectButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performServerDisconnecting();
+  emit performServerDisconnecting_signal();
 }
 
-void MainWindow::on_PersoServerEchoRequestButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_PersoServerEchoRequestButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performServerEcho();
+  emit performServerEcho_signal();
 }
 
-void MainWindow::on_MasterAuthorizePushButton_slot() {
-  QMap<QString, QString> data;
-  Interactor->getAuthorizationData(&data);
+void MainWindowKernel::on_MasterAuthorizePushButton_slot() {
+  QSharedPointer<QMap<QString, QString>> data;
+  Interactor->getAuthorizationData(data.get());
 
-  if (data.isEmpty()) {
+  if (data->isEmpty()) {
     return;
   }
 
   bool result = false;
-  Manager->performServerAuthorization(&data, result);
+  emit performServerAuthorization_signal(data, result);
   if (result == false) {
     return;
   }
 }
 
-void MainWindow::on_LoadTransponderFirmwareButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_LoadTransponderFirmwareButton_slot() {
+  emit loggerClear_signal();
 
-  Manager->performTransponderFirmwareLoading(TransponderInfo);
+  emit performTransponderFirmwareLoading_signal(TransponderInfo);
 
   CurrentGUI->update();
 }
 
-void MainWindow::on_ReloadTransponderFirmwareButton_slot() {
-  Logger->clear();
+void MainWindowKernel::on_ReloadTransponderFirmwareButton_slot() {
+  emit loggerClear_signal();
 
   QStringList stickerData;
   bool ok;
@@ -241,12 +229,12 @@ void MainWindow::on_ReloadTransponderFirmwareButton_slot() {
     return;
   }
 
-  Manager->performTransponderFirmwareReloading(TransponderInfo, pan);
+  emit performTransponderFirmwareReloading_signal(TransponderInfo, pan);
 
   CurrentGUI->update();
 }
 
-void MainWindow::on_MasterInterfaceRequest_slot() {
+void MainWindowKernel::on_MasterInterfaceRequest_slot() {
   QString pass;
   Interactor->getMasterPassword(pass);
 
@@ -259,15 +247,15 @@ void MainWindow::on_MasterInterfaceRequest_slot() {
   createMasterInterface();
 }
 
-void MainWindow::on_ProductionInterfaceRequest_slot() {
+void MainWindowKernel::on_ProductionInterfaceRequest_slot() {
   createProductionInterface();
 }
 
-void MainWindow::on_ExitFromProductionLineAct_slot() {
+void MainWindowKernel::on_ExitFromProductionLineAct_slot() {
   createAuthorizationInterface();
 }
 
-void MainWindow::proxyLogging(const QString& log) {
+void MainWindowKernel::proxyLogging(const QString& log) {
   if (sender()->objectName() == QString("ClientManager")) {
     Logger->generate(QString("Manager - ") + log);
   } else {
@@ -275,13 +263,17 @@ void MainWindow::proxyLogging(const QString& log) {
   }
 }
 
-void MainWindow::loadSettings() {
+void MainWindowKernel::loadSettings() {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
   QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
   QCoreApplication::setApplicationName(PROGRAM_NAME);
+
+  QSettings::setDefaultFormat(QSettings::IniFormat);
+  QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
+                     QCoreApplication::applicationDirPath());
 }
 
-bool MainWindow::checkNewSettings() {
+bool MainWindowKernel::checkNewSettings() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
 
   QHostAddress IP = QHostAddress(gui->PersoServerIpAddressLineEdit->text());
@@ -306,7 +298,7 @@ bool MainWindow::checkNewSettings() {
     return false;
   }
 
-  info.setFile(gui->PrinterLibPathLineEdit->text());
+  info.setFile(gui->StickerPrinterLibPathLineEdit->text());
   if ((!info.exists()) || (info.suffix() != "dll")) {
     return false;
   }
@@ -314,7 +306,7 @@ bool MainWindow::checkNewSettings() {
   return true;
 }
 
-QString MainWindow::getStickerPan(QStringList& stickerData) {
+QString MainWindowKernel::getStickerPan(QStringList& stickerData) {
   if (stickerData.size() > 2) {
     return QString();
   }
@@ -330,7 +322,7 @@ QString MainWindow::getStickerPan(QStringList& stickerData) {
   return QString();
 }
 
-void MainWindow::createAuthorizationInterface() {
+void MainWindowKernel::createAuthorizationInterface() {
   // Настраиваем размер главного окна
   DesktopGeometry = QApplication::desktop()->screenGeometry();
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
@@ -350,14 +342,14 @@ void MainWindow::createAuthorizationInterface() {
   createTopMenu();
 }
 
-void MainWindow::connectAuthorizationInterface() {
+void MainWindowKernel::connectAuthorizationInterface() {
   AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
 
   connect(gui->AuthorizePushButton, &QPushButton::clicked, this,
-          &MainWindow::on_AuthorizePushButton_slot);
+          &MainWindowKernel::on_AuthorizePushButton_slot);
 }
 
-void MainWindow::createMasterInterface() {
+void MainWindowKernel::createMasterInterface() {
   // Настраиваем размер главного окна
   DesktopGeometry = QApplication::desktop()->screenGeometry();
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
@@ -377,72 +369,63 @@ void MainWindow::createMasterInterface() {
   createTopMenu();
 }
 
-void MainWindow::connectMasterInterface() {
+void MainWindowKernel::connectMasterInterface() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
 
   // Сервер
   connect(gui->PersoServerConnectPushButton, &QPushButton::clicked, this,
-          &MainWindow::on_PersoServerConnectPushButton_slot);
+          &MainWindowKernel::on_PersoServerConnectPushButton_slot);
   connect(gui->PersoServerDisconnectButton, &QPushButton::clicked, this,
-          &MainWindow::on_PersoServerDisconnectButton_slot);
+          &MainWindowKernel::on_PersoServerDisconnectButton_slot);
   connect(gui->PersoServerEchoRequestButton, &QPushButton::clicked, this,
-          &MainWindow::on_PersoServerEchoRequestButton_slot);
+          &MainWindowKernel::on_PersoServerEchoRequestButton_slot);
   connect(gui->MasterAuthorizePushButton, &QPushButton::clicked, this,
-          &MainWindow::on_MasterAuthorizePushButton_slot);
+          &MainWindowKernel::on_MasterAuthorizePushButton_slot);
   connect(gui->LoadTransponderFirmwareButton, &QPushButton::clicked, this,
-          &MainWindow::on_LoadTransponderFirmwareButton_slot);
+          &MainWindowKernel::on_LoadTransponderFirmwareButton_slot);
   connect(gui->ReloadTransponderFirmwareButton, &QPushButton::clicked, this,
-          &MainWindow::on_ReloadTransponderFirmwareButton_slot);
+          &MainWindowKernel::on_ReloadTransponderFirmwareButton_slot);
 
   // Программатор
   connect(gui->ProgramDeviceButton, &QPushButton::clicked, this,
-          &MainWindow::on_ProgramDeviceButton_slot);
+          &MainWindowKernel::on_ProgramDeviceButton_slot);
   connect(gui->ReadDeviceFirmwareButton, &QPushButton::clicked, this,
-          &MainWindow::on_ReadDeviceFirmwareButton_slot);
+          &MainWindowKernel::on_ReadDeviceFirmwareButton_slot);
   connect(gui->EraseDeviceButton, &QPushButton::clicked, this,
-          &MainWindow::on_EraseDeviceButton_slot);
+          &MainWindowKernel::on_EraseDeviceButton_slot);
   connect(gui->ReadDeviceUserDataButton, &QPushButton::clicked, this,
-          &MainWindow::on_ReadDeviceUserDataButton_slot);
+          &MainWindowKernel::on_ReadDeviceUserDataButton_slot);
   connect(gui->ProgramDeviceUserDataButton, &QPushButton::clicked, this,
-          &MainWindow::on_ProgramDeviceUserDataButton_slot);
+          &MainWindowKernel::on_ProgramDeviceUserDataButton_slot);
   connect(gui->UnlockDeviceButton, &QPushButton::clicked, this,
-          &MainWindow::on_UnlockDeviceButton_slot);
+          &MainWindowKernel::on_UnlockDeviceButton_slot);
   connect(gui->LockDeviceButton, &QPushButton::clicked, this,
-          &MainWindow::on_LockDeviceButton_slot);
+          &MainWindowKernel::on_LockDeviceButton_slot);
 
   // Стикер принтер
   connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
-          &MainWindow::on_PrintLastTransponderStickerButton_slot);
+          &MainWindowKernel::on_PrintLastTransponderStickerButton_slot);
   connect(gui->PrintCustomTransponderStickerButton, &QPushButton::clicked, this,
-          &MainWindow::on_PrintCustomTransponderStickerButton_slot);
+          &MainWindowKernel::on_PrintCustomTransponderStickerButton_slot);
   connect(gui->ExecuteStickerPrinterCommandScriptButton, &QPushButton::clicked,
-          this, &MainWindow::on_ExecuteStickerPrinterCommandScriptButton_slot);
+          this,
+          &MainWindowKernel::on_ExecuteStickerPrinterCommandScriptButton_slot);
 
   // Настройки
   connect(gui->ApplySettingsPushButton, &QPushButton::clicked, this,
-          &MainWindow::on_ApplySettingsPushButton_slot);
-
-  // Система логгирования
-  WidgetBackend = new WidgetLogBackend(this, gui);
-  Logger->addBackend(WidgetBackend);
+          &MainWindowKernel::on_ApplySettingsPushButton_slot);
 
   // Связывание моделей и представлений
   gui->TransponderInfoView->setModel(TransponderInfo);
 }
 
-void MainWindow::createProductionInterface() {
+void MainWindowKernel::createProductionInterface() {
   // Настраиваем размер главного окна
   DesktopGeometry = QApplication::desktop()->screenGeometry();
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
               DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
   setLayoutDirection(Qt::LeftToRight);
 
-  // Создаем интерфейс
-  if (WidgetBackend) {
-    Logger->removeBackend(WidgetBackend);
-    delete WidgetBackend;
-    WidgetBackend = nullptr;
-  }
   delete CurrentGUI;
   CurrentGUI = new ProductionGUI(this);
   CurrentGUI->create();
@@ -455,46 +438,46 @@ void MainWindow::createProductionInterface() {
   createTopMenu();
 }
 
-void MainWindow::connectProductionInterface() {
+void MainWindowKernel::connectProductionInterface() {
   ProductionGUI *gui = dynamic_cast<ProductionGUI *>(CurrentGUI);
 
   connect(gui->LoadTransponderFirmwareButton, &QPushButton::clicked, this,
-          &MainWindow::on_LoadTransponderFirmwareButton_slot);
+          &MainWindowKernel::on_LoadTransponderFirmwareButton_slot);
   connect(gui->ReloadTransponderFirmwareButton, &QPushButton::clicked, this,
-          &MainWindow::on_ReloadTransponderFirmwareButton_slot);
+          &MainWindowKernel::on_ReloadTransponderFirmwareButton_slot);
   connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
-          &MainWindow::on_PrintLastTransponderStickerButton_slot);
+          &MainWindowKernel::on_PrintLastTransponderStickerButton_slot);
 
   // Связывание моделей и представлений
   gui->TransponderInfoView->setModel(TransponderInfo);
 }
 
-void MainWindow::createTopMenuActions() {
+void MainWindowKernel::createTopMenuActions() {
   if ((CurrentGUI->type() == GUI::Production) ||
       (CurrentGUI->type() == GUI::Authorization)) {
     MasterInterfaceRequestAct = new QAction("Мастер интерфейс", this);
     MasterInterfaceRequestAct->setStatusTip("Открыть мастер интерфейс");
     connect(MasterInterfaceRequestAct, &QAction::triggered, this,
-            &MainWindow::on_MasterInterfaceRequest_slot);
+            &MainWindowKernel::on_MasterInterfaceRequest_slot);
     ExitFromProductionLineAct =
         new QAction("Выйти из производственной линии", this);
     ExitFromProductionLineAct->setStatusTip("Открыть интерфейс авторизации");
     connect(ExitFromProductionLineAct, &QAction::triggered, this,
-            &MainWindow::on_ExitFromProductionLineAct_slot);
+            &MainWindowKernel::on_ExitFromProductionLineAct_slot);
   } else {
     ProductionInterfaceRequestAct =
         new QAction("Производственный интерфейс", this);
     ProductionInterfaceRequestAct->setStatusTip(
         "Открыть производственный интерфейс");
     connect(ProductionInterfaceRequestAct, &QAction::triggered, this,
-            &MainWindow::on_ProductionInterfaceRequest_slot);
+            &MainWindowKernel::on_ProductionInterfaceRequest_slot);
   }
 
   AboutProgramAct = new QAction("О программе", this);
   AboutProgramAct->setStatusTip("Показать сведения о программе");
 }
 
-void MainWindow::createTopMenu() {
+void MainWindowKernel::createTopMenu() {
   // Удаляем предыдущее топ меню
   menuBar()->clear();
 
@@ -520,19 +503,91 @@ void MainWindow::createTopMenu() {
   HelpMenu->addAction(AboutProgramAct);
 }
 
-void MainWindow::createManager() {
+void MainWindowKernel::createManagerInstance() {
   Manager = new ClientManager(this);
-  connect(Manager, &ClientManager::logging, this, &MainWindow::proxyLogging);
+  connect(Manager, &ClientManager::logging, this,
+          &MainWindowKernel::proxyLogging);
   connect(Manager, &ClientManager::notifyUser, Interactor,
           &UserInteractionSystem::generateMessage);
   connect(Manager, &ClientManager::notifyUserAboutError, Interactor,
           &UserInteractionSystem::generateErrorMessage);
   connect(Manager, &ClientManager::operationPerfomingStarted, Interactor,
-          &UserInteractionSystem::generateProgressDialog);
-  connect(Manager, &ClientManager::operationStepPerfomed, Interactor,
-          &UserInteractionSystem::performeProgressDialogStep);
+          &UserInteractionSystem::startOperationProgressDialog);
   connect(Manager, &ClientManager::operationPerformingFinished, Interactor,
-          &UserInteractionSystem::completeProgressDialog);
+          &UserInteractionSystem::finishOperationProgressDialog);
   connect(Manager, &ClientManager::createProductionInterface_signal, this,
-          &MainWindow::on_ProductionInterfaceRequest_slot);
+          &MainWindowKernel::on_ProductionInterfaceRequest_slot);
+
+  // Подключаем функционал
+  connect(this, &MainWindowKernel::performServerConnecting_signal, Manager,
+          &ClientManager::performServerConnecting);
+  connect(this, &MainWindowKernel::performServerDisconnecting_signal, Manager,
+          &ClientManager::performServerDisconnecting);
+  connect(this, &MainWindowKernel::performServerEcho_signal, Manager,
+          &ClientManager::performServerEcho);
+  connect(this, &MainWindowKernel::performServerAuthorization_signal, Manager,
+          &ClientManager::performServerAuthorization);
+  connect(this, &MainWindowKernel::performTransponderFirmwareLoading_signal,
+          Manager, &ClientManager::performTransponderFirmwareLoading);
+  connect(this, &MainWindowKernel::performTransponderFirmwareReloading_signal,
+          Manager, &ClientManager::performTransponderFirmwareReloading);
+  connect(this, &MainWindowKernel::performLocalFirmwareLoading_signal, Manager,
+          &ClientManager::performLocalFirmwareLoading);
+  connect(this, &MainWindowKernel::performFirmwareReading_signal, Manager,
+          &ClientManager::performFirmwareReading);
+  connect(this, &MainWindowKernel::performFirmwareErasing_signal, Manager,
+          &ClientManager::performFirmwareErasing);
+  connect(this, &MainWindowKernel::performDataReading_signal, Manager,
+          &ClientManager::performDataReading);
+  connect(this, &MainWindowKernel::performDataLoading_signal, Manager,
+          &ClientManager::performDataLoading);
+  connect(this, &MainWindowKernel::performDeviceUnlock_signal, Manager,
+          &ClientManager::performDeviceUnlock);
+  connect(this, &MainWindowKernel::performDeviceLock_signal, Manager,
+          &ClientManager::performDeviceLock);
+  connect(this, &MainWindowKernel::performPrintingLastTransponderSticker_signal,
+          Manager, &ClientManager::performPrintingLastTransponderSticker);
+  connect(this,
+          &MainWindowKernel::performPrintingCustomTransponderSticker_signal,
+          Manager, &ClientManager::performPrintingCustomTransponderSticker);
+  connect(this, &MainWindowKernel::performExecutingPrinterCommandScript_signal,
+          Manager, &ClientManager::performExecutingPrinterCommandScript);
+
+  // Создаем отдельный поток
+  ManagerThread = new QThread(this);
+  connect(ManagerThread, &QThread::finished, ManagerThread,
+          &QThread::deleteLater);
+  connect(ManagerThread, &QThread::finished, Manager,
+          &ClientManager::deleteLater);
+  connect(ManagerThread, &QThread::started, Manager,
+          &ClientManager::on_InsctanceThreadStarted_slot);
+
+  emit moveToThread(ManagerThread);
+  ManagerThread->start();
+}
+
+void MainWindowKernel::createLoggerInstance() {
+  Logger = new LogSystem(nullptr);
+  connect(this, &MainWindowKernel::applySettings_signal, Logger,
+          &LogSystem::applySettings);
+  connect(this, &MainWindowKernel::loggerClear_signal, Logger,
+          &LogSystem::clear);
+  connect(this, &MainWindowKernel::loggerGenerate_signal, Logger,
+          &LogSystem::generate);
+
+  LoggerThread = new QThread(this);
+  connect(LoggerThread, &QThread::finished, LoggerThread,
+          &QThread::deleteLater);
+  connect(LoggerThread, &QThread::finished, Logger, &LogSystem::deleteLater);
+
+  Logger->moveToThread(LoggerThread);
+  LoggerThread->start();
+}
+
+void MainWindowKernel::createInteractorInstance() {
+  Interactor = new UserInteractionSystem(this);
+  connect(Interactor, &UserInteractionSystem::logging, Logger,
+          &LogSystem::generate);
+  connect(this, &MainWindowKernel::applySettings_signal, Interactor,
+          &UserInteractionSystem::applySettings);
 }

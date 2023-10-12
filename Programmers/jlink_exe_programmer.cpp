@@ -46,7 +46,7 @@ void JLinkExeProgrammer::getUcid(QString* ucid) {
     }
   }
 
-  emit operationFinished(CompletedSuccessfully);
+  emit operationFinished(Completed);
 }
 
 void JLinkExeProgrammer::loadFirmware(QFile* firmware) {
@@ -82,7 +82,7 @@ void JLinkExeProgrammer::loadFirmware(QFile* firmware) {
   // Обрабатываем вывод JLink.exe
   if ((ProcessOutput.indexOf("O.K.") > -1) &&
       (ProcessOutput.indexOf("Erasing done.") > -1)) {
-    emit operationFinished(CompletedSuccessfully);
+    emit operationFinished(Completed);
   } else {
     emit operationFinished(ProgrammatorError);
   }
@@ -137,7 +137,7 @@ void JLinkExeProgrammer::loadFirmwareWithUnlock(QFile* firmware) {
       (ProcessOutput.indexOf("Erasing done.") > -1) &&
       (ProcessOutput.indexOf("1FFFF800 = A5 5A FF 00                           "
                              "            .Z..") > -1)) {
-    emit operationFinished(CompletedSuccessfully);
+    emit operationFinished(Completed);
   } else {
     emit operationFinished(ProgrammatorError);
   }
@@ -166,7 +166,7 @@ void JLinkExeProgrammer::readFirmware(void) {
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf(
           "Reading 65536 bytes from addr 0x08000000 into file...O.K.") > -1) {
-    emit operationFinished(CompletedSuccessfully);
+    emit operationFinished(Completed);
   } else {
     emit operationFinished(ProgrammatorError);
   }
@@ -192,7 +192,7 @@ void JLinkExeProgrammer::eraseFirmware() {
 
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf("Erasing done.") > -1)
-    emit operationFinished(CompletedSuccessfully);
+    emit operationFinished(Completed);
   else
     emit operationFinished(ProgrammatorError);
 }
@@ -225,7 +225,7 @@ void JLinkExeProgrammer::readData(void) {
                             QString(" bytes from addr ") +
                             QString(USER_DATA_FLASH_START_ADDRESS) +
                             QString(" into file...O.K.")) > -1) {
-    emit operationFinished(CompletedSuccessfully);
+    emit operationFinished(Completed);
   } else {
     emit operationFinished(ProgrammatorError);
   }
@@ -265,7 +265,7 @@ void JLinkExeProgrammer::loadData(QFile* data) {
   // Обрабатываем вывод JLink.exe
   if ((ProcessOutput.indexOf("O.K.") > -1) &&
       (ProcessOutput.indexOf("Erasing done.") > -1)) {
-    emit operationFinished(CompletedSuccessfully);
+    emit operationFinished(Completed);
   } else {
     emit operationFinished(ProgrammatorError);
   }
@@ -301,7 +301,7 @@ void JLinkExeProgrammer::unlockDevice() {
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf("1FFFF800 = A5 5A FF 00                           "
                             "            .Z..") > -1) {
-    emit operationFinished(CompletedSuccessfully);
+    emit operationFinished(Completed);
   } else {
     emit operationFinished(ProgrammatorError);
   }
@@ -338,7 +338,7 @@ void JLinkExeProgrammer::lockDevice() { // Проверка на существ�
   if (ProcessOutput.indexOf(
           "1FFFF800 = 00 FF FF 00                                       ....") >
       -1) {
-    emit operationFinished(CompletedSuccessfully);
+    emit operationFinished(Completed);
   } else {
     emit operationFinished(ProgrammatorError);
   }

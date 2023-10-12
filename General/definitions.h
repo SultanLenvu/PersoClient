@@ -8,12 +8,12 @@
 #define ORGANIZATION_NAME "PowerSyntez"
 
 #define MASTER_ACCESS_PASSWORD "1995"
+
 //===============================================================
 
 /* Определения менеджера */
 //===============================================================
-#define FIRMWARE_MANAGER_OPERATION_MAX_DURATION 10000
-#define FIRMWARE_MANAGER_OPERATION_QUANT_DURATION 100
+#define CLIENT_MANAGER_OPERATION_MAX_DURATION 10000
 //===============================================================
 
 /* Определения клиента */

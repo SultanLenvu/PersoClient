@@ -21,33 +21,26 @@
 
 class ClientManager : public QObject {
   Q_OBJECT
- public:
-  enum OperationState { Ready, WaitingExecution, Failed, Completed };
 
  private:
   QString CurrentLogin;
   QString CurrentPassword;
 
-  OperationState CurrentState;
-  QString NotificationText;
-
-  QThread* ClientThread;
   PersoClient* Client;
-  QThread* ProgrammerThread;
+  QMap<PersoClient::ReturnStatus, QString> ClientReturnStatusMatch;
+
   IProgrammer* Programmer;
+  QMap<IProgrammer::ReturnStatus, QString> ProgrammerReturnStatusMatch;
 
-  QEventLoop* WaitingLoop;
-  QTimer* ODQTimer;
-  QTimer* ODTimer;
-  QElapsedTimer* ODMeter;
+  IStickerPrinter* StickerPrinter;
+  QMap<IStickerPrinter::ReturnStatus, QString> StickerPrinterReturnStatusMatch;
 
-  IStickerPrinter* Printer;
+  QMutex Mutex;
 
- public:
+ public slots:
   explicit ClientManager(QObject* parent);
   ~ClientManager();
-
-  IProgrammer* programmer(void) const;
+  void on_InsctanceThreadStarted_slot(void);
 
   // Сервер
   void performServerConnecting(void);
@@ -77,68 +70,29 @@ class ClientManager : public QObject {
   void applySettings(void);
 
  private:
+  Q_DISABLE_COPY(ClientManager);
   void loadSettings(void);
   void createProgrammerInstance(void);
   void createClientInstance(void);
-  void createPrinterInstance(void);
-  void createWaitingLoop(void);
-  void createTimers(void);
-  void setupODQTimer(uint32_t msecs);
+  void createStickerPrinterInstance(void);
 
-  bool startOperationExecution(const QString& operationName);
+  void startOperationExecution(const QString& operationName);
   void endOperationExecution(const QString& operationName);
 
-  void deleteClientInstance(void);
-  void deleteProgrammerInstance(void);
+  void processClientReturnStatus(PersoClient::ReturnStatus status);
+  void processProgrammerReturnStatus(IProgrammer::ReturnStatus status);
+  void processStickerPrintersReturnStatus(IStickerPrinter::ReturnStatus status);
 
  private slots:
   void proxyLogging(const QString& log);
-
-  void on_ProgrammerOperationFinished_slot(IProgrammer::ExecutionStatus status);
-  void on_ClientOperationFinished_slot(PersoClient::ExecutionStatus status);
-  void on_ODTimerTimeout_slot(void);
-  void on_ODQTimerTimeout_slot(void);
 
  signals:
   void logging(const QString& log);
   void notifyUser(const QString& log);
   void notifyUserAboutError(const QString& log);
-  void operationPerfomingStarted(void);
-  void operationStepPerfomed(void);
-  void operationPerformingFinished(void);
-  void waitingEnd(void);
+  void operationPerfomingStarted(const QString& operationName);
+  void operationPerformingFinished(const QString& operationName);
   void createProductionInterface_signal(void);
-  void applySettings_signal(void);
-
-  // Сигналы для программатора
-  void getUcid_signal(QString* ucid);
-  void loadFirmware_signal(QFile* firmware);
-  void loadFirmwareWithUnlock_signal(QFile* firmware);
-  void readFirmware_signal(void);
-  void eraseFirmware_signal(void);
-  void readData_signal(void);
-  void loadData_signal(QFile* data);
-  void unlockDevice_signal(void);
-  void lockDevice_signal(void);
-
-  // Сигналы для клиента
-  void connectToPersoServer_signal(void);
-  void disconnectFromPersoServer_signal(void);
-
-  void requestEcho_signal(void);
-  void requestAuthorize_signal(const QMap<QString, QString>* requestParameters);
-  void requestTransponderRelease_signal(
-      const QMap<QString, QString>* requestParameters,
-      QFile* firmware);
-  void requestTransponderReleaseConfirm_signal(
-      const QMap<QString, QString>* requestParameters,
-      QMap<QString, QString>* responseParameters);
-  void requestTransponderRerelease_signal(
-      const QMap<QString, QString>* requestParameters,
-      QFile* firmware);
-  void requestTransponderRereleaseConfirm_signal(
-      const QMap<QString, QString>* requestParameters,
-      QMap<QString, QString>* responseParameters);
 };
 
 #endif  // CLIENT_MANAGER_H

@@ -10,82 +10,45 @@ ClientManager::ClientManager(QObject* parent) : QObject(parent) {
   createClientInstance();
 
   // Создаем принтер
-  createPrinterInstance();
-
-  // Создаем цикл ожидания
-  createWaitingLoop();
-
-  // Создаем таймеры для работы с временем
-  createTimers();
-
-  // Инициализируем текущее состояние
-  CurrentState = Ready;
+  createStickerPrinterInstance();
 
   CurrentLogin = PRODUCTION_LINE_DEFAULT_LOGIN;
   CurrentPassword = PRODUCTION_LINE_DEFAULT_PASSWORD;
 }
 
 ClientManager::~ClientManager() {
-  if (ProgrammerThread->isRunning()) {
-    ProgrammerThread->quit();
-    ProgrammerThread->wait();
-  }
-
-  if (ClientThread->isRunning()) {
-    ClientThread->quit();
-    ClientThread->wait();
-  }
-
-  delete ODMeter;
 }
 
-IProgrammer* ClientManager::programmer() const {
-  return Programmer;
-}
+void ClientManager::on_InsctanceThreadStarted_slot() {}
 
 void ClientManager::performServerConnecting() {
-  // Начинаем операцию
-  if (!startOperationExecution("performServerConnecting")) {
-    return;
-  }
+  startOperationExecution("performServerConnecting");
 
   emit logging("Подключение к серверу персонализации. ");
-  emit connectToPersoServer_signal();
-
-  // Запуск цикла ожидания
-  WaitingLoop->exec();
+  if (Client->connectToServer() != PersoClient::Completed) {
+    emit logging("");
+    endOperationExecution("performServerConnecting");
+  }
 
   // Завершаем операцию
   endOperationExecution("performServerConnecting");
 }
 
 void ClientManager::performServerDisconnecting() {
-  // Начинаем операцию
-  if (!startOperationExecution("performServerDisconnecting")) {
-    return;
-  }
+  startOperationExecution("performServerDisconnecting");
 
   emit logging("Отключение от сервера персонализации. ");
-  emit disconnectFromPersoServer_signal();
-
-  // Запуск цикла ожидания
-  WaitingLoop->exec();
+  emit disconnectFromPersoServer();
 
   // Завершаем операцию
   endOperationExecution("performServerDisconnecting");
 }
 
 void ClientManager::performServerEcho() {
-  // Начинаем операцию
-  if (!startOperationExecution("performServerEcho")) {
-    return;
-  }
+  startOperationExecution("performServerEcho");
 
   emit logging("Отправка эхо-запроса на сервер персонализации. ");
-  emit requestEcho_signal();
-
-  // Запуск цикла ожидания
-  WaitingLoop->exec();
+  emit requestEcho();
 
   // Завершаем операцию
   endOperationExecution("performServerEcho");
@@ -94,16 +57,11 @@ void ClientManager::performServerEcho() {
 void ClientManager::performServerAuthorization(
     const QMap<QString, QString>* data,
     bool& result) {
-  // Начинаем операцию
-  if (!startOperationExecution("performServerAuthorization")) {
-    return;
-  }
+  startOperationExecution("performServerAuthorization");
 
   emit logging("Авторизация на сервере персонализации. ");
-  emit requestAuthorize_signal(data);
+  emit requestAuthorize(data);
 
-  // Запуск цикла ожидания
-  WaitingLoop->exec();
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при авторизации на сервере. ");
     endOperationExecution("performServerAuthorization");
@@ -114,7 +72,7 @@ void ClientManager::performServerAuthorization(
   CurrentLogin = data->value("login");
   CurrentPassword = data->value("password");
 
-  emit createProductionInterface_signal();
+  emit createProductionInterface();
 
   // Формируем регзультат
   if (CurrentState == Completed) {
@@ -133,14 +91,10 @@ void ClientManager::performTransponderFirmwareLoading(
   QMap<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
 
-  // Начинаем операцию
-  if (!startOperationExecution("performTransponderFirmwareLoading")) {
-    return;
-  }
+  startOperationExecution("performTransponderFirmwareLoading");
 
   emit logging("Разблокирование памяти транспондера. ");
-  emit unlockDevice_signal();
-  WaitingLoop->exec();
+  emit unlockDevice();
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при разблокировании памяти транспондера. ");
     endOperationExecution("performTransponderFirmwareLoading");
@@ -148,8 +102,7 @@ void ClientManager::performTransponderFirmwareLoading(
   }
 
   emit logging("Считывание UCID транспондера. ");
-  emit getUcid_signal(&ucid);
-  WaitingLoop->exec();
+  emit getUcid(&ucid);
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при считывании UCID с транспондера. ");
     endOperationExecution("performTransponderFirmwareLoading");
@@ -159,8 +112,7 @@ void ClientManager::performTransponderFirmwareLoading(
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
   emit logging("Запрос прошивки транспондера. ");
-  emit requestTransponderRelease_signal(&requestParameters, &firmware);
-  WaitingLoop->exec();
+  emit requestTransponderRelease(&requestParameters, &firmware);
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при выпуске транспондера. ");
     endOperationExecution("performTransponderFirmwareLoading");
@@ -169,8 +121,7 @@ void ClientManager::performTransponderFirmwareLoading(
   requestParameters.clear();
 
   emit logging("Загрузка прошивки в транспондер. ");
-  emit loadFirmware_signal(&firmware);
-  WaitingLoop->exec();
+  emit loadFirmware(&firmware);
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при загрузке прошивки в транспондер. ");
     endOperationExecution("performTransponderFirmwareLoading");
@@ -183,9 +134,7 @@ void ClientManager::performTransponderFirmwareLoading(
   requestParameters.insert("ucid", ucid);
   emit logging(
       "Отправка запроса на подтверждение загрузки прошивки в транспондер. ");
-  emit requestTransponderReleaseConfirm_signal(&requestParameters,
-                                               responseParameters);
-  WaitingLoop->exec();
+  emit requestTransponderReleaseConfirm(&requestParameters, responseParameters);
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при подтверждении выпуска транспондера. ");
     endOperationExecution("performTransponderFirmwareLoading");
@@ -196,10 +145,10 @@ void ClientManager::performTransponderFirmwareLoading(
   model->build(responseParameters);
 
   // Удаляем файл прошивки
-  //  firmware.remove();
+  firmware.remove();
 
   emit logging("Печать стикера для транспондера.");
-  if (!Printer->printTransponderSticker(responseParameters)) {
+  if (!StickerPrinter->printTransponderSticker(responseParameters)) {
     emit logging("Получена ошибка при печати стикера для транспондера.");
     CurrentState = Failed;
     NotificationText = "Принтер: ошибка печати.";
@@ -218,14 +167,10 @@ void ClientManager::performTransponderFirmwareReloading(
   QMap<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
 
-  // Начинаем операцию
-  if (!startOperationExecution("performTransponderFirmwareReloading")) {
-    return;
-  }
+  startOperationExecution("performTransponderFirmwareReloading");
 
   emit logging("Разблокирование памяти транспондера. ");
-  emit unlockDevice_signal();
-  WaitingLoop->exec();
+  emit unlockDevice();
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при разблокировании памяти транспондера. ");
     endOperationExecution("performTransponderFirmwareReloading");
@@ -233,8 +178,8 @@ void ClientManager::performTransponderFirmwareReloading(
   }
 
   emit logging("Считывание UCID транспондера. ");
-  emit getUcid_signal(&ucid);
-  WaitingLoop->exec();
+  emit getUcid(&ucid);
+
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при считывании UCID с транспондера. ");
     endOperationExecution("performTransponderFirmwareReloading");
@@ -245,8 +190,8 @@ void ClientManager::performTransponderFirmwareReloading(
   requestParameters.insert("password", CurrentPassword);
   requestParameters.insert("pan", pan);
   emit logging("Запрос перевыпуска транспондера. ");
-  emit requestTransponderRerelease_signal(&requestParameters, &firmware);
-  WaitingLoop->exec();
+  emit requestTransponderRerelease(&requestParameters, &firmware);
+
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при перевыпуске транспондера. ");
     endOperationExecution("performTransponderFirmwareReloading");
@@ -255,8 +200,8 @@ void ClientManager::performTransponderFirmwareReloading(
   requestParameters.clear();
 
   emit logging("Загрузка прошивки в транспондер. ");
-  emit loadFirmware_signal(&firmware);
-  WaitingLoop->exec();
+  emit loadFirmware(&firmware);
+
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при загрузке прошивки в транспондер. ");
     endOperationExecution("performTransponderFirmwareReloading");
@@ -269,9 +214,9 @@ void ClientManager::performTransponderFirmwareReloading(
   requestParameters.insert("pan", pan);
   requestParameters.insert("ucid", ucid);
   emit logging("Отправка запроса на подтверждение перевыпуска транспондера. ");
-  emit requestTransponderRereleaseConfirm_signal(&requestParameters,
-                                                 responseParameters);
-  WaitingLoop->exec();
+  emit requestTransponderRereleaseConfirm(&requestParameters,
+                                          responseParameters);
+
   if (CurrentState != Completed) {
     emit logging("Получена ошибка при загрузке прошивки в транспондер. ");
     endOperationExecution("performTransponderFirmwareReloading");
@@ -282,10 +227,10 @@ void ClientManager::performTransponderFirmwareReloading(
   model->build(responseParameters);
 
   // Удаляем файл прошивки
-  //  firmware.remove();
+  firmware.remove();
 
   emit logging("Печать стикера для транспондера.");
-  if (!Printer->printTransponderSticker(responseParameters)) {
+  if (!StickerPrinter->printTransponderSticker(responseParameters)) {
     emit logging("Получена ошибка при печати стикера для транспондера.");
     CurrentState = Failed;
     NotificationText = "Принтер: ошибка печати.";
@@ -299,10 +244,7 @@ void ClientManager::performTransponderFirmwareReloading(
 
 void ClientManager::performLocalFirmwareLoading(const QString& path,
                                                 bool unlockOption) {
-  // Начинаем операцию
-  if (!startOperationExecution("performLocalFirmwareLoading")) {
-    return;
-  }
+  startOperationExecution("performLocalFirmwareLoading");
 
   // Создаем файл
   QFile firmware(path);
@@ -310,63 +252,50 @@ void ClientManager::performLocalFirmwareLoading(const QString& path,
   // Вызываем соответствующую функцию
   if (unlockOption == true) {
     emit logging("Загрузка прошивки микроконтроллера. ");
-    emit loadFirmware_signal(&firmware);
+    emit loadFirmware(&firmware);
   } else {
     emit logging(
         "Разблокирование памяти и загрузка прошивки микроконтроллера. ");
-    emit loadFirmwareWithUnlock_signal(&firmware);
+    emit loadFirmwareWithUnlock(&firmware);
   }
 
   // Запуск цикла ожидания
-  WaitingLoop->exec();
 
   // Завершаем операцию
   endOperationExecution("performLocalFirmwareLoading");
 }
 
 void ClientManager::performFirmwareReading() {
-  // Начинаем операцию
-  if (!startOperationExecution("performFirmwareReading")) {
-    return;
-  }
+  startOperationExecution("performFirmwareReading");
 
   emit logging("Считывание прошивки микроконтроллера. ");
-  emit readFirmware_signal();
+  emit readFirmware();
 
   // Запуск цикла ожидания
-  WaitingLoop->exec();
 
   // Завершаем операцию
   endOperationExecution("performFirmwareReading");
 }
 
 void ClientManager::performFirmwareErasing() {
-  // Начинаем операцию
-  if (!startOperationExecution("performFirmwareErasing")) {
-    return;
-  }
+  startOperationExecution("performFirmwareErasing");
 
   emit logging("Стирание прошивки микроконтроллера. ");
-  emit eraseFirmware_signal();
+  emit eraseFirmware();
 
   // Запуск цикла ожидания
-  WaitingLoop->exec();
 
   // Завершаем операцию
   endOperationExecution("performFirmwareErasing");
 }
 
 void ClientManager::performDataReading() {
-  // Начинаем операцию
-  if (!startOperationExecution("performDataReading")) {
-    return;
-  }
+  startOperationExecution("performDataReading");
 
   emit logging("Считывание данных в память микроконтроллера. ");
-  emit readData_signal();
+  emit readData();
 
   // Запуск цикла ожидания
-  WaitingLoop->exec();
 
   // Завершаем операцию
   endOperationExecution("performDataReading");
@@ -382,55 +311,43 @@ void ClientManager::performDataLoading(const QString& path) {
   QFile dataFile(path);
 
   emit logging("Загрузка данных в память микроконтроллера. ");
-  emit loadData_signal(&dataFile);
+  emit loadData(&dataFile);
 
   // Запуск цикла ожидания
-  WaitingLoop->exec();
 
   // Завершаем операцию
   endOperationExecution("performDataLoading");
 }
 
 void ClientManager::performDeviceUnlock() {
-  // Начинаем операцию
-  if (!startOperationExecution("performDeviceUnlock")) {
-    return;
-  }
+  startOperationExecution("performDeviceUnlock");
 
   emit logging("Разблокирование памяти микроконтроллера. ");
-  emit unlockDevice_signal();
+  emit unlockDevice();
 
   // Запуск цикла ожидания
-  WaitingLoop->exec();
 
   // Завершаем операцию
   endOperationExecution("performDeviceUnlock");
 }
 
 void ClientManager::performDeviceLock() {
-  // Начинаем операцию
-  if (!startOperationExecution("performDeviceLock")) {
-    return;
-  }
+  startOperationExecution("performDeviceLock");
 
   emit logging("Блокирование памяти микроконтроллера. ");
-  emit lockDevice_signal();
+  emit lockDevice();
 
   // Запуск цикла ожидания
-  WaitingLoop->exec();
 
   // Завершаем операцию
   endOperationExecution("performDeviceLock");
 }
 
 void ClientManager::performPrintingLastTransponderSticker() {
-  // Начинаем операцию
-  if (!startOperationExecution("performPrintingLastTransponderSticker")) {
-    return;
-  }
+  startOperationExecution("performPrintingLastTransponderSticker");
 
   emit logging("Печать последнего стикера транспондера. ");
-  if (!Printer->printLastTransponderSticker()) {
+  if (!StickerPrinter->printLastTransponderSticker()) {
     CurrentState = Failed;
     NotificationText = "Получена ошибка при печати стикера транспондера. ";
     endOperationExecution("performPrintingLastTransponderSticker");
@@ -445,13 +362,10 @@ void ClientManager::performPrintingLastTransponderSticker() {
 
 void ClientManager::performPrintingCustomTransponderSticker(
     const QMap<QString, QString>* parameters) {
-  // Начинаем операцию
-  if (!startOperationExecution("performPrintingCustomTransponderSticker")) {
-    return;
-  }
+  startOperationExecution("performPrintingCustomTransponderSticker");
 
   emit logging("Печать произвольного стикера транспондера. ");
-  if (!Printer->printTransponderSticker(parameters)) {
+  if (!StickerPrinter->printTransponderSticker(parameters)) {
     CurrentState = Failed;
     NotificationText = "Получена ошибка при печати стикера транспондера. ";
     endOperationExecution("performPrintingCustomTransponderSticker");
@@ -464,235 +378,113 @@ void ClientManager::performPrintingCustomTransponderSticker(
   endOperationExecution("performPrintingCustomTransponderSticker");
 }
 
-void ClientManager::performExecutingPrinterCommandScript(
+void ClientManager::performExecutingStickerPrinterCommandScript(
     const QStringList* commandScript) {
-  // Начинаем операцию
-  if (!startOperationExecution("performExecutingPrinterCommandScript")) {
-    return;
-  }
+  startOperationExecution("performExecutingStickerPrinterCommandScript");
 
   emit logging("Выполнение командного скрипта для принтера. ");
-  Printer->exec(commandScript);
+  StickerPrinter->exec(commandScript);
 
   // Завершаем операцию
-  endOperationExecution("performExecutingPrinterCommandScript");
+  endOperationExecution("performExecutingStickerPrinterCommandScript");
 }
 
 void ClientManager::applySettings() {
   emit logging("Применение новых настроек. ");
   loadSettings();
 
-  emit applySettings_signal();
-  Printer->applySetting();
+  emit applySettings();
+  StickerPrinter->applySetting();
 }
 
 void ClientManager::loadSettings() {}
 
 void ClientManager::createProgrammerInstance() {
-  // Создаем поток для программатора
-  ProgrammerThread = new QThread(this);
-
-  // И интерфейс программатора
-  Programmer = new JLinkExeProgrammer(nullptr);
-  Programmer->moveToThread(ProgrammerThread);
-
-  // Подключаем логгирование к Programmer'у
+  Programmer = new JLinkExeProgrammer(this);
   connect(Programmer, &IProgrammer::logging, this,
           &ClientManager::proxyLogging);
-  // Когда поток завершит работу, объект Programmer будет удален
-  connect(ProgrammerThread, &QThread::finished, Programmer,
-          &QObject::deleteLater);
-  // Когда поток завершит работу, он будет удален
-  connect(ProgrammerThread, &QThread::finished, ProgrammerThread,
-          &QObject::deleteLater);
-  // Когда программатор завершит операцию, можно будет приступить к следующей
-  connect(Programmer, &IProgrammer::operationFinished, this,
-          &ClientManager::on_ProgrammerOperationFinished_slot);
-
-  // Подключаем функционал
-  connect(this, &ClientManager::getUcid_signal, Programmer,
-          &IProgrammer::getUcid);
-  connect(this, &ClientManager::loadFirmware_signal, Programmer,
-          &IProgrammer::loadFirmware);
-  connect(this, &ClientManager::loadFirmwareWithUnlock_signal, Programmer,
-          &IProgrammer::loadFirmwareWithUnlock);
-  connect(this, &ClientManager::readFirmware_signal, Programmer,
-          &IProgrammer::readFirmware);
-  connect(this, &ClientManager::eraseFirmware_signal, Programmer,
-          &IProgrammer::eraseFirmware);
-  connect(this, &ClientManager::loadData_signal, Programmer,
-          &IProgrammer::loadData);
-  connect(this, &ClientManager::readData_signal, Programmer,
-          &IProgrammer::readData);
-  connect(this, &ClientManager::unlockDevice_signal, Programmer,
-          &IProgrammer::unlockDevice);
-  connect(this, &ClientManager::lockDevice_signal, Programmer,
-          &IProgrammer::lockDevice);
-  connect(this, &ClientManager::applySettings_signal, Programmer,
-          &IProgrammer::applySettings);
-
-  // Запускаем поток програматора
-  ProgrammerThread->start();
 }
 
 void ClientManager::createClientInstance() {
-  // Создаем поток для программатора
-  ClientThread = new QThread(this);
-
-  // И интерфейс программатора
-  Client = new PersoClient(nullptr);
-  Client->moveToThread(ClientThread);
-
-  // Подключаем логгирование к клиенту
+  Client = new PersoClient(this);
   connect(Client, &PersoClient::logging, this, &ClientManager::proxyLogging);
-  // Когда поток завершит работу, клиент будет удален
-  connect(ClientThread, &QThread::finished, Programmer, &QObject::deleteLater);
-  // Когда поток завершит работу, он будет удален
-  connect(ClientThread, &QThread::finished, ClientThread,
-          &QObject::deleteLater);
-  // Когда клиент завершит операцию, можно будет приступить к следующей
-  connect(Client, &PersoClient::operationFinished, this,
-          &ClientManager::on_ClientOperationFinished_slot);
 
-  // Подключаем функционал
-
-  connect(this, &ClientManager::connectToPersoServer_signal, Client,
-          &PersoClient::connectToPersoServer);
-  connect(this, &ClientManager::disconnectFromPersoServer_signal, Client,
-          &PersoClient::disconnectFromPersoServer);
-  connect(this, &ClientManager::requestEcho_signal, Client,
-          &PersoClient::requestEcho);
-  connect(this, &ClientManager::requestAuthorize_signal, Client,
-          &PersoClient::requestAuthorize);
-  connect(this, &ClientManager::requestTransponderRelease_signal, Client,
-          &PersoClient::requestTransponderRelease);
-  connect(this, &ClientManager::requestTransponderReleaseConfirm_signal, Client,
-          &PersoClient::requestTransponderReleaseConfirm);
-  connect(this, &ClientManager::requestTransponderRerelease_signal, Client,
-          &PersoClient::requestTransponderRerelease);
-  connect(this, &ClientManager::requestTransponderRereleaseConfirm_signal,
-          Client, &PersoClient::requestTransponderRereleaseConfirm);
-  connect(this, &ClientManager::applySettings_signal, Client,
-          &PersoClient::applySettings);
-
-  // Запускаем поток клиента
-  ClientThread->start();
+  // Заполняем таблицу соответствий статусов возврата
+  ClientReturnStatusMatch.insert(PersoClient::NotExecuted,
+                                 "Выполнение операции не началось.");
+  ClientReturnStatusMatch.insert(PersoClient::RequestParameterError,
+                                 "Не удалось обработать параметры запроса. ");
+  ClientReturnStatusMatch.insert(PersoClient::ServerConnectionError,
+                                 "Не удалось подключиться к серверу. ");
+  ClientReturnStatusMatch.insert(PersoClient::ServerNotResponding,
+                                 "Сервер не отвечает.");
+  ClientReturnStatusMatch.insert(PersoClient::ServerConnectionTerminated,
+                                 "Оборвалось соединение с сервером.");
+  ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotExist,
+                                 "Производственная линия не существует.");
+  ClientReturnStatusMatch.insert(PersoClient::AuthorizationAccessDenied,
+                                 "Ошибка доступа к производственной линии.");
+  ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotActive,
+                                 "Производственная линия не активна. ");
+  ClientReturnStatusMatch.insert(PersoClient::ResponseSyntaxError,
+                                 "Синтаксическая ошибка в ответе на запрос. ");
+  ClientReturnStatusMatch.insert(PersoClient::ServerError,
+                                 "Серверная ошибка. ");
+  ClientReturnStatusMatch.insert(PersoClient::UnknownError,
+                                 "Неизвествная ошибка. ");
+  ClientReturnStatusMatch.insert(PersoClient::Completed, "Выполнено. ");
 }
 
-void ClientManager::createPrinterInstance() {
-  Printer = new TE310Printer(this);
-  connect(Printer, &IStickerPrinter::logging, this,
+void ClientManager::createStickerPrinterInstance() {
+  StickerPrinter = new TE310Printer(this);
+  connect(StickerPrinter, &IStickerPrinter::logging, this,
           &ClientManager::proxyLogging);
+
+  // Заполняем таблицу соответствий статусов возврата
 }
 
-void ClientManager::createWaitingLoop() {
-  WaitingLoop = new QEventLoop(this);
-  connect(this, &ClientManager::waitingEnd, WaitingLoop, &QEventLoop::quit);
-}
-
-void ClientManager::createTimers() {
-  // Таймер, отслеживающий длительность выполняющихся операций
-  ODTimer = new QTimer(this);
-  ODTimer->setInterval(FIRMWARE_MANAGER_OPERATION_MAX_DURATION);
-  connect(ODTimer, &QTimer::timeout, this,
-          &ClientManager::on_ODTimerTimeout_slot);
-  connect(ODTimer, &QTimer::timeout, ODTimer, &QTimer::stop);
-  connect(this, &ClientManager::operationPerformingFinished, ODTimer,
-          &QTimer::stop);
-
-  // Таймер для измерения длительности операции
-  ODMeter = new QElapsedTimer();
-}
-
-void ClientManager::setupODQTimer(uint32_t msecs) {
-  // Таймер, отслеживающий квант длительности операции
-  ODQTimer = new QTimer(this);
-  ODQTimer->setInterval(msecs);
-
-  connect(ODQTimer, &QTimer::timeout, this,
-          &ClientManager::on_ODQTimerTimeout_slot);
-  connect(this, &ClientManager::operationPerformingFinished, ODQTimer,
-          &QTimer::stop);
-}
-
-bool ClientManager::startOperationExecution(const QString& operationName) {
-  // Проверяем готовность к выполнению операции
-  if (CurrentState != Ready) {
-    return false;
-  }
-
-  // Переходим в состояние ожидания конца обработки
-  CurrentState = WaitingExecution;
-
-  // Настраиваем и запускаем таймер для измерения квантов времени
-  QSettings settings;
-  uint64_t operationDuration =
-      settings
-          .value(QString("ClientManager/Operations/") + operationName +
-                 QString("/Duration"))
-          .toInt();
-  uint32_t operationQuantDuration = operationDuration / 100;
-  operationQuantDuration++;
-  emit logging(QString("Длительность кванта операции: %1.")
-                   .arg(QString::number(operationQuantDuration)));
-  setupODQTimer(operationQuantDuration);
-  ODQTimer->start();
-
-  // Запускаем таймер для контроля максимальной длительности операции
-  ODTimer->start();
-
-  // Запускаем измеритель длительности операции
-  ODMeter->start();
+void ClientManager::startOperationExecution(const QString& operationName) {
+  Mutex.lock();
 
   // Отправляем сигнал о начале выполнения длительной операции
-  emit operationPerfomingStarted();
-
-  return true;
+  emit operationPerfomingStarted(operationName);
 }
 
 void ClientManager::endOperationExecution(const QString& operationName) {
-  QSettings settings;
+  Mutex.unlock();
 
   // Сигнал о завершении текущей операции
-  emit operationPerformingFinished();
+  emit operationPerformingFinished(operationName);
+}
 
-  // Оповещаем пользователя о результатах
-  if (CurrentState == Completed) {
-    // Измеряем и сохраняем длительность операции
-    uint64_t duration = ODMeter->elapsed();
-    emit logging(
-        QString("Длительность операции: %1.").arg(QString::number(duration)));
-    settings.setValue(QString("ClientManager/Operations/") + operationName +
-                          QString("/Duration"),
-                      QVariant::fromValue(duration));
-
-    emit notifyUser(NotificationText);
-  } else {
-    emit notifyUserAboutError(NotificationText);
+void ClientManager::processClientReturnStatus(
+    PersoClient::ReturnStatus status) {
+  if (status != PersoClient::Completed) {
+    emit notifyUserAboutError(ClientReturnStatusMatch.value(status));
+    return;
   }
 
-  // Готовы к следующей операции
-  CurrentState = Ready;
+  emit notifyUser(ClientReturnStatusMatch.value(status));
 }
 
-void ClientManager::deleteClientInstance() {
-  if (!ClientThread->isRunning())
+void ClientManager::processProgrammerReturnStatus(
+    IProgrammer::ReturnStatus status) {
+  if (status != IProgrammer::Completed) {
+    emit notifyUserAboutError(ProgrammerReturnStatusMatch.value(status));
     return;
+  }
 
-  ClientThread->quit();
-  ClientThread->wait();
-  delete ClientThread;
-  delete Client;
+  emit notifyUser(ProgrammerReturnStatusMatch.value(status));
 }
 
-void ClientManager::deleteProgrammerInstance() {
-  if (!ProgrammerThread->isRunning())
+void ClientManager::processStickerPrintersReturnStatus(
+    IStickerPrinter::ReturnStatus status) {
+  if (status != IStickerPrinter::Completed) {
+    emit notifyUserAboutError(StickerPrinterReturnStatusMatch.value(status));
     return;
+  }
 
-  ProgrammerThread->quit();
-  ProgrammerThread->wait();
-  delete ProgrammerThread;
-  delete Programmer;
+  emit notifyUser(StickerPrinterReturnStatusMatch.value(status));
 }
 
 void ClientManager::proxyLogging(const QString& log) {
@@ -701,110 +493,7 @@ void ClientManager::proxyLogging(const QString& log) {
   else if (sender()->objectName() == "PersoClient")
     emit logging("Client - " + log);
   else if (sender()->objectName() == "IStickerPrinter")
-    emit logging("Printer - " + log);
+    emit logging("StickerPrinter - " + log);
   else
     emit logging("Unknown - " + log);
-}
-
-void ClientManager::on_ProgrammerOperationFinished_slot(
-    IProgrammer::ExecutionStatus status) {
-  switch (status) {
-    case IProgrammer::NotExecuted:
-      CurrentState = Failed;
-      NotificationText = "Программатор: операция не была запущена. ";
-      emit break;
-    case IProgrammer::RequestParameterError:
-      CurrentState = Failed;
-      NotificationText = "Программатор: некорректный файл прошивки. ";
-      break;
-    case IProgrammer::DataFileError:
-      CurrentState = Failed;
-      NotificationText =
-          "Программатор: некорректный файл данных для загрузки. ";
-      break;
-    case IProgrammer::ProgrammatorError:
-      CurrentState = Failed;
-      NotificationText =
-          "Программатор: получена ошибка при выполнении операции. ";
-      break;
-    case IProgrammer::CompletedSuccessfully:
-      CurrentState = Completed;
-      NotificationText = "Операция успешно выполнена. ";
-      break;
-  }
-
-  // Завершаем цикл ожидания
-  emit waitingEnd();
-}
-
-void ClientManager::on_ClientOperationFinished_slot(
-    PersoClient::ExecutionStatus status) {
-  switch (status) {
-    case PersoClient::NotExecuted:
-      CurrentState = Failed;
-      NotificationText = "Клиент: операция не была запущена. ";
-      emit break;
-    case PersoClient::RequestParameterError:
-      CurrentState = Failed;
-      NotificationText = "Клиент: некорректный файл прошивки. ";
-      break;
-    case PersoClient::ServerConnectionError:
-      CurrentState = Failed;
-      NotificationText = "Клиент: не удалось подключиться к серверу. ";
-      break;
-    case PersoClient::ServerNotResponding:
-      CurrentState = Failed;
-      NotificationText = "Клиент: сервер не отвечает. ";
-      break;
-    case PersoClient::ServerConnectionTerminated:
-      CurrentState = Failed;
-      NotificationText = "Клиент: соединение с сервером прервалось. ";
-      break;
-    case PersoClient::AuthorizationNotExist:
-      CurrentState = Failed;
-      NotificationText = "Клиент: неверный логин или пароль. ";
-      break;
-    case PersoClient::AuthorizationAccessDenied:
-      CurrentState = Failed;
-      NotificationText = "Клиент: доступ запрещен. ";
-      break;
-    case PersoClient::AuthorizationNotActive:
-      CurrentState = Failed;
-      NotificationText = "Клиент: производственная линия не активна. ";
-      break;
-    case PersoClient::ResponseSyntaxError:
-      CurrentState = Failed;
-      NotificationText = "Клиент: получен некорректный ответ от сервера. ";
-      break;
-    case PersoClient::ServerError:
-      CurrentState = Failed;
-      NotificationText = "Клиент: получена серверная ошибка. ";
-      break;
-    case PersoClient::UnknownError:
-      CurrentState = Failed;
-      NotificationText = "Клиент: неизвестная ошибка. ";
-      break;
-    case PersoClient::CompletedSuccessfully:
-      CurrentState = Completed;
-      NotificationText = "Операция успешно выполнена. ";
-      break;
-  }
-
-  // Завершаем цикл ожидания
-  emit waitingEnd();
-}
-
-void ClientManager::on_ODTimerTimeout_slot() {
-  emit logging("Операция выполняется слишком долго. Сброс. ");
-  emit notifyUserAboutError("Операция выполняется слишком долго. Сброс. ");
-
-  //  deleteClientInstance();
-  //  createClientInstance();
-
-  //  deleteProgrammerInstance();
-  //  createProgrammerInstance();
-}
-
-void ClientManager::on_ODQTimerTimeout_slot() {
-  emit operationStepPerfomed();
 }

@@ -1,11 +1,12 @@
 #ifndef MAINWINDOW_KERNEL_H
 #define MAINWINDOW_KERNEL_H
 
+#include <QFile>
 #include <QMainWindow>
 #include <QSettings>
-#include <QtWidgets>
-#include <QFile>
+#include <QSharedPointer>
 #include <QTextStream>
+#include <QtWidgets>
 
 #include "Environment/client_manager.h"
 #include "Environment/log_system.h"
@@ -20,7 +21,7 @@
 #include "GUI/user_interaction_system.h"
 #include "General/definitions.h"
 
-class MainWindow : public QMainWindow {
+class MainWindowKernel : public QMainWindow {
   Q_OBJECT
 
  private:
@@ -38,20 +39,19 @@ class MainWindow : public QMainWindow {
   QAction* AboutProgramAct;
   //==================================================
 
-  QFile *LogFile;
-  QTextStream *LogStream;
-
-  TextStreamLogBackend *StreamBackend;
-  WidgetLogBackend *WidgetBackend;
   LogSystem* Logger;
-  UserInteractionSystem* Interactor;
+  QThread* LoggerThread;
+
   ClientManager* Manager;
+  QThread* ManagerThread;
+
+  UserInteractionSystem* Interactor;
 
   TransponderInfoModel* TransponderInfo;
 
  public:
-  MainWindow();
-  ~MainWindow();
+  MainWindowKernel();
+  ~MainWindowKernel();
 
  public slots:
   void on_AuthorizePushButton_slot(void);
@@ -104,7 +104,40 @@ class MainWindow : public QMainWindow {
   void createTopMenuActions(void);
   void createTopMenu(void);
 
-  void createManager(void);
+  void createManagerInstance(void);
+  void createLoggerInstance(void);
+  void createInteractorInstance(void);
+
+ signals:
+  void applySettings_signal(void);
+
+  // Сигналы для логгера
+  void loggerClear_signal(void);
+  void loggerGenerate_signal(const QString& log);
+
+  // Сигналы для менеджера
+  void performServerConnecting_signal(void);
+  void performServerDisconnecting_signal(void);
+  void performServerEcho_signal(void);
+  void performServerAuthorization_signal(
+      const QSharedPointer<QMap<QString, QString>> data,
+      bool& result);
+  void performTransponderFirmwareLoading_signal(TransponderInfoModel* model);
+  void performTransponderFirmwareReloading_signal(TransponderInfoModel* model,
+                                                  const QString& pan);
+  void performLocalFirmwareLoading_signal(const QString& path,
+                                          bool unlockOption);
+  void performFirmwareReading_signal(void);
+  void performFirmwareErasing_signal(void);
+  void performDataReading_signal(void);
+  void performDataLoading_signal(const QString& path);
+  void performDeviceUnlock_signal(void);
+  void performDeviceLock_signal(void);
+  void performPrintingLastTransponderSticker_signal(void);
+  void performPrintingCustomTransponderSticker_signal(
+      const QSharedPointer<QMap<QString, QString>> data);
+  void performExecutingPrinterCommandScript_signal(
+      const QSharedPointer<QStringList> commandScript);
 };
 
 #endif  // MAINWINDOW_KERNEL_H

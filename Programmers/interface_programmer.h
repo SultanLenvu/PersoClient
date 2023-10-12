@@ -12,16 +12,18 @@
 class IProgrammer : public QObject {
   Q_OBJECT
  public:
-  enum ExecutionStatus {
+  enum ReturnStatus {
     NotExecuted,
     RequestParameterError,
     DataFileError,
     ProgrammatorError,
-    CompletedSuccessfully
+    Completed
   };
+  Q_ENUM(ReturnStatus);
 
  public:
   enum ProgrammerType { JLink };
+  Q_ENUM(ProgrammerType);
 
  protected:
   ProgrammerType Type;
@@ -51,9 +53,12 @@ class IProgrammer : public QObject {
   bool checkFirmwareFile(const QFile* firmware);
   bool checkDataFile(const QFile* data);
 
+ private:
+  Q_DISABLE_COPY(IProgrammer);
+
  signals:
   void logging(const QString& log);
-  void operationFinished(ExecutionStatus status);
+  void operationFinished(ReturnStatus status);
 };
 
 #endif  // ABSTRACTPROGRAMMER_H

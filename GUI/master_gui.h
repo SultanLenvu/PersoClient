@@ -102,11 +102,11 @@ class MasterGUI : public GUI {
   QLineEdit* ProgrammerSpeedLineEdit;
 
   // Принтер
-  QGroupBox* PrinterSettingsGroupBox;
-  QGridLayout* PrinterSettingsMainLayout;
-  QLabel* PrinterLibPathLabel;
-  QLineEdit* PrinterLibPathLineEdit;
-  QPushButton* PrinterLibPathPushButton;
+  QGroupBox* StickerPrinterSettingsGroupBox;
+  QGridLayout* StickerPrinterSettingsMainLayout;
+  QLabel* StickerPrinterLibPathLabel;
+  QLineEdit* StickerPrinterLibPathLineEdit;
+  QPushButton* StickerPrinterLibPathPushButton;
 
   QSpacerItem* SettingsVS1;
   QSpacerItem* SettingsHS1;
@@ -131,7 +131,7 @@ class MasterGUI : public GUI {
 
  private slots:
   void on_ProgrammerExeFilePathPushButton_slot(void);
-  void on_PrinterLibPathPushButton_slot(void);
+  void on_StickerPrinterLibPathPushButton_slot(void);
 };
 
 #endif  // MASTERGUI_H

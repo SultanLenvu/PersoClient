@@ -21,7 +21,7 @@
 class PersoClient : public QObject {
   Q_OBJECT
  public:
-  enum ExecutionStatus {
+  enum ReturnStatus {
     NotExecuted,
     RequestParameterError,
     ServerConnectionError,
@@ -33,19 +33,19 @@ class PersoClient : public QObject {
     ResponseSyntaxError,
     ServerError,
     UnknownError,
-    CompletedSuccessfully
+    Completed
   };
+  Q_ENUM(ReturnStatus);
 
  private:
   enum InstanceState {
     Ready,
-    RequestCreated,
-    WaitingConnectionWithServer,
-    ConnectedToServer,
+    CreatingRequest,
+    WaitingServerConnection,
     WaitingResponse,
-    ResponseReceived,
-    DisconnectedFromServer
+    ProcessingResponse,
   };
+  Q_ENUM(InstanceState);
 
  private:
   bool ExtendedLoggingEnable;
@@ -53,7 +53,7 @@ class PersoClient : public QObject {
   uint32_t PersoServerPort;
 
   InstanceState CurrentState;
-  ExecutionStatus ReturnStatus;
+  ReturnStatus ProcessingStatus;
 
   QTcpSocket* Socket;
 
@@ -66,43 +66,47 @@ class PersoClient : public QObject {
 
   QTimer* WaitTimer;
   QEventLoop* WaitingLoop;
+  bool TimeoutIndicator;
 
  public:
   explicit PersoClient(QObject* parent);
   ~PersoClient();
 
- public slots:
-  void connectToPersoServer(void);
-  void disconnectFromPersoServer(void);
+  ReturnStatus connectToServer(void);
+  ReturnStatus disconnectFromServer(void);
 
-  void requestEcho(void);
-  void requestAuthorize(const QMap<QString, QString>* requestAttributes);
-  void requestTransponderRelease(
+  ReturnStatus requestEcho(void);
+  ReturnStatus requestAuthorize(
+      const QMap<QString, QString>* requestAttributes);
+
+  ReturnStatus requestTransponderRelease(
       const QMap<QString, QString>* requestAttributes,
       QFile* firmware);
-  void requestTransponderReleaseConfirm(
+  ReturnStatus requestTransponderReleaseConfirm(
       const QMap<QString, QString>* requestAttributes,
       QMap<QString, QString>* responseAttributes);
-  void requestTransponderRerelease(
+  ReturnStatus requestTransponderRerelease(
       const QMap<QString, QString>* requestAttributes,
       QFile* firmware);
-  void requestTransponderRereleaseConfirm(
+  ReturnStatus requestTransponderRereleaseConfirm(
       const QMap<QString, QString>* requestAttributes,
       QMap<QString, QString>* responseAttributes);
 
   void applySettings(void);
 
  private:
+  Q_DISABLE_COPY(PersoClient);
   void loadSettings(void);
+  void createTimers(void);
+  void createSocket(void);
   bool processingServerConnection(void);
 
   void processingDataBlock(void);
   void createTransmittedDataBlock(void);
   void transmitDataBlock(void);
 
-  void createEchoRequest(void);
-  void createAuthorizationRequest(
-      const QMap<QString, QString>* requestAttributes);
+  void createEcho(void);
+  void createAuthorization(const QMap<QString, QString>* requestAttributes);
   void createTransponderRelease(
       const QMap<QString, QString>* requestAttributes);
   void createTransponderReleaseConfirm(
@@ -112,13 +116,13 @@ class PersoClient : public QObject {
   void createTransponderRereleaseConfirm(
       const QMap<QString, QString>* requestAttributes);
 
-  void processEchoResponse(void);
-  void processAuthorizationResponse(void);
-  void processTransponderReleaseResponse(QFile* firmware);
-  void processTransponderReleaseConfirmResponse(
+  void processEcho(void);
+  void processAuthorization(void);
+  void processTransponderRelease(QFile* firmware);
+  void processTransponderReleaseConfirm(
       QMap<QString, QString>* responseAttributes);
-  void processTransponderRereleaseResponse(QFile* firmware);
-  void processTransponderRereleaseConfirmResponse(
+  void processTransponderRerelease(QFile* firmware);
+  void processTransponderRereleaseConfirm(
       QMap<QString, QString>* responseAttributes);
 
  private slots:
@@ -133,7 +137,6 @@ class PersoClient : public QObject {
  signals:
   void logging(const QString& log);
   void stopResponseWaiting(void);
-  void operationFinished(ExecutionStatus status);
 };
 
 #endif  // PERSOCLIENT_H

@@ -4,9 +4,6 @@ IProgrammer::IProgrammer(QObject* parent, ProgrammerType type)
     : QObject(parent) {
   setObjectName("IProgrammer");
   Type = type;
-
-  // Регистрация в мета-объектной системе Qt пользовательские типы
-  qRegisterMetaType<ExecutionStatus>("ExecutionStatus");
 }
 
 IProgrammer::~IProgrammer() {}

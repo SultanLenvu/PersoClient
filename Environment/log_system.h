@@ -1,11 +1,12 @@
 #ifndef LOGSYSTEM_H
 #define LOGSYSTEM_H
 
+#include <QHostAddress>
 #include <QObject>
+#include <QSettings>
+#include <QThread>
 #include <QTime>
-#include <QList>
-
-#include "Environment/log_backend.h"
+#include <QUdpSocket>
 
 /* Глобальная система логгирования */
 //==================================================================================
@@ -14,19 +15,25 @@ class LogSystem : public QObject {
   Q_OBJECT
 
  private:
-  QList<LogBackend*> backends;
+  bool GlobalEnableOption;
 
  public:
   LogSystem(QObject* parent);
   ~LogSystem();
 
-  void addBackend(LogBackend *backend);
-  void removeBackend(LogBackend *backend);
-
-  void clear(void);
-
  public slots:
+  void clear(void);
   void generate(const QString& log);
+
+  void applySettings(void);
+
+ private:
+  Q_DISABLE_COPY(LogSystem)
+  void loadSettings(void);
+
+ signals:
+  void requestDisplayLog(const QString& logData);
+  void requestClearDisplayLog(void);
 };
 
 //==================================================================================

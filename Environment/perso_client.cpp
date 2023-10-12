@@ -5,17 +5,330 @@ PersoClient::PersoClient(QObject *parent) : QObject(parent)
   setObjectName("PersoClient");
   loadSettings();
 
-  Socket = new QTcpSocket(this);
-  connect(Socket, &QTcpSocket::connected, this,
-          &PersoClient::on_SocketConnected_slot);
-  connect(Socket, &QTcpSocket::disconnected, this,
-          &PersoClient::on_SocketDisconnected_slot);
-  connect(Socket, &QTcpSocket::readyRead, this,
-          &PersoClient::on_SocketReadyRead_slot);
-  connect(Socket,
-          QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error), this,
-          &PersoClient::on_SocketError_slot);
+  // Создаем таймеры
+  createTimers();
 
+  // Создаем сокет
+  createSocket();
+
+  // Готовы к выполнению команд
+  CurrentState = Ready;
+}
+
+PersoClient::~PersoClient() {
+  if (Socket->isOpen())
+    Socket->disconnectFromHost();
+}
+
+PersoClient::ReturnStatus PersoClient::connectToServer() {
+  CurrentState = Ready;
+
+  // Подключаемся к серверу персонализации
+  if (!processingServerConnection()) {
+    return ServerConnectionError;
+  }
+
+  return Completed;
+}
+
+PersoClient::ReturnStatus PersoClient::disconnectFromServer() {
+  if (Socket->isOpen()) {
+    Socket->disconnectFromHost();
+    emit logging("Отключение от сервера персонализации. ");
+  } else {
+    emit logging("Подключение не было установлено. ");
+  }
+
+  return Completed;
+}
+
+PersoClient::ReturnStatus PersoClient::requestEcho() {
+  // Создаем запрос
+  CurrentState = CreatingRequest;
+  createEcho();
+
+  // Подключаемся к серверу персонализации
+  CurrentState = WaitingServerConnection;
+  if (!processingServerConnection()) {
+    return ServerConnectionError;
+  }
+
+  // Отправляем сформированный блок данных
+  CurrentState = WaitingResponse;
+  transmitDataBlock();
+
+  // Если сервер не отвечает
+  if (TimeoutIndicator) {
+    return ServerNotResponding;
+  }
+
+  // Отключаемся от сервера
+  Socket->close();
+
+  // Обрабатываем полученный ответ
+  CurrentState = ProcessingResponse;
+  processEcho();
+
+  // Очищаем команду и ответ на нее
+  CurrentCommand = QJsonObject();
+  CurrentResponse = QJsonObject();
+
+  // Замыкаем машину состояний
+  CurrentState = Ready;
+
+  // Возвращаем статус выполнения команды
+  return ProcessingStatus;
+}
+
+PersoClient::ReturnStatus PersoClient::requestAuthorize(
+    const QMap<QString, QString>* requestAttributes) {
+  // Создаем запрос
+  CurrentState = CreatingRequest;
+
+  // Проверка на существование
+  if (!requestAttributes) {
+    emit logging("Получены не корректные параметры запроса. Сброс.");
+    return RequestParameterError;
+  }
+  createAuthorization(requestAttributes);
+
+  // Подключаемся к серверу персонализации
+  CurrentState = WaitingServerConnection;
+  if (!processingServerConnection()) {
+    return ServerConnectionError;
+  }
+
+  // Отправляем сформированный блок данных
+  CurrentState = WaitingResponse;
+  transmitDataBlock();
+
+  // Если сервер не отвечает
+  if (TimeoutIndicator) {
+    return ServerNotResponding;
+  }
+
+  // Отключаемся от сервера
+  Socket->close();
+
+  // Обрабатываем полученный ответ
+  CurrentState = ProcessingResponse;
+  processAuthorization();
+
+  // Очищаем команду и ответ на нее
+  CurrentCommand = QJsonObject();
+  CurrentResponse = QJsonObject();
+
+  // Замыкаем машину состояний
+  CurrentState = Ready;
+
+  // Возвращаем статус выполнения команды
+  return ProcessingStatus;
+}
+
+PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
+    const QMap<QString, QString>* requestAttributes,
+    QFile* firmware) {
+  // Создаем запрос
+  CurrentState = CreatingRequest;
+
+  // Проверка на существование
+  if ((!requestAttributes) || (!firmware)) {
+    emit logging("Получены не корректные параметры запроса. Сброс.");
+    return RequestParameterError;
+  }
+  createTransponderRelease(requestAttributes);
+
+  // Подключаемся к серверу персонализации
+  CurrentState = WaitingServerConnection;
+  if (!processingServerConnection()) {
+    return ServerConnectionError;
+  }
+
+  // Отправляем сформированный блок данных
+  CurrentState = WaitingResponse;
+  transmitDataBlock();
+
+  // Если сервер не отвечает
+  if (TimeoutIndicator) {
+    return ServerNotResponding;
+  }
+
+  // Отключаемся от сервера
+  Socket->close();
+
+  // Обрабатываем полученный ответ
+  CurrentState = ProcessingResponse;
+  processTransponderRelease(firmware);
+
+  // Очищаем команду и ответ на нее
+  CurrentCommand = QJsonObject();
+  CurrentResponse = QJsonObject();
+
+  // Замыкаем машину состояний
+  CurrentState = Ready;
+
+  // Возвращаем статус выполнения команды
+  return ProcessingStatus;
+}
+
+PersoClient::ReturnStatus PersoClient::requestTransponderReleaseConfirm(
+    const QMap<QString, QString>* requestAttributes,
+    QMap<QString, QString>* responseAttributes) {
+  // Создаем запрос
+  CurrentState = CreatingRequest;
+
+  // Проверка на существование
+  if ((!requestAttributes) || (!responseAttributes)) {
+    emit logging("Получены не корректные параметры запроса. Сброс.");
+    return RequestParameterError;
+  }
+  createTransponderReleaseConfirm(requestAttributes);
+
+  // Подключаемся к серверу персонализации
+  CurrentState = WaitingServerConnection;
+  if (!processingServerConnection()) {
+    return ServerConnectionError;
+  }
+
+  // Отправляем сформированный блок данных
+  CurrentState = WaitingResponse;
+  transmitDataBlock();
+
+  // Если сервер не отвечает
+  if (TimeoutIndicator) {
+    return ServerNotResponding;
+  }
+
+  // Отключаемся от сервера
+  Socket->close();
+
+  // Обрабатываем полученный ответ
+  CurrentState = ProcessingResponse;
+  processTransponderReleaseConfirm(responseAttributes);
+
+  // Очищаем команду и ответ на нее
+  CurrentCommand = QJsonObject();
+  CurrentResponse = QJsonObject();
+
+  // Замыкаем машину состояний
+  CurrentState = Ready;
+
+  // Возвращаем статус выполнения команды
+  return ProcessingStatus;
+}
+
+PersoClient::ReturnStatus PersoClient::requestTransponderRerelease(
+    const QMap<QString, QString>* requestAttributes,
+    QFile* firmware) {
+  // Создаем запрос
+  CurrentState = CreatingRequest;
+
+  // Проверка на существование
+  if ((!requestAttributes) || (!firmware)) {
+    emit logging("Получены не корректные параметры запроса. Сброс.");
+    return RequestParameterError;
+  }
+  createTransponderRerelease(requestAttributes);
+
+  // Подключаемся к серверу персонализации
+  CurrentState = WaitingServerConnection;
+  if (!processingServerConnection()) {
+    return ServerConnectionError;
+  }
+
+  // Отправляем сформированный блок данных
+  CurrentState = WaitingResponse;
+  transmitDataBlock();
+
+  // Если сервер не отвечает
+  if (TimeoutIndicator) {
+    return ServerNotResponding;
+  }
+
+  // Отключаемся от сервера
+  Socket->close();
+
+  // Обрабатываем полученный ответ
+  CurrentState = ProcessingResponse;
+  processTransponderRerelease(firmware);
+
+  // Очищаем команду и ответ на нее
+  CurrentCommand = QJsonObject();
+  CurrentResponse = QJsonObject();
+
+  // Замыкаем машину состояний
+  CurrentState = Ready;
+
+  // Возвращаем статус выполнения команды
+  return ProcessingStatus;
+}
+
+PersoClient::ReturnStatus PersoClient::requestTransponderRereleaseConfirm(
+    const QMap<QString, QString>* requestAttributes,
+    QMap<QString, QString>* responseAttributes) {
+  // Создаем запрос
+  CurrentState = CreatingRequest;
+
+  // Проверка на существование
+  if ((!requestAttributes) || (!responseAttributes)) {
+    emit logging("Получены не корректные параметры запроса. Сброс.");
+    return RequestParameterError;
+  }
+  createTransponderRereleaseConfirm(requestAttributes);
+
+  // Подключаемся к серверу персонализации
+  CurrentState = WaitingServerConnection;
+  if (!processingServerConnection()) {
+    return ServerConnectionError;
+  }
+
+  // Отправляем сформированный блок данных
+  CurrentState = WaitingResponse;
+  transmitDataBlock();
+
+  // Если сервер не отвечает
+  if (TimeoutIndicator) {
+    return ServerNotResponding;
+  }
+
+  // Отключаемся от сервера
+  Socket->close();
+
+  // Обрабатываем полученный ответ
+  CurrentState = ProcessingResponse;
+  processTransponderRereleaseConfirm(responseAttributes);
+
+  // Очищаем команду и ответ на нее
+  CurrentCommand = QJsonObject();
+  CurrentResponse = QJsonObject();
+
+  // Замыкаем машину состояний
+  CurrentState = Ready;
+
+  // Возвращаем статус выполнения команды
+  return ProcessingStatus;
+}
+
+void PersoClient::applySettings() {
+  emit logging("Применение новых настроек. ");
+  loadSettings();
+}
+
+/*
+ * Приватные  методы
+ */
+
+void PersoClient::loadSettings() {
+  QSettings settings;
+
+  PersoServerAddress =
+      settings.value("Personalization/ServerIpAddress").toString();
+  PersoServerPort = settings.value("Personalization/ServerPort").toInt();
+  ExtendedLoggingEnable =
+      settings.value("General/ExtendedLoggingEnable").toBool();
+}
+
+void PersoClient::createTimers() {
   WaitTimer = new QTimer(this);
   WaitTimer->setInterval(PERSO_SERVER_CONNECTION_WAITING_TIME);
   connect(WaitTimer, &QTimer::timeout, this,
@@ -37,307 +350,19 @@ PersoClient::PersoClient(QObject *parent) : QObject(parent)
   connect(WaitTimer, &QTimer::timeout, WaitingLoop, &QEventLoop::quit);
   connect(this, &PersoClient::stopResponseWaiting, WaitingLoop,
           &QEventLoop::quit);
-
-  // Команды еще не выполнялись
-  ReturnStatus = NotExecuted;
-
-  // Готовы к выполнению команд
-  CurrentState = Ready;
-
-  // Регистрация в мета-объектной системе Qt пользовательские типы
-  qRegisterMetaType<ExecutionStatus>("ExecutionStatus");
 }
 
-PersoClient::~PersoClient() {
-  if (Socket->isOpen())
-    Socket->disconnectFromHost();
-}
-
-void PersoClient::applySettings() {
-  emit logging("Применение новых настроек. ");
-  loadSettings();
-}
-
-void PersoClient::loadSettings() {
-  QSettings settings;
-
-  PersoServerAddress =
-      settings.value("Personalization/ServerIpAddress").toString();
-  PersoServerPort = settings.value("Personalization/ServerPort").toInt();
-  ExtendedLoggingEnable =
-      settings.value("General/ExtendedLoggingEnable").toBool();
-}
-
-void PersoClient::connectToPersoServer() {
-  CurrentState = Ready;
-
-  // Подключаемся к серверу персонализации
-  if (!processingServerConnection()) {
-    CurrentState = DisconnectedFromServer;
-    emit operationFinished(ServerConnectionError);
-  } else {
-    CurrentState = ConnectedToServer;
-    emit operationFinished(CompletedSuccessfully);
-  }
-}
-
-void PersoClient::disconnectFromPersoServer() {
-  if (Socket->isOpen()) {
-    Socket->disconnectFromHost();
-    emit logging("Отключение от сервера персонализации. ");
-  } else {
-    emit logging("Подключение не было установлено. ");
-  }
-
-  CurrentState = DisconnectedFromServer;
-  emit operationFinished(CompletedSuccessfully);
-}
-
-void PersoClient::requestEcho() {
-  CurrentState = Ready;
-
-  // Создаем запрос
-  createEchoRequest();
-  CurrentState = RequestCreated;
-
-  // Подключаемся к серверу персонализации
-  if (!processingServerConnection()) {
-    CurrentState = DisconnectedFromServer;
-    emit operationFinished(ServerConnectionError);
-    return;
-  }
-
-  CurrentState = ConnectedToServer;
-
-  // Отправляем сформированный блок данных
-  transmitDataBlock();
-
-  // Отключаемся от сервера
-  Socket->close();
-  CurrentState = DisconnectedFromServer;
-
-  // Обрабатываем полученный ответ
-  processEchoResponse();
-
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
-
-  // Возвращаем статус выполнения команды
-  emit operationFinished(ReturnStatus);
-}
-
-void PersoClient::requestAuthorize(
-    const QMap<QString, QString>* requestAttributes) {
-  CurrentState = Ready;
-
-  // Проверка на существование
-  if (!requestAttributes) {
-    emit logging("Получены не корректные параметры запроса. Сброс.");
-    emit operationFinished(RequestParameterError);
-    return;
-  }
-
-  // Создаем запрос
-  createAuthorizationRequest(requestAttributes);
-  CurrentState = RequestCreated;
-
-  // Подключаемся к серверу персонализации
-  if (!processingServerConnection()) {
-    CurrentState = DisconnectedFromServer;
-    emit operationFinished(ServerConnectionError);
-    return;
-  }
-  CurrentState = ConnectedToServer;
-
-  // Отправляем сформированный блок данных
-  transmitDataBlock();
-
-  // Отключаемся от сервера
-  Socket->close();
-  CurrentState = DisconnectedFromServer;
-
-  // Обрабатываем полученный ответ
-  processAuthorizationResponse();
-
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
-
-  // Возвращаем статус выполнения команды
-  emit operationFinished(ReturnStatus);
-}
-
-void PersoClient::requestTransponderRelease(
-    const QMap<QString, QString>* requestAttributes,
-    QFile* firmware) {
-  CurrentState = Ready;
-
-  // Проверка на существование
-  if ((!requestAttributes) || (!firmware)) {
-    emit logging("Получены не корректные параметры запроса. Сброс.");
-    emit operationFinished(RequestParameterError);
-    return;
-  }
-
-  // Создаем запрос
-  createTransponderRelease(requestAttributes);
-  CurrentState = RequestCreated;
-
-  // Подключаемся к серверу персонализации
-  if (!processingServerConnection()) {
-    CurrentState = DisconnectedFromServer;
-    emit operationFinished(ServerConnectionError);
-    return;
-  }
-
-  CurrentState = ConnectedToServer;
-
-  // Отправляем сформированный блок данных
-  transmitDataBlock();
-
-  // Отключаемся от сервера
-  Socket->close();
-  CurrentState = DisconnectedFromServer;
-
-  // Обрабатываем полученный ответ
-  processTransponderReleaseResponse(firmware);
-
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
-
-  // Возвращаем статус выполнения команды
-  emit operationFinished(ReturnStatus);
-}
-
-void PersoClient::requestTransponderReleaseConfirm(
-    const QMap<QString, QString>* requestAttributes,
-    QMap<QString, QString>* responseAttributes) {
-  CurrentState = Ready;
-
-  // Проверка на существование
-  if ((!requestAttributes) || (!responseAttributes)) {
-    emit logging("Получены не корректные параметры запроса. Сброс.");
-    emit operationFinished(RequestParameterError);
-    return;
-  }
-
-  // Создаем запрос
-  createTransponderReleaseConfirm(requestAttributes);
-  CurrentState = RequestCreated;
-
-  // Подключаемся к серверу персонализации
-  if (!processingServerConnection()) {
-    CurrentState = DisconnectedFromServer;
-    emit operationFinished(ServerConnectionError);
-    return;
-  }
-
-  CurrentState = ConnectedToServer;
-
-  // Отправляем сформированный блок данных
-  transmitDataBlock();
-
-  // Отключаемся от сервера
-  Socket->close();
-  CurrentState = DisconnectedFromServer;
-
-  // Обрабатываем полученный ответ
-  processTransponderReleaseConfirmResponse(responseAttributes);
-
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
-
-  // Возвращаем статус выполнения команды
-  emit operationFinished(ReturnStatus);
-}
-
-void PersoClient::requestTransponderRerelease(
-    const QMap<QString, QString>* requestAttributes,
-    QFile* firmware) {
-  CurrentState = Ready;
-
-  // Проверка на существование
-  if ((!firmware) || (requestAttributes->isEmpty())) {
-    emit logging("Получены не корректные параметры запроса. Сброс.");
-    emit operationFinished(RequestParameterError);
-    return;
-  }
-
-  // Создаем запрос
-  createTransponderRerelease(requestAttributes);
-  CurrentState = RequestCreated;
-
-  // Подключаемся к серверу персонализации
-  if (!processingServerConnection()) {
-    CurrentState = DisconnectedFromServer;
-    emit operationFinished(ServerConnectionError);
-    return;
-  }
-
-  CurrentState = ConnectedToServer;
-
-  // Отправляем сформированный блок данных
-  transmitDataBlock();
-
-  // Отключаемся от сервера
-  Socket->close();
-  CurrentState = DisconnectedFromServer;
-
-  // Обрабатываем полученный ответ
-  processTransponderRereleaseResponse(firmware);
-
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
-
-  // Возвращаем статус выполнения команды
-  emit operationFinished(ReturnStatus);
-}
-
-void PersoClient::requestTransponderRereleaseConfirm(
-    const QMap<QString, QString>* requestAttributes,
-    QMap<QString, QString>* responseAttributes) {
-  CurrentState = Ready;
-
-  // Проверка на существование
-  if ((!requestAttributes) || (!responseAttributes)) {
-    emit logging("Получены не корректные параметры запроса. Сброс.");
-    emit operationFinished(RequestParameterError);
-    return;
-  }
-
-  // Создаем запрос
-  createTransponderRereleaseConfirm(requestAttributes);
-  CurrentState = RequestCreated;
-
-  // Подключаемся к серверу персонализации
-  if (!processingServerConnection()) {
-    CurrentState = DisconnectedFromServer;
-    emit operationFinished(ServerConnectionError);
-    return;
-  }
-
-  CurrentState = ConnectedToServer;
-
-  // Отправляем сформированный блок данных
-  transmitDataBlock();
-
-  // Отключаемся от сервера
-  Socket->close();
-  CurrentState = DisconnectedFromServer;
-
-  // Обрабатываем полученный ответ
-  processTransponderRereleaseConfirmResponse(responseAttributes);
-
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
-
-  // Возвращаем статус выполнения команды
-  emit operationFinished(ReturnStatus);
+void PersoClient::createSocket() {
+  Socket = new QTcpSocket(this);
+  connect(Socket, &QTcpSocket::connected, this,
+          &PersoClient::on_SocketConnected_slot);
+  connect(Socket, &QTcpSocket::disconnected, this,
+          &PersoClient::on_SocketDisconnected_slot);
+  connect(Socket, &QTcpSocket::readyRead, this,
+          &PersoClient::on_SocketReadyRead_slot);
+  connect(Socket,
+          QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error), this,
+          &PersoClient::on_SocketError_slot);
 }
 
 bool PersoClient::processingServerConnection() {
@@ -347,7 +372,6 @@ bool PersoClient::processingServerConnection() {
 
   // Ожидаем подключения или отказа
   emit logging("Ожидание ответа от сервера. ");
-  CurrentState = WaitingConnectionWithServer;
   WaitTimer->start();
   WaitingLoop->exec();
 
@@ -369,7 +393,6 @@ void PersoClient::processingDataBlock() {
   // Если пришел некорректный JSON
   if (status.error != QJsonParseError::NoError) {
     emit logging("Ошибка парсинга JSON команды. ");
-    ReturnStatus = ResponseSyntaxError;
     return;
   }
 
@@ -423,15 +446,13 @@ void PersoClient::transmitDataBlock() {
       Socket->write(TransmittedDataBlock.mid(i, ONETIME_TRANSMIT_DATA_SIZE));
     }
   }
-  CurrentState = WaitingResponse;
 
   // Ожидаем ответ
   WaitTimer->start();
   WaitingLoop->exec();
-  CurrentState = ResponseReceived;
 }
 
-void PersoClient::createEchoRequest(void) {
+void PersoClient::createEcho(void) {
   emit logging("Формирование команды Echo. ");
 
   // Заголовок команды
@@ -444,7 +465,7 @@ void PersoClient::createEchoRequest(void) {
   createTransmittedDataBlock();
 }
 
-void PersoClient::createAuthorizationRequest(
+void PersoClient::createAuthorization(
     const QMap<QString, QString>* requestAttributes) {
   emit logging("Формирование команды Authorization. ");
 
@@ -523,14 +544,14 @@ void PersoClient::createTransponderRereleaseConfirm(
   createTransmittedDataBlock();
 }
 
-void PersoClient::processEchoResponse(void) {
+void PersoClient::processEcho(void) {
   emit logging("Обработка ответа на команду Echo. ");
 
   // Проверка статуса возврата
   if (CurrentResponse["return_status"] != "NoError") {
     emit logging(QString("Получена серверная ошибка: %1")
                      .arg(CurrentResponse["return_status"].toString()));
-    ReturnStatus = ServerError;
+    ProcessingStatus = ServerError;
     return;
   }
 
@@ -538,22 +559,22 @@ void PersoClient::processEchoResponse(void) {
       CurrentResponse.value("response_name").isUndefined() ||
       (CurrentResponse.value("response_name").toString() != "Echo")) {
     emit logging("Обнаружена синтаксическая ошибка в ответе Echo. ");
-    ReturnStatus = ResponseSyntaxError;
+    ProcessingStatus = ResponseSyntaxError;
     return;
   }
 
   emit logging("Команда Echo успешно выполнена. ");
-  ReturnStatus = CompletedSuccessfully;
+  ProcessingStatus = Completed;
 }
 
-void PersoClient::processAuthorizationResponse(void) {
+void PersoClient::processAuthorization(void) {
   emit logging("Обработка ответа на команду TransponderRelease. ");
 
   // Проверка статуса возврата
   if (CurrentResponse["return_status"] != "NoError") {
     emit logging(QString("Получена серверная ошибка: %1")
                      .arg(CurrentResponse["return_status"].toString()));
-    ReturnStatus = ServerError;
+    ProcessingStatus = ServerError;
     return;
   }
 
@@ -563,31 +584,31 @@ void PersoClient::processAuthorizationResponse(void) {
       CurrentResponse.value("access").isUndefined()) {
     emit logging(
         "Обнаружена синтаксическая ошибка в ответе Authorization. Сброс. ");
-    ReturnStatus = ResponseSyntaxError;
+    ProcessingStatus = ResponseSyntaxError;
     return;
   }
 
   if (CurrentResponse.value("access").toString() == "Allowed") {
-    ReturnStatus = CompletedSuccessfully;
+    ProcessingStatus = Completed;
   } else if (CurrentResponse.value("access").toString() == "NotExist") {
-    ReturnStatus = AuthorizationNotExist;
+    ProcessingStatus = AuthorizationNotExist;
   } else if (CurrentResponse.value("access").toString() == "NotActive") {
-    ReturnStatus = AuthorizationNotActive;
+    ProcessingStatus = AuthorizationNotActive;
   } else {
-    ReturnStatus = AuthorizationAccessDenied;
+    ProcessingStatus = AuthorizationAccessDenied;
   }
 
   emit logging("Команда Authorization успешно выполнена. ");
 }
 
-void PersoClient::processTransponderReleaseResponse(QFile* firmware) {
+void PersoClient::processTransponderRelease(QFile* firmware) {
   emit logging("Обработка ответа на команду TransponderRelease. ");
 
   // Проверка статуса возврата
   if (CurrentResponse["return_status"] != "NoError") {
     emit logging(QString("Получена серверная ошибка: %1")
                      .arg(CurrentResponse["return_status"].toString()));
-    ReturnStatus = ServerError;
+    ProcessingStatus = ServerError;
     return;
   }
 
@@ -598,14 +619,14 @@ void PersoClient::processTransponderReleaseResponse(QFile* firmware) {
       CurrentResponse.value("firmware").isUndefined()) {
     emit logging(
         "Обнаружена синтаксическая ошибка в ответе TransponderRelease. ");
-    ReturnStatus = ResponseSyntaxError;
+    ProcessingStatus = ResponseSyntaxError;
     return;
   }
 
   // Сохраняем присланный файл прошивки
   if (!firmware->open(QIODevice::WriteOnly)) {
     emit logging("Не удалось сохранить файл прошивки. ");
-    ReturnStatus = ServerError;
+    ProcessingStatus = ServerError;
     return;
   }
 
@@ -614,11 +635,11 @@ void PersoClient::processTransponderReleaseResponse(QFile* firmware) {
       CurrentResponse.value("firmware").toString().toUtf8()));
   firmware->close();
 
-  ReturnStatus = CompletedSuccessfully;
+  ProcessingStatus = Completed;
   emit logging("Команда TransponderRelease успешно выполнена. ");
 }
 
-void PersoClient::processTransponderReleaseConfirmResponse(
+void PersoClient::processTransponderReleaseConfirm(
     QMap<QString, QString>* responseAttributes) {
   emit logging("Обработка ответа на команду TransponderReleaseConfirm. ");
 
@@ -626,7 +647,7 @@ void PersoClient::processTransponderReleaseConfirmResponse(
   if (CurrentResponse["return_status"] != "NoError") {
     emit logging(QString("Получена серверная ошибка: %1")
                      .arg(CurrentResponse["return_status"].toString()));
-    ReturnStatus = ServerError;
+    ProcessingStatus = ServerError;
     return;
   }
 
@@ -639,13 +660,11 @@ void PersoClient::processTransponderReleaseConfirmResponse(
       CurrentResponse.value("box_id").isUndefined() ||
       CurrentResponse.value("pallet_id").isUndefined() ||
       CurrentResponse.value("order_id").isUndefined() ||
-      CurrentResponse.value("issuer_name").isUndefined() ||
-      CurrentResponse.value("manufacturer_id").isUndefined() ||
-      CurrentResponse.value("battery_insertation_date").isUndefined()) {
+      CurrentResponse.value("issuer_name").isUndefined()) {
     emit logging(
         "Обнаружена синтаксическая ошибка в ответе TransponderReleaseConfirm. "
         "Сброс. ");
-    ReturnStatus = ResponseSyntaxError;
+    ProcessingStatus = ResponseSyntaxError;
     return;
   }
 
@@ -659,24 +678,19 @@ void PersoClient::processTransponderReleaseConfirmResponse(
                              CurrentResponse.value("order_id").toString());
   responseAttributes->insert("issuer_name",
                              CurrentResponse.value("issuer_name").toString());
-  responseAttributes->insert(
-      "manufacturer_id", CurrentResponse.value("manufacturer_id").toString());
-  responseAttributes->insert(
-      "battery_insertation_date",
-      CurrentResponse.value("battery_insertation_date").toString());
 
-  ReturnStatus = CompletedSuccessfully;
+  ProcessingStatus = Completed;
   emit logging("Команда TransponderReleaseConfirm успешно выполнена. ");
 }
 
-void PersoClient::processTransponderRereleaseResponse(QFile* firmware) {
+void PersoClient::processTransponderRerelease(QFile* firmware) {
   emit logging("Обработка ответа на команду TransponderRerelease. ");
 
   // Проверка статуса возврата
   if (CurrentResponse["return_status"] != "NoError") {
     emit logging(QString("Получена серверная ошибка: %1")
                      .arg(CurrentResponse["return_status"].toString()));
-    ReturnStatus = ServerError;
+    ProcessingStatus = ServerError;
     return;
   }
 
@@ -688,14 +702,14 @@ void PersoClient::processTransponderRereleaseResponse(QFile* firmware) {
     emit logging(
         "Обнаружена синтаксическая ошибка в ответе TransponderRerelease: "
         "отсутствует файл прошивки. ");
-    ReturnStatus = ResponseSyntaxError;
+    ProcessingStatus = ResponseSyntaxError;
     return;
   }
 
   // Сохраняем присланный файл прошивки
   if (!firmware->open(QIODevice::WriteOnly)) {
     emit logging("Не удалось сохранить файл прошивки. ");
-    ReturnStatus = ResponseSyntaxError;
+    ProcessingStatus = ResponseSyntaxError;
     return;
   }
 
@@ -704,11 +718,11 @@ void PersoClient::processTransponderRereleaseResponse(QFile* firmware) {
       CurrentResponse.value("firmware").toString().toUtf8()));
   firmware->close();
 
-  ReturnStatus = CompletedSuccessfully;
+  ProcessingStatus = Completed;
   emit logging("Команда TransponderRerelease успешно выполнена. ");
 }
 
-void PersoClient::processTransponderRereleaseConfirmResponse(
+void PersoClient::processTransponderRereleaseConfirm(
     QMap<QString, QString>* responseAttributes) {
   emit logging("Обработка ответа на команду TransponderRereleaseConfirm. ");
 
@@ -716,7 +730,7 @@ void PersoClient::processTransponderRereleaseConfirmResponse(
   if (CurrentResponse["return_status"] != "NoError") {
     emit logging(QString("Получена серверная ошибка: %1")
                      .arg(CurrentResponse["return_status"].toString()));
-    ReturnStatus = ServerError;
+    ProcessingStatus = ServerError;
     return;
   }
 
@@ -729,13 +743,11 @@ void PersoClient::processTransponderRereleaseConfirmResponse(
       CurrentResponse.value("box_id").isUndefined() ||
       CurrentResponse.value("pallet_id").isUndefined() ||
       CurrentResponse.value("order_id").isUndefined() ||
-      CurrentResponse.value("issuer_name").isUndefined() ||
-      CurrentResponse.value("manufacturer_id").isUndefined() ||
-      CurrentResponse.value("battery_insertation_date").isUndefined()) {
+      CurrentResponse.value("issuer_name").isUndefined()) {
     emit logging(
         "Обнаружена синтаксическая ошибка в ответе TransponderReleaseConfirm. "
         "Сброс. ");
-    ReturnStatus = ResponseSyntaxError;
+    ProcessingStatus = ResponseSyntaxError;
     return;
   }
 
@@ -749,13 +761,8 @@ void PersoClient::processTransponderRereleaseConfirmResponse(
                              CurrentResponse.value("order_id").toString());
   responseAttributes->insert("issuer_name",
                              CurrentResponse.value("issuer_name").toString());
-  responseAttributes->insert(
-      "manufacturer_id", CurrentResponse.value("manufacturer_id").toString());
-  responseAttributes->insert(
-      "battery_insertation_date",
-      CurrentResponse.value("battery_insertation_date").toString());
 
-  ReturnStatus = CompletedSuccessfully;
+  ProcessingStatus = Completed;
   emit logging("Команда TransponderRereleaseConfirm успешно выполнена. ");
 }
 
@@ -822,29 +829,13 @@ void PersoClient::on_SocketReadyRead_slot() {
 
 void PersoClient::on_SocketError_slot(
     QAbstractSocket::SocketError socketError) {
-  ReturnStatus = ServerConnectionTerminated;
-  CurrentState = DisconnectedFromServer;
-
+  Socket->abort();
   emit logging(QString("Ошибка сети: Код: %1. Описание: %2.")
                    .arg(QString::number(socketError), Socket->errorString()));
-  Socket->close();
-
-  emit operationFinished(ReturnStatus);
 }
 
 void PersoClient::on_WaitTimerTimeout_slot() {
-  if (CurrentState == WaitingConnectionWithServer) {
-    ReturnStatus = ServerConnectionError;
-  } else if (CurrentState == WaitingResponse) {
-    ReturnStatus = ServerNotResponding;
-  } else {
-    ReturnStatus = UnknownError;
-  }
-
-  CurrentState = DisconnectedFromServer;
-
-  emit logging("Время ожидания вышло. ");
   Socket->abort();
-
-  emit operationFinished(ReturnStatus);
+  TimeoutIndicator = true;
+  emit logging("Время ожидания вышло. ");
 }

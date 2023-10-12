@@ -248,21 +248,24 @@ void MasterGUI::createSettingsTab() {
   ProgrammerSettingsMainLayout->addWidget(ProgrammerSpeedLineEdit, 1, 1, 1, 2);
 
   // Настройки принтера
-  PrinterSettingsGroupBox = new QGroupBox(QString("Стикер-принтер"));
-  SettingsMainSubLayout->addWidget(PrinterSettingsGroupBox);
+  StickerPrinterSettingsGroupBox = new QGroupBox(QString("Стикер-принтер"));
+  SettingsMainSubLayout->addWidget(StickerPrinterSettingsGroupBox);
 
-  PrinterSettingsMainLayout = new QGridLayout();
-  PrinterSettingsGroupBox->setLayout(PrinterSettingsMainLayout);
+  StickerPrinterSettingsMainLayout = new QGridLayout();
+  StickerPrinterSettingsGroupBox->setLayout(StickerPrinterSettingsMainLayout);
 
-  PrinterLibPathLabel = new QLabel("Путь к библиотеке");
-  PrinterSettingsMainLayout->addWidget(PrinterLibPathLabel, 0, 0, 1, 1);
-  PrinterLibPathLineEdit =
+  StickerPrinterLibPathLabel = new QLabel("Путь к библиотеке");
+  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLabel, 0, 0,
+                                              1, 1);
+  StickerPrinterLibPathLineEdit =
       new QLineEdit(settings.value("StickerPrinter/DLL/Path").toString());
-  PrinterSettingsMainLayout->addWidget(PrinterLibPathLineEdit, 0, 1, 1, 1);
-  PrinterLibPathPushButton = new QPushButton("Обзор");
-  PrinterSettingsMainLayout->addWidget(PrinterLibPathPushButton, 0, 2, 1, 1);
-  connect(PrinterLibPathPushButton, &QPushButton::clicked, this,
-          &MasterGUI::on_PrinterLibPathPushButton_slot);
+  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLineEdit, 0,
+                                              1, 1, 1);
+  StickerPrinterLibPathPushButton = new QPushButton("Обзор");
+  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathPushButton,
+                                              0, 2, 1, 1);
+  connect(StickerPrinterLibPathPushButton, &QPushButton::clicked, this,
+          &MasterGUI::on_StickerPrinterLibPathPushButton_slot);
 
   // Кнопка сохранения настроек
   ApplySettingsPushButton = new QPushButton("Применить изменения");
@@ -300,8 +303,8 @@ void MasterGUI::on_ProgrammerExeFilePathPushButton_slot() {
   ProgrammerExeFilePathLineEdit->setText(filePath);
 }
 
-void MasterGUI::on_PrinterLibPathPushButton_slot() {
+void MasterGUI::on_StickerPrinterLibPathPushButton_slot() {
   QString filePath =
       QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.dll");
-  PrinterLibPathLineEdit->setText(filePath);
+  StickerPrinterLibPathLineEdit->setText(filePath);
 }
