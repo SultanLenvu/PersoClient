@@ -24,6 +24,7 @@ class LogSystem : public QObject {
     QString SavePath;
     QList<LogBackend*> backends;
     WidgetLogBackend *WidgetLogger; // meh
+    TextStreamLogBackend *TextStreamLogger;
 
   public:
     LogSystem(QObject* parent);
