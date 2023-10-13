@@ -1,13 +1,7 @@
 #include "widget_log_backend.h"
 
-WidgetLogBackend::WidgetLogBackend(QObject *parent, MasterGUI *gui)
-  : LogBackend(parent)
-{
-  connect(this, &WidgetLogBackend::requestDisplayLog,
-      gui, &MasterGUI::displayLogData);
-  connect(this, &WidgetLogBackend::requestClearDisplayLog,
-      gui, &MasterGUI::clearLogDataDisplay);
-}
+WidgetLogBackend::WidgetLogBackend(QObject *parent)
+  : LogBackend(parent) {}
 
 void WidgetLogBackend::writeLogLine(const QString &str)
 {

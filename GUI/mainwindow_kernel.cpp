@@ -5,6 +5,7 @@
 
 #include "General/definitions.h"
 #include "mainwindow_kernel.h"
+#include "Log/widget_log_backend.h"
 
 MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   setObjectName("MainWindowKernel");
@@ -358,10 +359,10 @@ void MainWindowKernel::createMasterInterface() {
 
 void MainWindowKernel::connectMasterInterface() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  connect(Logger, &LogSystem::requestDisplayLog, gui,
+  connect(Logger->getWidgetLogger(), &WidgetLogBackend::requestDisplayLog, gui,
           &MasterGUI::displayLogData);
-  connect(Logger, &LogSystem::requestClearDisplayLog, gui,
-          &MasterGUI::clearLogDataDisplay);
+  connect(Logger->getWidgetLogger(), &WidgetLogBackend::requestClearDisplayLog,
+          gui, &MasterGUI::clearLogDataDisplay);
 
   // Сервер
   connect(gui->PersoServerConnectPushButton, &QPushButton::clicked, this,
