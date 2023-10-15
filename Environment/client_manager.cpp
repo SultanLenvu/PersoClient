@@ -85,7 +85,7 @@ void ClientManager::performServerAuthorization(
   finishOperationPerforming("performServerAuthorization");
 }
 
-void ClientManager::performTransponderFirmwareLoading(StringMapModel* model) {
+void ClientManager::performTransponderFirmwareLoading(MapModel* model) {
   startOperationPerforming("performTransponderFirmwareLoading");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -130,39 +130,39 @@ void ClientManager::performTransponderFirmwareLoading(StringMapModel* model) {
     return;
   }
 
-  QMap<QString, QString>* responseParameters = new QMap<QString, QString>;
+  QMap<QString, QString> responseParameters;
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
   requestParameters.insert("ucid", ucid);
   sendLog(
       "Отправка запроса на подтверждение загрузки прошивки в транспондер. ");
   clientStatus = Client->requestTransponderReleaseConfirm(&requestParameters,
-                                                          responseParameters);
+                                                          &responseParameters);
   if (clientStatus != PersoClient::Completed) {
     processClientError(clientStatus, "performTransponderFirmwareLoading");
     return;
   }
-
-  // Строим модель для представления данных транспондера
-  model->build(responseParameters);
 
   // Удаляем файл прошивки
   firmware.remove();
 
   sendLog("Печать стикера для транспондера.");
   stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(responseParameters);
+      StickerPrinter->printTransponderSticker(&responseParameters);
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
     return;
   }
 
+  // Строим модель для представления данных транспондера
+  model->buildTransponderInfo(&responseParameters);
+
   // Завершаем операцию
   finishOperationPerforming("performTransponderFirmwareLoading");
 }
 
-void ClientManager::performTransponderFirmwareReloading(StringMapModel* model,
+void ClientManager::performTransponderFirmwareReloading(MapModel* model,
                                                         const QString& pan) {
   startOperationPerforming("performTransponderFirmwareReloading");
 
@@ -209,33 +209,33 @@ void ClientManager::performTransponderFirmwareReloading(StringMapModel* model,
     return;
   }
 
-  QMap<QString, QString>* responseParameters = new QMap<QString, QString>;
+  QMap<QString, QString> responseParameters;
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
   requestParameters.insert("pan", pan);
   requestParameters.insert("ucid", ucid);
   sendLog("Отправка запроса на подтверждение перевыпуска транспондера. ");
-  clientStatus = Client->requestTransponderRereleaseConfirm(&requestParameters,
-                                                            responseParameters);
+  clientStatus = Client->requestTransponderRereleaseConfirm(
+      &requestParameters, &responseParameters);
   if (clientStatus != PersoClient::Completed) {
     processClientError(clientStatus, "performTransponderFirmwareReloading");
     return;
   }
-
-  // Строим модель для представления данных транспондера
-  model->build(responseParameters);
 
   // Удаляем файл прошивки
   firmware.remove();
 
   sendLog("Печать стикера для транспондера.");
   stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(responseParameters);
+      StickerPrinter->printTransponderSticker(&responseParameters);
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
     return;
   }
+
+  // Строим модель для представления данных транспондера
+  model->buildTransponderInfo(&responseParameters);
 
   // Завершаем операцию
   finishOperationPerforming("performTransponderFirmwareReloading");

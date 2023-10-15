@@ -1,7 +1,7 @@
 #include <QDateTime>
-#include <QString>
-#include <QFile>
 #include <QDebug>
+#include <QFile>
+#include <QString>
 
 #include "General/definitions.h"
 #include "mainwindow_kernel.h"
@@ -27,7 +27,7 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   createManagerInstance();
 
   // Создаем модель для представления данных транспондера
-  TransponderInfo = new StringMapModel(this);
+  TransponderInfo = new MapModel(this);
 
   // Создаем графический интерфейс для авторизации
   //  createAuthorizationInterface();
@@ -509,13 +509,13 @@ void MainWindowKernel::createManagerInstance() {
   connect(Manager, &ClientManager::logging, LogSystem::instance(),
           &LogSystem::generate);
   connect(Manager, &ClientManager::notifyUser, Interactor,
-          &UserInteractionSystem::generateMessage);
+          &InteractionSystem::generateMessage);
   connect(Manager, &ClientManager::notifyUserAboutError, Interactor,
-          &UserInteractionSystem::generateErrorMessage);
+          &InteractionSystem::generateErrorMessage);
   connect(Manager, &ClientManager::operationPerfomingStarted, Interactor,
-          &UserInteractionSystem::startOperationProgressDialog);
+          &InteractionSystem::startOperationProgressDialog);
   connect(Manager, &ClientManager::operationPerformingFinished, Interactor,
-          &UserInteractionSystem::finishOperationProgressDialog);
+          &InteractionSystem::finishOperationProgressDialog);
   connect(Manager, &ClientManager::requestProductionInterface_signal, this,
           &MainWindowKernel::on_RequestProductionInterface_slot);
 
@@ -570,9 +570,10 @@ void MainWindowKernel::createManagerInstance() {
 }
 
 void MainWindowKernel::createLoggerInstance() {
-  connect(this, &MainWindowKernel::applySettings_signal, LogSystem::instance(),
+  Logger = LogSystem::instance();
+  connect(this, &MainWindowKernel::applySettings_signal, Logger,
           &LogSystem::applySettings);
-  connect(this, &MainWindowKernel::loggerClear_signal, LogSystem::instance(),
+  connect(this, &MainWindowKernel::loggerClear_signal, Logger,
           &LogSystem::clear);
 
   LoggerThread = new QThread(this);
@@ -584,11 +585,11 @@ void MainWindowKernel::createLoggerInstance() {
 }
 
 void MainWindowKernel::createInteractorInstance() {
-  Interactor = new UserInteractionSystem(this);
-  connect(Interactor, &UserInteractionSystem::logging, LogSystem::instance(),
+  Interactor = InteractionSystem::instance();
+  connect(Interactor, &InteractionSystem::logging, Logger,
           &LogSystem::generate);
   connect(this, &MainWindowKernel::applySettings_signal, Interactor,
-          &UserInteractionSystem::applySettings);
+          &InteractionSystem::applySettings);
 }
 
 void MainWindowKernel::on_RequestProductionInterface_slot() {

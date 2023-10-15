@@ -8,7 +8,7 @@ CustomTransponderStickerScanDialog::CustomTransponderStickerScanDialog(
 
   // Создаем диалоговое окно
   setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
-              DesktopGeometry.width() * 0.3, DesktopGeometry.height() * 0.1);
+              DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.1);
   setWindowTitle("Данные стикера");
 
   MainLayout = new QGridLayout();
@@ -24,7 +24,7 @@ CustomTransponderStickerScanDialog::CustomTransponderStickerScanDialog(
   PanInput = new QLineEdit();
   MainLayout->addWidget(PanInput, 4, 1, 1, 1);
 
-  OkButton = new QPushButton("Начать");
+  OkButton = new QPushButton("Распечатать");
   MainLayout->addWidget(OkButton, 5, 0, 1, 2);
   connect(OkButton, &QPushButton::clicked, this, &QDialog::accept);
 

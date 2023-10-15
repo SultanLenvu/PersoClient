@@ -5,18 +5,19 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
-#include <QMessageBox>
+#include <QFileInfo>
 #include <QObject>
 #include <QString>
 #include <QTextStream>
 
+#include "GUI/interaction_system.h"
 #include "log_backend.h"
 
 class TextStreamLogBackend: public LogBackend {
   Q_OBJECT
  private:
   bool LogEnable;
-  QFile File;
+  QFile CurrentLogFile;
   QTextStream LogTextStream;
 
  public:
@@ -29,6 +30,10 @@ class TextStreamLogBackend: public LogBackend {
  private:
   Q_DISABLE_COPY(TextStreamLogBackend);
   void initialize();
+  void removeOldestLogFiles(void);
+
+ signals:
+  void notifyAboutError(const QString& log);
 };
 
 #endif /* FILELOGBACKEND_H */

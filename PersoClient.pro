@@ -11,7 +11,8 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    General/string_map_model.cpp \
+    GUI/interaction_system.cpp \
+    General/map_model.cpp \
     Log/log_system.cpp \
     Log/log_backend.cpp \
     Log/text_stream_log_backend.cpp \
@@ -21,7 +22,6 @@ SOURCES += \
     GUI/authorization_dialog.cpp \
     GUI/custom_transponder_sticker_dialog.cpp \
     GUI/transponder_sticker_scan_dialog.cpp \
-    GUI/user_interaction_system.cpp \
     GUI/authorization_gui.cpp \
     GUI/gui.cpp \
     GUI/mainwindow_kernel.cpp \
@@ -34,7 +34,8 @@ SOURCES += \
     main.cpp
 
 HEADERS += \
-    General/string_map_model.h \
+    GUI/interaction_system.h \
+    General/map_model.h \
     Log/log_system.h \
     Log/log_backend.h \
     Log/text_stream_log_backend.h \
@@ -44,7 +45,6 @@ HEADERS += \
     GUI/authorization_dialog.h \
     GUI/custom_transponder_sticker_dialog.h \
     GUI/transponder_sticker_scan_dialog.h \
-    GUI/user_interaction_system.h \
     GUI/authorization_gui.h \
     GUI/gui.h \
     GUI/mainwindow_kernel.h \

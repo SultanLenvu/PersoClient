@@ -663,7 +663,8 @@ void PersoClient::processTransponderReleaseConfirm(
       CurrentResponse.value("box_id").isUndefined() ||
       CurrentResponse.value("pallet_id").isUndefined() ||
       CurrentResponse.value("order_id").isUndefined() ||
-      CurrentResponse.value("issuer_name").isUndefined()) {
+      CurrentResponse.value("issuer_name").isUndefined() ||
+      CurrentResponse.value("transponder_model").isUndefined()) {
     sendLog(
         "Обнаружена синтаксическая ошибка в ответе TransponderReleaseConfirm. "
         "Сброс. ");
@@ -681,6 +682,9 @@ void PersoClient::processTransponderReleaseConfirm(
                              CurrentResponse.value("order_id").toString());
   responseAttributes->insert("issuer_name",
                              CurrentResponse.value("issuer_name").toString());
+  responseAttributes->insert(
+      "transponder_model",
+      CurrentResponse.value("transponder_model").toString());
 
   ProcessingStatus = Completed;
   sendLog("Команда TransponderReleaseConfirm успешно выполнена. ");
@@ -746,7 +750,8 @@ void PersoClient::processTransponderRereleaseConfirm(
       CurrentResponse.value("box_id").isUndefined() ||
       CurrentResponse.value("pallet_id").isUndefined() ||
       CurrentResponse.value("order_id").isUndefined() ||
-      CurrentResponse.value("issuer_name").isUndefined()) {
+      CurrentResponse.value("issuer_name").isUndefined() ||
+      CurrentResponse.value("transponder_model").isUndefined()) {
     sendLog(
         "Обнаружена синтаксическая ошибка в ответе TransponderReleaseConfirm. "
         "Сброс. ");
@@ -764,6 +769,9 @@ void PersoClient::processTransponderRereleaseConfirm(
                              CurrentResponse.value("order_id").toString());
   responseAttributes->insert("issuer_name",
                              CurrentResponse.value("issuer_name").toString());
+  responseAttributes->insert(
+      "transponder_model",
+      CurrentResponse.value("transponder_model").toString());
 
   ProcessingStatus = Completed;
   sendLog("Команда TransponderRereleaseConfirm успешно выполнена. ");

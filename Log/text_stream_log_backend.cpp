@@ -9,6 +9,10 @@ TextStreamLogBackend::TextStreamLogBackend(QObject* parent)
     : LogBackend(parent) {
   setObjectName("TextStreamLogBackend");
   initialize();
+
+  connect(this, &TextStreamLogBackend::notifyAboutError,
+          InteractionSystem::instance(),
+          &InteractionSystem::generateErrorMessage);
 }
 
 TextStreamLogBackend::~TextStreamLogBackend() {
@@ -27,23 +31,41 @@ void TextStreamLogBackend::initialize() {
   QDir logDir;
   if (!logDir.mkpath(QApplication::applicationDirPath() + "/logs")) {
     LogEnable = false;
-    QMessageBox::critical(nullptr, "Ошибка",
-                          "Не удалось создать директорию для логгирования. ",
-                          QMessageBox::Ok);
+    emit notifyAboutError("Не удалось создать директорию для логгирования. ");
     return;
   }
 
-  File.setFileName(
-      QApplication::applicationDirPath() + "/logs/log " +
-      QDateTime::currentDateTime().toString("dd.MM.yyyy hh.mm.ss"));
-  if (!File.open(QIODevice::WriteOnly)) {
+  CurrentLogDir = QApplication::applicationDirPath() + "/logs/log " +
+                  QDateTime::currentDateTime().toString("dd.MM.yyyy hh.mm.ss");
+  CurrentLogFile.setFileName(CurrentLogDir);
+  if (!CurrentLogFile.open(QIODevice::WriteOnly)) {
     LogEnable = false;
-    QMessageBox::critical(nullptr, "Ошибка",
-                          "Не удалось открыть файл для логгирования. ",
-                          QMessageBox::Ok);
+    emit notifyAboutError("Не удалось открыть файл для логгирования. ");
     return;
   }
+
+  removeOldestLogFiles();
 
   LogEnable = true;
-  LogTextStream.setDevice(&File);
+  LogTextStream.setDevice(&CurrentLogFile);
+}
+
+void TextStreamLogBackend::removeOldestLogFiles() {
+  QDir directory(CurrentLogDir);
+
+  // Получаем список файлов в директории
+  QFileInfoList fileList =
+      directory.entryInfoList(QDir::Files | QDir::NoDotAndDotDot, QDir::Time);
+
+  if (fileList.size() > LOG_FILE_MAX_NUMBER) {
+    int filesToDeleteCount = fileList.size() - LOG_FILE_MAX_NUMBER;
+
+    // Удаляем самые старые файлы
+    for (int i = 0; i < filesToDeleteCount; ++i) {
+      const QFileInfo& fileInfo = fileList.at(i);
+      QString filePath = fileInfo.absoluteFilePath();
+
+      QFile::remove(filePath);
+    }
+  }
 }

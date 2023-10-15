@@ -1,22 +1,23 @@
-#ifndef STRING_MAP_MODEL_H
-#define STRING_MAP_MODEL_H
+#ifndef MAP_MODEL_H
+#define MAP_MODEL_H
 
 #include <QAbstractTableModel>
 #include <QMap>
 #include <QString>
 
-class StringMapModel : public QAbstractTableModel {
+class MapModel : public QAbstractTableModel {
  private:
-  const QMap<QString, QString>* Map;
+  QMap<QVariant, QVariant> Map;
+  QMap<QString, QString> TransponderInfoMatchTable;
 
  public:
-  explicit StringMapModel(QObject* parent);
-  ~StringMapModel();
+  explicit MapModel(QObject* parent);
+  ~MapModel();
 
-  void build(const QMap<QString, QString>* map);
+  void buildTransponderInfo(const QMap<QString, QString>* map);
   void clear(void);
   bool isEmpty(void) const;
-  const QMap<QString, QString>* map(void) const;
+  const QMap<QVariant, QVariant>* map(void) const;
 
   // Методы модели
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -27,8 +28,8 @@ class StringMapModel : public QAbstractTableModel {
                       int role = Qt::DisplayRole) const override;
 
  private:
-  Q_DISABLE_COPY(StringMapModel);
-  void deleteAll(void);
+  Q_DISABLE_COPY(MapModel);
+  void createMatchTables(void);
 };
 
-#endif  // STRING_MAP_MODEL_H
+#endif  // MAP_MODEL_H

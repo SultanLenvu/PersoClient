@@ -10,11 +10,11 @@
 
 #include "Environment/client_manager.h"
 #include "GUI/authorization_gui.h"
+#include "GUI/interaction_system.h"
 #include "GUI/master_gui.h"
 #include "GUI/production_gui.h"
-#include "GUI/user_interaction_system.h"
 #include "General/definitions.h"
-#include "General/string_map_model.h"
+#include "General/map_model.h"
 #include "Log/log_system.h"
 
 class MainWindowKernel : public QMainWindow {
@@ -35,14 +35,15 @@ class MainWindowKernel : public QMainWindow {
   QAction* AboutProgramAct;
   //==================================================
 
+  LogSystem* Logger;
   QThread* LoggerThread;
 
   ClientManager* Manager;
   QThread* ManagerThread;
 
-  UserInteractionSystem* Interactor;
+  InteractionSystem* Interactor;
 
-  StringMapModel* TransponderInfo;
+  MapModel* TransponderInfo;
 
  public:
   explicit MainWindowKernel(QWidget* parent = nullptr);
@@ -118,8 +119,8 @@ class MainWindowKernel : public QMainWindow {
   void performServerEcho_signal(void);
   void performServerAuthorization_signal(
       const QSharedPointer<QMap<QString, QString>> data);
-  void performTransponderFirmwareLoading_signal(StringMapModel* model);
-  void performTransponderFirmwareReloading_signal(StringMapModel* model,
+  void performTransponderFirmwareLoading_signal(MapModel* model);
+  void performTransponderFirmwareReloading_signal(MapModel* model,
                                                   const QString& pan);
   void performLocalFirmwareLoading_signal(const QString& path);
   void performFirmwareReading_signal(void);

@@ -11,7 +11,7 @@
 #include <QVector>
 
 #include "General/definitions.h"
-#include "General/string_map_model.h"
+#include "General/map_model.h"
 #include "General/types.h"
 #include "Log/log_system.h"
 #include "Programmers/interface_programmer.h"
@@ -51,9 +51,8 @@ class ClientManager : public QObject {
   void performServerEcho(void);
   void performServerAuthorization(
       const QSharedPointer<QMap<QString, QString>> data);
-  void performTransponderFirmwareLoading(StringMapModel* model);
-  void performTransponderFirmwareReloading(StringMapModel* model,
-                                           const QString& pan);
+  void performTransponderFirmwareLoading(MapModel* model);
+  void performTransponderFirmwareReloading(MapModel* model, const QString& pan);
 
   // Программатор
   void performLocalFirmwareLoading(const QString& path);
