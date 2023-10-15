@@ -20,6 +20,9 @@ class AuthorizationGUI : public GUI {
 
   virtual void create(void) override;
   virtual void update(void) override;
+
+ private:
+  Q_DISABLE_COPY(AuthorizationGUI);
 };
 
 #endif // AUTHORIZATIONGUI_H

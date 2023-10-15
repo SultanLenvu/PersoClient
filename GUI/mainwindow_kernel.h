@@ -14,7 +14,7 @@
 #include "GUI/production_gui.h"
 #include "GUI/user_interaction_system.h"
 #include "General/definitions.h"
-#include "General/qmap_model.h"
+#include "General/string_map_model.h"
 #include "Log/log_system.h"
 
 class MainWindowKernel : public QMainWindow {
@@ -35,7 +35,6 @@ class MainWindowKernel : public QMainWindow {
   QAction* AboutProgramAct;
   //==================================================
 
-  LogSystem* Logger;
   QThread* LoggerThread;
 
   ClientManager* Manager;
@@ -83,6 +82,7 @@ class MainWindowKernel : public QMainWindow {
   void on_OpenAuthorizationInterfaceAct_slot(void);
 
  private:
+  Q_DISABLE_COPY(MainWindowKernel);
   void loadSettings(void);
   bool checkNewSettings(void);
   QString getStickerPan(QStringList& stickerData);

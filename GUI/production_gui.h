@@ -24,6 +24,9 @@ class ProductionGUI : public GUI {
 
   virtual void create(void) override;
   virtual void update(void) override;
+
+ private:
+  Q_DISABLE_COPY(ProductionGUI);
 };
 
 #endif  // PRODUCTION_GUI_H

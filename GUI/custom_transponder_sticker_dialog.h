@@ -22,6 +22,7 @@ class CustomTransponderStickerScanDialog : public QDialog {
   void getData(QMap<QString, QString>* data);
 
  private:
+  Q_DISABLE_COPY(CustomTransponderStickerScanDialog);
   bool checkInput(void);
 };
 

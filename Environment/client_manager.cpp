@@ -431,16 +431,16 @@ void ClientManager::loadSettings() {
   LogEnable = settings.value("log_system/global_enable").toBool();
 }
 
-void ClientManager::sendLog(const QString& log) {
+void ClientManager::sendLog(const QString& log) const {
   if (LogEnable) {
-    emit logging(log);
+    emit logging(QString("%1 - %2").arg(objectName(), log));
   }
 }
 
 void ClientManager::createProgrammerInstance() {
   Programmer = new JLinkExeProgrammer(this);
-  connect(Programmer, &IProgrammer::logging, this,
-          &ClientManager::proxyLogging);
+  connect(Programmer, &IProgrammer::logging, LogSystem::instance(),
+          &LogSystem::generate);
 
   // Заполняем таблицу соответствий статусов возврата
   ProgrammerReturnStatusMatch.insert(IProgrammer::NotExecuted,
@@ -456,7 +456,8 @@ void ClientManager::createProgrammerInstance() {
 
 void ClientManager::createClientInstance() {
   Client = new PersoClient(this);
-  connect(Client, &PersoClient::logging, this, &ClientManager::proxyLogging);
+  connect(Client, &PersoClient::logging, LogSystem::instance(),
+          &LogSystem::generate);
 
   // Заполняем таблицу соответствий статусов возврата
   ClientReturnStatusMatch.insert(PersoClient::NotExecuted,
@@ -486,8 +487,8 @@ void ClientManager::createClientInstance() {
 
 void ClientManager::createStickerPrinterInstance() {
   StickerPrinter = new TE310Printer(this);
-  connect(StickerPrinter, &IStickerPrinter::logging, this,
-          &ClientManager::proxyLogging);
+  connect(StickerPrinter, &IStickerPrinter::logging, LogSystem::instance(),
+          &LogSystem::generate);
 
   // Заполняем таблицу соответствий статусов возврата
   StickerPrinterReturnStatusMatch.insert(
@@ -545,15 +546,4 @@ void ClientManager::processStickerPrintersError(
   emit operationPerformingFinished(operationName);
   emit notifyUserAboutError(StickerPrinterReturnStatusMatch.value(status));
   Mutex.unlock();
-}
-
-void ClientManager::proxyLogging(const QString& log) {
-  if (sender()->objectName() == "IProgrammer")
-    sendLog("Programmer - " + log);
-  else if (sender()->objectName() == "PersoClient")
-    sendLog("Client - " + log);
-  else if (sender()->objectName() == "TE310Printer")
-    sendLog("StickerPrinter - " + log);
-  else
-    sendLog("Unknown - " + log);
 }

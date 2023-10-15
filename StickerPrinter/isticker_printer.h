@@ -38,9 +38,12 @@ class IStickerPrinter : public QObject {
 
   virtual void applySetting(void) = 0;
 
+ private:
+  Q_DISABLE_COPY(IStickerPrinter);
+
  signals:
-  void logging(const QString& log);
-  void operationFinished(ReturnStatus ret);
+  void logging(const QString& log) const;
+  void operationFinished(ReturnStatus ret) const;
 };
 
 #endif  // ISTICKERPRINTER_H

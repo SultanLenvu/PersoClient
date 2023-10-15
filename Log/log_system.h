@@ -2,17 +2,17 @@
 #define LOGSYSTEM_H
 
 #include <QHostAddress>
+#include <QList>
+#include <QMutex>
 #include <QObject>
 #include <QSettings>
 #include <QThread>
 #include <QTime>
 #include <QUdpSocket>
-#include <QList>
 
 #include <Log/log_backend.h>
-#include <Log/widget_log_backend.h>
 #include <Log/text_stream_log_backend.h>
-
+#include <Log/widget_log_backend.h>
 
 /* Глобальная система логгирования */
 //==================================================================================
@@ -20,32 +20,29 @@
 class LogSystem : public QObject {
   Q_OBJECT
 
-  private:
-    QString SavePath;
-    QList<LogBackend*> backends;
-    WidgetLogBackend *WidgetLogger; // meh
-    TextStreamLogBackend *TextStreamLogger;
+ private:
+  QString SavePath;
+  QList<LogBackend*> backends;
+  WidgetLogBackend* WidgetLogger;
+  TextStreamLogBackend* TextStreamLogger;
 
-  public:
-    LogSystem(QObject* parent);
-    ~LogSystem();
-    WidgetLogBackend *getWidgetLogger();
-    void addBackend(LogBackend *backend);
-    void removeBackend(LogBackend *backend);
+  static QMutex Mutex;
 
-  public slots:
-    void clear(void);
-    void generate(const QString& log);
+ public:
+  ~LogSystem();
+  WidgetLogBackend* getWidgetLogger();
+  static LogSystem* instance(void);
 
-    void applySettings(void);
+ public slots:
+  void clear(void);
+  void generate(const QString& log);
 
-  private:
-    Q_DISABLE_COPY(LogSystem)
-    void loadSettings(void);
+  void applySettings(void);
 
-  signals:
-    void requestDisplayLog(const QString& logData);
-    void requestClearDisplayLog(void);
+ private:
+  LogSystem(QObject* parent);
+  Q_DISABLE_COPY(LogSystem)
+  void loadSettings(void);
 };
 
 //==================================================================================

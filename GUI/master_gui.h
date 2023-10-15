@@ -128,6 +128,8 @@ class MasterGUI : public GUI {
   void clearLogDataDisplay(void);
 
  private:
+  Q_DISABLE_COPY(MasterGUI);
+
   void createServerTab(void);
   void createProgrammatorTab(void);
   void createStickerPrinterTab(void);

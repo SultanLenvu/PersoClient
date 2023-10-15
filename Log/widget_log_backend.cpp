@@ -5,10 +5,10 @@ WidgetLogBackend::WidgetLogBackend(QObject *parent)
 
 void WidgetLogBackend::writeLogLine(const QString &str)
 {
-  emit requestDisplayLog(str);
+  emit displayLog_signal(str);
 }
 
 void WidgetLogBackend::clear()
 {
-  emit requestClearDisplayLog();
+  emit clearLogDisplay_signal();
 }

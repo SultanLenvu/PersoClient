@@ -25,6 +25,9 @@ class GUI : public QWidget {
 
   GuiType type(void);
 
+ private:
+  Q_DISABLE_COPY(GUI);
+
  signals:
 };
 

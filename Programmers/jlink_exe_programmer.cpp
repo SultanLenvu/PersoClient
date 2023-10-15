@@ -12,12 +12,12 @@ JLinkExeProgrammer::~JLinkExeProgrammer() {
 JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::getUcid(QString* ucid) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    sendLog(QString("Отсутсвует JLink.exe. Сброс."));
     return DriverMissing;
   }
 
   // Логгирование
-  emit logging(QString("Считывание UCID микроконтроллера."));
+  sendLog(QString("Считывание UCID микроконтроллера."));
 
   // Формируем скрипт JLink
   initScript();
@@ -52,18 +52,18 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadFirmware(
     QFile* firmware) {
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
-    emit logging(QString("Получен некорректный файл прошивки. Сброс. "));
+    sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
     return FirmwareFileError;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    sendLog(QString("Отсутсвует JLink.exe. Сброс."));
     return DriverMissing;
   }
 
   // Логгирование
-  emit logging(QString("Загрузка прошивки."));
+  sendLog(QString("Загрузка прошивки."));
 
   // Формируем скрипт JLink
   initScript();
@@ -90,18 +90,18 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadFirmwareWithUnlock(
     QFile* firmware) {
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
-    emit logging(QString("Получен некорректный файл прошивки. Сброс. "));
+    sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
     return FirmwareFileError;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    sendLog(QString("Отсутсвует JLink.exe. Сброс."));
     return DriverMissing;
   }
 
   // Логгирование
-  emit logging(QString("Разблокировка памяти и загрузка прошивки."));
+  sendLog(QString("Разблокировка памяти и загрузка прошивки."));
 
   // Формируем скрипт JLink
   initScript();
@@ -143,12 +143,12 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadFirmwareWithUnlock(
 JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readFirmware(void) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    sendLog(QString("Отсутсвует JLink.exe. Сброс."));
     return DriverMissing;
   }
 
   // Логгирование
-  emit logging(QString("Считывание прошивки."));
+  sendLog(QString("Считывание прошивки."));
 
   // Формируем скрипт JLink
   initScript();
@@ -171,12 +171,12 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readFirmware(void) {
 JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::eraseFirmware() {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    sendLog(QString("Отсутсвует JLink.exe. Сброс."));
     return DriverMissing;
   }
 
   // Логгирование
-  emit logging(QString("Стирание прошивки."));
+  sendLog(QString("Стирание прошивки."));
 
   // Формируем скрипт JLink
   initScript();
@@ -195,12 +195,12 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::eraseFirmware() {
 JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readData(void) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    sendLog(QString("Отсутсвует JLink.exe. Сброс."));
     return DriverMissing;
   }
 
   // Логгирование
-  emit logging(QString("Чтение данных."));
+  sendLog(QString("Чтение данных."));
 
   // Формируем скрипт JLink
   initScript();
@@ -228,13 +228,13 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readData(void) {
 JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadData(QFile* data) {
   // Проверка корректности присланной прошивки
   if (!checkDataFile(data)) {
-    emit logging(QString("Получен некорректный файл с данными. Сброс. "));
+    sendLog(QString("Получен некорректный файл с данными. Сброс. "));
     return DataFileError;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    sendLog(QString("Отсутсвует JLink.exe. Сброс."));
     return DriverMissing;
   }
 
@@ -266,12 +266,12 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadData(QFile* data) {
 JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::unlockDevice() {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    sendLog(QString("Отсутсвует JLink.exe. Сброс."));
     return DriverMissing;
   }
 
   // Логгирование
-  emit logging(QString("Разблокирование памяти."));
+  sendLog(QString("Разблокирование памяти."));
 
   // Формируем скрипт JLink
   initScript();
@@ -302,12 +302,12 @@ JLinkExeProgrammer::ReturnStatus
 JLinkExeProgrammer::lockDevice() {  // Проверка на существование программы
   // адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
-    emit logging(QString("Отсутсвует JLink.exe. Сброс."));
+    sendLog(QString("Отсутсвует JLink.exe. Сброс."));
     return DriverMissing;
   }
 
   // Логгирование
-  emit logging(QString("Блокировка памяти."));
+  sendLog(QString("Блокировка памяти."));
 
   // Формируем скрипт JLink
   initScript();
@@ -336,13 +336,13 @@ JLinkExeProgrammer::lockDevice() {  // Проверка на существов�
 }
 
 void JLinkExeProgrammer::applySettings() {
-  emit logging("Применение новых настроек. ");
+  sendLog("Применение новых настроек. ");
   loadSettings();
 }
 
 void JLinkExeProgrammer::sendLog(const QString& log) {
   if (LogEnable) {
-    emit logging(log);
+    emit logging(QString("%1 - %2").arg(objectName(), log));
   }
 }
 
@@ -393,7 +393,7 @@ void JLinkExeProgrammer::excuteJLinkScript() {
 
   // Логгирование вывода JLink.exe
   if (ExtendedLoggingEnable == true) {
-    emit logging(rawOutput);
+    sendLog(rawOutput);
   }
 }
 
@@ -407,7 +407,7 @@ void JLinkExeProgrammer::initScript() {
   // Создаем новый скрипт для адаптера
   JLinkScript = new QFile(JLINK_COMMAND_SCRIPT_DEFAULT_NAME, this);
   if (JLinkScript->open(QIODevice::WriteOnly)) {
-    emit logging("Командный скрипт JLink создан. ");
+    sendLog("Командный скрипт JLink создан. ");
 
     // Добавляем иницирующие команды в скрипт
 
@@ -422,6 +422,6 @@ void JLinkExeProgrammer::initScript() {
     JLinkScript->write("halt\n");
     JLinkScript->write("connect\n");
   } else {
-    emit logging("Не удалось создать командный скрипт JLink. ");
+    sendLog("Не удалось создать командный скрипт JLink. ");
   }
 }

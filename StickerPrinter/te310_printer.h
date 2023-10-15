@@ -37,7 +37,9 @@ class TE310Printer : public IStickerPrinter {
   virtual void applySetting(void) override;
 
  private:
+  Q_DISABLE_COPY(TE310Printer);
   void loadSetting(void);
+  void sendLog(const QString& log) const;
   void loadTscLib(void);
 
   void printNkdSticker(const QMap<QString, QString>* parameters);

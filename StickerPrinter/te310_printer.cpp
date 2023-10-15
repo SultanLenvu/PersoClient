@@ -13,14 +13,14 @@ TE310Printer::ReturnStatus TE310Printer::printTransponderSticker(
   // Проврека параметров
   if (parameters->value("issuer_name").isEmpty() ||
       parameters->value("sn").isEmpty() || parameters->value("pan").isEmpty()) {
-    emit logging(QString("Получены некорректные параметры. Сброс."));
+    sendLog(QString("Получены некорректные параметры. Сброс."));
     return ParameterError;
   }
-  emit logging(QString("Печать стикера транспондера для %1.")
-                   .arg(parameters->value("issuer_name")));
+  sendLog(QString("Печать стикера транспондера для %1.")
+              .arg(parameters->value("issuer_name")));
 
   if (!TscLib->isLoaded()) {
-    emit logging("Библиотека не загружена. Сброс. ");
+    sendLog("Библиотека не загружена. Сброс. ");
     return LibraryMissing;
   }
 
@@ -33,7 +33,7 @@ TE310Printer::ReturnStatus TE310Printer::printTransponderSticker(
              "Магистраль северной столицы") {
     printZsdSticker(parameters);
   } else {
-    emit logging("Получено неизвестное название компании-эмитента. Сброс.");
+    sendLog("Получено неизвестное название компании-эмитента. Сброс.");
     return ParameterError;
   }
 
@@ -42,7 +42,7 @@ TE310Printer::ReturnStatus TE310Printer::printTransponderSticker(
 
 TE310Printer::ReturnStatus TE310Printer::printLastTransponderSticker() {
   if (LastTransponderSticker.isEmpty()) {
-    emit logging("Данные о последнем распечанном стикере отсутствуют. Сброс. ");
+    sendLog("Данные о последнем распечанном стикере отсутствуют. Сброс. ");
     return ParameterError;
   }
 
@@ -63,7 +63,7 @@ IStickerPrinter::ReturnStatus TE310Printer::exec(
 }
 
 void TE310Printer::applySetting() {
-  emit logging("Применение новых настроек.");
+  sendLog("Применение новых настроек.");
 
   loadSetting();
   TscLib->setFileName(TscLibPath);
@@ -81,15 +81,21 @@ void TE310Printer::loadSetting() {
   TscLibPath = settings.value("sticker_printer/library_path").toString();
 }
 
+void TE310Printer::sendLog(const QString& log) const {
+  if (LogEnable) {
+    emit logging(QString("%1 - %2").arg(objectName(), log));
+  }
+}
+
 void TE310Printer::loadTscLib() {
   if (TscLib->load()) {
-    emit logging("Библиотека загружена.");
+    sendLog("Библиотека загружена.");
     about = (TscAbout)TscLib->resolve("about");
     openPort = (TscOpenPort)TscLib->resolve("openport");
     sendCommand = (TscSendCommand)TscLib->resolve("sendcommand");
     closePort = (TscClosePort)TscLib->resolve("closeport");
   } else {
-    emit logging("Не удалось загрузить библиотеку.");
+    sendLog("Не удалось загрузить библиотеку.");
 
     about = nullptr;
     openPort = nullptr;

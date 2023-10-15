@@ -41,6 +41,7 @@ class JLinkExeProgrammer : public IProgrammer {
   virtual void applySettings() override;
 
  private:
+  Q_DISABLE_COPY(JLinkExeProgrammer);
   void sendLog(const QString& log);
   void loadSettings(void);
   void excuteJLinkScript(void);

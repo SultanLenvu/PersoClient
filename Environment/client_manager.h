@@ -11,7 +11,7 @@
 #include <QVector>
 
 #include "General/definitions.h"
-#include "General/qmap_model.h"
+#include "General/string_map_model.h"
 #include "General/types.h"
 #include "Log/log_system.h"
 #include "Programmers/interface_programmer.h"
@@ -76,7 +76,7 @@ class ClientManager : public QObject {
  private:
   Q_DISABLE_COPY(ClientManager);
   void loadSettings(void);
-  void sendLog(const QString& log);
+  void sendLog(const QString& log) const;
   void createProgrammerInstance(void);
   void createClientInstance(void);
   void createStickerPrinterInstance(void);
@@ -91,11 +91,8 @@ class ClientManager : public QObject {
   void processStickerPrintersError(IStickerPrinter::ReturnStatus status,
                                    const QString& operationName);
 
- private slots:
-  void proxyLogging(const QString& log);
-
  signals:
-  void logging(const QString& log);
+  void logging(const QString& log) const;
   void notifyUser(const QString& log);
   void notifyUserAboutError(const QString& log);
   void operationPerfomingStarted(const QString& operationName);

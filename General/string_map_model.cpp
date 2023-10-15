@@ -1,4 +1,4 @@
-#include "qmap_model.h"
+#include "string_map_model.h"
 
 StringMapModel::StringMapModel(QObject* parent) : QAbstractTableModel(parent) {
   setObjectName("StringMapModel");

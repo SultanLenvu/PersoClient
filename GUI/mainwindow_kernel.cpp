@@ -369,10 +369,12 @@ void MainWindowKernel::createMasterInterface() {
 
 void MainWindowKernel::connectMasterInterface() {
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  connect(Logger->getWidgetLogger(), &WidgetLogBackend::requestDisplayLog, gui,
+  connect(LogSystem::instance()->getWidgetLogger(),
+          &WidgetLogBackend::displayLog_signal, gui,
           &MasterGUI::displayLogData);
-  connect(Logger->getWidgetLogger(), &WidgetLogBackend::requestClearDisplayLog,
-          gui, &MasterGUI::clearLogDataDisplay);
+  connect(LogSystem::instance()->getWidgetLogger(),
+          &WidgetLogBackend::clearLogDisplay_signal, gui,
+          &MasterGUI::clearLogDataDisplay);
 
   // Сервер
   connect(gui->PersoServerConnectPushButton, &QPushButton::clicked, this,
@@ -504,7 +506,8 @@ void MainWindowKernel::createTopMenu() {
 
 void MainWindowKernel::createManagerInstance() {
   Manager = new ClientManager(nullptr);
-  connect(Manager, &ClientManager::logging, Logger, &LogSystem::generate);
+  connect(Manager, &ClientManager::logging, LogSystem::instance(),
+          &LogSystem::generate);
   connect(Manager, &ClientManager::notifyUser, Interactor,
           &UserInteractionSystem::generateMessage);
   connect(Manager, &ClientManager::notifyUserAboutError, Interactor,
@@ -567,24 +570,22 @@ void MainWindowKernel::createManagerInstance() {
 }
 
 void MainWindowKernel::createLoggerInstance() {
-  Logger = new LogSystem(nullptr);
-  connect(this, &MainWindowKernel::applySettings_signal, Logger,
+  connect(this, &MainWindowKernel::applySettings_signal, LogSystem::instance(),
           &LogSystem::applySettings);
-  connect(this, &MainWindowKernel::loggerClear_signal, Logger,
+  connect(this, &MainWindowKernel::loggerClear_signal, LogSystem::instance(),
           &LogSystem::clear);
 
   LoggerThread = new QThread(this);
   connect(LoggerThread, &QThread::finished, LoggerThread,
           &QThread::deleteLater);
-  connect(LoggerThread, &QThread::finished, Logger, &LogSystem::deleteLater);
 
-  Logger->moveToThread(LoggerThread);
+  LogSystem::instance()->moveToThread(LoggerThread);
   LoggerThread->start();
 }
 
 void MainWindowKernel::createInteractorInstance() {
   Interactor = new UserInteractionSystem(this);
-  connect(Interactor, &UserInteractionSystem::logging, Logger,
+  connect(Interactor, &UserInteractionSystem::logging, LogSystem::instance(),
           &LogSystem::generate);
   connect(this, &MainWindowKernel::applySettings_signal, Interactor,
           &UserInteractionSystem::applySettings);

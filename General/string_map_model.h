@@ -27,6 +27,7 @@ class StringMapModel : public QAbstractTableModel {
                       int role = Qt::DisplayRole) const override;
 
  private:
+  Q_DISABLE_COPY(StringMapModel);
   void deleteAll(void);
 };
 

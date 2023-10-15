@@ -19,6 +19,9 @@ class TransponderStickerScanDialog : public QDialog {
  public:
   TransponderStickerScanDialog(QWidget* parent);
   void getData(QStringList* data);
+
+ private:
+  Q_DISABLE_COPY(TransponderStickerScanDialog);
 };
 
 #endif  // TRANSPONDERSTICKERDIALOG_H
