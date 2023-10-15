@@ -4,6 +4,7 @@ PersoClient::PersoClient(QObject *parent) : QObject(parent)
 {
   setObjectName("PersoClient");
   loadSettings();
+  TimeoutIndicator = false;
 
   // Создаем сокет
   createSocket();
@@ -21,8 +22,6 @@ PersoClient::~PersoClient() {
 }
 
 PersoClient::ReturnStatus PersoClient::connectToServer() {
-  CurrentState = Ready;
-
   // Подключаемся к серверу персонализации
   if (!processingServerConnection()) {
     return ServerConnectionError;
@@ -836,7 +835,7 @@ void PersoClient::on_SocketReadyRead_slot() {
 void PersoClient::on_SocketError_slot(
     QAbstractSocket::SocketError socketError) {
   Socket->abort();
-  emit logging(QString("Ошибка сети: Код: %1. Описание: %2.")
+  emit logging(QString("Ошибка сети: %1. %2.")
                    .arg(QString::number(socketError), Socket->errorString()));
 }
 

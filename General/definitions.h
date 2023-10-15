@@ -54,7 +54,7 @@
 
 #define MANUFACTURER_ID_DS_CHAR_LENGTH 2
 #define BATTERY_INSERTATION_DATE_DS_CHAR_LENGTH 4
-#define SERIAL_NUMBER_DS_CHAR_LENGTH 10
+#define SERIAL_NUMBER_DS_CHAR_LENGTH 16
 //===============================================================
 
 #endif // DEFINITIONS_H

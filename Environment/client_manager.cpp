@@ -2,6 +2,7 @@
 
 ClientManager::ClientManager(QObject* parent) : QObject(parent) {
   setObjectName("ClientManager");
+  loadSettings();
 
   // Создаем программатор
   createProgrammerInstance();
@@ -24,10 +25,10 @@ void ClientManager::on_InsctanceThreadStarted_slot() {}
 void ClientManager::performServerConnecting() {
   startOperationPerforming("performServerConnecting");
 
-  emit logging("Подключение к серверу персонализации. ");
+  sendLog("Подключение к серверу персонализации. ");
   if (Client->connectToServer() != PersoClient::Completed) {
-    emit logging("");
     finishOperationPerforming("performServerConnecting");
+    return;
   }
 
   // Завершаем операцию
@@ -37,7 +38,7 @@ void ClientManager::performServerConnecting() {
 void ClientManager::performServerDisconnecting() {
   startOperationPerforming("performServerDisconnecting");
 
-  emit logging("Отключение от сервера персонализации. ");
+  sendLog("Отключение от сервера персонализации. ");
   PersoClient::ReturnStatus status = Client->disconnectFromServer();
   if (status != PersoClient::Completed) {
     processClientError(status, "performServerDisconnecting");
@@ -51,7 +52,7 @@ void ClientManager::performServerDisconnecting() {
 void ClientManager::performServerEcho() {
   startOperationPerforming("performServerEcho");
 
-  emit logging("Отправка эхо-запроса на сервер персонализации. ");
+  sendLog("Отправка эхо-запроса на сервер персонализации. ");
   PersoClient::ReturnStatus status = Client->requestEcho();
   if (status != PersoClient::Completed) {
     processClientError(status, "performServerEcho");
@@ -66,7 +67,7 @@ void ClientManager::performServerAuthorization(
     const QSharedPointer<QMap<QString, QString>> data) {
   startOperationPerforming("performServerAuthorization");
 
-  emit logging("Авторизация на сервере персонализации. ");
+  sendLog("Авторизация на сервере персонализации. ");
   PersoClient::ReturnStatus status = Client->requestAuthorize(data.get());
   if (status != PersoClient::Completed) {
     processClientError(status, "performServerAuthorization");
@@ -84,8 +85,7 @@ void ClientManager::performServerAuthorization(
   finishOperationPerforming("performServerAuthorization");
 }
 
-void ClientManager::performTransponderFirmwareLoading(
-    TransponderInfoModel* model) {
+void ClientManager::performTransponderFirmwareLoading(StringMapModel* model) {
   startOperationPerforming("performTransponderFirmwareLoading");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -95,7 +95,7 @@ void ClientManager::performTransponderFirmwareLoading(
   QMap<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
 
-  emit logging("Разблокирование памяти транспондера. ");
+  sendLog("Разблокирование памяти транспондера. ");
   programmerStatus = Programmer->unlockDevice();
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus,
@@ -103,7 +103,7 @@ void ClientManager::performTransponderFirmwareLoading(
     return;
   }
 
-  emit logging("Считывание UCID транспондера. ");
+  sendLog("Считывание UCID транспондера. ");
   programmerStatus = Programmer->getUcid(&ucid);
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus,
@@ -113,7 +113,7 @@ void ClientManager::performTransponderFirmwareLoading(
 
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
-  emit logging("Запрос прошивки транспондера. ");
+  sendLog("Запрос прошивки транспондера. ");
   clientStatus =
       Client->requestTransponderRelease(&requestParameters, &firmware);
   if (clientStatus != PersoClient::Completed) {
@@ -122,7 +122,7 @@ void ClientManager::performTransponderFirmwareLoading(
   }
   requestParameters.clear();
 
-  emit logging("Загрузка прошивки в транспондер. ");
+  sendLog("Загрузка прошивки в транспондер. ");
   programmerStatus = Programmer->loadFirmware(&firmware);
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus,
@@ -134,7 +134,7 @@ void ClientManager::performTransponderFirmwareLoading(
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
   requestParameters.insert("ucid", ucid);
-  emit logging(
+  sendLog(
       "Отправка запроса на подтверждение загрузки прошивки в транспондер. ");
   clientStatus = Client->requestTransponderReleaseConfirm(&requestParameters,
                                                           responseParameters);
@@ -149,7 +149,7 @@ void ClientManager::performTransponderFirmwareLoading(
   // Удаляем файл прошивки
   firmware.remove();
 
-  emit logging("Печать стикера для транспондера.");
+  sendLog("Печать стикера для транспондера.");
   stickerPrinterStatus =
       StickerPrinter->printTransponderSticker(responseParameters);
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
@@ -162,9 +162,8 @@ void ClientManager::performTransponderFirmwareLoading(
   finishOperationPerforming("performTransponderFirmwareLoading");
 }
 
-void ClientManager::performTransponderFirmwareReloading(
-    TransponderInfoModel* model,
-    const QString& pan) {
+void ClientManager::performTransponderFirmwareReloading(StringMapModel* model,
+                                                        const QString& pan) {
   startOperationPerforming("performTransponderFirmwareReloading");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -174,7 +173,7 @@ void ClientManager::performTransponderFirmwareReloading(
   QMap<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
 
-  emit logging("Разблокирование памяти транспондера. ");
+  sendLog("Разблокирование памяти транспондера. ");
   programmerStatus = Programmer->unlockDevice();
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus,
@@ -182,7 +181,7 @@ void ClientManager::performTransponderFirmwareReloading(
     return;
   }
 
-  emit logging("Считывание UCID транспондера. ");
+  sendLog("Считывание UCID транспондера. ");
   programmerStatus = Programmer->getUcid(&ucid);
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus,
@@ -193,7 +192,7 @@ void ClientManager::performTransponderFirmwareReloading(
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
   requestParameters.insert("pan", pan);
-  emit logging("Запрос перевыпуска транспондера. ");
+  sendLog("Запрос перевыпуска транспондера. ");
   clientStatus =
       Client->requestTransponderRerelease(&requestParameters, &firmware);
   if (clientStatus != PersoClient::Completed) {
@@ -202,7 +201,7 @@ void ClientManager::performTransponderFirmwareReloading(
   }
   requestParameters.clear();
 
-  emit logging("Загрузка прошивки в транспондер. ");
+  sendLog("Загрузка прошивки в транспондер. ");
   programmerStatus = Programmer->loadFirmware(&firmware);
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus,
@@ -215,7 +214,7 @@ void ClientManager::performTransponderFirmwareReloading(
   requestParameters.insert("password", CurrentPassword);
   requestParameters.insert("pan", pan);
   requestParameters.insert("ucid", ucid);
-  emit logging("Отправка запроса на подтверждение перевыпуска транспондера. ");
+  sendLog("Отправка запроса на подтверждение перевыпуска транспондера. ");
   clientStatus = Client->requestTransponderRereleaseConfirm(&requestParameters,
                                                             responseParameters);
   if (clientStatus != PersoClient::Completed) {
@@ -229,7 +228,7 @@ void ClientManager::performTransponderFirmwareReloading(
   // Удаляем файл прошивки
   firmware.remove();
 
-  emit logging("Печать стикера для транспондера.");
+  sendLog("Печать стикера для транспондера.");
   stickerPrinterStatus =
       StickerPrinter->printTransponderSticker(responseParameters);
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
@@ -248,14 +247,14 @@ void ClientManager::performLocalFirmwareLoading(const QString& path) {
   IProgrammer::ReturnStatus programmerStatus;
   QFile firmware(path);
 
-  emit logging("Разблокирование памяти транспондера. ");
+  sendLog("Разблокирование памяти транспондера. ");
   programmerStatus = Programmer->unlockDevice();
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus, "performLocalFirmwareLoading");
     return;
   }
 
-  emit logging("Загрузка прошивки в транспондер. ");
+  sendLog("Загрузка прошивки в транспондер. ");
   programmerStatus = Programmer->loadFirmware(&firmware);
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus, "performLocalFirmwareLoading");
@@ -271,7 +270,7 @@ void ClientManager::performFirmwareReading() {
 
   IProgrammer::ReturnStatus programmerStatus;
 
-  emit logging("Считывание прошивки микроконтроллера. ");
+  sendLog("Считывание прошивки микроконтроллера. ");
   programmerStatus = Programmer->readFirmware();
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus, "performFirmwareReading");
@@ -287,7 +286,7 @@ void ClientManager::performFirmwareErasing() {
 
   IProgrammer::ReturnStatus programmerStatus;
 
-  emit logging("Стирание прошивки микроконтроллера. ");
+  sendLog("Стирание прошивки микроконтроллера. ");
   programmerStatus = Programmer->eraseFirmware();
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus, "performFirmwareErasing");
@@ -303,7 +302,7 @@ void ClientManager::performDataReading() {
 
   IProgrammer::ReturnStatus programmerStatus;
 
-  emit logging("Считывание данных из памяти микроконтроллера. ");
+  sendLog("Считывание данных из памяти микроконтроллера. ");
   programmerStatus = Programmer->readData();
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus, "performDataReading");
@@ -321,7 +320,7 @@ void ClientManager::performDataLoading(const QString& path) {
   QFile dataFile(path);
   IProgrammer::ReturnStatus programmerStatus;
 
-  emit logging("Загрузка данных в память микроконтроллера. ");
+  sendLog("Загрузка данных в память микроконтроллера. ");
   programmerStatus = Programmer->loadData(&dataFile);
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus, "performDataLoading");
@@ -337,7 +336,7 @@ void ClientManager::performDeviceUnlock() {
 
   IProgrammer::ReturnStatus programmerStatus;
 
-  emit logging("Разблокирование памяти микроконтроллера. ");
+  sendLog("Разблокирование памяти микроконтроллера. ");
   programmerStatus = Programmer->unlockDevice();
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus, "performDeviceUnlock");
@@ -353,7 +352,7 @@ void ClientManager::performDeviceLock() {
 
   IProgrammer::ReturnStatus programmerStatus;
 
-  emit logging("Блокирование памяти микроконтроллера. ");
+  sendLog("Блокирование памяти микроконтроллера. ");
   programmerStatus = Programmer->lockDevice();
   if (programmerStatus != IProgrammer::Completed) {
     processProgrammerError(programmerStatus, "performDeviceUnlock");
@@ -369,7 +368,7 @@ void ClientManager::performPrintingLastTransponderSticker() {
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
 
-  emit logging("Печать последнего стикера транспондера. ");
+  sendLog("Печать последнего стикера транспондера. ");
   stickerPrinterStatus = StickerPrinter->printLastTransponderSticker();
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
@@ -387,7 +386,7 @@ void ClientManager::performPrintingCustomTransponderSticker(
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
 
-  emit logging("Печать произвольного стикера транспондера. ");
+  sendLog("Печать произвольного стикера транспондера. ");
   stickerPrinterStatus = StickerPrinter->printTransponderSticker(data.get());
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
@@ -405,7 +404,7 @@ void ClientManager::performStickerPrinterCommandScript(
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
 
-  emit logging("Выполнение командного скрипта для принтера. ");
+  sendLog("Выполнение командного скрипта для принтера. ");
   stickerPrinterStatus = StickerPrinter->exec(commandScript.get());
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
@@ -418,7 +417,7 @@ void ClientManager::performStickerPrinterCommandScript(
 }
 
 void ClientManager::applySettings() {
-  emit logging("Применение новых настроек. ");
+  sendLog("Применение новых настроек. ");
   loadSettings();
 
   Client->applySettings();
@@ -426,7 +425,17 @@ void ClientManager::applySettings() {
   StickerPrinter->applySetting();
 }
 
-void ClientManager::loadSettings() {}
+void ClientManager::loadSettings() {
+  QSettings settings;
+
+  LogEnable = settings.value("log_system/global_enable").toBool();
+}
+
+void ClientManager::sendLog(const QString& log) {
+  if (LogEnable) {
+    emit logging(log);
+  }
+}
 
 void ClientManager::createProgrammerInstance() {
   Programmer = new JLinkExeProgrammer(this);
@@ -523,6 +532,7 @@ void ClientManager::processClientError(PersoClient::ReturnStatus status,
 
 void ClientManager::processProgrammerError(IProgrammer::ReturnStatus status,
                                            const QString& operationName) {
+  sendLog(ProgrammerReturnStatusMatch.value(status));
   emit operationPerformingFinished(operationName);
   emit notifyUserAboutError(ProgrammerReturnStatusMatch.value(status));
   Mutex.unlock();
@@ -531,6 +541,7 @@ void ClientManager::processProgrammerError(IProgrammer::ReturnStatus status,
 void ClientManager::processStickerPrintersError(
     IStickerPrinter::ReturnStatus status,
     const QString& operationName) {
+  sendLog(StickerPrinterReturnStatusMatch.value(status));
   emit operationPerformingFinished(operationName);
   emit notifyUserAboutError(StickerPrinterReturnStatusMatch.value(status));
   Mutex.unlock();
@@ -538,11 +549,11 @@ void ClientManager::processStickerPrintersError(
 
 void ClientManager::proxyLogging(const QString& log) {
   if (sender()->objectName() == "IProgrammer")
-    emit logging("Programmer - " + log);
+    sendLog("Programmer - " + log);
   else if (sender()->objectName() == "PersoClient")
-    emit logging("Client - " + log);
+    sendLog("Client - " + log);
   else if (sender()->objectName() == "TE310Printer")
-    emit logging("StickerPrinter - " + log);
+    sendLog("StickerPrinter - " + log);
   else
-    emit logging("Unknown - " + log);
+    sendLog("Unknown - " + log);
 }

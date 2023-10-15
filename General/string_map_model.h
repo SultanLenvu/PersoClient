@@ -1,23 +1,22 @@
-#ifndef TRANSPONDER_SEED_MODEL_H
-#define TRANSPONDER_SEED_MODEL_H
+#ifndef STRING_MAP_MODEL_H
+#define STRING_MAP_MODEL_H
 
 #include <QAbstractTableModel>
 #include <QMap>
 #include <QString>
 
-class TransponderInfoModel : public QAbstractTableModel {
-  Q_OBJECT
+class StringMapModel : public QAbstractTableModel {
  private:
-  const QMap<QString, QString>* Attributes;
+  const QMap<QString, QString>* Map;
 
  public:
-  explicit TransponderInfoModel(QObject* parent = nullptr);
-  ~TransponderInfoModel();
+  explicit StringMapModel(QObject* parent);
+  ~StringMapModel();
 
-  void build(const QMap<QString, QString>* attributes);
+  void build(const QMap<QString, QString>* map);
   void clear(void);
-  bool isEmpty(void);
-  const QMap<QString, QString>* attributes(void) const;
+  bool isEmpty(void) const;
+  const QMap<QString, QString>* map(void) const;
 
   // Методы модели
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -31,4 +30,4 @@ class TransponderInfoModel : public QAbstractTableModel {
   void deleteAll(void);
 };
 
-#endif  // TRANSPONDER_SEED_MODEL_H
+#endif  // STRING_MAP_MODEL_H

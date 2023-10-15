@@ -51,8 +51,6 @@ class UserInteractionSystem : public QWidget {
   void createTimers(void);
 
  private slots:
-  void on_ProgressDialogCanceled_slot(void);
-
   void on_ODTimerTimeout_slot(void);
   void on_ODQTimerTimeout_slot(void);
 

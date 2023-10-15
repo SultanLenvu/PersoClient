@@ -9,14 +9,13 @@
 #include <QtWidgets>
 
 #include "Environment/client_manager.h"
-#include "Environment/transponder_seed_model.h"
-#include "Log/log_system.h"
-
 #include "GUI/authorization_gui.h"
 #include "GUI/master_gui.h"
 #include "GUI/production_gui.h"
 #include "GUI/user_interaction_system.h"
 #include "General/definitions.h"
+#include "General/qmap_model.h"
+#include "Log/log_system.h"
 
 class MainWindowKernel : public QMainWindow {
   Q_OBJECT
@@ -30,9 +29,9 @@ class MainWindowKernel : public QMainWindow {
   QMenu* ServiceMenu;
   QMenu* HelpMenu;
 
-  QAction* MasterInterfaceRequestAct;
-  QAction* ProductionInterfaceRequestAct;
-  QAction* ExitFromProductionLineAct;
+  QAction* OpenMasterInterfaceAct;
+  QAction* OpenProductionInterfaceAct;
+  QAction* OpenAuthorizationInterfaceAct;
   QAction* AboutProgramAct;
   //==================================================
 
@@ -44,7 +43,7 @@ class MainWindowKernel : public QMainWindow {
 
   UserInteractionSystem* Interactor;
 
-  TransponderInfoModel* TransponderInfo;
+  StringMapModel* TransponderInfo;
 
  public:
   explicit MainWindowKernel(QWidget* parent = nullptr);
@@ -81,7 +80,7 @@ class MainWindowKernel : public QMainWindow {
   // Верхнее меню
   void on_MasterInterfaceRequest_slot(void);
   void on_ProductionInterfaceRequest_slot(void);
-  void on_ExitFromProductionLineAct_slot(void);
+  void on_OpenAuthorizationInterfaceAct_slot(void);
 
  private:
   void loadSettings(void);
@@ -119,8 +118,8 @@ class MainWindowKernel : public QMainWindow {
   void performServerEcho_signal(void);
   void performServerAuthorization_signal(
       const QSharedPointer<QMap<QString, QString>> data);
-  void performTransponderFirmwareLoading_signal(TransponderInfoModel* model);
-  void performTransponderFirmwareReloading_signal(TransponderInfoModel* model,
+  void performTransponderFirmwareLoading_signal(StringMapModel* model);
+  void performTransponderFirmwareReloading_signal(StringMapModel* model,
                                                   const QString& pan);
   void performLocalFirmwareLoading_signal(const QString& path);
   void performFirmwareReading_signal(void);

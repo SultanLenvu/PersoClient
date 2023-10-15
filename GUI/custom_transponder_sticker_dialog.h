@@ -10,12 +10,6 @@ class CustomTransponderStickerScanDialog : public QDialog {
   QRect DesktopGeometry;
 
   QGridLayout* MainLayout;
-  QLabel* IssuerLabel;
-  QLineEdit* IssuerInput;
-  QLabel* ManufacturerIdLabel;
-  QLineEdit* ManufacturerIdInput;
-  QLabel* BatteryInsertationDateLabel;
-  QLineEdit* BatteryInsertationDateInput;
   QLabel* SnLabel;
   QLineEdit* SnInput;
   QLabel* PanLabel;

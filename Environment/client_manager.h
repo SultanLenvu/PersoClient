@@ -11,6 +11,7 @@
 #include <QVector>
 
 #include "General/definitions.h"
+#include "General/qmap_model.h"
 #include "General/types.h"
 #include "Log/log_system.h"
 #include "Programmers/interface_programmer.h"
@@ -18,12 +19,13 @@
 #include "StickerPrinter/isticker_printer.h"
 #include "StickerPrinter/te310_printer.h"
 #include "perso_client.h"
-#include "transponder_seed_model.h"
 
 class ClientManager : public QObject {
   Q_OBJECT
 
  private:
+  bool LogEnable;
+
   QString CurrentLogin;
   QString CurrentPassword;
 
@@ -49,8 +51,8 @@ class ClientManager : public QObject {
   void performServerEcho(void);
   void performServerAuthorization(
       const QSharedPointer<QMap<QString, QString>> data);
-  void performTransponderFirmwareLoading(TransponderInfoModel* model);
-  void performTransponderFirmwareReloading(TransponderInfoModel* model,
+  void performTransponderFirmwareLoading(StringMapModel* model);
+  void performTransponderFirmwareReloading(StringMapModel* model,
                                            const QString& pan);
 
   // Программатор
@@ -74,6 +76,7 @@ class ClientManager : public QObject {
  private:
   Q_DISABLE_COPY(ClientManager);
   void loadSettings(void);
+  void sendLog(const QString& log);
   void createProgrammerInstance(void);
   void createClientInstance(void);
   void createStickerPrinterInstance(void);

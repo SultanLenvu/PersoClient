@@ -13,6 +13,9 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   // Загружаем настройки приложения
   loadSettings();
 
+  // Создаем действия для верхнего меню
+  createTopMenuActions();
+
   // Создаем логгер
   createLoggerInstance();
 
@@ -23,10 +26,17 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   createManagerInstance();
 
   // Создаем модель для представления данных транспондера
-  TransponderInfo = new TransponderInfoModel(this);
+  TransponderInfo = new StringMapModel(this);
 
   // Создаем графический интерфейс для авторизации
-  createAuthorizationInterface();
+  //  createAuthorizationInterface();
+
+  // Debug
+  createMasterInterface();
+
+  // Регистрируем типы
+  qRegisterMetaType<QSharedPointer<QMap<QString, QString>>>(
+      "QSharedPointer<QMap<QString, QString> >");
 }
 
 MainWindowKernel::~MainWindowKernel() {
@@ -241,7 +251,7 @@ void MainWindowKernel::on_ProductionInterfaceRequest_slot() {
   createProductionInterface();
 }
 
-void MainWindowKernel::on_ExitFromProductionLineAct_slot() {
+void MainWindowKernel::on_OpenAuthorizationInterfaceAct_slot() {
   createAuthorizationInterface();
 }
 
@@ -444,25 +454,23 @@ void MainWindowKernel::connectProductionInterface() {
 }
 
 void MainWindowKernel::createTopMenuActions() {
-  if ((CurrentGUI->type() == GUI::Production) ||
-      (CurrentGUI->type() == GUI::Authorization)) {
-    MasterInterfaceRequestAct = new QAction("Мастер интерфейс", this);
-    MasterInterfaceRequestAct->setStatusTip("Открыть мастер интерфейс");
-    connect(MasterInterfaceRequestAct, &QAction::triggered, this,
-            &MainWindowKernel::on_MasterInterfaceRequest_slot);
-    ExitFromProductionLineAct =
-        new QAction("Выйти из производственной линии", this);
-    ExitFromProductionLineAct->setStatusTip("Открыть интерфейс авторизации");
-    connect(ExitFromProductionLineAct, &QAction::triggered, this,
-            &MainWindowKernel::on_ExitFromProductionLineAct_slot);
-  } else {
-    ProductionInterfaceRequestAct =
-        new QAction("Производственный интерфейс", this);
-    ProductionInterfaceRequestAct->setStatusTip(
-        "Открыть производственный интерфейс");
-    connect(ProductionInterfaceRequestAct, &QAction::triggered, this,
-            &MainWindowKernel::on_ProductionInterfaceRequest_slot);
-  }
+  OpenMasterInterfaceAct = new QAction("Мастер доступ", this);
+  OpenMasterInterfaceAct->setStatusTip("Открыть мастер интерфейс");
+  connect(OpenMasterInterfaceAct, &QAction::triggered, this,
+          &MainWindowKernel::on_MasterInterfaceRequest_slot);
+  OpenAuthorizationInterfaceAct =
+      new QAction("Выйти из производственной линии", this);
+
+  OpenAuthorizationInterfaceAct->setStatusTip("Авторизация");
+  OpenAuthorizationInterfaceAct->setStatusTip("Открыть интерфейс авторизации");
+  connect(OpenAuthorizationInterfaceAct, &QAction::triggered, this,
+          &MainWindowKernel::on_OpenAuthorizationInterfaceAct_slot);
+
+  OpenProductionInterfaceAct = new QAction("Производственный доступ", this);
+  OpenProductionInterfaceAct->setStatusTip(
+      "Открыть производственный интерфейс");
+  connect(OpenProductionInterfaceAct, &QAction::triggered, this,
+          &MainWindowKernel::on_ProductionInterfaceRequest_slot);
 
   AboutProgramAct = new QAction("О программе", this);
   AboutProgramAct->setStatusTip("Показать сведения о программе");
@@ -472,21 +480,20 @@ void MainWindowKernel::createTopMenu() {
   // Удаляем предыдущее топ меню
   menuBar()->clear();
 
-  // Cоздаем обработчики пользовательских действий
-  createTopMenuActions();
-
   // Создаем меню
   ServiceMenu = menuBar()->addMenu("Сервис");
-  if ((CurrentGUI->type() == GUI::Production) ||
-      (CurrentGUI->type() == GUI::Authorization)) {
-    ServiceMenu->addAction(MasterInterfaceRequestAct);
-  } else {
-    ServiceMenu->addAction(ProductionInterfaceRequestAct);
-  }
-
-  if ((CurrentGUI->type() == GUI::Production) ||
-      (CurrentGUI->type() == GUI::Master)) {
-    ServiceMenu->addAction(ExitFromProductionLineAct);
+  switch (CurrentGUI->type()) {
+    case GUI::Production:
+      ServiceMenu->addAction(OpenMasterInterfaceAct);
+      ServiceMenu->addAction(OpenAuthorizationInterfaceAct);
+      break;
+    case GUI::Master:
+      ServiceMenu->addAction(OpenProductionInterfaceAct);
+      ServiceMenu->addAction(OpenAuthorizationInterfaceAct);
+      break;
+    case GUI::Authorization:
+      ServiceMenu->addAction(OpenMasterInterfaceAct);
+      break;
   }
 
   HelpMenu = menuBar()->addMenu("Справка");

@@ -11,13 +11,13 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    General/string_map_model.cpp \
     Log/log_system.cpp \
     Log/log_backend.cpp \
     Log/text_stream_log_backend.cpp \
     Log/widget_log_backend.cpp \
     Environment/client_manager.cpp \
     Environment/perso_client.cpp \
-    Environment/transponder_seed_model.cpp \
     GUI/authorization_dialog.cpp \
     GUI/custom_transponder_sticker_dialog.cpp \
     GUI/transponder_sticker_scan_dialog.cpp \
@@ -34,13 +34,13 @@ SOURCES += \
     main.cpp
 
 HEADERS += \
+    General/string_map_model.h \
     Log/log_system.h \
     Log/log_backend.h \
     Log/text_stream_log_backend.h \
     Log/widget_log_backend.h \
     Environment/client_manager.h \
     Environment/perso_client.h \
-    Environment/transponder_seed_model.h \
     GUI/authorization_dialog.h \
     GUI/custom_transponder_sticker_dialog.h \
     GUI/transponder_sticker_scan_dialog.h \
@@ -50,12 +50,12 @@ HEADERS += \
     GUI/mainwindow_kernel.h \
     GUI/master_gui.h \
     GUI/production_gui.h \
-    General/types.h \
-    General/definitions.h \
     Programmers/interface_programmer.h \
     Programmers/jlink_exe_programmer.h \
     StickerPrinter/isticker_printer.h \
-    StickerPrinter/te310_printer.h 
+    StickerPrinter/te310_printer.h \
+    General/types.h \
+    General/definitions.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -29,8 +29,7 @@ void UserInteractionSystem::startOperationProgressDialog(
 
   //  Настраиваем и запускаем таймер для измерения квантов времени
   uint64_t operationDuration =
-      settings
-          .value(QString("Operations/") + operationName + QString("/Duration"))
+      settings.value(QString("duration_of_operations/") + operationName)
           .toInt();
   uint32_t operationQuantDuration = operationDuration / 100;
   operationQuantDuration += 1;
@@ -157,12 +156,6 @@ void UserInteractionSystem::createTimers() {
   ODQTimer = new QTimer(this);
   connect(ODQTimer, &QTimer::timeout, this,
           &UserInteractionSystem::on_ODQTimerTimeout_slot);
-}
-
-void UserInteractionSystem::on_ProgressDialogCanceled_slot() {
-  destroyProgressDialog();
-
-  emit abortCurrentOperation();
 }
 
 void UserInteractionSystem::on_ODTimerTimeout_slot() {
