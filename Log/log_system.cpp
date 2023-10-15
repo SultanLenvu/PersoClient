@@ -7,8 +7,8 @@
 
 #include "log_system.h"
 
+#include "Log/file_log_backend.h"
 #include "Log/log_backend.h"
-#include "Log/text_stream_log_backend.h"
 #include "Log/widget_log_backend.h"
 
 LogSystem::LogSystem(QObject* parent) : QObject(parent) {
@@ -18,7 +18,7 @@ LogSystem::LogSystem(QObject* parent) : QObject(parent) {
   WidgetLogger = new WidgetLogBackend(this);
   backends << WidgetLogger;
 
-  TextStreamLogger = new TextStreamLogBackend(this);
+  TextStreamLogger = new FileLogBackend(this);
   backends << TextStreamLogger;
 }
 

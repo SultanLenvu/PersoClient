@@ -313,11 +313,6 @@ void PersoClient::applySettings() {
   loadSettings();
 }
 
-void PersoClient::sendLog(const QString& log) {
-  if (LogEnable) {
-    emit logging(QString("%1 - %2").arg(objectName(), log));
-  }
-}
 
 /*
  * Приватные  методы
@@ -331,6 +326,12 @@ void PersoClient::loadSettings() {
 
   PersoServerAddress = settings.value("perso_client/server_ip").toString();
   PersoServerPort = settings.value("perso_client/server_port").toInt();
+}
+
+void PersoClient::sendLog(const QString& log) {
+  if (LogEnable) {
+    emit logging(QString("%1 - %2").arg(objectName(), log));
+  }
 }
 
 void PersoClient::createTimers() {

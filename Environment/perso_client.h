@@ -96,8 +96,8 @@ class PersoClient : public QObject {
 
  private:
   Q_DISABLE_COPY(PersoClient);
-  void sendLog(const QString& log);
   void loadSettings(void);
+  void sendLog(const QString& log);
   void createTimers(void);
   void createSocket(void);
   bool processingServerConnection(void);

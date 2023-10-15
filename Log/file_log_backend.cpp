@@ -2,32 +2,30 @@
 #include <QString>
 #include <QTextStream>
 
+#include "file_log_backend.h"
 #include "log_backend.h"
-#include "text_stream_log_backend.h"
 
-TextStreamLogBackend::TextStreamLogBackend(QObject* parent)
-    : LogBackend(parent) {
-  setObjectName("TextStreamLogBackend");
+FileLogBackend::FileLogBackend(QObject* parent) : LogBackend(parent) {
+  setObjectName("FileLogBackend");
   initialize();
 
-  connect(this, &TextStreamLogBackend::notifyAboutError,
+  connect(this, &FileLogBackend::notifyAboutError,
           InteractionSystem::instance(),
           &InteractionSystem::generateErrorMessage);
 }
 
-TextStreamLogBackend::~TextStreamLogBackend() {
-}
+FileLogBackend::~FileLogBackend() {}
 
-void TextStreamLogBackend::writeLogLine(const QString& str) {
+void FileLogBackend::writeLogLine(const QString& str) {
   if (LogEnable) {
     LogTextStream << str << "\n";
   }
 }
 
-void TextStreamLogBackend::clear() { /* No-op */
+void FileLogBackend::clear() { /* No-op */
 }
 
-void TextStreamLogBackend::initialize() {
+void FileLogBackend::initialize() {
   QDir logDir;
   if (!logDir.mkpath(QApplication::applicationDirPath() + "/logs")) {
     LogEnable = false;
@@ -50,7 +48,7 @@ void TextStreamLogBackend::initialize() {
   LogTextStream.setDevice(&CurrentLogFile);
 }
 
-void TextStreamLogBackend::removeOldestLogFiles() {
+void FileLogBackend::removeOldestLogFiles() {
   QDir directory(CurrentLogDir);
 
   // Получаем список файлов в директории

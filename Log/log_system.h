@@ -11,7 +11,7 @@
 #include <QUdpSocket>
 
 #include <Log/log_backend.h>
-#include <Log/text_stream_log_backend.h>
+#include <Log/file_log_backend.h>
 #include <Log/widget_log_backend.h>
 
 /* Глобальная система логгирования */
@@ -24,9 +24,7 @@ class LogSystem : public QObject {
   QString SavePath;
   QList<LogBackend*> backends;
   WidgetLogBackend* WidgetLogger;
-  TextStreamLogBackend* TextStreamLogger;
-
-  static QMutex Mutex;
+  FileLogBackend* TextStreamLogger;
 
  public:
   ~LogSystem();

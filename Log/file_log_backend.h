@@ -13,22 +13,23 @@
 #include "GUI/interaction_system.h"
 #include "log_backend.h"
 
-class TextStreamLogBackend: public LogBackend {
+class FileLogBackend : public LogBackend {
   Q_OBJECT
  private:
   bool LogEnable;
+  QString CurrentLogDir;
   QFile CurrentLogFile;
   QTextStream LogTextStream;
 
  public:
-  explicit TextStreamLogBackend(QObject* parent);
-  ~TextStreamLogBackend();
+  explicit FileLogBackend(QObject* parent);
+  ~FileLogBackend();
 
   virtual void writeLogLine(const QString& str) override;
   virtual void clear() override;
 
  private:
-  Q_DISABLE_COPY(TextStreamLogBackend);
+  Q_DISABLE_COPY(FileLogBackend);
   void initialize();
   void removeOldestLogFiles(void);
 
