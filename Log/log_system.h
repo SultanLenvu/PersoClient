@@ -7,6 +7,12 @@
 #include <QThread>
 #include <QTime>
 #include <QUdpSocket>
+#include <QList>
+
+#include <Log/log_backend.h>
+#include <Log/widget_log_backend.h>
+#include <Log/text_stream_log_backend.h>
+
 
 /* Глобальная система логгирования */
 //==================================================================================
@@ -14,26 +20,32 @@
 class LogSystem : public QObject {
   Q_OBJECT
 
- private:
-  QString SavePath;
+  private:
+    QString SavePath;
+    QList<LogBackend*> backends;
+    WidgetLogBackend *WidgetLogger; // meh
+    TextStreamLogBackend *TextStreamLogger;
 
- public:
-  LogSystem(QObject* parent);
-  ~LogSystem();
+  public:
+    LogSystem(QObject* parent);
+    ~LogSystem();
+    WidgetLogBackend *getWidgetLogger();
+    void addBackend(LogBackend *backend);
+    void removeBackend(LogBackend *backend);
 
- public slots:
-  void clear(void);
-  void generate(const QString& log);
+  public slots:
+    void clear(void);
+    void generate(const QString& log);
 
-  void applySettings(void);
+    void applySettings(void);
 
- private:
-  Q_DISABLE_COPY(LogSystem)
-  void loadSettings(void);
+  private:
+    Q_DISABLE_COPY(LogSystem)
+    void loadSettings(void);
 
- signals:
-  void requestDisplayLog(const QString& logData);
-  void requestClearDisplayLog(void);
+  signals:
+    void requestDisplayLog(const QString& logData);
+    void requestClearDisplayLog(void);
 };
 
 //==================================================================================
