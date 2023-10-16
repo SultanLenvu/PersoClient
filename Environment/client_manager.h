@@ -43,6 +43,8 @@ class ClientManager : public QObject {
  public:
   explicit ClientManager(QObject* parent);
   ~ClientManager();
+
+ public slots:
   void on_InsctanceThreadStarted_slot(void);
 
   // Сервер
