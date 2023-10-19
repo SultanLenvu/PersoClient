@@ -1,12 +1,8 @@
-#include <QObject>
-#include <QString>
-#include <QTextStream>
-
 #include "file_log_backend.h"
-#include "log_backend.h"
 
 FileLogBackend::FileLogBackend(QObject* parent) : LogBackend(parent) {
   setObjectName("FileLogBackend");
+  loadSettings();
   initialize();
 
   connect(this, &FileLogBackend::notifyAboutError,
@@ -25,6 +21,19 @@ void FileLogBackend::writeLogLine(const QString& str) {
 void FileLogBackend::clear() { /* No-op */
 }
 
+void FileLogBackend::applySettings() {
+  loadSettings();
+  initialize();
+}
+
+void FileLogBackend::loadSettings() {
+  QSettings settings;
+
+  CurrentLogDir = QApplication::applicationDirPath() + "/logs";
+  LogEnable = settings.value("log_system/file_log_enable").toBool();
+  LogFileMaxNumber = settings.value("log_system/log_file_max_number").toInt();
+}
+
 void FileLogBackend::initialize() {
   QDir logDir;
   if (!logDir.mkpath(QApplication::applicationDirPath() + "/logs")) {
@@ -33,9 +42,12 @@ void FileLogBackend::initialize() {
     return;
   }
 
-  CurrentLogDir = QApplication::applicationDirPath() + "/logs/log " +
-                  QDateTime::currentDateTime().toString("dd.MM.yyyy hh.mm.ss");
-  CurrentLogFile.setFileName(CurrentLogDir);
+  if (CurrentLogFile.isOpen()) {
+    CurrentLogFile.close();
+  }
+  CurrentLogFile.setFileName(
+      CurrentLogDir + "/log " +
+      QDateTime::currentDateTime().toString("dd.MM.yyyy hh.mm.ss"));
   if (!CurrentLogFile.open(QIODevice::WriteOnly)) {
     LogEnable = false;
     emit notifyAboutError("Не удалось открыть файл для логгирования. ");
@@ -55,8 +67,8 @@ void FileLogBackend::removeOldestLogFiles() {
   QFileInfoList fileList =
       directory.entryInfoList(QDir::Files | QDir::NoDotAndDotDot, QDir::Time);
 
-  if (fileList.size() > LOG_FILE_MAX_NUMBER) {
-    int filesToDeleteCount = fileList.size() - LOG_FILE_MAX_NUMBER;
+  if (fileList.size() > LogFileMaxNumber) {
+    int filesToDeleteCount = fileList.size() - LogFileMaxNumber;
 
     // Удаляем самые старые файлы
     for (int i = 0; i < filesToDeleteCount; ++i) {

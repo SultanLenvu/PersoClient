@@ -10,9 +10,9 @@
 #include <QTime>
 #include <QUdpSocket>
 
-#include <Log/log_backend.h>
-#include <Log/file_log_backend.h>
-#include <Log/widget_log_backend.h>
+#include "Log/file_log_backend.h"
+#include "Log/log_backend.h"
+#include "Log/widget_log_backend.h"
 
 /* Глобальная система логгирования */
 //==================================================================================
@@ -22,9 +22,14 @@ class LogSystem : public QObject {
 
  private:
   QString SavePath;
-  QList<LogBackend*> backends;
+  QList<LogBackend*> Backends;
   WidgetLogBackend* WidgetLogger;
-  FileLogBackend* TextStreamLogger;
+  FileLogBackend* FileLogger;
+
+  bool UdpListenEnable;
+  QUdpSocket* UdpSocket;
+  QHostAddress UdpListenIp;
+  uint32_t UdpListenPort;
 
  public:
   ~LogSystem();
@@ -41,6 +46,9 @@ class LogSystem : public QObject {
   LogSystem(QObject* parent);
   Q_DISABLE_COPY(LogSystem)
   void loadSettings(void);
+
+ private slots:
+  void on_UdpSocketReadyRead_slot();
 };
 
 //==================================================================================

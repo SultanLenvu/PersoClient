@@ -4,22 +4,26 @@
 #include <QApplication>
 #include <QObject>
 
-#include "GUI/master_gui.h"
 #include "Log/log_backend.h"
 
 class WidgetLogBackend : public LogBackend {
   Q_OBJECT
+ private:
+  bool LogEnable;
+
  public:
   WidgetLogBackend(QObject* parent);
 
   virtual void writeLogLine(const QString& str) override;
   virtual void clear() override;
+  virtual void applySettings() override;
 
  private:
   Q_DISABLE_COPY(WidgetLogBackend);
+  void loadSettings(void);
 
  signals:
-  void displayLog_signal(const QString& logData);
+  void displayLog_signal(const QString& log);
   void clearLogDisplay_signal(void);
 };
 

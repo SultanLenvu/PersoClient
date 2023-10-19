@@ -459,10 +459,10 @@ void PersoClient::transmitDataBlock() {
 }
 
 void PersoClient::createEcho(void) {
-  sendLog("Формирование команды Echo. ");
+  sendLog("Формирование команды echo. ");
 
   // Заголовок команды
-  CurrentCommand["command_name"] = "Echo";
+  CurrentCommand["command_name"] = "echo";
 
   // Тело команды
   CurrentCommand["data"] = "Test";
@@ -473,10 +473,10 @@ void PersoClient::createEcho(void) {
 
 void PersoClient::createAuthorization(
     const QMap<QString, QString>* requestAttributes) {
-  sendLog("Формирование команды Authorization. ");
+  sendLog("Формирование команды athorization. ");
 
   // Заголовок команды
-  CurrentCommand["command_name"] = "Authorization";
+  CurrentCommand["command_name"] = "authorization";
 
   // Тело команды
   CurrentCommand["login"] = requestAttributes->value("login");
@@ -488,10 +488,10 @@ void PersoClient::createAuthorization(
 
 void PersoClient::createTransponderRelease(
     const QMap<QString, QString>* requestAttributes) {
-  sendLog("Формирование команды TransponderRelease. ");
+  sendLog("Формирование команды transponder_release. ");
 
   // Заголовок команды
-  CurrentCommand["command_name"] = "TransponderRelease";
+  CurrentCommand["command_name"] = "transponder_release";
 
   // Тело команды
   CurrentCommand["login"] = requestAttributes->value("login");
@@ -503,10 +503,10 @@ void PersoClient::createTransponderRelease(
 
 void PersoClient::createTransponderReleaseConfirm(
     const QMap<QString, QString>* requestAttributes) {
-  sendLog("Формирование команды TransponderReleaseConfirm. ");
+  sendLog("Формирование команды transponder_release_confirm. ");
 
   // Заголовок команды
-  CurrentCommand["command_name"] = "TransponderReleaseConfirm";
+  CurrentCommand["command_name"] = "transponder_release_confirm";
 
   // Тело команды
   CurrentCommand["login"] = requestAttributes->value("login");
@@ -519,10 +519,10 @@ void PersoClient::createTransponderReleaseConfirm(
 
 void PersoClient::createTransponderRerelease(
     const QMap<QString, QString>* requestAttributes) {
-  sendLog("Формирование команды TransponderRerelease. ");
+  sendLog("Формирование команды transponder_rerelease. ");
 
   // Заголовок команды
-  CurrentCommand["command_name"] = "TransponderRerelease";
+  CurrentCommand["command_name"] = "transponder_rerelease";
 
   // Тело команды
   CurrentCommand["login"] = requestAttributes->value("login");
@@ -535,10 +535,10 @@ void PersoClient::createTransponderRerelease(
 
 void PersoClient::createTransponderRereleaseConfirm(
     const QMap<QString, QString>* requestAttributes) {
-  sendLog("Формирование команды TransponderRereleaseConfirm. ");
+  sendLog("Формирование команды transponder_rerelease_confirm. ");
 
   // Заголовок команды
-  CurrentCommand["command_name"] = "TransponderRereleaseConfirm";
+  CurrentCommand["command_name"] = "transponder_rerelease_confirm";
 
   // Тело команды
   CurrentCommand["login"] = requestAttributes->value("login");
@@ -554,7 +554,7 @@ void PersoClient::processEcho(void) {
   sendLog("Обработка ответа на команду Echo. ");
 
   // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "NoError") {
+  if (CurrentResponse["return_status"] != "no_error") {
     sendLog(QString("Получена серверная ошибка: %1")
                 .arg(CurrentResponse["return_status"].toString()));
     ProcessingStatus = ServerError;
@@ -563,7 +563,7 @@ void PersoClient::processEcho(void) {
 
   if (CurrentResponse.value("data").isUndefined() ||
       CurrentResponse.value("response_name").isUndefined() ||
-      (CurrentResponse.value("response_name").toString() != "Echo")) {
+      (CurrentResponse.value("response_name").toString() != "echo")) {
     sendLog("Обнаружена синтаксическая ошибка в ответе Echo. ");
     ProcessingStatus = ResponseSyntaxError;
     return;
@@ -577,7 +577,7 @@ void PersoClient::processAuthorization(void) {
   sendLog("Обработка ответа на команду TransponderRelease. ");
 
   // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "NoError") {
+  if (CurrentResponse["return_status"] != "no_error") {
     sendLog(QString("Получена серверная ошибка: %1")
                 .arg(CurrentResponse["return_status"].toString()));
     ProcessingStatus = ServerError;
@@ -586,18 +586,18 @@ void PersoClient::processAuthorization(void) {
 
   // Синтаксическая проверка
   if (CurrentResponse.value("response_name").isUndefined() ||
-      (CurrentResponse.value("response_name").toString() != "Authorization") ||
+      (CurrentResponse.value("response_name").toString() != "authorization") ||
       CurrentResponse.value("access").isUndefined()) {
     sendLog("Обнаружена синтаксическая ошибка в ответе Authorization. Сброс. ");
     ProcessingStatus = ResponseSyntaxError;
     return;
   }
 
-  if (CurrentResponse.value("access").toString() == "Allowed") {
+  if (CurrentResponse.value("access").toString() == "allowed") {
     ProcessingStatus = Completed;
-  } else if (CurrentResponse.value("access").toString() == "NotExist") {
+  } else if (CurrentResponse.value("access").toString() == "not_exist") {
     ProcessingStatus = AuthorizationNotExist;
-  } else if (CurrentResponse.value("access").toString() == "NotActive") {
+  } else if (CurrentResponse.value("access").toString() == "not_active") {
     ProcessingStatus = AuthorizationNotActive;
   } else {
     ProcessingStatus = AuthorizationAccessDenied;
@@ -607,10 +607,10 @@ void PersoClient::processAuthorization(void) {
 }
 
 void PersoClient::processTransponderRelease(QFile* firmware) {
-  sendLog("Обработка ответа на команду TransponderRelease. ");
+  sendLog("Обработка ответа на команду transponder_release. ");
 
   // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "NoError") {
+  if (CurrentResponse["return_status"] != "no_error") {
     sendLog(QString("Получена серверная ошибка: %1")
                 .arg(CurrentResponse["return_status"].toString()));
     ProcessingStatus = ServerError;
@@ -620,7 +620,7 @@ void PersoClient::processTransponderRelease(QFile* firmware) {
   // Синтаксическая проверка
   if (CurrentResponse.value("response_name").isUndefined() ||
       (CurrentResponse.value("response_name").toString() !=
-       "TransponderRelease") ||
+       "transponder_release") ||
       CurrentResponse.value("firmware").isUndefined()) {
     sendLog("Обнаружена синтаксическая ошибка в ответе TransponderRelease. ");
     ProcessingStatus = ResponseSyntaxError;
@@ -645,10 +645,10 @@ void PersoClient::processTransponderRelease(QFile* firmware) {
 
 void PersoClient::processTransponderReleaseConfirm(
     QMap<QString, QString>* responseAttributes) {
-  sendLog("Обработка ответа на команду TransponderReleaseConfirm. ");
+  sendLog("Обработка ответа на команду transponder_release_confirm. ");
 
   // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "NoError") {
+  if (CurrentResponse["return_status"] != "no_error") {
     sendLog(QString("Получена серверная ошибка: %1")
                 .arg(CurrentResponse["return_status"].toString()));
     ProcessingStatus = ServerError;
@@ -658,7 +658,7 @@ void PersoClient::processTransponderReleaseConfirm(
   // Синтаксическая проверка
   if (CurrentResponse.value("response_name").isUndefined() ||
       (CurrentResponse.value("response_name").toString() !=
-       "TransponderReleaseConfirm") ||
+       "transponder_release_confirm") ||
       CurrentResponse.value("sn").isUndefined() ||
       CurrentResponse.value("pan").isUndefined() ||
       CurrentResponse.value("box_id").isUndefined() ||
@@ -667,7 +667,8 @@ void PersoClient::processTransponderReleaseConfirm(
       CurrentResponse.value("issuer_name").isUndefined() ||
       CurrentResponse.value("transponder_model").isUndefined()) {
     sendLog(
-        "Обнаружена синтаксическая ошибка в ответе TransponderReleaseConfirm. "
+        "Обнаружена синтаксическая ошибка в ответе "
+        "transponder_release_confirm. "
         "Сброс. ");
     ProcessingStatus = ResponseSyntaxError;
     return;
@@ -692,10 +693,10 @@ void PersoClient::processTransponderReleaseConfirm(
 }
 
 void PersoClient::processTransponderRerelease(QFile* firmware) {
-  sendLog("Обработка ответа на команду TransponderRerelease. ");
+  sendLog("Обработка ответа на команду transponder_rerelease. ");
 
   // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "NoError") {
+  if (CurrentResponse["return_status"] != "no_error") {
     sendLog(QString("Получена серверная ошибка: %1")
                 .arg(CurrentResponse["return_status"].toString()));
     ProcessingStatus = ServerError;
@@ -705,7 +706,7 @@ void PersoClient::processTransponderRerelease(QFile* firmware) {
   // Синтаксическая проверка
   if (CurrentResponse.value("response_name").isUndefined() ||
       (CurrentResponse.value("response_name").toString() !=
-       "TransponderRerelease") ||
+       "transponder_rerelease") ||
       CurrentResponse.value("firmware").isUndefined()) {
     sendLog(
         "Обнаружена синтаксическая ошибка в ответе TransponderRerelease: "
@@ -727,15 +728,15 @@ void PersoClient::processTransponderRerelease(QFile* firmware) {
   firmware->close();
 
   ProcessingStatus = Completed;
-  sendLog("Команда TransponderRerelease успешно выполнена. ");
+  sendLog("Команда transponder_rerelease успешно выполнена. ");
 }
 
 void PersoClient::processTransponderRereleaseConfirm(
     QMap<QString, QString>* responseAttributes) {
-  sendLog("Обработка ответа на команду TransponderRereleaseConfirm. ");
+  sendLog("Обработка ответа на команду transponder_rerelease_confirm. ");
 
   // Проверка статуса возврата
-  if (CurrentResponse["return_status"] != "NoError") {
+  if (CurrentResponse["return_status"] != "no_error") {
     sendLog(QString("Получена серверная ошибка: %1")
                 .arg(CurrentResponse["return_status"].toString()));
     ProcessingStatus = ServerError;
@@ -745,7 +746,7 @@ void PersoClient::processTransponderRereleaseConfirm(
   // Синтаксическая проверка
   if (CurrentResponse.value("response_name").isUndefined() ||
       (CurrentResponse.value("response_name").toString() !=
-       "TransponderRereleaseConfirm") ||
+       "transponder_rerelease_confirm") ||
       CurrentResponse.value("sn").isUndefined() ||
       CurrentResponse.value("pan").isUndefined() ||
       CurrentResponse.value("box_id").isUndefined() ||
@@ -775,7 +776,7 @@ void PersoClient::processTransponderRereleaseConfirm(
       CurrentResponse.value("transponder_model").toString());
 
   ProcessingStatus = Completed;
-  sendLog("Команда TransponderRereleaseConfirm успешно выполнена. ");
+  sendLog("Команда transponder_rerelease_confirm успешно выполнена. ");
 }
 
 void PersoClient::on_SocketDisconnected_slot() {

@@ -30,13 +30,13 @@ class ClientManager : public QObject {
   QString CurrentPassword;
 
   PersoClient* Client;
-  QMap<PersoClient::ReturnStatus, QString> ClientReturnStatusMatch;
+  QHash<PersoClient::ReturnStatus, QString> ClientReturnStatusMatch;
 
   IProgrammer* Programmer;
-  QMap<IProgrammer::ReturnStatus, QString> ProgrammerReturnStatusMatch;
+  QHash<IProgrammer::ReturnStatus, QString> ProgrammerReturnStatusMatch;
 
   IStickerPrinter* StickerPrinter;
-  QMap<IStickerPrinter::ReturnStatus, QString> StickerPrinterReturnStatusMatch;
+  QHash<IStickerPrinter::ReturnStatus, QString> StickerPrinterReturnStatusMatch;
 
   QMutex Mutex;
 

@@ -5,3 +5,5 @@ IStickerPrinter::IStickerPrinter(QObject* parent, StickerPrinterType type)
   setObjectName("IStickerPrinter");
   Type = type;
 }
+
+IStickerPrinter::~IStickerPrinter() {}

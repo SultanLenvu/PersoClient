@@ -486,7 +486,7 @@ void ClientManager::createClientInstance() {
 }
 
 void ClientManager::createStickerPrinterInstance() {
-  StickerPrinter = new TE310Printer(this);
+  StickerPrinter = new TE310Printer(this, "TransponderStickerPrinter");
   connect(StickerPrinter, &IStickerPrinter::logging, LogSystem::instance(),
           &LogSystem::generate);
 
@@ -497,9 +497,9 @@ void ClientManager::createStickerPrinterInstance() {
   StickerPrinterReturnStatusMatch.insert(IStickerPrinter::Failed,
                                          "Не удалось распечать стикер.");
   StickerPrinterReturnStatusMatch.insert(
-      IStickerPrinter::LibraryMissing,
+      IStickerPrinter::LibraryMissed,
       "Отсутствует библиотека для работы с принтером стикеров.");
-  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::NotConnected,
+  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::ConnectionError,
                                          "Принтер стикеров не подключен.");
   StickerPrinterReturnStatusMatch.insert(IStickerPrinter::Completed,
                                          "Выполнено.");

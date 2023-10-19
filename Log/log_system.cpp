@@ -1,25 +1,21 @@
-#include <QDateTime>
-#include <QDir>
-#include <QList>
-#include <QObject>
-#include <QString>
-#include <QStringList>
-
 #include "log_system.h"
-
-#include "Log/file_log_backend.h"
-#include "Log/log_backend.h"
-#include "Log/widget_log_backend.h"
 
 LogSystem::LogSystem(QObject* parent) : QObject(parent) {
   setObjectName("LogSystem");
   loadSettings();
 
   WidgetLogger = new WidgetLogBackend(this);
-  backends << WidgetLogger;
+  Backends << WidgetLogger;
 
-  TextStreamLogger = new FileLogBackend(this);
-  backends << TextStreamLogger;
+  FileLogger = new FileLogBackend(this);
+  Backends << FileLogger;
+
+  UdpSocket = new QUdpSocket(this);
+  if (UdpListenEnable) {
+    UdpSocket->bind(UdpListenIp, UdpListenPort);
+  }
+  connect(UdpSocket, &QUdpSocket::readyRead, this,
+          &LogSystem::on_UdpSocketReadyRead_slot);
 }
 
 LogSystem::~LogSystem() {}
@@ -34,7 +30,7 @@ LogSystem* LogSystem::instance() {
 }
 
 void LogSystem::clear() {
-  for (QList<LogBackend*>::iterator it = backends.begin(); it != backends.end();
+  for (QList<LogBackend*>::iterator it = Backends.begin(); it != Backends.end();
        it++) {
     (*it)->clear();
   }
@@ -43,8 +39,8 @@ void LogSystem::clear() {
 void LogSystem::generate(const QString& log) {
   QTime time = QDateTime::currentDateTime().time();
   QString LogData = time.toString("hh:mm:ss.zzz - ") + log;
-  for (QList<LogBackend*>::iterator it = backends.begin(); it != backends.end();
-       it++) {
+  for (QList<LogBackend*>::const_iterator it = Backends.begin();
+       it != Backends.end(); it++) {
     (*it)->writeLogLine(LogData);
   }
 }
@@ -52,10 +48,34 @@ void LogSystem::generate(const QString& log) {
 void LogSystem::applySettings() {
   generate("LogSystem - Применение новых настроек. ");
   loadSettings();
+
+  UdpSocket->abort();
+  if (UdpListenEnable) {
+    UdpSocket->bind(UdpListenIp, UdpListenPort);
+  }
+
+  for (QList<LogBackend*>::const_iterator it = Backends.begin();
+       it != Backends.end(); it++) {
+    (*it)->applySettings();
+  }
 }
 
 /*
  * Приватные методы
  */
 
-void LogSystem::loadSettings() {}
+void LogSystem::loadSettings() {
+  QSettings settings;
+
+  UdpListenEnable = settings.value("log_system/udp_listen_enable").toBool();
+  UdpListenIp = settings.value("log_system/udp_listen_ip").toString();
+  UdpListenPort = settings.value("log_system/udp_listen_port").toUInt();
+}
+
+void LogSystem::on_UdpSocketReadyRead_slot() {
+  QByteArray datagram;
+  datagram.resize(UdpSocket->bytesAvailable());
+
+  UdpSocket->readDatagram(datagram.data(), datagram.size());
+  generate(datagram);
+}
