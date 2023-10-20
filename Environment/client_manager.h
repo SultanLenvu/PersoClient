@@ -11,7 +11,7 @@
 #include <QVector>
 
 #include "General/definitions.h"
-#include "General/map_model.h"
+#include "General/hash_model.h"
 #include "General/types.h"
 #include "Log/log_system.h"
 #include "Programmers/interface_programmer.h"
@@ -52,9 +52,10 @@ class ClientManager : public QObject {
   void performServerDisconnecting(void);
   void performServerEcho(void);
   void performServerAuthorization(
-      const QSharedPointer<QMap<QString, QString>> data);
-  void performTransponderFirmwareLoading(MapModel* model);
-  void performTransponderFirmwareReloading(MapModel* model, const QString& pan);
+      const QSharedPointer<QHash<QString, QString>> data);
+  void performTransponderFirmwareLoading(HashModel* model);
+  void performTransponderFirmwareReloading(HashModel* model,
+                                           const QString& pan);
 
   // Программатор
   void performLocalFirmwareLoading(const QString& path);
@@ -68,7 +69,7 @@ class ClientManager : public QObject {
   // Стикер принтер
   void performPrintingLastTransponderSticker(void);
   void performPrintingCustomTransponderSticker(
-      const QSharedPointer<QMap<QString, QString>> data);
+      const QSharedPointer<QHash<QString, QString>> data);
   void performStickerPrinterCommandScript(
       const QSharedPointer<QStringList> commandScript);
 

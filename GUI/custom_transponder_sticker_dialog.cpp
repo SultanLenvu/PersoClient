@@ -33,7 +33,8 @@ CustomTransponderStickerScanDialog::CustomTransponderStickerScanDialog(
   connect(CancelButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-void CustomTransponderStickerScanDialog::getData(QMap<QString, QString>* data) {
+void CustomTransponderStickerScanDialog::getData(
+    QHash<QString, QString>* data) {
   if (!data) {
     return;
   }

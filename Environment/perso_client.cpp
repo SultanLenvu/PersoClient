@@ -68,10 +68,6 @@ PersoClient::ReturnStatus PersoClient::requestEcho() {
   CurrentState = ProcessingResponse;
   processEcho();
 
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
-
   // Замыкаем машину состояний
   CurrentState = Ready;
 
@@ -80,7 +76,7 @@ PersoClient::ReturnStatus PersoClient::requestEcho() {
 }
 
 PersoClient::ReturnStatus PersoClient::requestAuthorize(
-    const QMap<QString, QString>* requestAttributes) {
+    const QHash<QString, QString>* requestAttributes) {
   // Создаем запрос
   CurrentState = CreatingRequest;
 
@@ -113,10 +109,6 @@ PersoClient::ReturnStatus PersoClient::requestAuthorize(
   CurrentState = ProcessingResponse;
   processAuthorization();
 
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
-
   // Замыкаем машину состояний
   CurrentState = Ready;
 
@@ -125,7 +117,7 @@ PersoClient::ReturnStatus PersoClient::requestAuthorize(
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
-    const QMap<QString, QString>* requestAttributes,
+    const QHash<QString, QString>* requestAttributes,
     QFile* firmware) {
   // Создаем запрос
   CurrentState = CreatingRequest;
@@ -159,10 +151,6 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
   CurrentState = ProcessingResponse;
   processTransponderRelease(firmware);
 
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
-
   // Замыкаем машину состояний
   CurrentState = Ready;
 
@@ -171,8 +159,8 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderReleaseConfirm(
-    const QMap<QString, QString>* requestAttributes,
-    QMap<QString, QString>* responseAttributes) {
+    const QHash<QString, QString>* requestAttributes,
+    QHash<QString, QString>* responseAttributes) {
   // Создаем запрос
   CurrentState = CreatingRequest;
 
@@ -205,10 +193,6 @@ PersoClient::ReturnStatus PersoClient::requestTransponderReleaseConfirm(
   CurrentState = ProcessingResponse;
   processTransponderReleaseConfirm(responseAttributes);
 
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
-
   // Замыкаем машину состояний
   CurrentState = Ready;
 
@@ -217,7 +201,7 @@ PersoClient::ReturnStatus PersoClient::requestTransponderReleaseConfirm(
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderRerelease(
-    const QMap<QString, QString>* requestAttributes,
+    const QHash<QString, QString>* requestAttributes,
     QFile* firmware) {
   // Создаем запрос
   CurrentState = CreatingRequest;
@@ -251,10 +235,6 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRerelease(
   CurrentState = ProcessingResponse;
   processTransponderRerelease(firmware);
 
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
-
   // Замыкаем машину состояний
   CurrentState = Ready;
 
@@ -263,8 +243,8 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRerelease(
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderRereleaseConfirm(
-    const QMap<QString, QString>* requestAttributes,
-    QMap<QString, QString>* responseAttributes) {
+    const QHash<QString, QString>* requestAttributes,
+    QHash<QString, QString>* responseAttributes) {
   // Создаем запрос
   CurrentState = CreatingRequest;
 
@@ -296,10 +276,6 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRereleaseConfirm(
   // Обрабатываем полученный ответ
   CurrentState = ProcessingResponse;
   processTransponderRereleaseConfirm(responseAttributes);
-
-  // Очищаем команду и ответ на нее
-  CurrentCommand = QJsonObject();
-  CurrentResponse = QJsonObject();
 
   // Замыкаем машину состояний
   CurrentState = Ready;
@@ -373,6 +349,13 @@ void PersoClient::createSocket() {
 
 bool PersoClient::processingServerConnection() {
   sendLog("Подключение к серверу персонализации. ");
+
+  // Сбрасываем флаг ошибки ожидания
+  TimeoutIndicator = false;
+  // Очищаем команду и ответ на нее
+  CurrentCommand = QJsonObject();
+  CurrentResponse = QJsonObject();
+
   // Подключаемся к серверу персонализации
   Socket->connectToHost(PersoServerAddress, PersoServerPort);
 
@@ -472,7 +455,7 @@ void PersoClient::createEcho(void) {
 }
 
 void PersoClient::createAuthorization(
-    const QMap<QString, QString>* requestAttributes) {
+    const QHash<QString, QString>* requestAttributes) {
   sendLog("Формирование команды athorization. ");
 
   // Заголовок команды
@@ -487,7 +470,7 @@ void PersoClient::createAuthorization(
 }
 
 void PersoClient::createTransponderRelease(
-    const QMap<QString, QString>* requestAttributes) {
+    const QHash<QString, QString>* requestAttributes) {
   sendLog("Формирование команды transponder_release. ");
 
   // Заголовок команды
@@ -502,7 +485,7 @@ void PersoClient::createTransponderRelease(
 }
 
 void PersoClient::createTransponderReleaseConfirm(
-    const QMap<QString, QString>* requestAttributes) {
+    const QHash<QString, QString>* requestAttributes) {
   sendLog("Формирование команды transponder_release_confirm. ");
 
   // Заголовок команды
@@ -518,7 +501,7 @@ void PersoClient::createTransponderReleaseConfirm(
 }
 
 void PersoClient::createTransponderRerelease(
-    const QMap<QString, QString>* requestAttributes) {
+    const QHash<QString, QString>* requestAttributes) {
   sendLog("Формирование команды transponder_rerelease. ");
 
   // Заголовок команды
@@ -534,7 +517,7 @@ void PersoClient::createTransponderRerelease(
 }
 
 void PersoClient::createTransponderRereleaseConfirm(
-    const QMap<QString, QString>* requestAttributes) {
+    const QHash<QString, QString>* requestAttributes) {
   sendLog("Формирование команды transponder_rerelease_confirm. ");
 
   // Заголовок команды
@@ -644,7 +627,7 @@ void PersoClient::processTransponderRelease(QFile* firmware) {
 }
 
 void PersoClient::processTransponderReleaseConfirm(
-    QMap<QString, QString>* responseAttributes) {
+    QHash<QString, QString>* responseAttributes) {
   sendLog("Обработка ответа на команду transponder_release_confirm. ");
 
   // Проверка статуса возврата
@@ -732,7 +715,7 @@ void PersoClient::processTransponderRerelease(QFile* firmware) {
 }
 
 void PersoClient::processTransponderRereleaseConfirm(
-    QMap<QString, QString>* responseAttributes) {
+    QHash<QString, QString>* responseAttributes) {
   sendLog("Обработка ответа на команду transponder_rerelease_confirm. ");
 
   // Проверка статуса возврата

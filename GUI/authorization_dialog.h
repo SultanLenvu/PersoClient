@@ -25,7 +25,7 @@ class AuthorizationDialog : public QDialog {
 
  public:
   AuthorizationDialog(QWidget* parent);
-  void getData(QMap<QString, QString>* data);
+  void getData(QHash<QString, QString>* data);
 
  private:
   Q_DISABLE_COPY(AuthorizationDialog);

@@ -35,9 +35,9 @@ class InteractionSystem : public QWidget {
   void finishOperationProgressDialog(const QString& operationName);
 
   void getMasterPassword(QString& pass);
-  void getAuthorizationData(QMap<QString, QString>* data);
+  void getAuthorizationData(QHash<QString, QString>* data);
   void getTransponderStickerData(QStringList* data, bool& ok);
-  void getCustomTransponderStickerData(QMap<QString, QString>* data, bool& ok);
+  void getCustomTransponderStickerData(QHash<QString, QString>* data, bool& ok);
 
   void applySettings(void);
 

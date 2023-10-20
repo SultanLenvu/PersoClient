@@ -1,23 +1,23 @@
-#ifndef MAP_MODEL_H
-#define MAP_MODEL_H
+#ifndef HASH_MODEL_H
+#define HASH_MODEL_H
 
 #include <QAbstractTableModel>
-#include <QMap>
+#include <QHash>
 #include <QString>
 
-class MapModel : public QAbstractTableModel {
+class HashModel : public QAbstractTableModel {
  private:
-  QMap<QVariant, QVariant> Map;
-  QMap<QString, QString> TransponderInfoMatchTable;
+  QHash<QString, QVariant> Hash;
+  QHash<QString, QString> TransponderInfoMatchTable;
 
  public:
-  explicit MapModel(QObject* parent);
-  ~MapModel();
+  explicit HashModel(QObject* parent);
+  ~HashModel();
 
-  void buildTransponderInfo(const QMap<QString, QString>* map);
+  void buildTransponderInfo(const QHash<QString, QString>* map);
   void clear(void);
   bool isEmpty(void) const;
-  const QMap<QVariant, QVariant>* map(void) const;
+  const QHash<QString, QVariant>* map(void) const;
 
   // Методы модели
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -28,8 +28,8 @@ class MapModel : public QAbstractTableModel {
                       int role = Qt::DisplayRole) const override;
 
  private:
-  Q_DISABLE_COPY(MapModel);
+  Q_DISABLE_COPY(HashModel);
   void createMatchTables(void);
 };
 
-#endif  // MAP_MODEL_H
+#endif  // HASH_MODEL_H

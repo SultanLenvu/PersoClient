@@ -19,7 +19,7 @@ class CustomTransponderStickerScanDialog : public QDialog {
 
  public:
   CustomTransponderStickerScanDialog(QWidget* parent);
-  void getData(QMap<QString, QString>* data);
+  void getData(QHash<QString, QString>* data);
 
  private:
   Q_DISABLE_COPY(CustomTransponderStickerScanDialog);

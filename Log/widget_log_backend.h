@@ -12,7 +12,8 @@ class WidgetLogBackend : public LogBackend {
   bool LogEnable;
 
  public:
-  WidgetLogBackend(QObject* parent);
+  explicit WidgetLogBackend(QObject* parent);
+  ~WidgetLogBackend();
 
   virtual void writeLogLine(const QString& str) override;
   virtual void clear() override;

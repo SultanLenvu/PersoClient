@@ -14,7 +14,7 @@
 #include "GUI/master_gui.h"
 #include "GUI/production_gui.h"
 #include "General/definitions.h"
-#include "General/map_model.h"
+#include "General/hash_model.h"
 #include "Log/log_system.h"
 
 class MainWindowKernel : public QMainWindow {
@@ -43,7 +43,7 @@ class MainWindowKernel : public QMainWindow {
 
   InteractionSystem* Interactor;
 
-  MapModel* TransponderInfo;
+  HashModel* TransponderInfo;
 
  public:
   explicit MainWindowKernel(QWidget* parent = nullptr);
@@ -118,9 +118,9 @@ class MainWindowKernel : public QMainWindow {
   void performServerDisconnecting_signal(void);
   void performServerEcho_signal(void);
   void performServerAuthorization_signal(
-      const QSharedPointer<QMap<QString, QString>> data);
-  void performTransponderFirmwareLoading_signal(MapModel* model);
-  void performTransponderFirmwareReloading_signal(MapModel* model,
+      const QSharedPointer<QHash<QString, QString>> data);
+  void performTransponderFirmwareLoading_signal(HashModel* model);
+  void performTransponderFirmwareReloading_signal(HashModel* model,
                                                   const QString& pan);
   void performLocalFirmwareLoading_signal(const QString& path);
   void performFirmwareReading_signal(void);
@@ -131,7 +131,7 @@ class MainWindowKernel : public QMainWindow {
   void performDeviceLock_signal(void);
   void performPrintingLastTransponderSticker_signal(void);
   void performPrintingCustomTransponderSticker_signal(
-      const QSharedPointer<QMap<QString, QString>> data);
+      const QSharedPointer<QHash<QString, QString>> data);
   void performStickerPrinterCommandScript_signal(
       const QSharedPointer<QStringList> commandScript);
 };

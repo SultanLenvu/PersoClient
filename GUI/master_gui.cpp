@@ -279,7 +279,7 @@ void MasterGUI::createSettingsTab() {
   StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLabel, 0, 0,
                                               1, 1);
   StickerPrinterLibPathLineEdit =
-      new QLineEdit(settings.value("sticker_printer/library_path").toString());
+      new QLineEdit(settings.value("te310_printer/library_path").toString());
   StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLineEdit, 0,
                                               1, 1, 1);
   StickerPrinterLibPathPushButton = new QPushButton("Обзор");

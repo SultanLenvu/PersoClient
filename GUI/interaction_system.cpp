@@ -76,7 +76,7 @@ void InteractionSystem::getMasterPassword(QString& pass) {
                                nullptr);
 }
 
-void InteractionSystem::getAuthorizationData(QMap<QString, QString>* data) {
+void InteractionSystem::getAuthorizationData(QHash<QString, QString>* data) {
   AuthorizationDialog* dialog = new AuthorizationDialog(this);
 
   if (dialog->exec() == QDialog::Accepted) {
@@ -97,7 +97,7 @@ void InteractionSystem::getTransponderStickerData(QStringList* data,
 }
 
 void InteractionSystem::getCustomTransponderStickerData(
-    QMap<QString, QString>* data,
+    QHash<QString, QString>* data,
     bool& ok) {
   CustomTransponderStickerScanDialog* dialog =
       new CustomTransponderStickerScanDialog(this);

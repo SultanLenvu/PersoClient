@@ -35,7 +35,7 @@ AuthorizationDialog::AuthorizationDialog(QWidget* parent) : QDialog(parent) {
   connect(CancelButton, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-void AuthorizationDialog::getData(QMap<QString, QString>* data) {
+void AuthorizationDialog::getData(QHash<QString, QString>* data) {
   if (!data) {
     return;
   }

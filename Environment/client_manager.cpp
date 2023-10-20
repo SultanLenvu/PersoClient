@@ -64,7 +64,7 @@ void ClientManager::performServerEcho() {
 }
 
 void ClientManager::performServerAuthorization(
-    const QSharedPointer<QMap<QString, QString>> data) {
+    const QSharedPointer<QHash<QString, QString>> data) {
   startOperationPerforming("performServerAuthorization");
 
   sendLog("Авторизация на сервере персонализации. ");
@@ -85,14 +85,14 @@ void ClientManager::performServerAuthorization(
   finishOperationPerforming("performServerAuthorization");
 }
 
-void ClientManager::performTransponderFirmwareLoading(MapModel* model) {
+void ClientManager::performTransponderFirmwareLoading(HashModel* model) {
   startOperationPerforming("performTransponderFirmwareLoading");
 
   IProgrammer::ReturnStatus programmerStatus;
   PersoClient::ReturnStatus clientStatus;
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
   QString ucid;
-  QMap<QString, QString> requestParameters;
+  QHash<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
 
   sendLog("Разблокирование памяти транспондера. ");
@@ -130,7 +130,7 @@ void ClientManager::performTransponderFirmwareLoading(MapModel* model) {
     return;
   }
 
-  QMap<QString, QString> responseParameters;
+  QHash<QString, QString> responseParameters;
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
   requestParameters.insert("ucid", ucid);
@@ -162,7 +162,7 @@ void ClientManager::performTransponderFirmwareLoading(MapModel* model) {
   finishOperationPerforming("performTransponderFirmwareLoading");
 }
 
-void ClientManager::performTransponderFirmwareReloading(MapModel* model,
+void ClientManager::performTransponderFirmwareReloading(HashModel* model,
                                                         const QString& pan) {
   startOperationPerforming("performTransponderFirmwareReloading");
 
@@ -170,7 +170,7 @@ void ClientManager::performTransponderFirmwareReloading(MapModel* model,
   PersoClient::ReturnStatus clientStatus;
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
   QString ucid;
-  QMap<QString, QString> requestParameters;
+  QHash<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
 
   sendLog("Разблокирование памяти транспондера. ");
@@ -209,7 +209,7 @@ void ClientManager::performTransponderFirmwareReloading(MapModel* model,
     return;
   }
 
-  QMap<QString, QString> responseParameters;
+  QHash<QString, QString> responseParameters;
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
   requestParameters.insert("pan", pan);
@@ -381,7 +381,7 @@ void ClientManager::performPrintingLastTransponderSticker() {
 }
 
 void ClientManager::performPrintingCustomTransponderSticker(
-    const QSharedPointer<QMap<QString, QString>> data) {
+    const QSharedPointer<QHash<QString, QString>> data) {
   startOperationPerforming("performStickerPrinterCommandScript");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
@@ -486,7 +486,7 @@ void ClientManager::createClientInstance() {
 }
 
 void ClientManager::createStickerPrinterInstance() {
-  StickerPrinter = new TE310Printer(this, "TransponderStickerPrinter");
+  StickerPrinter = new TE310Printer(this, "TSC TE310");
   connect(StickerPrinter, &IStickerPrinter::logging, LogSystem::instance(),
           &LogSystem::generate);
 

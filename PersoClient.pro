@@ -11,6 +11,7 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    General/hash_model.cpp \
     Log/file_log_backend.cpp \
     Log/log_system.cpp \
     Log/log_backend.cpp \
@@ -30,10 +31,10 @@ SOURCES += \
     Programmers/jlink_exe_programmer.cpp \
     StickerPrinter/isticker_printer.cpp \
     StickerPrinter/te310_printer.cpp \
-    General/map_model.cpp \
     main.cpp
 
 HEADERS += \
+    General/hash_model.h \
     Log/file_log_backend.h \
     Log/log_system.h \
     Log/log_backend.h \
@@ -53,7 +54,6 @@ HEADERS += \
     Programmers/jlink_exe_programmer.h \
     StickerPrinter/isticker_printer.h \
     StickerPrinter/te310_printer.h \
-    General/map_model.h \
     General/types.h \
     General/definitions.h
 

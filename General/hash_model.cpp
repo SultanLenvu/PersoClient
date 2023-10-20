@@ -1,13 +1,13 @@
-#include "map_model.h"
+#include "hash_model.h"
 
-MapModel::MapModel(QObject* parent) : QAbstractTableModel(parent) {
-  setObjectName("MapModel");
+HashModel::HashModel(QObject* parent) : QAbstractTableModel(parent) {
+  setObjectName("HashModel");
   createMatchTables();
 }
 
-MapModel::~MapModel() {}
+HashModel::~HashModel() {}
 
-void MapModel::buildTransponderInfo(const QMap<QString, QString>* map) {
+void HashModel::buildTransponderInfo(const QHash<QString, QString>* map) {
   // Проверка на существование
   if (!map) {
     return;
@@ -16,64 +16,64 @@ void MapModel::buildTransponderInfo(const QMap<QString, QString>* map) {
   beginResetModel();
 
   // Очищаем старые данные
-  Map.clear();
+  Hash.clear();
 
   // Устанавливаем новые данные
-  for (QMap<QString, QString>::const_iterator it1 = map->constBegin();
+  for (QHash<QString, QString>::const_iterator it1 = map->constBegin();
        it1 != map->constEnd(); it1++) {
-    Map.insert(TransponderInfoMatchTable.value(it1.key()), it1.value());
+    Hash.insert(TransponderInfoMatchTable.value(it1.key()), it1.value());
   }
 
   endResetModel();
 }
 
-void MapModel::clear() {
+void HashModel::clear() {
   beginResetModel();
 
-  Map.clear();
+  Hash.clear();
 
   endResetModel();
 }
 
-bool MapModel::isEmpty() const {
-  return Map.isEmpty();
+bool HashModel::isEmpty() const {
+  return Hash.isEmpty();
 }
 
-const QMap<QVariant, QVariant>* MapModel::map() const {
-  return &Map;
+const QHash<QString, QVariant>* HashModel::map() const {
+  return &Hash;
 }
 
-int MapModel::columnCount(const QModelIndex& parent) const {
-  if (Map.isEmpty()) {
+int HashModel::columnCount(const QModelIndex& parent) const {
+  if (Hash.isEmpty()) {
     return 0;
   }
 
   return 1;
 }
 
-int MapModel::rowCount(const QModelIndex& parent) const {
-  return Map.size();
+int HashModel::rowCount(const QModelIndex& parent) const {
+  return Hash.size();
 }
 
-QVariant MapModel::data(const QModelIndex& index, int role) const {
+QVariant HashModel::data(const QModelIndex& index, int role) const {
   if (index.column() > 1) {
     return QVariant();
   }
 
-  if (index.row() > (Map.size())) {
+  if (index.row() > (Hash.size())) {
     return QVariant();
   }
 
   if (role == Qt::DisplayRole) {
-    return (Map.constBegin() + index.row()).value();
+    return (Hash.constBegin() + index.row()).value();
   } else
     return QVariant();
 }
 
-QVariant MapModel::headerData(int section,
-                              Qt::Orientation orientation,
-                              int role) const {
-  if (section > (Map.size())) {
+QVariant HashModel::headerData(int section,
+                               Qt::Orientation orientation,
+                               int role) const {
+  if (section > (Hash.size())) {
     return QVariant();
   }
 
@@ -85,13 +85,13 @@ QVariant MapModel::headerData(int section,
   }
 
   if (orientation == Qt::Vertical) {
-    return (Map.constBegin() + section).key();
+    return (Hash.constBegin() + section).key();
   } else {
     return QVariant();
   }
 }
 
-void MapModel::createMatchTables() {
+void HashModel::createMatchTables() {
   TransponderInfoMatchTable.insert("sn", "Серийный номер");
   TransponderInfoMatchTable.insert("pan", "PAN");
   TransponderInfoMatchTable.insert("issuer_name", "Компания-заказчик");

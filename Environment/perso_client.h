@@ -77,20 +77,20 @@ class PersoClient : public QObject {
 
   ReturnStatus requestEcho(void);
   ReturnStatus requestAuthorize(
-      const QMap<QString, QString>* requestAttributes);
+      const QHash<QString, QString>* requestAttributes);
 
   ReturnStatus requestTransponderRelease(
-      const QMap<QString, QString>* requestAttributes,
+      const QHash<QString, QString>* requestAttributes,
       QFile* firmware);
   ReturnStatus requestTransponderReleaseConfirm(
-      const QMap<QString, QString>* requestAttributes,
-      QMap<QString, QString>* responseAttributes);
+      const QHash<QString, QString>* requestAttributes,
+      QHash<QString, QString>* responseAttributes);
   ReturnStatus requestTransponderRerelease(
-      const QMap<QString, QString>* requestAttributes,
+      const QHash<QString, QString>* requestAttributes,
       QFile* firmware);
   ReturnStatus requestTransponderRereleaseConfirm(
-      const QMap<QString, QString>* requestAttributes,
-      QMap<QString, QString>* responseAttributes);
+      const QHash<QString, QString>* requestAttributes,
+      QHash<QString, QString>* responseAttributes);
 
   void applySettings(void);
 
@@ -107,24 +107,24 @@ class PersoClient : public QObject {
   void transmitDataBlock(void);
 
   void createEcho(void);
-  void createAuthorization(const QMap<QString, QString>* requestAttributes);
+  void createAuthorization(const QHash<QString, QString>* requestAttributes);
   void createTransponderRelease(
-      const QMap<QString, QString>* requestAttributes);
+      const QHash<QString, QString>* requestAttributes);
   void createTransponderReleaseConfirm(
-      const QMap<QString, QString>* requestAttributes);
+      const QHash<QString, QString>* requestAttributes);
   void createTransponderRerelease(
-      const QMap<QString, QString>* requestAttributes);
+      const QHash<QString, QString>* requestAttributes);
   void createTransponderRereleaseConfirm(
-      const QMap<QString, QString>* requestAttributes);
+      const QHash<QString, QString>* requestAttributes);
 
   void processEcho(void);
   void processAuthorization(void);
   void processTransponderRelease(QFile* firmware);
   void processTransponderReleaseConfirm(
-      QMap<QString, QString>* responseAttributes);
+      QHash<QString, QString>* responseAttributes);
   void processTransponderRerelease(QFile* firmware);
   void processTransponderRereleaseConfirm(
-      QMap<QString, QString>* responseAttributes);
+      QHash<QString, QString>* responseAttributes);
 
  private slots:
   void on_SocketConnected_slot(void);

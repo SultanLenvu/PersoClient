@@ -27,7 +27,7 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   createManagerInstance();
 
   // Создаем модель для представления данных транспондера
-  TransponderInfo = new MapModel(this);
+  TransponderInfo = new HashModel(this);
 
   // Создаем графический интерфейс для авторизации
   //  createAuthorizationInterface();
@@ -36,8 +36,8 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   createMasterInterface();
 
   // Регистрируем типы
-  qRegisterMetaType<QSharedPointer<QMap<QString, QString>>>(
-      "QSharedPointer<QMap<QString, QString> >");
+  qRegisterMetaType<QSharedPointer<QHash<QString, QString>>>(
+      "QSharedPointer<QHash<QString, QString> >");
 }
 
 MainWindowKernel::~MainWindowKernel() {
@@ -49,7 +49,7 @@ MainWindowKernel::~MainWindowKernel() {
 }
 
 void MainWindowKernel::on_AuthorizePushButton_slot() {
-  QSharedPointer<QMap<QString, QString>> data(new QMap<QString, QString>);
+  QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
   AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
   data->insert("login", gui->LoginLineEdit->text());
   data->insert("password", gui->PasswordLineEdit->text());
@@ -110,7 +110,7 @@ void MainWindowKernel::on_PrintLastTransponderStickerButton_slot() {
 void MainWindowKernel::on_PrintCustomTransponderStickerButton_slot() {
   emit loggerClear_signal();
 
-  QSharedPointer<QMap<QString, QString>> data(new QMap<QString, QString>);
+  QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
   bool ok = false;
   Interactor->getCustomTransponderStickerData(data.get(), ok);
 
@@ -165,7 +165,7 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
   settings.setValue("jlink_exe_programmer/speed",
                     gui->ProgrammerSpeedLineEdit->text());
 
-  settings.setValue("sticker_printer/library_path",
+  settings.setValue("te310_printer/library_path",
                     gui->StickerPrinterLibPathLineEdit->text());
 
   // Применение новых настроек
@@ -192,7 +192,7 @@ void MainWindowKernel::on_PersoServerEchoRequestButton_slot() {
 }
 
 void MainWindowKernel::on_MasterAuthorizePushButton_slot() {
-  QSharedPointer<QMap<QString, QString>> data(new QMap<QString, QString>);
+  QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
   Interactor->getAuthorizationData(data.get());
 
   if (data->isEmpty()) {
