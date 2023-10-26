@@ -74,7 +74,7 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
     QHash<QString, QString>* responseData) {
   // Проверка на существование
   if ((!requestData) || (!firmware) || (!responseData)) {
-    sendLog("Получены не корректные параметры запроса. Сброс.");
+    sendLog("Получены некорректные параметры запроса. Сброс.");
     return RequestParameterError;
   }
   Firmware = firmware;

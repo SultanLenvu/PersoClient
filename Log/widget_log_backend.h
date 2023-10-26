@@ -6,8 +6,14 @@
 
 #include "Log/log_backend.h"
 
+/*!
+ * Log backend to display log lines in master GUI.
+ * \todo log to specific QWidget
+ */
 class WidgetLogBackend : public LogBackend {
-  Q_OBJECT
+ Q_OBJECT
+ private:
+  bool LogEnable;
 
  public:
   explicit WidgetLogBackend(QObject* parent);

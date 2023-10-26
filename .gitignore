@@ -55,3 +55,6 @@ compile_commands.json
 
 # Binary
 PersoClient
+
+# Documentation directory
+docs

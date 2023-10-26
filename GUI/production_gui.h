@@ -5,8 +5,12 @@
 
 #include "abstract_gui.h"
 
+/*!
+ * Production GUI mode
+ */
 class ProductionGUI : public AbstractGUI {
  public:
+  //! \cond
   QVBoxLayout* ControlPanelLayout;
 
   QGroupBox* TransponderGroup;
@@ -25,15 +29,28 @@ class ProductionGUI : public AbstractGUI {
   QGroupBox* TransponderDataGroup;
   QVBoxLayout* TransponderDataLayout;
   QTableView* TransponderDataView;
+  //! \endcond
 
  public:
+  /*!
+   * Default constructor. Initialize widgets and layout
+   * \param parent Parent widget
+   */
   explicit ProductionGUI(QWidget* parent);
+  /*!
+   * Default destructor
+   */
   ~ProductionGUI();
 
+  /*!
+   * Update sizes to match TransponderDataView column sizes
+   */
   virtual void update(void) override;
 
  private:
+  //! \cond
   Q_DISABLE_COPY(ProductionGUI);
+  //! \endcond
 };
 
 #endif  // PRODUCTION_GUI_H
