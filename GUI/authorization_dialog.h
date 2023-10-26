@@ -6,10 +6,14 @@
 #include <QDialog>
 #include <QtWidgets>
 
+/*!
+ * Dialog for authorization data
+ */
 class AuthorizationDialog : public QDialog {
-  Q_OBJECT
+ Q_OBJECT
 
  private:
+  //! \cond
   QRect DesktopGeometry;
   QVBoxLayout* MainLayout;
 
@@ -22,9 +26,17 @@ class AuthorizationDialog : public QDialog {
 
   QPushButton* OkButton;
   QPushButton* CancelButton;
+  //! \endcond
 
  public:
+  /*!
+   * Construct class and create layout
+   */
   AuthorizationDialog(QWidget* parent);
+  /*!
+   * Put contents of login and password fields into data
+   * \param[out] data map to store login and password
+   */
   void getData(QMap<QString, QString>* data);
 
  private:

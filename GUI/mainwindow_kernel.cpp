@@ -512,7 +512,7 @@ void MainWindowKernel::createManagerInstance() {
           &InteractionSystem::generateMessage);
   connect(Manager, &ClientManager::notifyUserAboutError, Interactor,
           &InteractionSystem::generateErrorMessage);
-  connect(Manager, &ClientManager::operationPerfomingStarted, Interactor,
+  connect(Manager, &ClientManager::operationPerformingStarted, Interactor,
           &InteractionSystem::startOperationProgressDialog);
   connect(Manager, &ClientManager::operationPerformingFinished, Interactor,
           &InteractionSystem::finishOperationProgressDialog);
@@ -563,7 +563,7 @@ void MainWindowKernel::createManagerInstance() {
   connect(ManagerThread, &QThread::finished, Manager,
           &ClientManager::deleteLater);
   connect(ManagerThread, &QThread::started, Manager,
-          &ClientManager::on_InsctanceThreadStarted_slot);
+          &ClientManager::on_InstanceThreadStarted_slot);
 
   Manager->moveToThread(ManagerThread);
   ManagerThread->start();

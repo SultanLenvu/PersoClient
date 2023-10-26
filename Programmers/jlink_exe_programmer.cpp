@@ -28,7 +28,7 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::getUcid(QString* ucid) {
                      .toUtf8()));
 
   // Запускаем выполнение скрипта JLink
-  excuteJLinkScript();
+  executeJLinkScript();
 
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf("Script processing completed.") == -1) {
@@ -75,7 +75,7 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadFirmware(
   JLinkScript->write(temp.toUtf8());
 
   // Запускаем выполнение скрипта JLink
-  excuteJLinkScript();
+  executeJLinkScript();
 
   // Обрабатываем вывод JLink.exe
   if ((ProcessOutput.indexOf("O.K.") > -1) &&
@@ -127,7 +127,7 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadFirmwareWithUnlock(
   JLinkScript->write(temp.toUtf8());
 
   // Запускаем выполнение скрипта JLink
-  excuteJLinkScript();
+  executeJLinkScript();
 
   // Обрабатываем вывод JLink.exe
   if ((ProcessOutput.indexOf("O.K.") > -1) &&
@@ -157,7 +157,7 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readFirmware(void) {
       QByteArray("savebin saved_firmware.bin, 0x08000000, 0x10000\n"));
 
   // Запускаем выполнение скрипта JLink
-  excuteJLinkScript();
+  executeJLinkScript();
 
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf(
@@ -183,7 +183,7 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::eraseFirmware() {
   JLinkScript->write(QByteArray("erase\n"));
 
   // Запускаем выполнение скрипта JLink
-  excuteJLinkScript();
+  executeJLinkScript();
 
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf("Erasing done.") > -1)
@@ -211,7 +211,7 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readData(void) {
   JLinkScript->write(temp.toUtf8());
 
   // Запускаем выполнение скрипта JLink
-  excuteJLinkScript();
+  executeJLinkScript();
 
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf(QString("Reading ") +
@@ -252,7 +252,7 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadData(QFile* data) {
   JLinkScript->write(temp.toUtf8());
 
   // Запускаем выполнение скрипта JLink
-  excuteJLinkScript();
+  executeJLinkScript();
 
   // Обрабатываем вывод JLink.exe
   if ((ProcessOutput.indexOf("O.K.") > -1) &&
@@ -287,7 +287,7 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::unlockDevice() {
   JLinkScript->write(QByteArray("g\n"));
 
   // Запускаем выполнение скрипта JLink
-  excuteJLinkScript();
+  executeJLinkScript();
 
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf("1FFFF800 = A5 5A FF 00                           "
@@ -323,7 +323,7 @@ JLinkExeProgrammer::lockDevice() {  // Проверка на существов�
   JLinkScript->write(QByteArray("g\n"));
 
   // Запускаем выполнение скрипта JLink
-  excuteJLinkScript();
+  executeJLinkScript();
 
   // Обрабатываем вывод JLink.exe
   if (ProcessOutput.indexOf(
@@ -364,7 +364,7 @@ void JLinkExeProgrammer::loadSettings() {
   Speed = settings.value("jlink_exe_programmer/speed").toUInt();
 }
 
-void JLinkExeProgrammer::excuteJLinkScript() {
+void JLinkExeProgrammer::executeJLinkScript() {
   // Добавляем завершение скрипта
   // Посылаем сигнал Reset на МК
   JLinkScript->write(QByteArray("r\n"));

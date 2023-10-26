@@ -60,7 +60,7 @@ QVariant MapModel::data(const QModelIndex& index, int role) const {
     return QVariant();
   }
 
-  if (index.row() > (Map.size())) {
+  if (index.row() > Map.size()) {
     return QVariant();
   }
 
@@ -73,7 +73,7 @@ QVariant MapModel::data(const QModelIndex& index, int role) const {
 QVariant MapModel::headerData(int section,
                               Qt::Orientation orientation,
                               int role) const {
-  if (section > (Map.size())) {
+  if (section > Map.size()) {
     return QVariant();
   }
 

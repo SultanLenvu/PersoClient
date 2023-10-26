@@ -132,7 +132,7 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
 
   // Проверка на существование
   if ((!requestAttributes) || (!firmware)) {
-    sendLog("Получены не корректные параметры запроса. Сброс.");
+    emit logging("Получены некорректные параметры запроса. Сброс.");
     return RequestParameterError;
   }
   createTransponderRelease(requestAttributes);
