@@ -7,7 +7,7 @@ HashModel::HashModel(QObject* parent) : QAbstractTableModel(parent) {
 
 HashModel::~HashModel() {}
 
-void HashModel::buildTransponderInfo(const QHash<QString, QString>* map) {
+void HashModel::buildTransponderData(const QHash<QString, QString>* map) {
   // Проверка на существование
   if (!map) {
     return;
@@ -16,12 +16,12 @@ void HashModel::buildTransponderInfo(const QHash<QString, QString>* map) {
   beginResetModel();
 
   // Очищаем старые данные
-  Hash.clear();
+  HashTable.clear();
 
   // Устанавливаем новые данные
   for (QHash<QString, QString>::const_iterator it1 = map->constBegin();
        it1 != map->constEnd(); it1++) {
-    Hash.insert(TransponderInfoMatchTable.value(it1.key()), it1.value());
+    HashTable.insert(TransponderDataMatchTable.value(it1.key()), it1.value());
   }
 
   endResetModel();
@@ -30,21 +30,21 @@ void HashModel::buildTransponderInfo(const QHash<QString, QString>* map) {
 void HashModel::clear() {
   beginResetModel();
 
-  Hash.clear();
+  HashTable.clear();
 
   endResetModel();
 }
 
 bool HashModel::isEmpty() const {
-  return Hash.isEmpty();
+  return HashTable.isEmpty();
 }
 
 const QHash<QString, QVariant>* HashModel::map() const {
-  return &Hash;
+  return &HashTable;
 }
 
 int HashModel::columnCount(const QModelIndex& parent) const {
-  if (Hash.isEmpty()) {
+  if (HashTable.isEmpty()) {
     return 0;
   }
 
@@ -52,7 +52,7 @@ int HashModel::columnCount(const QModelIndex& parent) const {
 }
 
 int HashModel::rowCount(const QModelIndex& parent) const {
-  return Hash.size();
+  return HashTable.size();
 }
 
 QVariant HashModel::data(const QModelIndex& index, int role) const {
@@ -60,12 +60,12 @@ QVariant HashModel::data(const QModelIndex& index, int role) const {
     return QVariant();
   }
 
-  if (index.row() > (Hash.size())) {
+  if (index.row() > (HashTable.size())) {
     return QVariant();
   }
 
   if (role == Qt::DisplayRole) {
-    return (Hash.constBegin() + index.row()).value();
+    return (HashTable.constBegin() + index.row()).value();
   } else
     return QVariant();
 }
@@ -73,7 +73,7 @@ QVariant HashModel::data(const QModelIndex& index, int role) const {
 QVariant HashModel::headerData(int section,
                                Qt::Orientation orientation,
                                int role) const {
-  if (section > (Hash.size())) {
+  if (section > (HashTable.size())) {
     return QVariant();
   }
 
@@ -85,18 +85,18 @@ QVariant HashModel::headerData(int section,
   }
 
   if (orientation == Qt::Vertical) {
-    return (Hash.constBegin() + section).key();
+    return (HashTable.constBegin() + section).key();
   } else {
     return QVariant();
   }
 }
 
 void HashModel::createMatchTables() {
-  TransponderInfoMatchTable.insert("sn", "Серийный номер");
-  TransponderInfoMatchTable.insert("pan", "PAN");
-  TransponderInfoMatchTable.insert("issuer_name", "Компания-заказчик");
-  TransponderInfoMatchTable.insert("box_id", "Идентификатор бокса");
-  TransponderInfoMatchTable.insert("pallet_id", "Идентификатор паллеты");
-  TransponderInfoMatchTable.insert("order_id", "Идентификатор заказа");
-  TransponderInfoMatchTable.insert("transponder_model", "Модель транспондера");
+  TransponderDataMatchTable.insert("sn", "Серийный номер");
+  TransponderDataMatchTable.insert("pan", "PAN");
+  TransponderDataMatchTable.insert("issuer_name", "Компания-заказчик");
+  TransponderDataMatchTable.insert("box_id", "Идентификатор бокса");
+  TransponderDataMatchTable.insert("pallet_id", "Идентификатор паллеты");
+  TransponderDataMatchTable.insert("order_id", "Идентификатор заказа");
+  TransponderDataMatchTable.insert("transponder_model", "Модель транспондера");
 }

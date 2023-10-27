@@ -7,14 +7,14 @@
 
 class HashModel : public QAbstractTableModel {
  private:
-  QHash<QString, QVariant> Hash;
-  QHash<QString, QString> TransponderInfoMatchTable;
+  QHash<QString, QVariant> HashTable;
+  QHash<QString, QString> TransponderDataMatchTable;
 
  public:
   explicit HashModel(QObject* parent);
   ~HashModel();
 
-  void buildTransponderInfo(const QHash<QString, QString>* map);
+  void buildTransponderData(const QHash<QString, QString>* map);
   void clear(void);
   bool isEmpty(void) const;
   const QHash<QString, QVariant>* map(void) const;

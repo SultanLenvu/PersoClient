@@ -94,6 +94,7 @@ void ClientManager::performTransponderFirmwareLoading(HashModel* model) {
   QString ucid;
   QHash<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
+  QHash<QString, QString> transponderData;
 
   sendLog("Разблокирование памяти транспондера. ");
   programmerStatus = Programmer->unlockDevice();
@@ -114,8 +115,8 @@ void ClientManager::performTransponderFirmwareLoading(HashModel* model) {
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
   sendLog("Запрос прошивки транспондера. ");
-  clientStatus =
-      Client->requestTransponderRelease(&requestParameters, &firmware);
+  clientStatus = Client->requestTransponderRelease(&requestParameters,
+                                                   &firmware, &transponderData);
   if (clientStatus != PersoClient::Completed) {
     processClientError(clientStatus, "performTransponderFirmwareLoading");
     return;
@@ -130,33 +131,31 @@ void ClientManager::performTransponderFirmwareLoading(HashModel* model) {
     return;
   }
 
-  QHash<QString, QString> responseParameters;
-  requestParameters.insert("login", CurrentLogin);
-  requestParameters.insert("password", CurrentPassword);
-  requestParameters.insert("ucid", ucid);
-  sendLog(
-      "Отправка запроса на подтверждение загрузки прошивки в транспондер. ");
-  clientStatus = Client->requestTransponderReleaseConfirm(&requestParameters,
-                                                          &responseParameters);
-  if (clientStatus != PersoClient::Completed) {
-    processClientError(clientStatus, "performTransponderFirmwareLoading");
-    return;
-  }
-
   // Удаляем файл прошивки
   firmware.remove();
 
   sendLog("Печать стикера для транспондера.");
   stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(&responseParameters);
+      StickerPrinter->printTransponderSticker(&transponderData);
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
     return;
   }
 
+  requestParameters.insert("login", CurrentLogin);
+  requestParameters.insert("password", CurrentPassword);
+  requestParameters.insert("ucid", ucid);
+  sendLog(
+      "Отправка запроса на подтверждение загрузки прошивки в транспондер. ");
+  clientStatus = Client->requestTransponderReleaseConfirm(&requestParameters);
+  if (clientStatus != PersoClient::Completed) {
+    processClientError(clientStatus, "performTransponderFirmwareLoading");
+    return;
+  }
+
   // Строим модель для представления данных транспондера
-  model->buildTransponderInfo(&responseParameters);
+  model->buildTransponderData(&transponderData);
 
   // Завершаем операцию
   finishOperationPerforming("performTransponderFirmwareLoading");
@@ -172,6 +171,7 @@ void ClientManager::performTransponderFirmwareReloading(HashModel* model,
   QString ucid;
   QHash<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
+  QHash<QString, QString> transponderData;
 
   sendLog("Разблокирование памяти транспондера. ");
   programmerStatus = Programmer->unlockDevice();
@@ -193,8 +193,8 @@ void ClientManager::performTransponderFirmwareReloading(HashModel* model,
   requestParameters.insert("password", CurrentPassword);
   requestParameters.insert("pan", pan);
   sendLog("Запрос перевыпуска транспондера. ");
-  clientStatus =
-      Client->requestTransponderRerelease(&requestParameters, &firmware);
+  clientStatus = Client->requestTransponderRerelease(
+      &requestParameters, &firmware, &transponderData);
   if (clientStatus != PersoClient::Completed) {
     processClientError(clientStatus, "performTransponderFirmwareReloading");
     return;
@@ -209,33 +209,31 @@ void ClientManager::performTransponderFirmwareReloading(HashModel* model,
     return;
   }
 
-  QHash<QString, QString> responseParameters;
-  requestParameters.insert("login", CurrentLogin);
-  requestParameters.insert("password", CurrentPassword);
-  requestParameters.insert("pan", pan);
-  requestParameters.insert("ucid", ucid);
-  sendLog("Отправка запроса на подтверждение перевыпуска транспондера. ");
-  clientStatus = Client->requestTransponderRereleaseConfirm(
-      &requestParameters, &responseParameters);
-  if (clientStatus != PersoClient::Completed) {
-    processClientError(clientStatus, "performTransponderFirmwareReloading");
-    return;
-  }
-
   // Удаляем файл прошивки
   firmware.remove();
 
   sendLog("Печать стикера для транспондера.");
   stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(&responseParameters);
+      StickerPrinter->printTransponderSticker(&transponderData);
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
     return;
   }
 
+  requestParameters.insert("login", CurrentLogin);
+  requestParameters.insert("password", CurrentPassword);
+  requestParameters.insert("pan", pan);
+  requestParameters.insert("ucid", ucid);
+  sendLog("Отправка запроса на подтверждение перевыпуска транспондера. ");
+  clientStatus = Client->requestTransponderRereleaseConfirm(&requestParameters);
+  if (clientStatus != PersoClient::Completed) {
+    processClientError(clientStatus, "performTransponderFirmwareReloading");
+    return;
+  }
+
   // Строим модель для представления данных транспондера
-  model->buildTransponderInfo(&responseParameters);
+  model->buildTransponderData(&transponderData);
 
   // Завершаем операцию
   finishOperationPerforming("performTransponderFirmwareReloading");
@@ -460,7 +458,7 @@ void ClientManager::createClientInstance() {
           &LogSystem::generate);
 
   // Заполняем таблицу соответствий статусов возврата
-  ClientReturnStatusMatch.insert(PersoClient::NotExecuted,
+  ClientReturnStatusMatch.insert(PersoClient::Undefined,
                                  "Выполнение операции не началось.");
   ClientReturnStatusMatch.insert(PersoClient::RequestParameterError,
                                  "Не удалось обработать параметры запроса. ");
