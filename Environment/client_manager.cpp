@@ -85,7 +85,7 @@ void ClientManager::performServerAuthorization(
   finishOperationPerforming("performServerAuthorization");
 }
 
-void ClientManager::performTransponderFirmwareLoading(HashModel* model) {
+void ClientManager::performTransponderFirmwareLoading() {
   startOperationPerforming("performTransponderFirmwareLoading");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -94,7 +94,8 @@ void ClientManager::performTransponderFirmwareLoading(HashModel* model) {
   QString ucid;
   QHash<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
-  QHash<QString, QString> transponderData;
+  QSharedPointer<QHash<QString, QString>> transponderData(
+      new QHash<QString, QString>());
 
   sendLog("Разблокирование памяти транспондера. ");
   programmerStatus = Programmer->unlockDevice();
@@ -115,8 +116,8 @@ void ClientManager::performTransponderFirmwareLoading(HashModel* model) {
   requestParameters.insert("login", CurrentLogin);
   requestParameters.insert("password", CurrentPassword);
   sendLog("Запрос прошивки транспондера. ");
-  clientStatus = Client->requestTransponderRelease(&requestParameters,
-                                                   &firmware, &transponderData);
+  clientStatus = Client->requestTransponderRelease(
+      &requestParameters, &firmware, transponderData.get());
   if (clientStatus != PersoClient::Completed) {
     processClientError(clientStatus, "performTransponderFirmwareLoading");
     return;
@@ -134,9 +135,12 @@ void ClientManager::performTransponderFirmwareLoading(HashModel* model) {
   // Удаляем файл прошивки
   firmware.remove();
 
+  // Запрашиваем отображение данных транспондера
+  emit displayTransponderData_signal(transponderData);
+
   sendLog("Печать стикера для транспондера.");
   stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(&transponderData);
+      StickerPrinter->printTransponderSticker(transponderData.get());
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
@@ -154,15 +158,11 @@ void ClientManager::performTransponderFirmwareLoading(HashModel* model) {
     return;
   }
 
-  // Строим модель для представления данных транспондера
-  model->buildTransponderData(&transponderData);
-
   // Завершаем операцию
   finishOperationPerforming("performTransponderFirmwareLoading");
 }
 
-void ClientManager::performTransponderFirmwareReloading(HashModel* model,
-                                                        const QString& pan) {
+void ClientManager::performTransponderFirmwareReloading(const QString& pan) {
   startOperationPerforming("performTransponderFirmwareReloading");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -171,7 +171,8 @@ void ClientManager::performTransponderFirmwareReloading(HashModel* model,
   QString ucid;
   QHash<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
-  QHash<QString, QString> transponderData;
+  QSharedPointer<QHash<QString, QString>> transponderData(
+      new QHash<QString, QString>());
 
   sendLog("Разблокирование памяти транспондера. ");
   programmerStatus = Programmer->unlockDevice();
@@ -194,7 +195,7 @@ void ClientManager::performTransponderFirmwareReloading(HashModel* model,
   requestParameters.insert("pan", pan);
   sendLog("Запрос перевыпуска транспондера. ");
   clientStatus = Client->requestTransponderRerelease(
-      &requestParameters, &firmware, &transponderData);
+      &requestParameters, &firmware, transponderData.get());
   if (clientStatus != PersoClient::Completed) {
     processClientError(clientStatus, "performTransponderFirmwareReloading");
     return;
@@ -212,9 +213,12 @@ void ClientManager::performTransponderFirmwareReloading(HashModel* model,
   // Удаляем файл прошивки
   firmware.remove();
 
+  // Запрашиваем отображение данных транспондера
+  emit displayTransponderData_signal(transponderData);
+
   sendLog("Печать стикера для транспондера.");
   stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(&transponderData);
+      StickerPrinter->printTransponderSticker(transponderData.get());
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
@@ -232,11 +236,25 @@ void ClientManager::performTransponderFirmwareReloading(HashModel* model,
     return;
   }
 
-  // Строим модель для представления данных транспондера
-  model->buildTransponderData(&transponderData);
-
   // Завершаем операцию
   finishOperationPerforming("performTransponderFirmwareReloading");
+}
+
+void ClientManager::rollbackProductionLine() {
+  startOperationPerforming("rollbackProductionLine");
+  sendLog("Откат производственной линии. ");
+
+  QHash<QString, QString> param;
+  param.insert("login", CurrentLogin);
+  param.insert("password", CurrentPassword);
+  PersoClient::ReturnStatus status =
+      Client->requestProductionLineRollback(&param);
+  if (status != PersoClient::Completed) {
+    processClientError(status, "rollbackProductionLine");
+    return;
+  }
+
+  finishOperationPerforming("rollbackProductionLine");
 }
 
 void ClientManager::performLocalFirmwareLoading(const QString& path) {

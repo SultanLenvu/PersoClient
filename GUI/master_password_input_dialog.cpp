@@ -1,54 +1,44 @@
-#include "authorization_dialog.h"
+#include "master_password_input_dialog.h"
 
-AuthorizationDialog::AuthorizationDialog(QWidget* parent)
-    : InputDialog(parent, Authorization) {
+MasterPasswordInputDialog::MasterPasswordInputDialog(QWidget* parent)
+    : InputDialog(parent, MasterPassword) {
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::desktop()->screenGeometry();
 
   // Создаем диалоговое окно
   setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
-              DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1);
-  setMinimumWidth(DesktopGeometry.width() * 0.2);
+              DesktopGeometry.width() * 0.15, DesktopGeometry.height() * 0.05);
   setWindowTitle("Авторизация");
-  adjustSize();
-  setFixedSize(size());
 
   create();
 }
 
-AuthorizationDialog::~AuthorizationDialog() {}
+MasterPasswordInputDialog::~MasterPasswordInputDialog() {}
 
-void AuthorizationDialog::getData(QHash<QString, QString>* data) const {
+void MasterPasswordInputDialog::getData(QHash<QString, QString>* data) const {
   if (!data) {
     return;
   }
 
-  data->insert("login", LoginLineEdit->text());
   data->insert("password", PasswordLineEdit->text());
 }
 
-void AuthorizationDialog::create() {
+void MasterPasswordInputDialog::create() {
   MainLayout = new QVBoxLayout();
   setLayout(MainLayout);
-
-  LoginLayout = new QHBoxLayout();
-  MainLayout->addLayout(LoginLayout);
-  LoginLabel = new QLabel("Логин");
-  LoginLayout->addWidget(LoginLabel);
-  LoginLineEdit = new QLineEdit();
-  LoginLayout->addWidget(LoginLineEdit);
 
   PasswordLayout = new QHBoxLayout();
   MainLayout->addLayout(PasswordLayout);
   PasswordLabel = new QLabel("Пароль");
   PasswordLayout->addWidget(PasswordLabel);
   PasswordLineEdit = new QLineEdit();
+  PasswordLineEdit->setEchoMode(QLineEdit::Password);
   PasswordLayout->addWidget(PasswordLineEdit);
 
   ButtonLayout = new QHBoxLayout();
   MainLayout->addLayout(ButtonLayout);
 
-  OkButton = new QPushButton("Авторизоваться");
+  OkButton = new QPushButton("Ок");
   ButtonLayout->addWidget(OkButton);
   connect(OkButton, &QPushButton::clicked, this, &QDialog::accept);
 

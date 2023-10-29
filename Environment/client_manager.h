@@ -53,9 +53,9 @@ class ClientManager : public QObject {
   void performServerEcho(void);
   void performServerAuthorization(
       const QSharedPointer<QHash<QString, QString>> data);
-  void performTransponderFirmwareLoading(HashModel* model);
-  void performTransponderFirmwareReloading(HashModel* model,
-                                           const QString& pan);
+  void performTransponderFirmwareLoading(void);
+  void performTransponderFirmwareReloading(const QString& pan);
+  void rollbackProductionLine(void);
 
   // Программатор
   void performLocalFirmwareLoading(const QString& path);
@@ -100,6 +100,9 @@ class ClientManager : public QObject {
   void operationPerfomingStarted(const QString& operationName);
   void operationPerformingFinished(const QString& operationName);
   void requestProductionInterface_signal(void);
+
+  void displayTransponderData_signal(
+      QSharedPointer<QHash<QString, QString>> data);
 };
 
 #endif  // CLIENT_MANAGER_H

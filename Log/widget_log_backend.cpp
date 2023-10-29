@@ -8,15 +8,11 @@ WidgetLogBackend::WidgetLogBackend(QObject* parent) : LogBackend(parent) {
 WidgetLogBackend::~WidgetLogBackend() {}
 
 void WidgetLogBackend::writeLogLine(const QString& str) {
-  if (LogEnable) {
-    emit displayLog_signal(str);
-  }
+  emit displayLog_signal(str);
 }
 
 void WidgetLogBackend::clear() {
-  if (LogEnable) {
-    emit clearLogDisplay_signal();
-  }
+  emit clearLogDisplay_signal();
 }
 
 void WidgetLogBackend::applySettings() {
@@ -24,7 +20,4 @@ void WidgetLogBackend::applySettings() {
 }
 
 void WidgetLogBackend::loadSettings() {
-  QSettings settings;
-
-  LogEnable = settings.value("log_system/display_log_enable").toBool();
 }

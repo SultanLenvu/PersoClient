@@ -8,8 +8,6 @@
 
 class WidgetLogBackend : public LogBackend {
   Q_OBJECT
- private:
-  bool LogEnable;
 
  public:
   explicit WidgetLogBackend(QObject* parent);

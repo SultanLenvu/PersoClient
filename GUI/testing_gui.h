@@ -1,19 +1,15 @@
-#ifndef PRODUCTION_GUI_H
-#define PRODUCTION_GUI_H
-
-#include <QTableView>
+#ifndef TestingGUI_H
+#define TestingGUI_H
 
 #include "abstract_gui.h"
 
-class ProductionGUI : public AbstractGUI {
+class TestingGUI : public AbstractGUI {
  public:
   QGroupBox* ControlPanelGroup;
   QVBoxLayout* ControlPanelLayout;
 
-  QPushButton* LoadTransponderFirmwareButton;
-  QSpacerItem* ButtonVerticalSpacer;
-  QPushButton* RollbackProductionLinePushButton;
   QPushButton* ReloadTransponderFirmwareButton;
+  QSpacerItem* ButtonVerticalSpacer;
   QPushButton* PrintLastTransponderStickerButton;
   QPushButton* PrintCustomTransponderStickerButton;
 
@@ -22,13 +18,13 @@ class ProductionGUI : public AbstractGUI {
   QTableView* TransponderDataView;
 
  public:
-  explicit ProductionGUI(QWidget* parent);
-  ~ProductionGUI();
+  explicit TestingGUI(QWidget* parent);
+  ~TestingGUI();
 
   virtual void update(void) override;
 
  private:
-  Q_DISABLE_COPY(ProductionGUI);
+  Q_DISABLE_COPY(TestingGUI);
 };
 
-#endif  // PRODUCTION_GUI_H
+#endif  // TestingGUI_H

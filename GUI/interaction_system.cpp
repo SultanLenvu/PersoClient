@@ -70,44 +70,53 @@ void InteractionSystem::finishOperationProgressDialog(
   destroyProgressDialog();
 }
 
-void InteractionSystem::getMasterPassword(QString& pass) {
-  pass = QInputDialog::getText(this, "Мастер доступ",
-                               "Введите пароль:", QLineEdit::Password, "",
-                               nullptr);
+bool InteractionSystem::getMasterPassword(QString& pass) {
+  MasterPasswordInputDialog dialog(this);
+
+  if (dialog.exec() == QDialog::Rejected) {
+    return false;
+  }
+
+  QHash<QString, QString> data;
+  dialog.getData(&data);
+
+  pass = data.value("password");
+  return true;
 }
 
-void InteractionSystem::getAuthorizationData(QHash<QString, QString>* data) {
-  AuthorizationDialog* dialog = new AuthorizationDialog(this);
+bool InteractionSystem::getAuthorizationData(QHash<QString, QString>* data) {
+  AuthorizationDialog dialog(this);
 
-  if (dialog->exec() == QDialog::Accepted) {
-    dialog->getData(data);
+  if (dialog.exec() == QDialog::Rejected) {
+    return false;
   }
+
+  dialog.getData(data);
+  return true;
 }
 
-void InteractionSystem::getTransponderStickerData(QStringList* data,
-                                                      bool& ok) {
-  TransponderStickerScanDialog* dialog = new TransponderStickerScanDialog(this);
+bool InteractionSystem::getTransponderStickerData(
+    QHash<QString, QString>* data) {
+  TransponderStickerScanDialog dialog(this);
 
-  if (dialog->exec() == QDialog::Accepted) {
-    dialog->getData(data);
-    ok = true;
-  } else {
-    ok = false;
+  if (dialog.exec() == QDialog::Rejected) {
+    return false;
   }
+
+  dialog.getData(data);
+  return true;
 }
 
-void InteractionSystem::getCustomTransponderStickerData(
-    QHash<QString, QString>* data,
-    bool& ok) {
-  CustomTransponderStickerScanDialog* dialog =
-      new CustomTransponderStickerScanDialog(this);
+bool InteractionSystem::getCustomTransponderStickerData(
+    QHash<QString, QString>* data) {
+  CustomTransponderStickerScanDialog dialog(this);
 
-  if (dialog->exec() == QDialog::Accepted) {
-    dialog->getData(data);
-    ok = true;
-  } else {
-    ok = false;
+  if (dialog.exec() == QDialog::Rejected) {
+    return false;
   }
+
+  dialog.getData(data);
+  return true;
 }
 
 void InteractionSystem::applySettings() {

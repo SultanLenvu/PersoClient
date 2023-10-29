@@ -1,8 +1,6 @@
 #include "master_gui.h"
 
-MasterGUI::MasterGUI(QWidget* parent) : GUI(parent, Master) {}
-
-void MasterGUI::create() {
+MasterGUI::MasterGUI(QWidget* parent) : AbstractGUI(parent, Master) {
   // Вкладки с всеми интерфейсами
   Tabs = new QTabWidget();
   MainLayout->addWidget(Tabs);
@@ -27,9 +25,11 @@ void MasterGUI::create() {
   MainLayout->setStretch(1, 2);
 }
 
+MasterGUI::~MasterGUI() {}
+
 void MasterGUI::update() {
-  TransponderInfoView->resizeColumnsToContents();
-  TransponderInfoView->update();
+  TransponderDataView->resizeColumnsToContents();
+  TransponderDataView->update();
 }
 
 void MasterGUI::displayLogData(const QString& log) {
@@ -76,22 +76,26 @@ void MasterGUI::createServerTab() {
   ServerControlPanelLayout->addWidget(MasterAuthorizePushButton);
 
   LoadTransponderFirmwareButton =
-      new QPushButton(QString("Выпуск транспондера"));
+      new QPushButton(QString("Выпустить транспондер"));
   ServerControlPanelLayout->addWidget(LoadTransponderFirmwareButton);
 
   ReloadTransponderFirmwareButton =
-      new QPushButton(QString("Перевыпуск транспондера"));
+      new QPushButton(QString("Перевыпустить транспондер"));
   ServerControlPanelLayout->addWidget(ReloadTransponderFirmwareButton);
 
+  RollbackProductionLinePushButton =
+      new QPushButton(QString("Откатить производственную линию"));
+  ServerControlPanelLayout->addWidget(RollbackProductionLinePushButton);
+
   // Представление данных о транспондере
-  TransponderInfoGroup = new QGroupBox("Данные о выпущенном транспондере");
-  ServerTabMainLayout->addWidget(TransponderInfoGroup);
+  TransponderDataGroup = new QGroupBox("Данные о выпущенном транспондере");
+  ServerTabMainLayout->addWidget(TransponderDataGroup);
 
-  TransponderInfoLayout = new QVBoxLayout();
-  TransponderInfoGroup->setLayout(TransponderInfoLayout);
+  TransponderDataLayout = new QVBoxLayout();
+  TransponderDataGroup->setLayout(TransponderDataLayout);
 
-  TransponderInfoView = new QTableView();
-  TransponderInfoLayout->addWidget(TransponderInfoView);
+  TransponderDataView = new QTableView();
+  TransponderDataLayout->addWidget(TransponderDataView);
 
   // Настройка пропорции между объектами на макете
   ServerTabMainLayout->setStretch(0, 1);
@@ -213,16 +217,6 @@ void MasterGUI::createSettingsTab() {
                                                             : Qt::Unchecked);
   LogSystemSettingsMainLayout->addWidget(LogSystemExtendedEnableCheckBox, 1, 1,
                                          1, 1);
-  LogSystemSavePathLabel = new QLabel("Директория для сохранения");
-  LogSystemSettingsMainLayout->addWidget(LogSystemSavePathLabel, 2, 0, 1, 1);
-  LogSystemSavePathLineEdit =
-      new QLineEdit(settings.value("log_system/save_path").toString());
-  LogSystemSettingsMainLayout->addWidget(LogSystemSavePathLineEdit, 2, 1, 1, 1);
-  LogSystemSavePathPushButton = new QPushButton("Обзор");
-  LogSystemSettingsMainLayout->addWidget(LogSystemSavePathPushButton, 2, 2, 1,
-                                         1);
-  connect(LogSystemSavePathPushButton, &QPushButton::clicked, this,
-          &MasterGUI::on_LogSystemSavePathPushButton_slot);
 
   // Сеть
   PersoSettingsGroupBox = new QGroupBox(QString("Сетевые настройки"));
@@ -316,12 +310,6 @@ void MasterGUI::createLogWidgets() {
   GeneralLogs->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
   GeneralLogs->setCenterOnScroll(false);
   GeneralLogLayout->addWidget(GeneralLogs);
-}
-
-void MasterGUI::on_LogSystemSavePathPushButton_slot() {
-  QString dirPath =
-      QFileDialog::getExistingDirectory(this, "Выберите директорию", "");
-  LogSystemSavePathLineEdit->setText(dirPath);
 }
 
 void MasterGUI::on_ProgrammerExeFilePathPushButton_slot() {

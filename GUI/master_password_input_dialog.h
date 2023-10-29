@@ -1,18 +1,14 @@
-#ifndef AUTHORIZATIONDIALOG_H
-#define AUTHORIZATIONDIALOG_H
+#ifndef MasterPasswordInputDialog_H
+#define MasterPasswordInputDialog_H
 
 #include "input_dialog.h"
 
-class AuthorizationDialog : public InputDialog {
+class MasterPasswordInputDialog : public InputDialog {
   Q_OBJECT
-
  private:
   QRect DesktopGeometry;
   QVBoxLayout* MainLayout;
 
-  QHBoxLayout* LoginLayout;
-  QLabel* LoginLabel;
-  QLineEdit* LoginLineEdit;
   QHBoxLayout* PasswordLayout;
   QLabel* PasswordLabel;
   QLineEdit* PasswordLineEdit;
@@ -24,13 +20,14 @@ class AuthorizationDialog : public InputDialog {
   QSpacerItem* MainLayoutVS;
 
  public:
-  explicit AuthorizationDialog(QWidget* parent);
-  ~AuthorizationDialog();
+  explicit MasterPasswordInputDialog(QWidget* parent);
+  ~MasterPasswordInputDialog();
 
   virtual void getData(QHash<QString, QString>* data) const override;
 
  private:
-  Q_DISABLE_COPY(AuthorizationDialog);
+  Q_DISABLE_COPY(MasterPasswordInputDialog);
   void create(void);
 };
-#endif  // AUTHORIZATIONDIALOG_H
+
+#endif  // MasterPasswordInputDialog_H

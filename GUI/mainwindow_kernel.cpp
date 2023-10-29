@@ -10,6 +10,7 @@
 MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   setObjectName("MainWindowKernel");
   CurrentGUI = nullptr;
+  DesktopGeometry = QApplication::desktop()->screenGeometry();
 
   // Загружаем настройки приложения
   loadSettings();
@@ -26,18 +27,14 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   // Менеджер для взаимодействия с программатором
   createManagerInstance();
 
-  // Создаем модель для представления данных транспондера
-  TransponderInfo = new HashModel(this);
+  // Создаем модели
+  createModels();
 
   // Создаем графический интерфейс для авторизации
-  //  createAuthorizationInterface();
-
-  // Debug
-  createMasterInterface();
+  createAuthorizationInterface();
 
   // Регистрируем типы
-  qRegisterMetaType<QSharedPointer<QHash<QString, QString>>>(
-      "QSharedPointer<QHash<QString, QString> >");
+  registerMetaTypes();
 }
 
 MainWindowKernel::~MainWindowKernel() {
@@ -49,12 +46,20 @@ MainWindowKernel::~MainWindowKernel() {
 }
 
 void MainWindowKernel::on_AuthorizePushButton_slot() {
-  QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
   AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
-  data->insert("login", gui->LoginLineEdit->text());
-  data->insert("password", gui->PasswordLineEdit->text());
 
-  emit performServerAuthorization_signal(data);
+  if (gui->ModeChoice->currentText() == "Производство") {
+    QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
+    AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
+    data->insert("login", gui->LoginLineEdit->text());
+    data->insert("password", gui->PasswordLineEdit->text());
+
+    emit performServerAuthorization_signal(data);
+  }
+
+  if (gui->ModeChoice->currentText() == "Тестирование") {
+    createTestingInterface();
+  }
 }
 
 void MainWindowKernel::on_ProgramDeviceButton_slot() {
@@ -111,10 +116,8 @@ void MainWindowKernel::on_PrintCustomTransponderStickerButton_slot() {
   emit loggerClear_signal();
 
   QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
-  bool ok = false;
-  Interactor->getCustomTransponderStickerData(data.get(), ok);
 
-  if (!ok) {
+  if (!Interactor->getCustomTransponderStickerData(data.get())) {
     return;
   }
 
@@ -152,8 +155,6 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
                     gui->LogSystemGlobalEnableCheckBox->isChecked());
   settings.setValue("log_system/extended_enable",
                     gui->LogSystemExtendedEnableCheckBox->isChecked());
-  settings.setValue("log_system/save_path",
-                    gui->LogSystemSavePathLineEdit->text());
 
   settings.setValue("perso_client/server_ip",
                     gui->PersoServerIpAddressLineEdit->text());
@@ -205,39 +206,36 @@ void MainWindowKernel::on_MasterAuthorizePushButton_slot() {
 void MainWindowKernel::on_LoadTransponderFirmwareButton_slot() {
   emit loggerClear_signal();
 
-  emit performTransponderFirmwareLoading_signal(TransponderInfo);
-
-  CurrentGUI->update();
+  emit performTransponderFirmwareLoading_signal();
 }
 
 void MainWindowKernel::on_ReloadTransponderFirmwareButton_slot() {
   emit loggerClear_signal();
 
-  QStringList stickerData;
-  bool ok;
-  Interactor->getTransponderStickerData(&stickerData, ok);
-  if (!ok) {
+  QHash<QString, QString> stickerData;
+  if (!Interactor->getTransponderStickerData(&stickerData)) {
     return;
   }
+
   if (stickerData.isEmpty()) {
     Interactor->generateErrorMessage("Некорректный ввод данных. ");
     return;
   }
 
-  QString pan = getStickerPan(stickerData);
-  if (pan.isEmpty()) {
-    Interactor->generateErrorMessage("Некорректный ввод данных");
-    return;
-  }
+  emit performTransponderFirmwareReloading_signal(stickerData.value("pan"));
+}
 
-  emit performTransponderFirmwareReloading_signal(TransponderInfo, pan);
+void MainWindowKernel::on_RollbackProductionLinePushButton_slot() {
+  emit loggerClear_signal();
 
-  CurrentGUI->update();
+  emit rollbackProductionLine_signal();
 }
 
 void MainWindowKernel::on_MasterInterfaceRequest_slot() {
   QString pass;
-  Interactor->getMasterPassword(pass);
+  if (!Interactor->getMasterPassword(pass)) {
+    return;
+  }
 
   if (pass != QString(MASTER_ACCESS_PASSWORD)) {
     Interactor->generateErrorMessage("Неверный пароль");
@@ -252,7 +250,7 @@ void MainWindowKernel::on_ProductionInterfaceRequest_slot() {
   createProductionInterface();
 }
 
-void MainWindowKernel::on_OpenAuthorizationInterfaceAct_slot() {
+void MainWindowKernel::on_AuthorizationInterfaceRequest_slot() {
   createAuthorizationInterface();
 }
 
@@ -296,11 +294,6 @@ bool MainWindowKernel::checkNewSettings() {
     return false;
   }
 
-  info.setFile(gui->LogSystemSavePathLineEdit->text());
-  if (!info.isDir()) {
-    return false;
-  }
-
   return true;
 }
 
@@ -322,16 +315,19 @@ QString MainWindowKernel::getStickerPan(QStringList& stickerData) {
 
 void MainWindowKernel::createAuthorizationInterface() {
   // Настраиваем размер главного окна
-  DesktopGeometry = QApplication::desktop()->screenGeometry();
+  setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
-              DesktopGeometry.width() * 0.15, DesktopGeometry.height() * 0.1);
+              DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.1);
   setLayoutDirection(Qt::LeftToRight);
+  setMinimumWidth(DesktopGeometry.width() * 0.2);
 
   // Создаем интерфейс
-  delete CurrentGUI;
   CurrentGUI = new AuthorizationGUI(this);
-  CurrentGUI->create();
   setCentralWidget(CurrentGUI);
+  CurrentGUI->showMaximized();
+
+  adjustSize();
+  setFixedSize(size());
 
   // Подключаем интерфейс
   connectAuthorizationInterface();
@@ -345,19 +341,19 @@ void MainWindowKernel::connectAuthorizationInterface() {
 
   connect(gui->AuthorizePushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_AuthorizePushButton_slot);
+  connect(gui, &AbstractGUI::visibilityChanged, this,
+          &MainWindowKernel::on_VisabilityChanged_slot);
 }
 
 void MainWindowKernel::createMasterInterface() {
   // Настраиваем размер главного окна
-  DesktopGeometry = QApplication::desktop()->screenGeometry();
+  setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
               DesktopGeometry.width() * 0.8, DesktopGeometry.height() * 0.8);
   setLayoutDirection(Qt::LeftToRight);
 
   // Создаем интерфейс
-  delete CurrentGUI;
   CurrentGUI = new MasterGUI(this);
-  CurrentGUI->create();
   setCentralWidget(CurrentGUI);
 
   // Подключаем интерфейс
@@ -389,6 +385,8 @@ void MainWindowKernel::connectMasterInterface() {
           &MainWindowKernel::on_LoadTransponderFirmwareButton_slot);
   connect(gui->ReloadTransponderFirmwareButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_ReloadTransponderFirmwareButton_slot);
+  connect(gui->RollbackProductionLinePushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_RollbackProductionLinePushButton_slot);
 
   // Программатор
   connect(gui->ProgramDeviceButton, &QPushButton::clicked, this,
@@ -420,19 +418,17 @@ void MainWindowKernel::connectMasterInterface() {
           &MainWindowKernel::on_ApplySettingsPushButton_slot);
 
   // Связывание моделей и представлений
-  gui->TransponderInfoView->setModel(TransponderInfo);
+  gui->TransponderDataView->setModel(TransponderDataModel);
 }
 
 void MainWindowKernel::createProductionInterface() {
   // Настраиваем размер главного окна
-  DesktopGeometry = QApplication::desktop()->screenGeometry();
+  setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
               DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
   setLayoutDirection(Qt::LeftToRight);
 
-  delete CurrentGUI;
   CurrentGUI = new ProductionGUI(this);
-  CurrentGUI->create();
   setCentralWidget(CurrentGUI);
 
   // Подключаем интерфейс
@@ -451,9 +447,44 @@ void MainWindowKernel::connectProductionInterface() {
           &MainWindowKernel::on_ReloadTransponderFirmwareButton_slot);
   connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_PrintLastTransponderStickerButton_slot);
+  connect(gui->PrintCustomTransponderStickerButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_PrintCustomTransponderStickerButton_slot);
+  connect(gui->RollbackProductionLinePushButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_RollbackProductionLinePushButton_slot);
 
   // Связывание моделей и представлений
-  gui->TransponderInfoView->setModel(TransponderInfo);
+  gui->TransponderDataView->setModel(TransponderDataModel);
+}
+
+void MainWindowKernel::createTestingInterface() {
+  // Настраиваем размер главного окна
+  setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
+  setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
+              DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
+  setLayoutDirection(Qt::LeftToRight);
+
+  CurrentGUI = new TestingGUI(this);
+  setCentralWidget(CurrentGUI);
+
+  // Подключаем интерфейс
+  connectTestingInterface();
+
+  // Создаем верхнее меню
+  createTopMenu();
+}
+
+void MainWindowKernel::connectTestingInterface() {
+  TestingGUI* gui = dynamic_cast<TestingGUI*>(CurrentGUI);
+
+  connect(gui->ReloadTransponderFirmwareButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_ReloadTransponderFirmwareButton_slot);
+  connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_PrintLastTransponderStickerButton_slot);
+  connect(gui->PrintCustomTransponderStickerButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_PrintCustomTransponderStickerButton_slot);
+
+  // Связывание моделей и представлений
+  gui->TransponderDataView->setModel(TransponderDataModel);
 }
 
 void MainWindowKernel::createTopMenuActions() {
@@ -461,19 +492,11 @@ void MainWindowKernel::createTopMenuActions() {
   OpenMasterInterfaceAct->setStatusTip("Открыть мастер интерфейс");
   connect(OpenMasterInterfaceAct, &QAction::triggered, this,
           &MainWindowKernel::on_MasterInterfaceRequest_slot);
-  OpenAuthorizationInterfaceAct =
-      new QAction("Выйти из производственной линии", this);
 
-  OpenAuthorizationInterfaceAct->setStatusTip("Авторизация");
+  OpenAuthorizationInterfaceAct = new QAction("Авторизация", this);
   OpenAuthorizationInterfaceAct->setStatusTip("Открыть интерфейс авторизации");
   connect(OpenAuthorizationInterfaceAct, &QAction::triggered, this,
-          &MainWindowKernel::on_OpenAuthorizationInterfaceAct_slot);
-
-  OpenProductionInterfaceAct = new QAction("Производственный доступ", this);
-  OpenProductionInterfaceAct->setStatusTip(
-      "Открыть производственный интерфейс");
-  connect(OpenProductionInterfaceAct, &QAction::triggered, this,
-          &MainWindowKernel::on_ProductionInterfaceRequest_slot);
+          &MainWindowKernel::on_AuthorizationInterfaceRequest_slot);
 
   AboutProgramAct = new QAction("О программе", this);
   AboutProgramAct->setStatusTip("Показать сведения о программе");
@@ -486,15 +509,15 @@ void MainWindowKernel::createTopMenu() {
   // Создаем меню
   ServiceMenu = menuBar()->addMenu("Сервис");
   switch (CurrentGUI->type()) {
-    case GUI::Production:
+    case AbstractGUI::Testing:
+    case AbstractGUI::Production:
       ServiceMenu->addAction(OpenMasterInterfaceAct);
       ServiceMenu->addAction(OpenAuthorizationInterfaceAct);
       break;
-    case GUI::Master:
-      ServiceMenu->addAction(OpenProductionInterfaceAct);
+    case AbstractGUI::Master:
       ServiceMenu->addAction(OpenAuthorizationInterfaceAct);
       break;
-    case GUI::Authorization:
+    case AbstractGUI::Authorization:
       ServiceMenu->addAction(OpenMasterInterfaceAct);
       break;
   }
@@ -518,6 +541,8 @@ void MainWindowKernel::createManagerInstance() {
           &InteractionSystem::finishOperationProgressDialog);
   connect(Manager, &ClientManager::requestProductionInterface_signal, this,
           &MainWindowKernel::on_RequestProductionInterface_slot);
+  connect(Manager, &ClientManager::displayTransponderData_signal, this,
+          &MainWindowKernel::displayTransponderData_slot);
 
   // Подключаем функционал
   connect(this, &MainWindowKernel::performServerConnecting_signal, Manager,
@@ -532,6 +557,9 @@ void MainWindowKernel::createManagerInstance() {
           Manager, &ClientManager::performTransponderFirmwareLoading);
   connect(this, &MainWindowKernel::performTransponderFirmwareReloading_signal,
           Manager, &ClientManager::performTransponderFirmwareReloading);
+  connect(this, &MainWindowKernel::rollbackProductionLine_signal, Manager,
+          &ClientManager::rollbackProductionLine);
+
   connect(this, &MainWindowKernel::performLocalFirmwareLoading_signal, Manager,
           &ClientManager::performLocalFirmwareLoading);
   connect(this, &MainWindowKernel::performFirmwareReading_signal, Manager,
@@ -546,6 +574,7 @@ void MainWindowKernel::createManagerInstance() {
           &ClientManager::performDeviceUnlock);
   connect(this, &MainWindowKernel::performDeviceLock_signal, Manager,
           &ClientManager::performDeviceLock);
+
   connect(this, &MainWindowKernel::performPrintingLastTransponderSticker_signal,
           Manager, &ClientManager::performPrintingLastTransponderSticker);
   connect(this,
@@ -592,6 +621,26 @@ void MainWindowKernel::createInteractorInstance() {
           &InteractionSystem::applySettings);
 }
 
+void MainWindowKernel::createModels() {
+  TransponderDataModel = new HashModel(this);
+}
+
+void MainWindowKernel::registerMetaTypes() {
+  qRegisterMetaType<QSharedPointer<QHash<QString, QString>>>(
+      "QSharedPointer<QHash<QString, QString> >");
+}
+
 void MainWindowKernel::on_RequestProductionInterface_slot() {
   createProductionInterface();
+}
+
+void MainWindowKernel::on_VisabilityChanged_slot() {
+  adjustSize();
+  setFixedSize(size());
+}
+
+void MainWindowKernel::displayTransponderData_slot(
+    QSharedPointer<QHash<QString, QString>> data) {
+  TransponderDataModel->buildTransponderData(data.get());
+  CurrentGUI->update();
 }

@@ -1,36 +1,80 @@
 #include "authorization_gui.h"
 
 AuthorizationGUI::AuthorizationGUI(QWidget* parent)
-    : GUI(parent, Authorization) {}
+    : AbstractGUI(parent, Authorization) {
+  create();
+}
 
-void AuthorizationGUI::create() {
-  QSettings settings;
-
-  ControlPanelGroup = new QGroupBox("Авторизация");
-  ControlPanelGroup->setAlignment(Qt::AlignCenter);
-  MainLayout->addWidget(ControlPanelGroup);
-
-  ControlPanelLayout = new QGridLayout();
-  ControlPanelGroup->setLayout(ControlPanelLayout);
-
-  LoginLabel = new QLabel("Логин");
-  ControlPanelLayout->addWidget(LoginLabel, 0, 0, 1, 1);
-  LoginLineEdit =
-      new QLineEdit(settings.value("Authorization/Login").toString());
-  ControlPanelLayout->addWidget(LoginLineEdit, 0, 1, 1, 1);
-
-  PasswordLabel = new QLabel("Пароль");
-  ControlPanelLayout->addWidget(PasswordLabel, 1, 0, 1, 1);
-  PasswordLineEdit = new QLineEdit();
-  PasswordLineEdit->setEchoMode(QLineEdit::Password);
-  ControlPanelLayout->addWidget(PasswordLineEdit, 1, 1, 1, 1);
-
-  AuthorizePushButton = new QPushButton("Войти");
-  ControlPanelLayout->addWidget(AuthorizePushButton, 2, 0, 1, 2);
-
-  ControlPanelVS =
-      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  ControlPanelLayout->addItem(ControlPanelVS, 3, 0, 1, 1);
+AuthorizationGUI::~AuthorizationGUI() {
+  //  qDebug() << "Deleted.";
 }
 
 void AuthorizationGUI::update() {}
+
+void AuthorizationGUI::create() {
+  GeneralLayout = new QVBoxLayout();
+  MainLayout->addLayout(GeneralLayout);
+
+  ModeChoiceLayout = new QHBoxLayout();
+  GeneralLayout->addLayout(ModeChoiceLayout);
+
+  ModeChoiceLabel = new QLabel("Режим работы");
+  ModeChoiceLayout->addWidget(ModeChoiceLabel);
+  ModeChoice = new QComboBox();
+  ModeChoice->addItem("Производство");
+  ModeChoice->addItem("Тестирование");
+  GeneralLayout->addWidget(ModeChoice);
+  connect(ModeChoice, &QComboBox::currentTextChanged, this,
+          &AuthorizationGUI::on_ModeChoiceCurrentTextChanged_slot);
+  ModeChoice->setCurrentIndex(0);
+
+  createAuthorizationGroup();
+
+  AuthorizePushButton = new QPushButton("Войти");
+  GeneralLayout->addWidget(AuthorizePushButton);
+
+  ControlPanelVS =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  GeneralLayout->addItem(ControlPanelVS);
+}
+
+void AuthorizationGUI::createAuthorizationGroup() {
+  AuthorizationGroup = new QGroupBox("Авторизация");
+  AuthorizationGroup->setAlignment(Qt::AlignCenter);
+  GeneralLayout->insertWidget(GeneralLayout->indexOf(ControlPanelVS) - 1,
+                              AuthorizationGroup);
+
+  AuthorizationLayout = new QVBoxLayout();
+  AuthorizationGroup->setLayout(AuthorizationLayout);
+
+  LoginLayout = new QHBoxLayout();
+  AuthorizationLayout->addLayout(LoginLayout);
+
+  LoginLabel = new QLabel("Логин");
+  LoginLayout->addWidget(LoginLabel);
+  LoginLineEdit =
+      new QLineEdit(Settings.value("Authorization/Login").toString());
+  LoginLayout->addWidget(LoginLineEdit);
+
+  PasswordLayout = new QHBoxLayout();
+  AuthorizationLayout->addLayout(PasswordLayout);
+
+  PasswordLabel = new QLabel("Пароль");
+  PasswordLayout->addWidget(PasswordLabel);
+  PasswordLineEdit = new QLineEdit();
+  PasswordLineEdit->setEchoMode(QLineEdit::Password);
+  PasswordLayout->addWidget(PasswordLineEdit);
+}
+
+void AuthorizationGUI::on_ModeChoiceCurrentTextChanged_slot(
+    const QString& text) {
+  if (text == "Тестирование") {
+    GeneralLayout->removeWidget(AuthorizationGroup);
+    delete AuthorizationGroup;
+  } else {
+    createAuthorizationGroup();
+  }
+
+  adjustSize();
+  emit visibilityChanged();
+}

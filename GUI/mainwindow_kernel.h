@@ -13,6 +13,7 @@
 #include "GUI/interaction_system.h"
 #include "GUI/master_gui.h"
 #include "GUI/production_gui.h"
+#include "GUI/testing_gui.h"
 #include "General/definitions.h"
 #include "General/hash_model.h"
 #include "Log/log_system.h"
@@ -22,7 +23,7 @@ class MainWindowKernel : public QMainWindow {
 
  private:
   QRect DesktopGeometry;
-  GUI* CurrentGUI;
+  AbstractGUI* CurrentGUI;
 
   // Верхнее меню
   //==================================================
@@ -30,7 +31,6 @@ class MainWindowKernel : public QMainWindow {
   QMenu* HelpMenu;
 
   QAction* OpenMasterInterfaceAct;
-  QAction* OpenProductionInterfaceAct;
   QAction* OpenAuthorizationInterfaceAct;
   QAction* AboutProgramAct;
   //==================================================
@@ -43,7 +43,7 @@ class MainWindowKernel : public QMainWindow {
 
   InteractionSystem* Interactor;
 
-  HashModel* TransponderInfo;
+  HashModel* TransponderDataModel;
 
  public:
   explicit MainWindowKernel(QWidget* parent = nullptr);
@@ -59,6 +59,7 @@ class MainWindowKernel : public QMainWindow {
   void on_MasterAuthorizePushButton_slot(void);
   void on_LoadTransponderFirmwareButton_slot(void);
   void on_ReloadTransponderFirmwareButton_slot(void);
+  void on_RollbackProductionLinePushButton_slot(void);
 
   // Программатор
   void on_ProgramDeviceButton_slot(void);
@@ -80,7 +81,7 @@ class MainWindowKernel : public QMainWindow {
   // Верхнее меню
   void on_MasterInterfaceRequest_slot(void);
   void on_ProductionInterfaceRequest_slot(void);
-  void on_OpenAuthorizationInterfaceAct_slot(void);
+  void on_AuthorizationInterfaceRequest_slot(void);
 
  private:
   Q_DISABLE_COPY(MainWindowKernel);
@@ -97,6 +98,9 @@ class MainWindowKernel : public QMainWindow {
   void createProductionInterface(void);
   void connectProductionInterface(void);
 
+  void createTestingInterface(void);
+  void connectTestingInterface(void);
+
   void createTopMenuActions(void);
   void createTopMenu(void);
 
@@ -104,8 +108,14 @@ class MainWindowKernel : public QMainWindow {
   void createLoggerInstance(void);
   void createInteractorInstance(void);
 
+  void createModels(void);
+  void registerMetaTypes(void);
+
  private slots:
   void on_RequestProductionInterface_slot(void);
+  void on_VisabilityChanged_slot(void);
+  void displayTransponderData_slot(
+      QSharedPointer<QHash<QString, QString>> data);
 
  signals:
   void applySettings_signal(void);
@@ -119,9 +129,9 @@ class MainWindowKernel : public QMainWindow {
   void performServerEcho_signal(void);
   void performServerAuthorization_signal(
       const QSharedPointer<QHash<QString, QString>> data);
-  void performTransponderFirmwareLoading_signal(HashModel* model);
-  void performTransponderFirmwareReloading_signal(HashModel* model,
-                                                  const QString& pan);
+  void performTransponderFirmwareLoading_signal();
+  void performTransponderFirmwareReloading_signal(const QString& pan);
+  void rollbackProductionLine_signal(void);
   void performLocalFirmwareLoading_signal(const QString& path);
   void performFirmwareReading_signal(void);
   void performFirmwareErasing_signal(void);

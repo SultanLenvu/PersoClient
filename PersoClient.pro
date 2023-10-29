@@ -19,11 +19,14 @@ SOURCES += \
     Environment/client_manager.cpp \
     Environment/perso_client.cpp \
     GUI/interaction_system.cpp \
+    GUI/abstract_gui.cpp \
+    GUI/input_dialog.cpp \
+    GUI/master_password_input_dialog.cpp \
+    GUI/testing_gui.cpp \
     GUI/authorization_dialog.cpp \
     GUI/custom_transponder_sticker_dialog.cpp \
     GUI/transponder_sticker_scan_dialog.cpp \
     GUI/authorization_gui.cpp \
-    GUI/gui.cpp \
     GUI/mainwindow_kernel.cpp \
     GUI/master_gui.cpp \
     GUI/production_gui.cpp \
@@ -41,12 +44,15 @@ HEADERS += \
     Log/widget_log_backend.h \
     Environment/client_manager.h \
     Environment/perso_client.h \
+    GUI/abstract_gui.h \
+    GUI/input_dialog.h \
+    GUI/master_password_input_dialog.h \
+    GUI/testing_gui.h \
     GUI/interaction_system.h \
     GUI/authorization_dialog.h \
     GUI/custom_transponder_sticker_dialog.h \
     GUI/transponder_sticker_scan_dialog.h \
     GUI/authorization_gui.h \
-    GUI/gui.h \
     GUI/mainwindow_kernel.h \
     GUI/master_gui.h \
     GUI/production_gui.h \

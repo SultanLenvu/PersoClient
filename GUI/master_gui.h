@@ -2,9 +2,9 @@
 #define MASTERGUI_H
 
 #include "General/definitions.h"
-#include "gui.h"
+#include "abstract_gui.h"
 
-class MasterGUI : public GUI {
+class MasterGUI : public AbstractGUI {
  public:
   QTabWidget* Tabs;
 
@@ -29,10 +29,11 @@ class MasterGUI : public GUI {
   QPushButton* MasterAuthorizePushButton;
   QPushButton* LoadTransponderFirmwareButton;
   QPushButton* ReloadTransponderFirmwareButton;
+  QPushButton* RollbackProductionLinePushButton;
 
-  QGroupBox* TransponderInfoGroup;
-  QVBoxLayout* TransponderInfoLayout;
-  QTableView* TransponderInfoView;
+  QGroupBox* TransponderDataGroup;
+  QVBoxLayout* TransponderDataLayout;
+  QTableView* TransponderDataView;
   //============================================================
 
   /* Интерфейс для взаимодействия с программатором */
@@ -85,9 +86,6 @@ class MasterGUI : public GUI {
   QCheckBox* LogSystemGlobalEnableCheckBox;
   QLabel* LogSystemExtendedEnableLabel;
   QCheckBox* LogSystemExtendedEnableCheckBox;
-  QLabel* LogSystemSavePathLabel;
-  QLineEdit* LogSystemSavePathLineEdit;
-  QPushButton* LogSystemSavePathPushButton;
 
   // Сеть
   QGroupBox* PersoSettingsGroupBox;
@@ -118,9 +116,9 @@ class MasterGUI : public GUI {
   //============================================================
 
  public:
-  MasterGUI(QWidget* parent);
+  explicit MasterGUI(QWidget* parent);
+  ~MasterGUI();
 
-  virtual void create(void) override;
   virtual void update(void) override;
 
  public slots:
@@ -137,7 +135,6 @@ class MasterGUI : public GUI {
   void createLogWidgets(void);
 
  private slots:
-  void on_LogSystemSavePathPushButton_slot(void);
   void on_ProgrammerExeFilePathPushButton_slot(void);
   void on_StickerPrinterLibPathPushButton_slot(void);
 };

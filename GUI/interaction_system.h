@@ -1,6 +1,7 @@
 #ifndef INTERACTION_SYSTEM_H
 #define INTERACTION_SYSTEM_H
 
+#include <QElapsedTimer>
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QMessageBox>
@@ -10,6 +11,7 @@
 
 #include "authorization_dialog.h"
 #include "custom_transponder_sticker_dialog.h"
+#include "master_password_input_dialog.h"
 #include "transponder_sticker_scan_dialog.h"
 
 class InteractionSystem : public QWidget {
@@ -34,10 +36,10 @@ class InteractionSystem : public QWidget {
   void startOperationProgressDialog(const QString& operationName);
   void finishOperationProgressDialog(const QString& operationName);
 
-  void getMasterPassword(QString& pass);
-  void getAuthorizationData(QHash<QString, QString>* data);
-  void getTransponderStickerData(QStringList* data, bool& ok);
-  void getCustomTransponderStickerData(QHash<QString, QString>* data, bool& ok);
+  bool getMasterPassword(QString& pass);
+  bool getAuthorizationData(QHash<QString, QString>* data);
+  bool getTransponderStickerData(QHash<QString, QString>* data);
+  bool getCustomTransponderStickerData(QHash<QString, QString>* data);
 
   void applySettings(void);
 

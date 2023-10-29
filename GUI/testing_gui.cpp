@@ -1,31 +1,20 @@
-#include "production_gui.h"
+#include "testing_gui.h"
 
-ProductionGUI::ProductionGUI(QWidget* parent)
-    : AbstractGUI(parent, Production) {
+TestingGUI::TestingGUI(QWidget* parent) : AbstractGUI(parent, Testing) {
   ControlPanelGroup = new QGroupBox("Панель управления");
   MainLayout->addWidget(ControlPanelGroup);
 
   ControlPanelLayout = new QVBoxLayout();
   ControlPanelGroup->setLayout(ControlPanelLayout);
 
-  LoadTransponderFirmwareButton =
-      new QPushButton(QString("Выпустить транспондер"));
-  LoadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
-  ControlPanelLayout->addWidget(LoadTransponderFirmwareButton);
-
-  ButtonVerticalSpacer =
-      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  ControlPanelLayout->addItem(ButtonVerticalSpacer);
-
-  RollbackProductionLinePushButton =
-      new QPushButton(QString("Произвести откат"));
-  RollbackProductionLinePushButton->setFont(QFont("Arial", 12, QFont::Bold));
-  ControlPanelLayout->addWidget(RollbackProductionLinePushButton);
-
   ReloadTransponderFirmwareButton =
       new QPushButton(QString("Перевыпустить транспондер"));
   ReloadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
   ControlPanelLayout->addWidget(ReloadTransponderFirmwareButton);
+
+  ButtonVerticalSpacer =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  ControlPanelLayout->addItem(ButtonVerticalSpacer);
 
   PrintLastTransponderStickerButton =
       new QPushButton(QString("Распечатать последний стикер"));
@@ -50,9 +39,6 @@ ProductionGUI::ProductionGUI(QWidget* parent)
   MainLayout->setStretch(1, 3);
 }
 
-ProductionGUI::~ProductionGUI() {}
+TestingGUI::~TestingGUI() {}
 
-void ProductionGUI::update() {
-  TransponderDataView->resizeColumnsToContents();
-  TransponderDataView->update();
-}
+void TestingGUI::update() {}
