@@ -257,6 +257,36 @@ void ClientManager::rollbackProductionLine() {
   finishOperationPerforming("rollbackProductionLine");
 }
 
+void ClientManager::performBoxStickerPrinting(
+    const QSharedPointer<QHash<QString, QString>> param) {
+  startOperationPerforming("printBoxStickerOnServer");
+  sendLog("Запрос печати стикера для бокса на сервере. ");
+
+  PersoClient::ReturnStatus status =
+      Client->requestBoxStickerPrint(param.get());
+  if (status != PersoClient::Completed) {
+    processClientError(status, "printBoxStickerOnServer");
+    return;
+  }
+
+  finishOperationPerforming("printBoxStickerOnServer");
+}
+
+void ClientManager::performPalletStickerPrinting(
+    const QSharedPointer<QHash<QString, QString>> param) {
+  startOperationPerforming("printPalletStickerOnServer");
+  sendLog("Запрос печати стикера для паллеты на сервере. ");
+
+  PersoClient::ReturnStatus status =
+      Client->requestPalletStickerPrint(param.get());
+  if (status != PersoClient::Completed) {
+    processClientError(status, "printPalletStickerOnServer");
+    return;
+  }
+
+  finishOperationPerforming("printPalletStickerOnServer");
+}
+
 void ClientManager::performLocalFirmwareLoading(const QString& path) {
   startOperationPerforming("performLocalFirmwareLoading");
 
@@ -379,8 +409,8 @@ void ClientManager::performDeviceLock() {
   finishOperationPerforming("performDeviceLock");
 }
 
-void ClientManager::performPrintingLastTransponderSticker() {
-  startOperationPerforming("performPrintingLastTransponderSticker");
+void ClientManager::performLastTransponderStickerPrinting() {
+  startOperationPerforming("performLastTransponderStickerPrinting");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
 
@@ -388,15 +418,15 @@ void ClientManager::performPrintingLastTransponderSticker() {
   stickerPrinterStatus = StickerPrinter->printLastTransponderSticker();
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
-                                "performPrintingLastTransponderSticker");
+                                "performLastTransponderStickerPrinting");
     return;
   }
 
   // Завершаем операцию
-  finishOperationPerforming("performPrintingLastTransponderSticker");
+  finishOperationPerforming("performLastTransponderStickerPrinting");
 }
 
-void ClientManager::performPrintingCustomTransponderSticker(
+void ClientManager::performCustomTransponderStickerPrinting(
     const QSharedPointer<QHash<QString, QString>> data) {
   startOperationPerforming("performStickerPrinterCommandScript");
 

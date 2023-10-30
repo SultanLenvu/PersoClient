@@ -56,6 +56,10 @@ class ClientManager : public QObject {
   void performTransponderFirmwareLoading(void);
   void performTransponderFirmwareReloading(const QString& pan);
   void rollbackProductionLine(void);
+  void performBoxStickerPrinting(
+      const QSharedPointer<QHash<QString, QString>> param);
+  void performPalletStickerPrinting(
+      const QSharedPointer<QHash<QString, QString>> param);
 
   // Программатор
   void performLocalFirmwareLoading(const QString& path);
@@ -67,8 +71,8 @@ class ClientManager : public QObject {
   void performDeviceLock(void);
 
   // Стикер принтер
-  void performPrintingLastTransponderSticker(void);
-  void performPrintingCustomTransponderSticker(
+  void performLastTransponderStickerPrinting(void);
+  void performCustomTransponderStickerPrinting(
       const QSharedPointer<QHash<QString, QString>> data);
   void performStickerPrinterCommandScript(
       const QSharedPointer<QStringList> commandScript);

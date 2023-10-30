@@ -7,15 +7,20 @@
 
 class ProductionGUI : public AbstractGUI {
  public:
-  QGroupBox* ControlPanelGroup;
   QVBoxLayout* ControlPanelLayout;
 
+  QGroupBox* TransponderGroup;
+  QVBoxLayout* TransponderLayout;
   QPushButton* LoadTransponderFirmwareButton;
   QSpacerItem* ButtonVerticalSpacer;
   QPushButton* RollbackProductionLinePushButton;
   QPushButton* ReloadTransponderFirmwareButton;
+
+  QGroupBox* PrintStickerGroup;
+  QVBoxLayout* PrintStickerLayout;
   QPushButton* PrintLastTransponderStickerButton;
   QPushButton* PrintCustomTransponderStickerButton;
+  QPushButton* PrintBoxStickerButton;
 
   QGroupBox* TransponderDataGroup;
   QVBoxLayout* TransponderDataLayout;

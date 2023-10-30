@@ -29,8 +29,8 @@ void TransponderStickerScanDialog::getData(
   }
 
   if (input.size() == 2) {
-    data->insert("sn", input.at(0));
-    data->insert("pan", input.at(1));
+    data->insert("pan", input.at(0));
+    data->insert("sn", input.at(1));
   } else if (input.size() == 1) {
     data->insert("pan", input.at(0));
   }
@@ -64,7 +64,7 @@ void TransponderStickerScanDialog::create() {
 
 bool TransponderStickerScanDialog::checkInput(QStringList& input) const {
   if (input.size() == 2) {
-    return checkPan(input[1]) && checkSn(input[0]);
+    return checkPan(input[0]) && checkSn(input[1]);
   } else if (input.size() == 1) {
     return checkPan(input[0]);
   } else {

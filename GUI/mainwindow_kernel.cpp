@@ -109,13 +109,13 @@ void MainWindowKernel::on_LockDeviceButton_slot() {
 void MainWindowKernel::on_PrintLastTransponderStickerButton_slot() {
   emit loggerClear_signal();
 
-  emit performPrintingLastTransponderSticker_signal();
+  emit performLastTransponderStickerPrinting_signal();
 }
 
 void MainWindowKernel::on_PrintCustomTransponderStickerButton_slot() {
-  emit loggerClear_signal();
-
   QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
+
+  emit loggerClear_signal();
 
   if (!Interactor->getCustomTransponderStickerData(data.get())) {
     return;
@@ -126,7 +126,7 @@ void MainWindowKernel::on_PrintCustomTransponderStickerButton_slot() {
     return;
   }
 
-  emit performPrintingCustomTransponderSticker_signal(data);
+  emit performCustomTransponderStickerPrinting_signal(data);
 }
 
 void MainWindowKernel::on_ExecuteStickerPrinterCommandScriptButton_slot() {
@@ -231,6 +231,40 @@ void MainWindowKernel::on_RollbackProductionLinePushButton_slot() {
   emit rollbackProductionLine_signal();
 }
 
+void MainWindowKernel::on_PrintBoxStickerButton_slot() {
+  QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
+
+  emit loggerClear_signal();
+
+  if (!Interactor->getTransponderStickerData(data.get())) {
+    return;
+  }
+
+  if (data->isEmpty()) {
+    Interactor->generateErrorMessage("Некорректный ввод данных. ");
+    return;
+  }
+
+  emit performBoxStickerPrinting_signal(data);
+}
+
+void MainWindowKernel::on_PrintPalletStickerButton_slot() {
+  QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
+
+  emit loggerClear_signal();
+
+  if (!Interactor->getTransponderStickerData(data.get())) {
+    return;
+  }
+
+  if (data->isEmpty()) {
+    Interactor->generateErrorMessage("Некорректный ввод данных. ");
+    return;
+  }
+
+  emit performPalletStickerPrinting_signal(data);
+}
+
 void MainWindowKernel::on_MasterInterfaceRequest_slot() {
   QString pass;
   if (!Interactor->getMasterPassword(pass)) {
@@ -295,22 +329,6 @@ bool MainWindowKernel::checkNewSettings() {
   }
 
   return true;
-}
-
-QString MainWindowKernel::getStickerPan(QStringList& stickerData) {
-  if (stickerData.size() > 2) {
-    return QString();
-  }
-
-  if (stickerData.at(0).size() == PAN_CHAR_LENGTH) {
-    return stickerData.at(0);
-  }
-
-  if (stickerData.at(1).size() == PAN_CHAR_LENGTH) {
-    return stickerData.at(1);
-  }
-
-  return QString();
 }
 
 void MainWindowKernel::createAuthorizationInterface() {
@@ -451,6 +469,8 @@ void MainWindowKernel::connectProductionInterface() {
           &MainWindowKernel::on_PrintCustomTransponderStickerButton_slot);
   connect(gui->RollbackProductionLinePushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_RollbackProductionLinePushButton_slot);
+  connect(gui->PrintBoxStickerButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_PrintBoxStickerButton_slot);
 
   // Связывание моделей и представлений
   gui->TransponderDataView->setModel(TransponderDataModel);
@@ -482,6 +502,10 @@ void MainWindowKernel::connectTestingInterface() {
           &MainWindowKernel::on_PrintLastTransponderStickerButton_slot);
   connect(gui->PrintCustomTransponderStickerButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_PrintCustomTransponderStickerButton_slot);
+  connect(gui->PrintBoxStickerButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_PrintBoxStickerButton_slot);
+  connect(gui->PrintPalletStickerButton, &QPushButton::clicked, this,
+          &MainWindowKernel::on_PrintPalletStickerButton_slot);
 
   // Связывание моделей и представлений
   gui->TransponderDataView->setModel(TransponderDataModel);
@@ -559,6 +583,10 @@ void MainWindowKernel::createManagerInstance() {
           Manager, &ClientManager::performTransponderFirmwareReloading);
   connect(this, &MainWindowKernel::rollbackProductionLine_signal, Manager,
           &ClientManager::rollbackProductionLine);
+  connect(this, &MainWindowKernel::performBoxStickerPrinting_signal, Manager,
+          &ClientManager::performBoxStickerPrinting);
+  connect(this, &MainWindowKernel::performPalletStickerPrinting_signal, Manager,
+          &ClientManager::performPalletStickerPrinting);
 
   connect(this, &MainWindowKernel::performLocalFirmwareLoading_signal, Manager,
           &ClientManager::performLocalFirmwareLoading);
@@ -575,11 +603,11 @@ void MainWindowKernel::createManagerInstance() {
   connect(this, &MainWindowKernel::performDeviceLock_signal, Manager,
           &ClientManager::performDeviceLock);
 
-  connect(this, &MainWindowKernel::performPrintingLastTransponderSticker_signal,
-          Manager, &ClientManager::performPrintingLastTransponderSticker);
+  connect(this, &MainWindowKernel::performLastTransponderStickerPrinting_signal,
+          Manager, &ClientManager::performLastTransponderStickerPrinting);
   connect(this,
-          &MainWindowKernel::performPrintingCustomTransponderSticker_signal,
-          Manager, &ClientManager::performPrintingCustomTransponderSticker);
+          &MainWindowKernel::performCustomTransponderStickerPrinting_signal,
+          Manager, &ClientManager::performCustomTransponderStickerPrinting);
   connect(this, &MainWindowKernel::performStickerPrinterCommandScript_signal,
           Manager, &ClientManager::performStickerPrinterCommandScript);
   connect(this, &MainWindowKernel::applySettings_signal, Manager,

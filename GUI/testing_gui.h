@@ -5,13 +5,20 @@
 
 class TestingGUI : public AbstractGUI {
  public:
-  QGroupBox* ControlPanelGroup;
   QVBoxLayout* ControlPanelLayout;
 
+  QGroupBox* TransponderGroup;
+  QVBoxLayout* TransponderLayout;
   QPushButton* ReloadTransponderFirmwareButton;
-  QSpacerItem* ButtonVerticalSpacer;
+
+  QGroupBox* PrintStickerGroup;
+  QVBoxLayout* PrintStickerLayout;
   QPushButton* PrintLastTransponderStickerButton;
   QPushButton* PrintCustomTransponderStickerButton;
+  QPushButton* PrintBoxStickerButton;
+  QPushButton* PrintPalletStickerButton;
+
+  QSpacerItem* ControlPanelVS;
 
   QGroupBox* TransponderDataGroup;
   QVBoxLayout* TransponderDataLayout;

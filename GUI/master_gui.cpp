@@ -88,7 +88,7 @@ void MasterGUI::createServerTab() {
   ServerControlPanelLayout->addWidget(RollbackProductionLinePushButton);
 
   // Представление данных о транспондере
-  TransponderDataGroup = new QGroupBox("Данные о выпущенном транспондере");
+  TransponderDataGroup = new QGroupBox("Данные транспондера");
   ServerTabMainLayout->addWidget(TransponderDataGroup);
 
   TransponderDataLayout = new QVBoxLayout();

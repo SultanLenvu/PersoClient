@@ -1,32 +1,51 @@
 #include "testing_gui.h"
 
 TestingGUI::TestingGUI(QWidget* parent) : AbstractGUI(parent, Testing) {
-  ControlPanelGroup = new QGroupBox("Панель управления");
-  MainLayout->addWidget(ControlPanelGroup);
-
   ControlPanelLayout = new QVBoxLayout();
-  ControlPanelGroup->setLayout(ControlPanelLayout);
+  MainLayout->addLayout(ControlPanelLayout);
+
+  TransponderGroup = new QGroupBox("Сборка");
+  ControlPanelLayout->addWidget(TransponderGroup);
+
+  TransponderLayout = new QVBoxLayout();
+  TransponderGroup->setLayout(TransponderLayout);
 
   ReloadTransponderFirmwareButton =
       new QPushButton(QString("Перевыпустить транспондер"));
   ReloadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
-  ControlPanelLayout->addWidget(ReloadTransponderFirmwareButton);
+  TransponderLayout->addWidget(ReloadTransponderFirmwareButton);
 
-  ButtonVerticalSpacer =
+  ControlPanelVS =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  ControlPanelLayout->addItem(ButtonVerticalSpacer);
+  ControlPanelLayout->addItem(ControlPanelVS);
+
+  PrintStickerGroup = new QGroupBox("Печать");
+  ControlPanelLayout->addWidget(PrintStickerGroup);
+
+  PrintStickerLayout = new QVBoxLayout();
+  PrintStickerGroup->setLayout(PrintStickerLayout);
 
   PrintLastTransponderStickerButton =
       new QPushButton(QString("Распечатать последний стикер"));
   PrintLastTransponderStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
-  ControlPanelLayout->addWidget(PrintLastTransponderStickerButton);
+  PrintStickerLayout->addWidget(PrintLastTransponderStickerButton);
 
   PrintCustomTransponderStickerButton =
       new QPushButton(QString("Распечатать произвольный стикер"));
   PrintCustomTransponderStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
-  ControlPanelLayout->addWidget(PrintCustomTransponderStickerButton);
+  PrintStickerLayout->addWidget(PrintCustomTransponderStickerButton);
 
-  TransponderDataGroup = new QGroupBox("Данные о выпущенном транспондере");
+  PrintBoxStickerButton =
+      new QPushButton(QString("Распечатать стикер для бокса"));
+  PrintBoxStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
+  PrintStickerLayout->addWidget(PrintBoxStickerButton);
+
+  PrintPalletStickerButton =
+      new QPushButton(QString("Распечатать стикер для паллеты"));
+  PrintPalletStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
+  PrintStickerLayout->addWidget(PrintPalletStickerButton);
+
+  TransponderDataGroup = new QGroupBox("Данные транспондера");
   MainLayout->addWidget(TransponderDataGroup);
 
   TransponderDataLayout = new QVBoxLayout();
@@ -41,4 +60,7 @@ TestingGUI::TestingGUI(QWidget* parent) : AbstractGUI(parent, Testing) {
 
 TestingGUI::~TestingGUI() {}
 
-void TestingGUI::update() {}
+void TestingGUI::update() {
+  TransponderDataView->resizeColumnsToContents();
+  TransponderDataView->update();
+}

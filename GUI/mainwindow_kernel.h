@@ -60,6 +60,8 @@ class MainWindowKernel : public QMainWindow {
   void on_LoadTransponderFirmwareButton_slot(void);
   void on_ReloadTransponderFirmwareButton_slot(void);
   void on_RollbackProductionLinePushButton_slot(void);
+  void on_PrintBoxStickerButton_slot(void);
+  void on_PrintPalletStickerButton_slot(void);
 
   // Программатор
   void on_ProgramDeviceButton_slot(void);
@@ -87,7 +89,6 @@ class MainWindowKernel : public QMainWindow {
   Q_DISABLE_COPY(MainWindowKernel);
   void loadSettings(void);
   bool checkNewSettings(void);
-  QString getStickerPan(QStringList& stickerData);
 
   void createAuthorizationInterface(void);
   void connectAuthorizationInterface(void);
@@ -132,6 +133,11 @@ class MainWindowKernel : public QMainWindow {
   void performTransponderFirmwareLoading_signal();
   void performTransponderFirmwareReloading_signal(const QString& pan);
   void rollbackProductionLine_signal(void);
+  void performBoxStickerPrinting_signal(
+      const QSharedPointer<QHash<QString, QString>> data);
+  void performPalletStickerPrinting_signal(
+      const QSharedPointer<QHash<QString, QString>> data);
+
   void performLocalFirmwareLoading_signal(const QString& path);
   void performFirmwareReading_signal(void);
   void performFirmwareErasing_signal(void);
@@ -139,8 +145,9 @@ class MainWindowKernel : public QMainWindow {
   void performDataLoading_signal(const QString& path);
   void performDeviceUnlock_signal(void);
   void performDeviceLock_signal(void);
-  void performPrintingLastTransponderSticker_signal(void);
-  void performPrintingCustomTransponderSticker_signal(
+
+  void performLastTransponderStickerPrinting_signal(void);
+  void performCustomTransponderStickerPrinting_signal(
       const QSharedPointer<QHash<QString, QString>> data);
   void performStickerPrinterCommandScript_signal(
       const QSharedPointer<QStringList> commandScript);
