@@ -536,9 +536,10 @@ void ClientManager::createClientInstance() {
       "Транспондер не был выпущен ранее, перевыпуск невозможен. ");
   ClientReturnStatusMatch.insert(PersoClient::AwaitingConfirmationError,
                                  "Транспондер не ожидает подтверждения. ");
-  ClientReturnStatusMatch.insert(PersoClient::IdenticalUcidError,
-                                 "Используется одна и та же печатная плата. "
-                                 "Перевыпуск транспондера невозможен. ");
+  ClientReturnStatusMatch.insert(
+      PersoClient::IdenticalUcidError,
+      "Данная печатная плата уже была использована ранее. "
+      "Повтороное использование одной и той же платы запрещено. ");
   ClientReturnStatusMatch.insert(PersoClient::ProductionLineMissed,
                                  "Производственная линия не найдена. ");
   ClientReturnStatusMatch.insert(PersoClient::ProductionLineNotActive,
