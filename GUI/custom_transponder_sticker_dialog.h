@@ -24,7 +24,6 @@ class CustomTransponderStickerScanDialog : public InputDialog {
   QHBoxLayout* PanLayout;
   QLabel* PanLabel;
   QLineEdit* PanInput;
-<<<<<<< HEAD
 
   QHBoxLayout* ButtonLayout;
   QPushButton* AcceptButton;
