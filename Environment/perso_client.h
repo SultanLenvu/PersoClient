@@ -118,7 +118,8 @@ class PersoClient : public QObject {
 
  public:
   /*!
-   * Construct object, create socket and timers, load settings
+   * Construct object, create socket and timers, load settings,
+   * fill response, template and match tables
    * \param[in] parent QObject parent
    */
   explicit PersoClient(QObject* parent);
@@ -147,18 +148,23 @@ class PersoClient : public QObject {
   ReturnStatus requestEcho(void);
   /*!
    * Request authorization on the server
-   * \param[in] requestAttributes map which should contain
-   * "login" and "password" keys
-   * \return what transmitBlock returns
+   * \param[in] requestData Map which must contain "login" and
+   * "password" fields
+   * \return RequestParameterError if requestData is nullptr,
+   * or what transmitBlock returns otherwise
    */
   ReturnStatus requestAuthorize(const QHash<QString, QString>* requestData);
 
   /*!
    * Request transponder release
-   * \param[in] requestAttributes Map which should contain
+   * \param[in] requestData Map which must contain
    * "login" and "password" fields
-   * \param[in] firmware file to save device firmware to
-   * \return what transmitBlock returns
+   * \param firmware File to save device firmware to
+   * \param responseData Map to save response data to
+   * \return RequestParameterError if any of the arguments are nullptr,
+   * or what transmitBlock returns otherwise
+   *
+   * firmware and responseData will be saved to private fields
    */
   ReturnStatus requestTransponderRelease(
     const QHash<QString, QString>* requestData,
@@ -166,38 +172,23 @@ class PersoClient : public QObject {
     QHash<QString, QString>* responseData);
   /*!
    * Request transponder release confirmation
-   * \param[in] requestAttributes Map which should contain
+   * \param[in] requestData Map which should contain
    * "login" and "password" fields
-   * \param[out] responseAttributes map in which some keys
-   * will be copied. See processTransponderRelease for more
-   * information
-   * \return one of the following codes:
-   * - RequestParameterError if requestAttributes or firmware is NULL
-   * - ServerConnectionError if server connection has been failed
-   * - ServerNotResponding if transmission timed out
-   * - ServerError if server reported an error
-   * - ResponseSyntaxError if server response is malformed
-   * - Completed if command was completed successfully
-   * 
-   * In the last 3 cases, ProcessingStatus will contain the same value
+   * \return RequestParameterError if requestData is nullptr,
+   * or what transmitDataBlock returns otherwise
    */
   ReturnStatus requestTransponderReleaseConfirm(
     const QHash<QString, QString>* requestData);
   /*!
    * Request transponder re-release
-   * \param[in] requestAttributes Map which should contain
-   * "login" and "password" fields
-   * \param[in] firmware file to store transponder firmware
-   * \return one of the following codes:
-   * - RequestParameterError if requestAttributes or firmware is NULL
-   * - ServerConnectionError if server connection has been failed
-   * - ServerNotResponding if transmission timed out
-   * - ServerError if server reported an error
-   * - ResponseSyntaxError if server response is malformed
-   * - ResponseSyntaxError if firmware saving failed
-   * - Completed if command was completed successfully
-   *
-   * In last 4 cases, ProcessingStatus will contain the same value
+   * \param[in] requestData Map which should contain
+   * "login", "password" and "pan" fields
+   * \param firmware file to store transponder firmware
+   * \param responseData Map to write response to
+   * \return RequestParameterError if any of the arguments are nullptr,
+   * or what transmitBlock returns otherwise
+   * 
+   * reponseData and firmware will be saved to private fields
    */
   ReturnStatus requestTransponderRerelease(
     const QHash<QString, QString>* requestData,
@@ -207,18 +198,8 @@ class PersoClient : public QObject {
    * Request transponder re-release confirmation
    * \param[in] requestData Map which should contain
    * "login" and "password" fields
-   * \param[out] responseAttributes map in which some keys
-   * will be copied. See processTransponderRerelease for more
-   * information
-   * \return one of the following codes:
-   * - RequestParameterError if requestAttributes or firmware is NULL
-   * - ServerConnectionError if server connection has been failed
-   * - ServerNotResponding if transmission timed out
-   * - ServerError if server reported an error
-   * - ResponseSyntaxError if server response is malformed
-   * - Completed if command was completed successfully
-   * 
-   * In the last 3 cases, ProcessingStatus will contain the same value
+   * \return RequestParameterError if requestData is not nullptr, or
+   * what transmitDataBlock returns
    */
   ReturnStatus requestTransponderRereleaseConfirm(
     const QHash<QString, QString>* requestData);
@@ -226,7 +207,8 @@ class PersoClient : public QObject {
    * Request production line rollback
    * \param[in] requestData Map which must contain "login" and "password"
    * keys
-   * \return return code of transmitDataBlock
+   * \return RequestParameterError if requestData is not nullptr, or
+   * what transmitDataBlock returns
    */
   ReturnStatus requestProductionLineRollback(
     const QHash<QString, QString>* requestData);
@@ -234,7 +216,8 @@ class PersoClient : public QObject {
   /*!
    * Request box sticker printing
    * \param[in] requestData Map which must contain "pan" key
-   * \return return code of transmitDataBlock
+   * \return RequestParameterError if requestData is nullptr, or
+   * return code of transmitDataBlock
    */
   ReturnStatus requestBoxStickerPrint(
     const QHash<QString, QString>* requestData);
@@ -246,7 +229,8 @@ class PersoClient : public QObject {
   /*!
    * Request pallet sticker printing
    * \param[in] requestData Map which must contain "pan" key
-   * \return return code of transmitDataBlock
+   * \return RequestParameterError if requestData is nullptr,
+   * return code of transmitDataBlock otherwise
    */
   ReturnStatus requestPalletStickerPrint(
     const QHash<QString, QString>* requestData);
@@ -257,7 +241,7 @@ class PersoClient : public QObject {
   ReturnStatus requestPalletStickerReprint(void);
 
   /*!
-   * Load settings using loadSettings function
+   * Load settings using loadSettings method
    */
   void applySettings(void);
 
@@ -295,6 +279,11 @@ class PersoClient : public QObject {
   void createTransmittedDataBlock(void);
   /*!
    * Send serialized data to the server
+   * \return One of the following codes:
+   * - ServerConnectionError if server is unavailable
+   * - ServerNotResponding if server didn't respond
+   * - ResponseSyntaxError if response is malformed
+   * - Return code of respective response handler
    */
   ReturnStatus transmitDataBlock(void);
 
@@ -380,7 +369,7 @@ class PersoClient : public QObject {
    * Write received firmware to a file.
    * If saving succeeded, store "sn", "pan", "box_id", "pallet_id",
    * "order_id", "issuer_name", "transponder_model" in CurrentResponse
-   * \return FirmwareFileSavingError if it is imposible to save
+   * \return FirmwareFileSavingError if it is impossible to save
    * firmware, Completed otherwise
    */
   ReturnStatus processTransponderRelease(void);
@@ -420,7 +409,7 @@ class PersoClient : public QObject {
   ReturnStatus processPrintBoxSticker(void);
   /*!
    * Process server last box sticker printing request. Basically no-op.
-   * \return comleted
+   * \return Comleted
    */
   ReturnStatus processPrintLastBoxSticker(void);
   /*!
@@ -430,7 +419,8 @@ class PersoClient : public QObject {
   ReturnStatus processPrintPalletSticker(void);
   /*!
    * Process server last pallet sticker printing request.
-   * Basically no-op. \return comleted
+   * Basically no-op.
+   * \return comleted
    */
   ReturnStatus processPrintLastPalletSticker(void);
 
@@ -440,10 +430,7 @@ class PersoClient : public QObject {
    */
   void createTimers(void);
   /*!
-   * Initialize Socket, and perform signal-slot plumbing:
-   * - Socket->connected -> this->on_SocketConnected_slot
-   * - Socket->disconnected -> this->on_SocketDisconneted_slot
-   * - Socket->readyRead -> on_SocketReadyRead_slot
+   * Initialize Socket, and perform signal-slot plumbing.
    */
   void createSocket(void);
   /*!

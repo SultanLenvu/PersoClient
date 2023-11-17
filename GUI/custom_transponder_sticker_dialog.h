@@ -32,6 +32,9 @@ class CustomTransponderStickerScanDialog : public InputDialog {
   QSpacerItem* MainLayoutVS;
   //! \endcond
 
+  /*!
+   * Sticker format -> vendor mapping
+   */
   QHash<QString, QString> MatchTable;
 
  public:
@@ -66,7 +69,7 @@ class CustomTransponderStickerScanDialog : public InputDialog {
    */
   void create(void);
   /*!
-   * sticker format -> vendor mapping
+   * Initialize sticker format -> vendor mapping
    */
   void createMatchTable(void);
   /*! Validate input

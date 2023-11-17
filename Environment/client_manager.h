@@ -103,8 +103,6 @@ class ClientManager : public QObject {
    * - Report firmware loading to the server;
    * - Build model;
    * - Print device sticker.
-   *
-   * \param[out] model TODO
    */
   void performTransponderFirmwareLoading(void);
   /*!
@@ -297,6 +295,10 @@ class ClientManager : public QObject {
    */
   void requestProductionInterface_signal(void);
 
+  /*!
+   * Emitted to show transponder data
+   * \param data Data to display
+   */
   void displayTransponderData_signal(
       QSharedPointer<QHash<QString, QString>> data);
 };

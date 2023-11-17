@@ -26,13 +26,14 @@ class AuthorizationDialog : public InputDialog {
   QHBoxLayout* ButtonLayout;
   QPushButton* OkButton;
   QPushButton* CancelButton;
-  //! \endcond
 
   QSpacerItem* MainLayoutVS;
+  //! \endcond
 
  public:
   /*!
    * Construct class and create layout
+   * \param[in] parent QObject parent
    */
   explicit AuthorizationDialog(QWidget* parent);
   /*!

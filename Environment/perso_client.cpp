@@ -567,8 +567,8 @@ PersoClient::ReturnStatus PersoClient::processTransponderRelease() {
 PersoClient::ReturnStatus PersoClient::processTransponderReleaseConfirm() {
   sendLog("Обработка ответа на команду transponder_release_confirm. ");
 
-  return Completed;
   sendLog("Команда TransponderReleaseConfirm успешно выполнена. ");
+  return Completed;
 }
 
 PersoClient::ReturnStatus PersoClient::processTransponderRerelease() {

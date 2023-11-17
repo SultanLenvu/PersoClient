@@ -67,23 +67,25 @@ class InteractionSystem : public QWidget {
   /*!
    * Ask user for password to the master interface
    * \param[out] pass where to store entered password
+   * \return true if data was saved, false if user canceled the operation
    */
   bool getMasterPassword(QString& pass);
   /*!
    * Ask user for authorization data
    * \param[out] data where to store authorization data
+   * \return true if data was saved, false if user canceled the operation
    */
   bool getAuthorizationData(QHash<QString, QString>* data);
   /*!
    * Ask user for sticker data via TransponderStickerScanDialog
    * \param[out] data where to store sticker data
-   * \param[out] ok was data saved or did user cancel this operation
+   * \return true if data was saved, false if user canceled the operation
    */
   bool getTransponderStickerData(QHash<QString, QString>* data);
   /*!
    * Ask user for custom sticker data via CustomStickerScanDialog
    * \param[out] data where to store sticker data
-   * \param[out] ok was data saved or did user cancel this operation
+   * \return true if data was saved, false if user canceled the operation
    */
   bool getCustomTransponderStickerData(QHash<QString, QString>* data);
 
