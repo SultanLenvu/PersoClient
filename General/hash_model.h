@@ -4,11 +4,15 @@
 #include <QAbstractTableModel>
 #include <QHash>
 #include <QString>
+#include <QVector>
 
 class HashModel : public QAbstractTableModel {
  private:
   QHash<QString, QVariant> HashTable;
   QHash<QString, QString> TransponderDataMatchTable;
+  
+  QVector<QVariant> Values;
+  QVector<QVariant> Headers;
 
  public:
   explicit HashModel(QObject* parent);

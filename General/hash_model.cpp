@@ -17,10 +17,14 @@ void HashModel::buildTransponderData(const QHash<QString, QString>* map) {
 
   // Очищаем старые данные
   HashTable.clear();
+  Values.clear();
+  Headers.clear();
 
   // Устанавливаем новые данные
   for (QHash<QString, QString>::const_iterator it1 = map->constBegin();
        it1 != map->constEnd(); it1++) {
+    Values.append(it1.value());
+    Headers.append(TransponderDataMatchTable.value(it1.key()));
     HashTable.insert(TransponderDataMatchTable.value(it1.key()), it1.value());
   }
 
@@ -31,6 +35,8 @@ void HashModel::clear() {
   beginResetModel();
 
   HashTable.clear();
+  Values.clear();
+  Headers.clear();
 
   endResetModel();
 }
@@ -65,7 +71,7 @@ QVariant HashModel::data(const QModelIndex& index, int role) const {
   }
 
   if (role == Qt::DisplayRole) {
-    return (HashTable.constBegin() + index.row()).value();
+    return Values.at(index.row());
   } else
     return QVariant();
 }
@@ -85,7 +91,7 @@ QVariant HashModel::headerData(int section,
   }
 
   if (orientation == Qt::Vertical) {
-    return (HashTable.constBegin() + section).key();
+    return Headers.at(section);
   } else {
     return QVariant();
   }
