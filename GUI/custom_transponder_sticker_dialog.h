@@ -1,11 +1,13 @@
 #ifndef CUSTOMTRANSPONDERSTICKERDIALOG_H
 #define CUSTOMTRANSPONDERSTICKERDIALOG_H
 
+#include <QSize>
+
 #include "input_dialog.h"
 
 class CustomTransponderStickerScanDialog : public InputDialog {
  private:
-  QRect DesktopGeometry;
+  QSize DesktopGeometry;
 
   QGridLayout* MainLayout;
 

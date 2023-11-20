@@ -1,13 +1,15 @@
 #ifndef AUTHORIZATIONDIALOG_H
 #define AUTHORIZATIONDIALOG_H
 
+#include <QSize>
+
 #include "input_dialog.h"
 
 class AuthorizationDialog : public InputDialog {
   Q_OBJECT
 
  private:
-  QRect DesktopGeometry;
+  QSize DesktopGeometry;
   QVBoxLayout* MainLayout;
 
   QHBoxLayout* LoginLayout;

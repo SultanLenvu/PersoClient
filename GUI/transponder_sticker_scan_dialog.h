@@ -1,6 +1,8 @@
 #ifndef TRANSPONDERSTICKERDIALOG_H
 #define TRANSPONDERSTICKERDIALOG_H
 
+#include <QSize>
+
 #include "General/definitions.h"
 #include "input_dialog.h"
 
@@ -8,7 +10,7 @@ class TransponderStickerScanDialog : public InputDialog {
   Q_OBJECT
 
  private:
-  QRect DesktopGeometry;
+  QSize DesktopGeometry;
 
   QVBoxLayout* MainLayout;
   QLabel* MainLabel;

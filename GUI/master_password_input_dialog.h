@@ -6,7 +6,7 @@
 class MasterPasswordInputDialog : public InputDialog {
   Q_OBJECT
  private:
-  QRect DesktopGeometry;
+  QSize DesktopGeometry;
   QVBoxLayout* MainLayout;
 
   QHBoxLayout* PasswordLayout;
