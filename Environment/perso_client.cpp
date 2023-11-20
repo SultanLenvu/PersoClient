@@ -673,7 +673,7 @@ void PersoClient::createSocket() {
           &PersoClient::on_SocketDisconnected_slot);
   connect(Socket, &QTcpSocket::readyRead, this,
           &PersoClient::on_SocketReadyRead_slot);
-  connect(Socket, &QTcpSocket::errorOccured, this,
+  connect(Socket, &QTcpSocket::errorOccurred, this,
           &PersoClient::on_SocketError_slot);
 }
 
