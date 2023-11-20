@@ -4,6 +4,7 @@
 #include <QAbstractTableModel>
 #include <QHash>
 #include <QString>
+#include <QVector>
 
 /*!
  * \brief Transponder info model
@@ -16,6 +17,9 @@ class HashModel : public QAbstractTableModel {
   QHash<QString, QVariant> HashTable;
   //! Table of Russian names for headers
   QHash<QString, QString> TransponderDataMatchTable;
+  
+  QVector<QVariant> Values;
+  QVector<QVariant> Headers;
 
  public:
   /*!
