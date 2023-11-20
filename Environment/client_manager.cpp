@@ -20,7 +20,7 @@ ClientManager::ClientManager(QObject* parent) : QObject(parent) {
 ClientManager::~ClientManager() {
 }
 
-void ClientManager::on_InsctanceThreadStarted_slot() {}
+void ClientManager::on_InstanceThreadStarted_slot() {}
 
 void ClientManager::performServerConnecting() {
   startOperationPerforming("performServerConnecting");
@@ -140,7 +140,8 @@ void ClientManager::performTransponderFirmwareLoading() {
 
   sendLog("Печать стикера для транспондера.");
   stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(transponderData.get());
+      StickerPrinter->printTransponderSticker(
+          (const QHash<QString, QString>*)transponderData.get());
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
@@ -218,7 +219,8 @@ void ClientManager::performTransponderFirmwareReloading(const QString& pan) {
 
   sendLog("Печать стикера для транспондера.");
   stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(transponderData.get());
+      StickerPrinter->printTransponderSticker(
+          (const QHash<QString, QString>*)transponderData.get());
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
@@ -433,7 +435,8 @@ void ClientManager::performCustomTransponderStickerPrinting(
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
 
   sendLog("Печать произвольного стикера транспондера. ");
-  stickerPrinterStatus = StickerPrinter->printTransponderSticker(data.get());
+  stickerPrinterStatus = StickerPrinter->printTransponderSticker(
+      (const QHash<QString, QString>*)data.get());
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performStickerPrinterCommandScript");
@@ -592,7 +595,7 @@ void ClientManager::startOperationPerforming(const QString& operationName) {
   Mutex.lock();
 
   // Отправляем сигнал о начале выполнения длительной операции
-  emit operationPerfomingStarted(operationName);
+  emit operationPerformingStarted(operationName);
 }
 
 void ClientManager::finishOperationPerforming(const QString& operationName) {

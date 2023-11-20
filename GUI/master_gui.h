@@ -4,8 +4,12 @@
 #include "General/definitions.h"
 #include "abstract_gui.h"
 
+/*!
+ * Master GUI mode
+ */
 class MasterGUI : public AbstractGUI {
  public:
+  //! \cond
   QTabWidget* Tabs;
 
   // Виджеты для отображения логов
@@ -113,29 +117,69 @@ class MasterGUI : public AbstractGUI {
 
   QSpacerItem* SettingsVS1;
   QSpacerItem* SettingsHS1;
-  //============================================================
+  //! \endcond
 
  public:
+  /*!
+   * Default constructor. Initialize 
+   * \param[in] parent QObject parent
+   */
   explicit MasterGUI(QWidget* parent);
+  /*!
+   * Default destructor
+   */
   ~MasterGUI();
 
+  /*!
+   * Resize TransponderInfoView to match amount of columns
+   */
   virtual void update(void) override;
 
  public slots:
+  /*!
+   * Show logs on the screen in GeneralLogs view
+   * \param[in] log new log line
+   */
   void displayLogData(const QString& log);
+  /*!
+   * Clear GeneralLogs view
+   */
   void clearLogDataDisplay(void);
 
  private:
+  //! \cond
   Q_DISABLE_COPY(MasterGUI);
-
+  //! \endcond
+  /*!
+   * Create 'Server' tab widgets
+   * \todo Qt Designer?
+   */
   void createServerTab(void);
+  /*!
+   * Create 'Programmator' tab widgets
+   */
   void createProgrammatorTab(void);
+  /*!
+   * Create 'Sticker printer' tab widgets
+   */
   void createStickerPrinterTab(void);
+  /*!
+   * Create 'Settings' tab widgets
+   */
   void createSettingsTab(void);
+  /*!
+   * Create logging-related widgets
+   */
   void createLogWidgets(void);
 
  private slots:
+  /*!
+   * Show file picker for JLink
+   */
   void on_ProgrammerExeFilePathPushButton_slot(void);
+  /*!
+   * Show file picker for TSC library
+   */
   void on_StickerPrinterLibPathPushButton_slot(void);
 };
 

@@ -74,7 +74,7 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
     QHash<QString, QString>* responseData) {
   // Проверка на существование
   if ((!requestData) || (!firmware) || (!responseData)) {
-    sendLog("Получены не корректные параметры запроса. Сброс.");
+    sendLog("Получены некорректные параметры запроса. Сброс.");
     return RequestParameterError;
   }
   Firmware = firmware;
@@ -567,8 +567,8 @@ PersoClient::ReturnStatus PersoClient::processTransponderRelease() {
 PersoClient::ReturnStatus PersoClient::processTransponderReleaseConfirm() {
   sendLog("Обработка ответа на команду transponder_release_confirm. ");
 
-  return Completed;
   sendLog("Команда TransponderReleaseConfirm успешно выполнена. ");
+  return Completed;
 }
 
 PersoClient::ReturnStatus PersoClient::processTransponderRerelease() {

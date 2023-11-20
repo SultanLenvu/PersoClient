@@ -360,7 +360,7 @@ void MainWindowKernel::connectAuthorizationInterface() {
   connect(gui->AuthorizePushButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_AuthorizePushButton_slot);
   connect(gui, &AbstractGUI::visibilityChanged, this,
-          &MainWindowKernel::on_VisabilityChanged_slot);
+          &MainWindowKernel::on_VisibilityChanged_slot);
 }
 
 void MainWindowKernel::createMasterInterface() {
@@ -559,7 +559,7 @@ void MainWindowKernel::createManagerInstance() {
           &InteractionSystem::generateMessage);
   connect(Manager, &ClientManager::notifyUserAboutError, Interactor,
           &InteractionSystem::generateErrorMessage);
-  connect(Manager, &ClientManager::operationPerfomingStarted, Interactor,
+  connect(Manager, &ClientManager::operationPerformingStarted, Interactor,
           &InteractionSystem::startOperationProgressDialog);
   connect(Manager, &ClientManager::operationPerformingFinished, Interactor,
           &InteractionSystem::finishOperationProgressDialog);
@@ -620,7 +620,7 @@ void MainWindowKernel::createManagerInstance() {
   connect(ManagerThread, &QThread::finished, Manager,
           &ClientManager::deleteLater);
   connect(ManagerThread, &QThread::started, Manager,
-          &ClientManager::on_InsctanceThreadStarted_slot);
+          &ClientManager::on_InstanceThreadStarted_slot);
 
   Manager->moveToThread(ManagerThread);
   ManagerThread->start();
@@ -662,7 +662,7 @@ void MainWindowKernel::on_RequestProductionInterface_slot() {
   createProductionInterface();
 }
 
-void MainWindowKernel::on_VisabilityChanged_slot() {
+void MainWindowKernel::on_VisibilityChanged_slot() {
   adjustSize();
   setFixedSize(size());
 }
