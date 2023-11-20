@@ -3,7 +3,7 @@
 MasterPasswordInputDialog::MasterPasswordInputDialog(QWidget* parent)
     : InputDialog(parent, MasterPassword) {
   // Считываем размеры дисплея
-  DesktopGeometry = QApplication::desktop()->screenGeometry();
+  DesktopGeometry = QApplication::screens().first()->size();
 
   // Создаем диалоговое окно
   setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,

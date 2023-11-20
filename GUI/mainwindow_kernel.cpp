@@ -10,7 +10,7 @@
 MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   setObjectName("MainWindowKernel");
   CurrentGUI = nullptr;
-  DesktopGeometry = QApplication::desktop()->screenGeometry();
+  DesktopGeometry = QApplication::screens().first()->size();
 
   // Загружаем настройки приложения
   loadSettings();
