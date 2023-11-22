@@ -62,3 +62,8 @@ qt_generate_deploy_app_script(
     NO_UNSUPPORTED_PLATFORM_ERROR
 )
 install(SCRIPT ${deploy_script})
+
+add_custom_target(docs doxygen doxygen.conf
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+)
+
