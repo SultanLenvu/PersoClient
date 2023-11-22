@@ -2,6 +2,7 @@
 #define AUTHORIZATIONDIALOG_H
 
 #include <QtWidgets>
+#include <QSize>
 
 #include "input_dialog.h"
 
@@ -13,7 +14,7 @@ class AuthorizationDialog : public InputDialog {
 
  private:
   //! \cond
-  QRect DesktopGeometry;
+  QSize DesktopGeometry;
   QVBoxLayout* MainLayout;
 
   QHBoxLayout* LoginLayout;

@@ -27,7 +27,7 @@ class MainWindowKernel : public QMainWindow {
 
  private:
   //! \cond
-  QRect DesktopGeometry;
+  QSize DesktopGeometry;
   AbstractGUI* CurrentGUI;
 
   // Верхнее меню

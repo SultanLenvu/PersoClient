@@ -10,7 +10,7 @@ class MasterPasswordInputDialog : public InputDialog {
   Q_OBJECT
  private:
   //! \cond
-  QRect DesktopGeometry;
+  QSize DesktopGeometry;
   QVBoxLayout* MainLayout;
 
   QHBoxLayout* PasswordLayout;

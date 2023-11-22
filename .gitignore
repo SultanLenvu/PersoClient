@@ -58,3 +58,5 @@ PersoClient
 
 # Documentation directory
 docs
+# Build directory
+build
