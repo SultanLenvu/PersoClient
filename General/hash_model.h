@@ -18,7 +18,9 @@ class HashModel : public QAbstractTableModel {
   //! Table of Russian names for headers
   QHash<QString, QString> TransponderDataMatchTable;
   
+  //! Data values
   QVector<QVariant> Values;
+  //! Data keys
   QVector<QVariant> Headers;
 
  public:

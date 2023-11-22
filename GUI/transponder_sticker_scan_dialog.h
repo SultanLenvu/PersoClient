@@ -49,6 +49,9 @@ class TransponderStickerScanDialog : public InputDialog {
   //! \cond
   Q_DISABLE_COPY(TransponderStickerScanDialog);
   //! \endcond
+  /*!
+   * Allocate widgets and lay them out
+   */
   void create(void);
   /*!
    * Validate input. Check that:
@@ -66,10 +69,10 @@ class TransponderStickerScanDialog : public InputDialog {
    */
   bool checkPan(const QString& pan) const;
   /*!
-   * Check that entered PAN is of length SERIAL_NUMBER_DS_LENGTH
+   * Check that entered S/N is of length SERIAL_NUMBER_DS_LENGTH
    * and consists of digits only
-   * \param[in] pan PAN to check
-   * \return true if PAN is valid, false otherwise
+   * \param[in] sn S/N to check
+   * \return true if S/N is valid, false otherwise
    */
   bool checkSn(const QString& sn) const;
 };
