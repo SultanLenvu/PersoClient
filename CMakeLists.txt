@@ -9,9 +9,20 @@ find_package(Qt${QT_VERSION_MAJOR} OPTIONAL_COMPONENTS Widgets)
 
 qt_standard_project_setup()
 
+include_directories(Management/)
+include_directories(GUI/)
+include_directories(GUI/Dialogs)
+include_directories(General/)
+include_directories(Log/)
+include_directories(Programmers/)
+include_directories(Printing/)
+include_directories(ClientConnection/)
+
 qt_add_executable(PersoClient WIN32 MACOSX_BUNDLE
-    Environment/client_manager.cpp Environment/client_manager.h
-    Environment/perso_client.cpp Environment/perso_client.h
+    Management/client_manager.cpp Management/client_manager.h
+    Management/perso_client.cpp Management/perso_client.h
+    Management/global_environment.cpp Management/global_environment.h
+
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_dialog.cpp GUI/authorization_dialog.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
@@ -24,17 +35,39 @@ qt_add_executable(PersoClient WIN32 MACOSX_BUNDLE
     GUI/production_gui.cpp GUI/production_gui.h
     GUI/testing_gui.cpp GUI/testing_gui.h
     GUI/transponder_sticker_scan_dialog.cpp GUI/transponder_sticker_scan_dialog.h
+
     General/definitions.h
     General/hash_model.cpp General/hash_model.h
     General/types.h
+
     Log/file_log_backend.cpp Log/file_log_backend.h
     Log/log_backend.cpp Log/log_backend.h
     Log/log_system.cpp Log/log_system.h
     Log/widget_log_backend.cpp Log/widget_log_backend.h
+
     Programmers/interface_programmer.cpp Programmers/interface_programmer.h
     Programmers/jlink_exe_programmer.cpp Programmers/jlink_exe_programmer.h
-    StickerPrinter/isticker_printer.cpp StickerPrinter/isticker_printer.h
-    StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
+
+    Printing/abstract_sticker_printer.cpp Printing/abstract_sticker_printer.h
+    Printing/te310_printer.cpp Printing/te310_printer.h
+
+    ClientConnection/abstract_client_connection.h ClientConnection/abstract_client_connection.cpp
+    ClientConnection/client_connection.cpp ClientConnection/client_connection.h
+    ClientConnection/abstract_client_command.h ClientConnection/abstract_client_command.cpp
+    ClientConnection/echo_comand.h ClientConnection/echo_comand.cpp
+    ClientConnection/release_command.h ClientConnection/release_command.cpp
+    ClientConnection/release_confirm_command.h ClientConnection/release_confirm_command.cpp
+    ClientConnection/rerelease_command.h ClientConnection/rerelease_command.cpp
+    ClientConnection/rerelease_confirm_command.h ClientConnection/rerelease_confirm_command.cpp
+    ClientConnection/rollback_command.h ClientConnection/rollback_command.cpp
+    ClientConnection/box_sticker_print_command.h ClientConnection/box_sticker_print_command.cpp
+    ClientConnection/last_box_sticker_print_command.h ClientConnection/last_box_sticker_print_command.cpp
+    ClientConnection/pallet_sticker_print_command.h ClientConnection/pallet_sticker_print_command.cpp
+    ClientConnection/last_pallet_sticker_print_command.h ClientConnection/last_pallet_sticker_print_command.cpp
+    ClientConnection/log_in_command.h ClientConnection/log_in_command.cpp
+    ClientConnection/log_out_command.h ClientConnection/log_out_command.cpp
+    ClientConnection/update_command.h ClientConnection/update_command.cpp
+
     main.cpp
 )
 target_link_libraries(PersoClient PRIVATE

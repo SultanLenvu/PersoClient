@@ -1,4 +1,6 @@
 #include "client_manager.h"
+#include "perso_client.h"
+#include "te310_printer.h"
 
 ClientManager::ClientManager(QObject* parent) : QObject(parent) {
   setObjectName("ClientManager");
@@ -17,8 +19,7 @@ ClientManager::ClientManager(QObject* parent) : QObject(parent) {
   CurrentPassword = PRODUCTION_LINE_DEFAULT_PASSWORD;
 }
 
-ClientManager::~ClientManager() {
-}
+ClientManager::~ClientManager() {}
 
 void ClientManager::on_InstanceThreadStarted_slot() {}
 
@@ -90,7 +91,7 @@ void ClientManager::performTransponderFirmwareLoading() {
 
   IProgrammer::ReturnStatus programmerStatus;
   PersoClient::ReturnStatus clientStatus;
-  IStickerPrinter::ReturnStatus stickerPrinterStatus;
+  ReturnStatus stickerPrinterStatus;
   QString ucid;
   QHash<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
@@ -139,10 +140,9 @@ void ClientManager::performTransponderFirmwareLoading() {
   emit displayTransponderData_signal(transponderData);
 
   sendLog("Печать стикера для транспондера.");
-  stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(
-          (const QHash<QString, QString>*)transponderData.get());
-  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+  stickerPrinterStatus = StickerPrinter->printTransponderSticker(
+      (const QHash<QString, QString>*)transponderData.get());
+  if (stickerPrinterStatus != AbstractStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
     return;
@@ -168,7 +168,7 @@ void ClientManager::performTransponderFirmwareReloading(const QString& pan) {
 
   IProgrammer::ReturnStatus programmerStatus;
   PersoClient::ReturnStatus clientStatus;
-  IStickerPrinter::ReturnStatus stickerPrinterStatus;
+  AbstractStickerPrinter::ReturnStatus stickerPrinterStatus;
   QString ucid;
   QHash<QString, QString> requestParameters;
   QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
@@ -218,10 +218,9 @@ void ClientManager::performTransponderFirmwareReloading(const QString& pan) {
   emit displayTransponderData_signal(transponderData);
 
   sendLog("Печать стикера для транспондера.");
-  stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(
-          (const QHash<QString, QString>*)transponderData.get());
-  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+  stickerPrinterStatus = StickerPrinter->printTransponderSticker(
+      (const QHash<QString, QString>*)transponderData.get());
+  if (stickerPrinterStatus != AbstractStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
     return;
@@ -414,11 +413,11 @@ void ClientManager::performDeviceLock() {
 void ClientManager::performLastTransponderStickerPrinting() {
   startOperationPerforming("performLastTransponderStickerPrinting");
 
-  IStickerPrinter::ReturnStatus stickerPrinterStatus;
+  AbstractStickerPrinter::ReturnStatus stickerPrinterStatus;
 
   sendLog("Печать последнего стикера транспондера. ");
   stickerPrinterStatus = StickerPrinter->printLastTransponderSticker();
-  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+  if (stickerPrinterStatus != AbstractStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performLastTransponderStickerPrinting");
     return;
@@ -432,12 +431,12 @@ void ClientManager::performCustomTransponderStickerPrinting(
     const QSharedPointer<QHash<QString, QString>> data) {
   startOperationPerforming("performStickerPrinterCommandScript");
 
-  IStickerPrinter::ReturnStatus stickerPrinterStatus;
+  AbstractStickerPrinter::ReturnStatus stickerPrinterStatus;
 
   sendLog("Печать произвольного стикера транспондера. ");
   stickerPrinterStatus = StickerPrinter->printTransponderSticker(
       (const QHash<QString, QString>*)data.get());
-  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+  if (stickerPrinterStatus != AbstractStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performStickerPrinterCommandScript");
     return;
@@ -451,11 +450,11 @@ void ClientManager::performStickerPrinterCommandScript(
     const QSharedPointer<QStringList> commandScript) {
   startOperationPerforming("performStickerPrinterCommandScript");
 
-  IStickerPrinter::ReturnStatus stickerPrinterStatus;
+  AbstractStickerPrinter::ReturnStatus stickerPrinterStatus;
 
   sendLog("Выполнение командного скрипта для принтера. ");
   stickerPrinterStatus = StickerPrinter->exec(commandScript.get());
-  if (stickerPrinterStatus != IStickerPrinter::Completed) {
+  if (stickerPrinterStatus != AbstractStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performStickerPrinterCommandScript");
     return;
@@ -509,85 +508,77 @@ void ClientManager::createClientInstance() {
           &LogSystem::generate);
 
   // Заполняем таблицу соответствий статусов возврата
-  ClientReturnStatusMatch.insert(PersoClient::Completed, "Выполнено. ");
-  ClientReturnStatusMatch.insert(PersoClient::RequestParameterError,
-                                 "Не удалось обработать параметры запроса. ");
-  ClientReturnStatusMatch.insert(PersoClient::ServerConnectionError,
-                                 "Не удалось подключиться к серверу. ");
-  ClientReturnStatusMatch.insert(PersoClient::ServerNotResponding,
-                                 "Сервер не отвечает.");
-  ClientReturnStatusMatch.insert(PersoClient::ServerConnectionTerminated,
-                                 "Оборвалось соединение с сервером.");
-  ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotExist,
-                                 "Производственная линия не найдена. ");
-  ClientReturnStatusMatch.insert(PersoClient::AuthorizationAccessDenied,
-                                 "Ошибка доступа к производственной линии.");
-  ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotActive,
-                                 "Производственная линия не активна. ");
-  ClientReturnStatusMatch.insert(PersoClient::ResponseSyntaxError,
-                                 "Синтаксическая ошибка в ответе на запрос. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::CommandSyntaxError,
-      "В серверном запросе допущена синтаксическая ошибка. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::DatabaseError,
-      "Получена ошибка при выполнении запроса в базу данных. ");
-  ClientReturnStatusMatch.insert(PersoClient::TransponderNotFound,
-                                 "Транспондер не найден.");
-  ClientReturnStatusMatch.insert(
-      PersoClient::TransponderNotReleasedEarlier,
-      "Транспондер не был выпущен ранее, перевыпуск невозможен. ");
-  ClientReturnStatusMatch.insert(PersoClient::AwaitingConfirmationError,
-                                 "Транспондер не ожидает подтверждения. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::IdenticalUcidError,
-      "Данная печатная плата уже была использована ранее. "
-      "Повтороное использование одной и той же платы запрещено. ");
-  ClientReturnStatusMatch.insert(PersoClient::ProductionLineMissed,
-                                 "Производственная линия не найдена. ");
-  ClientReturnStatusMatch.insert(PersoClient::ProductionLineNotActive,
-                                 "Производственная линия не активна. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::CurrentOrderRunOut,
-      "В текущем заказе отсутствуют свободные транспондеры . ");
-  ClientReturnStatusMatch.insert(PersoClient::CurrentOrderAssembled,
-                                 "Текущий заказ собран. ");
-  ClientReturnStatusMatch.insert(PersoClient::ProductionLineRollbackLimitError,
-                                 "Производственная линия связана с первым "
-                                 "транспондером в боксе. Откат невозможен. ");
-  ClientReturnStatusMatch.insert(PersoClient::BoxStickerPrintError,
-                                 "Не удалось распечатать стикер для бокса. ");
-  ClientReturnStatusMatch.insert(PersoClient::PalletStickerPrintError,
-                                 "Не удалось распечатать стикер для паллеты. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::NextTransponderNotFound,
-      "Получена ошибка при поиске очередного транспондера. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::StartBoxAssemblingError,
-      "Получена ошибка при запуске сборки очередного бокса. ");
-  ClientReturnStatusMatch.insert(
-      PersoClient::StartPalletAssemblingError,
-      "Получена ошибка при запуске сборки очередной паллеты. ");
+  //  ClientReturnStatusMatch.insert(PersoClient::Completed, "Выполнено. ");
+  //  ClientReturnStatusMatch.insert(PersoClient::RequestParameterError,
+  //                                 "Не удалось обработать параметры запроса.
+  //                                 ");
+  //  ClientReturnStatusMatch.insert(PersoClient::ServerConnectionError,
+  //                                 "Не удалось подключиться к серверу. ");
+  //  ClientReturnStatusMatch.insert(PersoClient::ServerNotResponding,
+  //                                 "Сервер не отвечает.");
+  //  ClientReturnStatusMatch.insert(PersoClient::ServerConnectionTerminated,
+  //                                 "Оборвалось соединение с сервером.");
+  //  ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotExist,
+  //                                 "Производственная линия не найдена. ");
+  //  ClientReturnStatusMatch.insert(PersoClient::AuthorizationAccessDenied,
+  //                                 "Ошибка доступа к производственной
+  //                                 линии.");
+  //  ClientReturnStatusMatch.insert(PersoClient::AuthorizationNotActive,
+  //                                 "Производственная линия не активна. ");
+  //  ClientReturnStatusMatch.insert(PersoClient::ResponseSyntaxError,
+  //                                 "Синтаксическая ошибка в ответе на запрос.
+  //                                 ");
+  //  ClientReturnStatusMatch.insert(
+  //      PersoClient::CommandSyntaxError,
+  //      "В серверном запросе допущена синтаксическая ошибка. ");
+  //  ClientReturnStatusMatch.insert(
+  //      PersoClient::DatabaseError,
+  //      "Получена ошибка при выполнении запроса в базу данных. ");
+  //  ClientReturnStatusMatch.insert(PersoClient::TransponderNotFound,
+  //                                 "Транспондер не найден.");
+  //  ClientReturnStatusMatch.insert(
+  //      PersoClient::TransponderNotReleasedEarlier,
+  //      "Транспондер не был выпущен ранее, перевыпуск невозможен. ");
+  //  ClientReturnStatusMatch.insert(PersoClient::AwaitingConfirmationError,
+  //                                 "Транспондер не ожидает подтверждения. ");
+  //  ClientReturnStatusMatch.insert(
+  //      PersoClient::IdenticalUcidError,
+  //      "Данная печатная плата уже была использована ранее. "
+  //      "Повтороное использование одной и той же платы запрещено. ");
+  //  ClientReturnStatusMatch.insert(PersoClient::ProductionLineMissed,
+  //                                 "Производственная линия не найдена. ");
+  //  ClientReturnStatusMatch.insert(PersoClient::ProductionLineNotActive,
+  //                                 "Производственная линия не активна. ");
+  //  ClientReturnStatusMatch.insert(
+  //      PersoClient::CurrentOrderRunOut,
+  //      "В текущем заказе отсутствуют свободные транспондеры . ");
+  //  ClientReturnStatusMatch.insert(PersoClient::CurrentOrderAssembled,
+  //                                 "Текущий заказ собран. ");
+  //  ClientReturnStatusMatch.insert(PersoClient::ProductionLineRollbackLimitError,
+  //                                 "Производственная линия связана с первым "
+  //                                 "транспондером в боксе. Откат невозможен.
+  //                                 ");
+  //  ClientReturnStatusMatch.insert(PersoClient::BoxStickerPrintError,
+  //                                 "Не удалось распечатать стикер для бокса.
+  //                                 ");
+  //  ClientReturnStatusMatch.insert(PersoClient::PalletStickerPrintError,
+  //                                 "Не удалось распечатать стикер для паллеты.
+  //                                 ");
+  //  ClientReturnStatusMatch.insert(
+  //      PersoClient::NextTransponderNotFound,
+  //      "Получена ошибка при поиске очередного транспондера. ");
+  //  ClientReturnStatusMatch.insert(
+  //      PersoClient::StartBoxAssemblingError,
+  //      "Получена ошибка при запуске сборки очередного бокса. ");
+  //  ClientReturnStatusMatch.insert(
+  //      PersoClient::StartPalletAssemblingError,
+  //      "Получена ошибка при запуске сборки очередной паллеты. ");
 }
 
 void ClientManager::createStickerPrinterInstance() {
   StickerPrinter = new TE310Printer(this, "TSC TE310");
-  connect(StickerPrinter, &IStickerPrinter::logging, LogSystem::instance(),
-          &LogSystem::generate);
-
-  // Заполняем таблицу соответствий статусов возврата
-  StickerPrinterReturnStatusMatch.insert(
-      IStickerPrinter::ParameterError,
-      "Получены некорректные параметры для стикера.");
-  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::Failed,
-                                         "Не удалось распечать стикер.");
-  StickerPrinterReturnStatusMatch.insert(
-      IStickerPrinter::LibraryMissed,
-      "Отсутствует библиотека для работы с принтером стикеров.");
-  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::ConnectionError,
-                                         "Принтер стикеров не подключен.");
-  StickerPrinterReturnStatusMatch.insert(IStickerPrinter::Completed,
-                                         "Выполнено.");
+  connect(StickerPrinter, &AbstractStickerPrinter::logging,
+          LogSystem::instance(), &LogSystem::generate);
 }
 
 void ClientManager::startOperationPerforming(const QString& operationName) {
@@ -613,7 +604,6 @@ void ClientManager::processClientError(PersoClient::ReturnStatus status,
                                        const QString& operationName) {
   emit operationPerformingFinished(operationName);
   emit notifyUserAboutError(ClientReturnStatusMatch.value(status));
-  Mutex.unlock();
 }
 
 void ClientManager::processProgrammerError(IProgrammer::ReturnStatus status,
@@ -625,10 +615,9 @@ void ClientManager::processProgrammerError(IProgrammer::ReturnStatus status,
 }
 
 void ClientManager::processStickerPrintersError(
-    IStickerPrinter::ReturnStatus status,
+    AbstractStickerPrinter::ReturnStatus status,
     const QString& operationName) {
   sendLog(StickerPrinterReturnStatusMatch.value(status));
   emit operationPerformingFinished(operationName);
   emit notifyUserAboutError(StickerPrinterReturnStatusMatch.value(status));
-  Mutex.unlock();
 }

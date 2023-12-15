@@ -3,9 +3,14 @@
 #include <QFile>
 #include <QString>
 
+#include "GUI/authorization_gui.h"
 #include "General/definitions.h"
-#include "mainwindow_kernel.h"
 #include "Log/widget_log_backend.h"
+#include "definitions.h"
+#include "mainwindow_kernel.h"
+#include "master_gui.h"
+#include "production_gui.h"
+#include "testing_gui.h"
 
 MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   setObjectName("MainWindowKernel");
@@ -457,7 +462,7 @@ void MainWindowKernel::createProductionInterface() {
 }
 
 void MainWindowKernel::connectProductionInterface() {
-  ProductionGUI *gui = dynamic_cast<ProductionGUI *>(CurrentGUI);
+  ProductionGUI* gui = dynamic_cast<ProductionGUI*>(CurrentGUI);
 
   connect(gui->LoadTransponderFirmwareButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_LoadTransponderFirmwareButton_slot);

@@ -10,15 +10,10 @@
 #include <QTimer>
 #include <QVector>
 
-#include "General/definitions.h"
-#include "General/hash_model.h"
-#include "General/types.h"
-#include "Log/log_system.h"
 #include "Programmers/interface_programmer.h"
-#include "Programmers/jlink_exe_programmer.h"
-#include "StickerPrinter/isticker_printer.h"
-#include "StickerPrinter/te310_printer.h"
+#include "abstract_sticker_printer.h"
 #include "perso_client.h"
+#include "te310_printer.h"
 
 /*!
  * \brief Client Manager
@@ -44,9 +39,7 @@ class ClientManager : public QObject {
   QString CurrentPassword;
 
   //! Client for PersoServer
-  PersoClient* Client;
-  //! Strings for PersoClient statuses?
-  QHash<PersoClient::ReturnStatus, QString> ClientReturnStatusMatch;
+  std::unique_ptr<PersoClient> Client;
 
   //! Programmer interface
   IProgrammer* Programmer;
@@ -54,10 +47,7 @@ class ClientManager : public QObject {
   QHash<IProgrammer::ReturnStatus, QString> ProgrammerReturnStatusMatch;
 
   //! Sticker printer interface
-  IStickerPrinter* StickerPrinter;
-  //! Strings for IStickerPrinter statuses?
-  QHash<IStickerPrinter::ReturnStatus, QString> StickerPrinterReturnStatusMatch;
-
+  std::unique_ptr<AbstractStickerPrinter> StickerPrinter;
   //! Self-explanatory
   QMutex Mutex;
 
@@ -175,14 +165,14 @@ class ClientManager : public QObject {
   /*!
    * Print custom transponder sticker
    * \param[in] data Parameters.
-   * \sa IStickerPrinter::printTransponderSticker()
+   * \sa AbstractStickerPrinter::printTransponderSticker()
    */
   void performCustomTransponderStickerPrinting(
       const QSharedPointer<QHash<QString, QString>> data);
   /*!
    * Execute custom printer script (wat?)
    * \param[in] commandScript List of printer commands
-   * \sa IStickerPrinter::exec()
+   * \sa AbstractStickerPrinter::exec()
    */
   void performStickerPrinterCommandScript(
       const QSharedPointer<QStringList> commandScript);
@@ -246,21 +236,21 @@ class ClientManager : public QObject {
    * \param[in] operationName what operation it was
    */
   void processClientError(PersoClient::ReturnStatus status,
-      const QString& operationName);
+                          const QString& operationName);
   /*!
    * Report Programmer errors to user
    * \param[in] status status to report
    * \param[in] operationName what operation it was
    */
   void processProgrammerError(IProgrammer::ReturnStatus status,
-      const QString& operationName);
+                              const QString& operationName);
   /*!
    * Report Programmer errors to user
    * \param[in] status status to report
    * \param[in] operationName what operation it was
    */
-  void processStickerPrintersError(IStickerPrinter::ReturnStatus status,
-      const QString& operationName);
+  void processStickerPrintersError(AbstractStickerPrinter::ReturnStatus status,
+                                   const QString& operationName);
 
  signals:
   /*!
