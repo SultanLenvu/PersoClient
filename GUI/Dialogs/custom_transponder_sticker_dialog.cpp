@@ -1,12 +1,11 @@
-#include <QRegExp>
-
 #include "custom_transponder_sticker_dialog.h"
+#include "General/definitions.h"
 
 CustomTransponderStickerScanDialog::CustomTransponderStickerScanDialog(
     QWidget* parent)
-    : InputDialog(parent, CustomTransponderSticker) {
+    : AbstractInputDialog(parent) {
   // Считываем размеры дисплея
-  DesktopGeometry = QApplication::screens().first()->size();
+  DesktopGeometry = QApplication::primaryScreen()->size();
 
   // Создаем диалоговое окно
   setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
@@ -15,24 +14,26 @@ CustomTransponderStickerScanDialog::CustomTransponderStickerScanDialog(
 
   create();
   createMatchTable();
+
+  Regex.setPattern("^[0-9]+$");
 }
 
 CustomTransponderStickerScanDialog::~CustomTransponderStickerScanDialog() {}
 
-void CustomTransponderStickerScanDialog::getData(
-    QHash<QString, QString>* data) const {
-  if (!data) {
-    return;
-  }
+AbstractInputDialog::InputDialogType CustomTransponderStickerScanDialog::type()
+    const {
+  return CustomTransponderSticker;
+}
 
+void CustomTransponderStickerScanDialog::getData(StringDictionary& data) const {
   if (!checkInput()) {
     return;
   }
 
-  data->insert("issuer_name",
-               MatchTable.value(StickerFormatChoice->currentText()));
-  data->insert("pan", PanInput->text());
-  data->insert("sn", SnInput->text());
+  data.insert("issuer_name",
+              MatchTable.value(StickerFormatChoice->currentText()));
+  data.insert("pan", PanInput->text());
+  data.insert("sn", SnInput->text());
 }
 
 void CustomTransponderStickerScanDialog::create() {
@@ -98,11 +99,10 @@ bool CustomTransponderStickerScanDialog::checkInput() const {
     return false;
   }
 
-  QRegExp regex("\\D");
-  if (regex.indexIn(pan) != -1) {
+  if (!Regex.match(sn).hasMatch()) {
     return false;
   }
-  if (regex.indexIn(sn) != -1) {
+  if (!Regex.match(sn).hasMatch()) {
     return false;
   }
 

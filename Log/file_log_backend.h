@@ -10,7 +10,6 @@
 #include <QString>
 #include <QTextStream>
 
-#include "GUI/interaction_system.h"
 #include "log_backend.h"
 
 class FileLogBackend : public LogBackend {

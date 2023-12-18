@@ -18,7 +18,7 @@ include_directories(Programmers/)
 include_directories(Printing/)
 include_directories(ClientConnection/)
 
-qt_add_executable(PersoClient WIN32 MACOSX_BUNDLE
+qt_add_executable(PersoClient WIN32
     Management/client_manager.cpp Management/client_manager.h
     Management/perso_client.cpp Management/perso_client.h
     Management/global_environment.cpp Management/global_environment.h
@@ -26,15 +26,21 @@ qt_add_executable(PersoClient WIN32 MACOSX_BUNDLE
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_dialog.cpp GUI/authorization_dialog.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
-    GUI/custom_transponder_sticker_dialog.cpp GUI/custom_transponder_sticker_dialog.h
-    GUI/input_dialog.cpp GUI/input_dialog.h
     GUI/interaction_system.cpp GUI/interaction_system.h
-    GUI/mainwindow_kernel.cpp GUI/mainwindow_kernel.h
+    GUI/gui_kernel.cpp GUI/gui_kernel.h
     GUI/master_gui.cpp GUI/master_gui.h
-    GUI/master_password_input_dialog.cpp GUI/master_password_input_dialog.h
     GUI/production_gui.cpp GUI/production_gui.h
     GUI/testing_gui.cpp GUI/testing_gui.h
-    GUI/transponder_sticker_scan_dialog.cpp GUI/transponder_sticker_scan_dialog.h
+
+    GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
+    GUI/Subkernels/network_gui_subkernel.h GUI/Subkernels/network_gui_subkernel.cpp
+    GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
+    GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
+
+    GUI/Dialogs/master_password_input_dialog.cpp GUI/Dialogs/master_password_input_dialog.h
+    GUI/Dialogs/custom_transponder_sticker_dialog.cpp GUI/Dialogs/custom_transponder_sticker_dialog.h
+    GUI/Dialogs/transponder_sticker_scan_dialog.cpp GUI/Dialogs/transponder_sticker_scan_dialog.h
+    GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
 
     General/definitions.h
     General/hash_model.cpp General/hash_model.h
@@ -69,6 +75,7 @@ qt_add_executable(PersoClient WIN32 MACOSX_BUNDLE
     ClientConnection/update_command.h ClientConnection/update_command.cpp
 
     main.cpp
+    Management/abstract_manager.h Management/abstract_manager.cpp
 )
 target_link_libraries(PersoClient PRIVATE
     Qt::Core

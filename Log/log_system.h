@@ -10,8 +10,8 @@
 #include <QTime>
 #include <QUdpSocket>
 
-#include "Log/file_log_backend.h"
-#include "Log/log_backend.h"
+#include "file_log_backend.h"
+#include "log_backend.h"
 #include "widget_log_backend.h"
 
 /* Глобальная система логгирования */

@@ -6,7 +6,7 @@
 /*!
  * Authorization GUI mode and its widgets
  */
-class AuthorizationGUI : public AbstractGUI {
+class AuthorizationGUI : public AbstractGui {
   Q_OBJECT
 
  private:

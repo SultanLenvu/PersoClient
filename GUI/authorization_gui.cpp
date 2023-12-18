@@ -1,7 +1,7 @@
 #include "authorization_gui.h"
 
 AuthorizationGUI::AuthorizationGUI(QWidget* parent)
-    : AbstractGUI(parent, Authorization) {
+    : AbstractGui(parent, Authorization) {
   create();
 }
 

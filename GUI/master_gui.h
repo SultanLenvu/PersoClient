@@ -7,7 +7,7 @@
 /*!
  * Master GUI mode
  */
-class MasterGUI : public AbstractGUI {
+class MasterGUI : public AbstractGui {
  public:
   //! \cond
   QTabWidget* Tabs;

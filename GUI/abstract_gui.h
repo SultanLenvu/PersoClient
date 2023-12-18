@@ -7,7 +7,7 @@
 /*!
  * GUI ADT
  */
-class AbstractGUI : public QWidget {
+class AbstractGui : public QWidget {
   Q_OBJECT
  public:
   /*!
@@ -34,11 +34,11 @@ class AbstractGUI : public QWidget {
    * \param[in] type Subclass type. Should be set by subclass
    * constructor
    */
-  AbstractGUI(QWidget* parent, GuiType type);
+  AbstractGui(QWidget* parent, GuiType type);
   /*!
    * Default destructor
    */
-  virtual ~AbstractGUI();
+  virtual ~AbstractGui();
 
   /*!
    * Update GUI geometry
@@ -53,7 +53,7 @@ class AbstractGUI : public QWidget {
 
  private:
   //! \cond
-  Q_DISABLE_COPY(AbstractGUI);
+  Q_DISABLE_COPY(AbstractGui);
   //! \endcond
 
  signals:

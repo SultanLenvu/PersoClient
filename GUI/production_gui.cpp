@@ -1,7 +1,7 @@
 #include "production_gui.h"
 
 ProductionGUI::ProductionGUI(QWidget* parent)
-    : AbstractGUI(parent, Production) {
+    : AbstractGui(parent, Production) {
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
 

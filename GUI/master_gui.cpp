@@ -1,6 +1,6 @@
 #include "master_gui.h"
 
-MasterGUI::MasterGUI(QWidget* parent) : AbstractGUI(parent, Master) {
+MasterGUI::MasterGUI(QWidget* parent) : AbstractGui(parent, Master) {
   // Вкладки с всеми интерфейсами
   Tabs = new QTabWidget();
   MainLayout->addWidget(Tabs);

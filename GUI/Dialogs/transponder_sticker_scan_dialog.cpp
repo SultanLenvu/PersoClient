@@ -1,9 +1,10 @@
 #include "transponder_sticker_scan_dialog.h"
+#include "General/definitions.h"
 
 TransponderStickerScanDialog::TransponderStickerScanDialog(QWidget* parent)
-    : InputDialog(parent, TransponderStickerScan) {
+    : AbstractInputDialog(parent) {
   // Считываем размеры дисплея
-  DesktopGeometry = QApplication::screens().first()->size();
+  DesktopGeometry = QApplication::primaryScreen()->size();
 
   // Создаем диалоговое окно
   setGeometry(DesktopGeometry.width() * 0.3, DesktopGeometry.height() * 0.35,
@@ -12,27 +13,29 @@ TransponderStickerScanDialog::TransponderStickerScanDialog(QWidget* parent)
   setFixedSize(size());
 
   create();
+
+  Regex.setPattern("^[0-9]+$");
 }
 
 TransponderStickerScanDialog::~TransponderStickerScanDialog() {}
 
-void TransponderStickerScanDialog::getData(
-    QHash<QString, QString>* data) const {
-  if (!data) {
-    return;
-  }
+AbstractInputDialog::InputDialogType TransponderStickerScanDialog::type()
+    const {
+  return TransponderStickerScan;
+}
 
+void TransponderStickerScanDialog::getData(StringDictionary& data) const {
   QStringList input = StickerData->toPlainText().split("\n");
   if (!checkInput(input)) {
-    data->clear();
+    data.clear();
     return;
   }
 
   if (input.size() == 2) {
-    data->insert("pan", input.at(0));
-    data->insert("sn", input.at(1));
+    data.insert("pan", input.at(0));
+    data.insert("sn", input.at(1));
   } else if (input.size() == 1) {
-    data->insert("pan", input.at(0));
+    data.insert("pan", input.at(0));
   }
 }
 
@@ -77,9 +80,7 @@ bool TransponderStickerScanDialog::checkPan(const QString& pan) const {
     return false;
   }
 
-  QRegularExpression regex("^[0-9]+$");
-  QRegularExpressionMatch match = regex.match(pan);
-  return match.hasMatch();
+  return Regex.match(pan).hasMatch();
 }
 
 bool TransponderStickerScanDialog::checkSn(const QString& sn) const {
@@ -87,7 +88,5 @@ bool TransponderStickerScanDialog::checkSn(const QString& sn) const {
     return false;
   }
 
-  QRegularExpression regex("^[0-9]+$");
-  QRegularExpressionMatch match = regex.match(sn);
-  return match.hasMatch();
+  return Regex.match(sn).hasMatch();
 }

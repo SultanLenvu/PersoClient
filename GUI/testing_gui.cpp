@@ -1,6 +1,6 @@
 #include "testing_gui.h"
 
-TestingGUI::TestingGUI(QWidget* parent) : AbstractGUI(parent, Testing) {
+TestingGUI::TestingGUI(QWidget* parent) : AbstractGui(parent, Testing) {
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
 

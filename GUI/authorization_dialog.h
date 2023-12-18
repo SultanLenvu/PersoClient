@@ -4,7 +4,7 @@
 #include <QtWidgets>
 #include <QSize>
 
-#include "input_dialog.h"
+#include "abstract_input_dialog.h"
 
 /*!
  * Dialog for authorization data

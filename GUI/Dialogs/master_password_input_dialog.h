@@ -1,15 +1,14 @@
 #ifndef MasterPasswordInputDialog_H
 #define MasterPasswordInputDialog_H
 
-#include "input_dialog.h"
+#include "abstract_input_dialog.h"
 
 /*!
  * Master password dialog
  */
-class MasterPasswordInputDialog : public InputDialog {
+class MasterPasswordInputDialog : public AbstractInputDialog {
   Q_OBJECT
  private:
-  //! \cond
   QSize DesktopGeometry;
   QVBoxLayout* MainLayout;
 
@@ -22,32 +21,18 @@ class MasterPasswordInputDialog : public InputDialog {
   QPushButton* CancelButton;
 
   QSpacerItem* MainLayoutVS;
-  //! \endcond
 
  public:
-  /*!
-   * Construct object, Initialize dialog layout
-   * \param[in] parent Parent window
-   */
   explicit MasterPasswordInputDialog(QWidget* parent);
-  /*!
-   * Default destructor
-   */
   ~MasterPasswordInputDialog();
 
-  /*!
-   * Store entered password
-   * \param data Map where password will be stored
-   */
-  virtual void getData(QHash<QString, QString>* data) const override;
+  // AbstractInputDialog interface
+ public:
+  virtual void getData(StringDictionary& data) const override;
+  virtual InputDialogType type(void) const override;
 
  private:
-  //! \cond
-  Q_DISABLE_COPY(MasterPasswordInputDialog);
-  //! \endcond
-  /*!
-   * Initialize layout
-   */
+  Q_DISABLE_COPY_MOVE(MasterPasswordInputDialog);
   void create(void);
 };
 
