@@ -13,7 +13,6 @@ class AbstractGuiSubkernel : public QObject {
   virtual ~AbstractGuiSubkernel();
 
   virtual void setCurrentGui(std::shared_ptr<AbstractGui> gui) = 0;
-  virtual void setManager(std::shared_ptr<AbstractManager> manager) = 0;
 
  private:
   AbstractGuiSubkernel();

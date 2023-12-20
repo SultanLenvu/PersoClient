@@ -1,7 +1,7 @@
 #include "hash_model.h"
 
-HashModel::HashModel(QObject* parent) : QAbstractTableModel(parent) {
-  setObjectName("HashModel");
+HashModel::HashModel(const QString& name) : QAbstractTableModel(nullptr) {
+  setObjectName(name);
   createMatchTables();
 }
 

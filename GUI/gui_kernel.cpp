@@ -9,12 +9,15 @@
 #include "definitions.h"
 #include "gui_kernel.h"
 #include "master_gui.h"
+#include "network_manager.h"
 #include "production_gui.h"
+#include "programmer_manager.h"
+#include "sticker_printer_manager.h"
 #include "testing_gui.h"
 
 GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
   setObjectName("GuiKernel");
-  CurrentGUI = nullptr;
+  CurrentGui = nullptr;
   DesktopGeometry = QApplication::screens().first()->size();
 
   // Загружаем настройки приложения
@@ -30,7 +33,7 @@ GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
   createInteractorInstance();
 
   // Менеджер для взаимодействия с программатором
-  createManagerInstance();
+  createManagersInstance();
 
   // Создаем модели
   createModels();
@@ -50,84 +53,8 @@ GuiKernel::~GuiKernel() {
   LoggerThread->wait();
 }
 
-void GuiKernel::on_ProgramDeviceButton_slot() {
-  emit loggerClear_signal();
-
-  emit performLocalFirmwareLoading_signal(QFileDialog::getOpenFileName(
-      nullptr, "Выберите файл", "", "Все файлы (*.*)"));
-}
-
-void GuiKernel::on_ReadDeviceFirmwareButton_slot() {
-  emit loggerClear_signal();
-
-  emit performFirmwareReading_signal();
-}
-
-void GuiKernel::on_EraseDeviceButton_slot() {
-  emit loggerClear_signal();
-
-  emit performFirmwareErasing_signal();
-}
-
-void GuiKernel::on_ProgramDeviceUserDataButton_slot() {
-  emit loggerClear_signal();
-
-  emit performDataLoading_signal(QFileDialog::getOpenFileName(
-      nullptr, "Выберите файл", "", "Все файлы (*.*)"));
-}
-
-void GuiKernel::on_ReadDeviceUserDataButton_slot() {
-  emit loggerClear_signal();
-
-  emit performDataReading_signal();
-}
-
-void GuiKernel::on_UnlockDeviceButton_slot() {
-  emit loggerClear_signal();
-
-  emit performDeviceUnlock_signal();
-}
-
-void GuiKernel::on_LockDeviceButton_slot() {
-  emit loggerClear_signal();
-
-  emit performDeviceLock_signal();
-}
-
-void GuiKernel::on_PrintLastTransponderStickerButton_slot() {
-  emit loggerClear_signal();
-
-  emit performLastTransponderStickerPrinting_signal();
-}
-
-void GuiKernel::on_PrintCustomTransponderStickerButton_slot() {
-  QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
-
-  emit loggerClear_signal();
-
-  if (!Interactor->getCustomTransponderStickerData(data.get())) {
-    return;
-  }
-
-  if (data->isEmpty()) {
-    Interactor->generateErrorMessage("Некорректный ввод данных. ");
-    return;
-  }
-
-  emit performCustomTransponderStickerPrinting_signal(data);
-}
-
-void GuiKernel::on_ExecuteStickerPrinterCommandScriptButton_slot() {
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
-  emit loggerClear_signal();
-
-  QSharedPointer<QStringList> commandScript(new QStringList(
-      gui->StickerPrinterCommandSriptTextEdit->toPlainText().split("\n\r")));
-  emit performStickerPrinterCommandScript_signal(commandScript);
-}
-
-void GuiKernel::on_ApplySettingsPushButton_slot() {
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+void GuiKernel::applySettingsPushButton_slot() {
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGui);
   QSettings settings;
 
   emit loggerClear_signal();
@@ -162,7 +89,7 @@ void GuiKernel::on_ApplySettingsPushButton_slot() {
   Interactor->generateMessage("Новые настройки успешно применены. ");
 }
 
-void GuiKernel::on_MasterAuthorizePushButton_slot() {
+void GuiKernel::on_AuthorizePushButton_slot() {
   QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
   Interactor->getAuthorizationData(data.get());
 
@@ -173,69 +100,7 @@ void GuiKernel::on_MasterAuthorizePushButton_slot() {
   emit performServerAuthorization_signal(data);
 }
 
-void GuiKernel::on_LoadTransponderFirmwareButton_slot() {
-  emit loggerClear_signal();
-
-  emit performTransponderFirmwareLoading_signal();
-}
-
-void GuiKernel::on_ReloadTransponderFirmwareButton_slot() {
-  emit loggerClear_signal();
-
-  QHash<QString, QString> stickerData;
-  if (!Interactor->getTransponderStickerData(&stickerData)) {
-    return;
-  }
-
-  if (stickerData.isEmpty()) {
-    Interactor->generateErrorMessage("Некорректный ввод данных. ");
-    return;
-  }
-
-  emit performTransponderFirmwareReloading_signal(stickerData.value("pan"));
-}
-
-void GuiKernel::on_RollbackProductionLinePushButton_slot() {
-  emit loggerClear_signal();
-
-  emit rollbackProductionLine_signal();
-}
-
-void GuiKernel::on_PrintBoxStickerButton_slot() {
-  QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
-
-  emit loggerClear_signal();
-
-  if (!Interactor->getTransponderStickerData(data.get())) {
-    return;
-  }
-
-  if (data->isEmpty()) {
-    Interactor->generateErrorMessage("Некорректный ввод данных. ");
-    return;
-  }
-
-  emit performBoxStickerPrinting_signal(data);
-}
-
-void GuiKernel::on_PrintPalletStickerButton_slot() {
-  QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
-
-  emit loggerClear_signal();
-
-  if (!Interactor->getTransponderStickerData(data.get())) {
-    return;
-  }
-
-  if (data->isEmpty()) {
-    Interactor->generateErrorMessage("Некорректный ввод данных. ");
-    return;
-  }
-
-  emit performPalletStickerPrinting_signal(data);
-}
-
-void GuiKernel::on_MasterInterfaceRequest_slot() {
+void GuiKernel::displayMasterInterface_slot() {
   QString pass;
   if (!Interactor->getMasterPassword(pass)) {
     return;
@@ -250,11 +115,11 @@ void GuiKernel::on_MasterInterfaceRequest_slot() {
   createMasterInterface();
 }
 
-void GuiKernel::on_ProductionInterfaceRequest_slot() {
+void GuiKernel::displayProductionInterface_slot() {
   createProductionInterface();
 }
 
-void GuiKernel::on_AuthorizationInterfaceRequest_slot() {
+void GuiKernel::displayAuthorizationInterface_slot() {
   createAuthorizationInterface();
 }
 
@@ -269,7 +134,7 @@ void GuiKernel::loadSettings() {
 }
 
 bool GuiKernel::checkNewSettings() {
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGui);
 
   QHostAddress IP = QHostAddress(gui->PersoServerIpAddressLineEdit->text());
   uint32_t speed = gui->ProgrammerSpeedLineEdit->text().toUInt();
@@ -310,9 +175,9 @@ void GuiKernel::createAuthorizationInterface() {
   setMinimumWidth(DesktopGeometry.width() * 0.2);
 
   // Создаем интерфейс
-  CurrentGUI = new AuthorizationGUI(this);
-  setCentralWidget(CurrentGUI);
-  CurrentGUI->showMaximized();
+  CurrentGui = std::shared_ptr<AbstractGui>(new AuthorizationGui(this));
+  setCentralWidget(CurrentGui.get());
+  CurrentGui->showMaximized();
 
   adjustSize();
   setFixedSize(size());
@@ -325,12 +190,10 @@ void GuiKernel::createAuthorizationInterface() {
 }
 
 void GuiKernel::connectAuthorizationInterface() {
-  AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
+  AuthorizationGui* gui = dynamic_cast<AuthorizationGui*>(CurrentGui.get());
 
-  connect(gui->AuthorizePushButton, &QPushButton::clicked, this,
-          &GuiKernel::on_AuthorizePushButton_slot);
   connect(gui, &AbstractGui::visibilityChanged, this,
-          &GuiKernel::on_VisibilityChanged_slot);
+          &GuiKernel::currentGuiVisibilityChanged_slot);
 }
 
 void GuiKernel::createMasterInterface() {
@@ -341,8 +204,8 @@ void GuiKernel::createMasterInterface() {
   setLayoutDirection(Qt::LeftToRight);
 
   // Создаем интерфейс
-  CurrentGUI = new MasterGUI(this);
-  setCentralWidget(CurrentGUI);
+  CurrentGui = new MasterGUI(this);
+  setCentralWidget(CurrentGui);
 
   // Подключаем интерфейс
   connectMasterInterface();
@@ -352,7 +215,7 @@ void GuiKernel::createMasterInterface() {
 }
 
 void GuiKernel::connectMasterInterface() {
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
+  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGui);
   connect(LogSystem::instance()->getWidgetLogger(),
           &WidgetLogBackend::displayLog_signal, gui,
           &MasterGUI::displayLogData);
@@ -360,52 +223,9 @@ void GuiKernel::connectMasterInterface() {
           &WidgetLogBackend::clearLogDisplay_signal, gui,
           &MasterGUI::clearLogDataDisplay);
 
-  // Сервер
-  connect(gui->PersoServerConnectPushButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PersoServerConnectPushButton_slot);
-  connect(gui->PersoServerDisconnectButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PersoServerDisconnectButton_slot);
-  connect(gui->PersoServerEchoRequestButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PersoServerEchoRequestButton_slot);
-  connect(gui->MasterAuthorizePushButton, &QPushButton::clicked, this,
-          &GuiKernel::on_MasterAuthorizePushButton_slot);
-  connect(gui->LoadTransponderFirmwareButton, &QPushButton::clicked, this,
-          &GuiKernel::on_LoadTransponderFirmwareButton_slot);
-  connect(gui->ReloadTransponderFirmwareButton, &QPushButton::clicked, this,
-          &GuiKernel::on_ReloadTransponderFirmwareButton_slot);
-  connect(gui->RollbackProductionLinePushButton, &QPushButton::clicked, this,
-          &GuiKernel::on_RollbackProductionLinePushButton_slot);
-
-  // Программатор
-  connect(gui->ProgramDeviceButton, &QPushButton::clicked, this,
-          &GuiKernel::on_ProgramDeviceButton_slot);
-  connect(gui->ReadDeviceFirmwareButton, &QPushButton::clicked, this,
-          &GuiKernel::on_ReadDeviceFirmwareButton_slot);
-  connect(gui->EraseDeviceButton, &QPushButton::clicked, this,
-          &GuiKernel::on_EraseDeviceButton_slot);
-  connect(gui->ReadDeviceUserDataButton, &QPushButton::clicked, this,
-          &GuiKernel::on_ReadDeviceUserDataButton_slot);
-  connect(gui->ProgramDeviceUserDataButton, &QPushButton::clicked, this,
-          &GuiKernel::on_ProgramDeviceUserDataButton_slot);
-  connect(gui->UnlockDeviceButton, &QPushButton::clicked, this,
-          &GuiKernel::on_UnlockDeviceButton_slot);
-  connect(gui->LockDeviceButton, &QPushButton::clicked, this,
-          &GuiKernel::on_LockDeviceButton_slot);
-
-  // Стикер принтер
-  connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PrintLastTransponderStickerButton_slot);
-  connect(gui->PrintCustomTransponderStickerButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PrintCustomTransponderStickerButton_slot);
-  connect(gui->ExecuteStickerPrinterCommandScriptButton, &QPushButton::clicked,
-          this, &GuiKernel::on_ExecuteStickerPrinterCommandScriptButton_slot);
-
   // Настройки
   connect(gui->ApplySettingsPushButton, &QPushButton::clicked, this,
-          &GuiKernel::on_ApplySettingsPushButton_slot);
-
-  // Связывание моделей и представлений
-  gui->TransponderDataView->setModel(TransponderDataModel);
+          &GuiKernel::applySettingsPushButton_slot);
 }
 
 void GuiKernel::createProductionInterface() {
@@ -415,34 +235,14 @@ void GuiKernel::createProductionInterface() {
               DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
   setLayoutDirection(Qt::LeftToRight);
 
-  CurrentGUI = new ProductionGUI(this);
-  setCentralWidget(CurrentGUI);
+  CurrentGui = new ProductionGUI(this);
+  setCentralWidget(CurrentGui);
 
   // Подключаем интерфейс
   connectProductionInterface();
 
   // Создаем верхнее меню
   createTopMenu();
-}
-
-void GuiKernel::connectProductionInterface() {
-  ProductionGUI* gui = dynamic_cast<ProductionGUI*>(CurrentGUI);
-
-  connect(gui->LoadTransponderFirmwareButton, &QPushButton::clicked, this,
-          &GuiKernel::on_LoadTransponderFirmwareButton_slot);
-  connect(gui->ReloadTransponderFirmwareButton, &QPushButton::clicked, this,
-          &GuiKernel::on_ReloadTransponderFirmwareButton_slot);
-  connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PrintLastTransponderStickerButton_slot);
-  connect(gui->PrintCustomTransponderStickerButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PrintCustomTransponderStickerButton_slot);
-  connect(gui->RollbackProductionLinePushButton, &QPushButton::clicked, this,
-          &GuiKernel::on_RollbackProductionLinePushButton_slot);
-  connect(gui->PrintBoxStickerButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PrintBoxStickerButton_slot);
-
-  // Связывание моделей и представлений
-  gui->TransponderDataView->setModel(TransponderDataModel);
 }
 
 void GuiKernel::createTestingInterface() {
@@ -452,44 +252,25 @@ void GuiKernel::createTestingInterface() {
               DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
   setLayoutDirection(Qt::LeftToRight);
 
-  CurrentGUI = new TestingGUI(this);
-  setCentralWidget(CurrentGUI);
-
-  // Подключаем интерфейс
-  connectTestingInterface();
+  CurrentGui = new TestingGui(this);
+  setCentralWidget(CurrentGui);
 
   // Создаем верхнее меню
   createTopMenu();
 }
 
-void GuiKernel::connectTestingInterface() {
-  TestingGUI* gui = dynamic_cast<TestingGUI*>(CurrentGUI);
-
-  connect(gui->ReloadTransponderFirmwareButton, &QPushButton::clicked, this,
-          &GuiKernel::on_ReloadTransponderFirmwareButton_slot);
-  connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PrintLastTransponderStickerButton_slot);
-  connect(gui->PrintCustomTransponderStickerButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PrintCustomTransponderStickerButton_slot);
-  connect(gui->PrintBoxStickerButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PrintBoxStickerButton_slot);
-  connect(gui->PrintPalletStickerButton, &QPushButton::clicked, this,
-          &GuiKernel::on_PrintPalletStickerButton_slot);
-
-  // Связывание моделей и представлений
-  gui->TransponderDataView->setModel(TransponderDataModel);
-}
+void GuiKernel::connectCurrentGui() {}
 
 void GuiKernel::createTopMenuActions() {
   OpenMasterInterfaceAct = new QAction("Мастер доступ", this);
   OpenMasterInterfaceAct->setStatusTip("Открыть мастер интерфейс");
   connect(OpenMasterInterfaceAct, &QAction::triggered, this,
-          &GuiKernel::on_MasterInterfaceRequest_slot);
+          &GuiKernel::displayMasterInterface_slot);
 
   OpenAuthorizationInterfaceAct = new QAction("Авторизация", this);
   OpenAuthorizationInterfaceAct->setStatusTip("Открыть интерфейс авторизации");
   connect(OpenAuthorizationInterfaceAct, &QAction::triggered, this,
-          &GuiKernel::on_AuthorizationInterfaceRequest_slot);
+          &GuiKernel::displayAuthorizationInterface_slot);
 
   AboutProgramAct = new QAction("О программе", this);
   AboutProgramAct->setStatusTip("Показать сведения о программе");
@@ -501,7 +282,7 @@ void GuiKernel::createTopMenu() {
 
   // Создаем меню
   ServiceMenu = menuBar()->addMenu("Сервис");
-  switch (CurrentGUI->type()) {
+  switch (CurrentGui->type()) {
     case AbstractGui::Testing:
     case AbstractGui::Production:
       ServiceMenu->addAction(OpenMasterInterfaceAct);
@@ -520,7 +301,7 @@ void GuiKernel::createTopMenu() {
   HelpMenu->addAction(AboutProgramAct);
 }
 
-void GuiKernel::createManagerInstance() {
+void GuiKernel::createManagersInstance() {
   Manager = new ClientManager(nullptr);
   connect(Manager, &ClientManager::logging, LogSystem::instance(),
           &LogSystem::generate);
@@ -538,24 +319,6 @@ void GuiKernel::createManagerInstance() {
           &GuiKernel::displayTransponderData_slot);
 
   // Подключаем функционал
-  connect(this, &GuiKernel::performServerConnecting_signal, Manager,
-          &ClientManager::performServerConnecting);
-  connect(this, &GuiKernel::performServerDisconnecting_signal, Manager,
-          &ClientManager::performServerDisconnecting);
-  connect(this, &GuiKernel::performServerEcho_signal, Manager,
-          &ClientManager::performServerEcho);
-  connect(this, &GuiKernel::performServerAuthorization_signal, Manager,
-          &ClientManager::performServerAuthorization);
-  connect(this, &GuiKernel::performTransponderFirmwareLoading_signal, Manager,
-          &ClientManager::performTransponderFirmwareLoading);
-  connect(this, &GuiKernel::performTransponderFirmwareReloading_signal, Manager,
-          &ClientManager::performTransponderFirmwareReloading);
-  connect(this, &GuiKernel::rollbackProductionLine_signal, Manager,
-          &ClientManager::rollbackProductionLine);
-  connect(this, &GuiKernel::performBoxStickerPrinting_signal, Manager,
-          &ClientManager::performBoxStickerPrinting);
-  connect(this, &GuiKernel::performPalletStickerPrinting_signal, Manager,
-          &ClientManager::performPalletStickerPrinting);
 
   connect(this, &GuiKernel::performLocalFirmwareLoading_signal, Manager,
           &ClientManager::performLocalFirmwareLoading);
@@ -567,7 +330,7 @@ void GuiKernel::createManagerInstance() {
           &ClientManager::performDataReading);
   connect(this, &GuiKernel::performDataLoading_signal, Manager,
           &ClientManager::performDataLoading);
-  connect(this, &GuiKernel::performDeviceUnlock_signal, Manager,
+  connect(this, &GuiKernel::performDeviceUnlockMemory_signal, Manager,
           &ClientManager::performDeviceUnlock);
   connect(this, &GuiKernel::performDeviceLock_signal, Manager,
           &ClientManager::performDeviceLock);
@@ -610,14 +373,6 @@ void GuiKernel::createLoggerInstance() {
 
 void GuiKernel::createInteractorInstance() {
   Interactor = InteractionSystem::instance();
-  connect(Interactor, &InteractionSystem::logging, Logger,
-          &LogSystem::generate);
-  connect(this, &GuiKernel::applySettings_signal, Interactor,
-          &InteractionSystem::applySettings);
-}
-
-void GuiKernel::createModels() {
-  TransponderDataModel = new HashModel(this);
 }
 
 void GuiKernel::registerMetaTypes() {
@@ -629,7 +384,7 @@ void GuiKernel::on_RequestProductionInterface_slot() {
   createProductionInterface();
 }
 
-void GuiKernel::on_VisibilityChanged_slot() {
+void GuiKernel::currentGuiVisibilityChanged_slot() {
   adjustSize();
   setFixedSize(size());
 }
@@ -637,5 +392,5 @@ void GuiKernel::on_VisibilityChanged_slot() {
 void GuiKernel::displayTransponderData_slot(
     QSharedPointer<QHash<QString, QString>> data) {
   TransponderDataModel->buildTransponderData(data.get());
-  CurrentGUI->update();
+  CurrentGui->update();
 }

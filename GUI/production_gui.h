@@ -15,10 +15,10 @@ class ProductionGUI : public AbstractGui {
 
   QGroupBox* TransponderGroup;
   QVBoxLayout* TransponderLayout;
-  QPushButton* LoadTransponderFirmwareButton;
+  QPushButton* ReleaseTransponderButton;
   QSpacerItem* ButtonVerticalSpacer;
   QPushButton* RollbackProductionLinePushButton;
-  QPushButton* ReloadTransponderFirmwareButton;
+  QPushButton* RereleaseTransponderButton;
 
   QGroupBox* PrintStickerGroup;
   QVBoxLayout* PrintStickerLayout;

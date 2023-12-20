@@ -1,6 +1,6 @@
 #include "testing_gui.h"
 
-TestingGUI::TestingGUI(QWidget* parent) : AbstractGui(parent, Testing) {
+TestingGui::TestingGui(QWidget* parent) : AbstractGui(parent, Testing) {
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
 
@@ -10,10 +10,10 @@ TestingGUI::TestingGUI(QWidget* parent) : AbstractGui(parent, Testing) {
   TransponderLayout = new QVBoxLayout();
   TransponderGroup->setLayout(TransponderLayout);
 
-  ReloadTransponderFirmwareButton =
+  RereleaseTransponderButton =
       new QPushButton(QString("Перевыпустить транспондер"));
-  ReloadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
-  TransponderLayout->addWidget(ReloadTransponderFirmwareButton);
+  RereleaseTransponderButton->setFont(QFont("Arial", 12, QFont::Bold));
+  TransponderLayout->addWidget(RereleaseTransponderButton);
 
   ControlPanelVS =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -58,9 +58,9 @@ TestingGUI::TestingGUI(QWidget* parent) : AbstractGui(parent, Testing) {
   MainLayout->setStretch(1, 3);
 }
 
-TestingGUI::~TestingGUI() {}
+TestingGui::~TestingGui() {}
 
-void TestingGUI::update() {
+void TestingGui::update() {
   TransponderDataView->resizeColumnsToContents();
   TransponderDataView->update();
 }

@@ -25,15 +25,21 @@ class MasterGUI : public AbstractGui {
   QGroupBox* ServerControlPanel;
   QVBoxLayout* ServerControlPanelLayout;
 
-  QPushButton* PersoServerConnectPushButton;
-  QPushButton* PersoServerDisconnectButton;
-  QPushButton* PersoServerEchoRequestButton;
-  QSpacerItem* ButtonVerticalSpacer1;
+  QPushButton* ServerConnectPushButton;
+  QPushButton* ServerDisconnectButton;
+  QPushButton* ServerEchoRequestButton;
+  QSpacerItem* ServerControlPanelVS1;
 
-  QPushButton* MasterAuthorizePushButton;
-  QPushButton* LoadTransponderFirmwareButton;
-  QPushButton* ReloadTransponderFirmwareButton;
+  QPushButton* AuthorizePushButton;
+  QPushButton* ReleaseTransponderButton;
+  QPushButton* RereleaseTransponderButton;
   QPushButton* RollbackProductionLinePushButton;
+
+  QSpacerItem* ServerControlPanelVS2;
+  QPushButton* PrintBoxStickerButton;
+  QPushButton* PrintLastBoxStickerButton;
+  QPushButton* PrintPalletStickerButton;
+  QPushButton* PrintLastPalletStickerButton;
 
   QGroupBox* TransponderDataGroup;
   QVBoxLayout* TransponderDataLayout;
@@ -121,7 +127,7 @@ class MasterGUI : public AbstractGui {
 
  public:
   /*!
-   * Default constructor. Initialize 
+   * Default constructor. Initialize
    * \param[in] parent QObject parent
    */
   explicit MasterGUI(QWidget* parent);

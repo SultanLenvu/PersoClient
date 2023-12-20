@@ -57,35 +57,48 @@ void MasterGUI::createServerTab() {
   ServerControlPanelLayout = new QVBoxLayout();
   ServerControlPanel->setLayout(ServerControlPanelLayout);
 
-  PersoServerConnectPushButton =
+  ServerConnectPushButton =
       new QPushButton(QString("Подключиться к серверу персонализации"));
-  ServerControlPanelLayout->addWidget(PersoServerConnectPushButton);
+  ServerControlPanelLayout->addWidget(ServerConnectPushButton);
 
-  PersoServerDisconnectButton =
+  ServerDisconnectButton =
       new QPushButton(QString("Отключиться от сервера персонализации"));
-  ServerControlPanelLayout->addWidget(PersoServerDisconnectButton);
+  ServerControlPanelLayout->addWidget(ServerDisconnectButton);
 
-  PersoServerEchoRequestButton = new QPushButton(QString("Отправить эхо-запрос"));
-  ServerControlPanelLayout->addWidget(PersoServerEchoRequestButton);
+  ServerEchoRequestButton =
+      new QPushButton(QString("Отправить эхо-запрос"));
+  ServerControlPanelLayout->addWidget(ServerEchoRequestButton);
 
-  ButtonVerticalSpacer1 =
+  ServerControlPanelVS1 =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  ServerControlPanelLayout->addItem(ButtonVerticalSpacer1);
+  ServerControlPanelLayout->addItem(ServerControlPanelVS1);
 
-  MasterAuthorizePushButton = new QPushButton(QString("Авторизироваться"));
-  ServerControlPanelLayout->addWidget(MasterAuthorizePushButton);
-
-  LoadTransponderFirmwareButton =
-      new QPushButton(QString("Выпустить транспондер"));
-  ServerControlPanelLayout->addWidget(LoadTransponderFirmwareButton);
-
-  ReloadTransponderFirmwareButton =
+  AuthorizePushButton = new QPushButton(QString("Авторизироваться"));
+  ServerControlPanelLayout->addWidget(AuthorizePushButton);
+  ReleaseTransponderButton = new QPushButton(QString("Выпустить транспондер"));
+  ServerControlPanelLayout->addWidget(ReleaseTransponderButton);
+  RereleaseTransponderButton =
       new QPushButton(QString("Перевыпустить транспондер"));
-  ServerControlPanelLayout->addWidget(ReloadTransponderFirmwareButton);
-
+  ServerControlPanelLayout->addWidget(RereleaseTransponderButton);
   RollbackProductionLinePushButton =
       new QPushButton(QString("Откатить производственную линию"));
   ServerControlPanelLayout->addWidget(RollbackProductionLinePushButton);
+  ServerControlPanelVS2 =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  ServerControlPanelLayout->addItem(ServerControlPanelVS2);
+
+  PrintBoxStickerButton =
+      new QPushButton(QString("Распечатать стикер для бокса"));
+  ServerControlPanelLayout->addWidget(PrintBoxStickerButton);
+  PrintLastBoxStickerButton =
+      new QPushButton(QString("Распечатать последний стикер для бокса"));
+  ServerControlPanelLayout->addWidget(PrintLastBoxStickerButton);
+  PrintPalletStickerButton =
+      new QPushButton(QString("Распечатать стикер для паллеты"));
+  ServerControlPanelLayout->addWidget(PrintPalletStickerButton);
+  PrintLastPalletStickerButton =
+      new QPushButton(QString("Распечатать последний стикер для паллеты"));
+  ServerControlPanelLayout->addWidget(PrintLastPalletStickerButton);
 
   // Представление данных о транспондере
   TransponderDataGroup = new QGroupBox("Данные транспондера");

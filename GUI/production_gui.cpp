@@ -11,10 +11,10 @@ ProductionGUI::ProductionGUI(QWidget* parent)
   TransponderLayout = new QVBoxLayout();
   TransponderGroup->setLayout(TransponderLayout);
 
-  LoadTransponderFirmwareButton =
+  ReleaseTransponderButton =
       new QPushButton(QString("Выпустить транспондер"));
-  LoadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
-  TransponderLayout->addWidget(LoadTransponderFirmwareButton);
+  ReleaseTransponderButton->setFont(QFont("Arial", 12, QFont::Bold));
+  TransponderLayout->addWidget(ReleaseTransponderButton);
 
   ButtonVerticalSpacer =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -25,10 +25,10 @@ ProductionGUI::ProductionGUI(QWidget* parent)
   RollbackProductionLinePushButton->setFont(QFont("Arial", 12, QFont::Bold));
   TransponderLayout->addWidget(RollbackProductionLinePushButton);
 
-  ReloadTransponderFirmwareButton =
+  RereleaseTransponderButton =
       new QPushButton(QString("Перевыпустить транспондер"));
-  ReloadTransponderFirmwareButton->setFont(QFont("Arial", 12, QFont::Bold));
-  TransponderLayout->addWidget(ReloadTransponderFirmwareButton);
+  RereleaseTransponderButton->setFont(QFont("Arial", 12, QFont::Bold));
+  TransponderLayout->addWidget(RereleaseTransponderButton);
 
   PrintStickerGroup = new QGroupBox("Печать");
   ControlPanelLayout->addWidget(PrintStickerGroup);

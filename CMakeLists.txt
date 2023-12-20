@@ -12,6 +12,7 @@ qt_standard_project_setup()
 include_directories(Management/)
 include_directories(GUI/)
 include_directories(GUI/Dialogs)
+include_directories(GUI/Subkernels)
 include_directories(General/)
 include_directories(Log/)
 include_directories(Programmers/)
@@ -22,6 +23,10 @@ qt_add_executable(PersoClient WIN32
     Management/client_manager.cpp Management/client_manager.h
     Management/perso_client.cpp Management/perso_client.h
     Management/global_environment.cpp Management/global_environment.h
+    Management/abstract_manager.h Management/abstract_manager.cpp
+    Management/network_manager.h Management/network_manager.cpp
+    Management/programmer_manager.h Management/programmer_manager.cpp
+    Management/sticker_printer_manager.h Management/sticker_printer_manager.cpp
 
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_dialog.cpp GUI/authorization_dialog.h
@@ -75,7 +80,6 @@ qt_add_executable(PersoClient WIN32
     ClientConnection/update_command.h ClientConnection/update_command.cpp
 
     main.cpp
-    Management/abstract_manager.h Management/abstract_manager.cpp
 )
 target_link_libraries(PersoClient PRIVATE
     Qt::Core

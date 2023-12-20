@@ -1,19 +1,19 @@
-#ifndef TestingGUI_H
-#define TestingGUI_H
+#ifndef TestingGui_H
+#define TestingGui_H
 
 #include "abstract_gui.h"
 
 /*!
  * Testing interface
  */
-class TestingGUI : public AbstractGui {
+class TestingGui : public AbstractGui {
  public:
   //! \cond
   QVBoxLayout* ControlPanelLayout;
 
   QGroupBox* TransponderGroup;
   QVBoxLayout* TransponderLayout;
-  QPushButton* ReloadTransponderFirmwareButton;
+  QPushButton* RereleaseTransponderButton;
 
   QGroupBox* PrintStickerGroup;
   QVBoxLayout* PrintStickerLayout;
@@ -33,11 +33,11 @@ class TestingGUI : public AbstractGui {
    * Construct object, create layout
    * \param parent Parent layout
    */
-  explicit TestingGUI(QWidget* parent);
+  explicit TestingGui(QWidget* parent);
   /*!
    * Default no-op destructor
    */
-  ~TestingGUI();
+  ~TestingGui();
 
   /*!
    * Update size to match contents width
@@ -46,8 +46,8 @@ class TestingGUI : public AbstractGui {
 
  private:
   //! \cond
-  Q_DISABLE_COPY(TestingGUI);
+  Q_DISABLE_COPY(TestingGui);
   //! \endcond
 };
 
-#endif  // TestingGUI_H
+#endif  // TestingGui_H

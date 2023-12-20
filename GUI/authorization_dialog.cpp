@@ -1,9 +1,9 @@
 #include "authorization_dialog.h"
 
 AuthorizationDialog::AuthorizationDialog(QWidget* parent)
-    : InputDialog(parent, Authorization) {
+    : AbstractInputDialog(parent) {
   // Считываем размеры дисплея
-  DesktopGeometry = QApplication::screens().first()->size();
+  DesktopGeometry = QApplication::primaryScreen()->size();
 
   // Создаем диалоговое окно
   setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
@@ -18,13 +18,9 @@ AuthorizationDialog::AuthorizationDialog(QWidget* parent)
 
 AuthorizationDialog::~AuthorizationDialog() {}
 
-void AuthorizationDialog::getData(QHash<QString, QString>* data) const {
-  if (!data) {
-    return;
-  }
-
-  data->insert("login", LoginLineEdit->text());
-  data->insert("password", PasswordLineEdit->text());
+void AuthorizationDialog::getData(StringDictionary& data) const {
+  data.insert("login", LoginLineEdit->text());
+  data.insert("password", PasswordLineEdit->text());
 }
 
 void AuthorizationDialog::create() {

@@ -1,7 +1,5 @@
 #include "abstract_manager.h"
 
-AbstractManager::AbstractManager(QObject *parent)
-    : QObject{parent}
-{
-
+AbstractManager::AbstractManager(const QString& name) : QObject{nullptr} {
+  setObjectName(name);
 }

@@ -8,9 +8,9 @@
 #include <QTextStream>
 #include <QtWidgets>
 
-#include "General/hash_model.h"
 #include "Log/log_system.h"
 #include "abstract_gui.h"
+#include "abstract_gui_subkernel.h"
 #include "abstract_manager.h"
 #include "interaction_system.h"
 
@@ -19,7 +19,9 @@ class GuiKernel : public QMainWindow {
 
  private:
   QSize DesktopGeometry;
-  std::unique_ptr<AbstractGui> CurrentGUI;
+  std::shared_ptr<AbstractGui> CurrentGui;
+
+  std::vector<std::shared_ptr<AbstractGuiSubkernel>> Subkernels;
 
   // Верхнее меню
   //==================================================
@@ -39,36 +41,18 @@ class GuiKernel : public QMainWindow {
 
   std::unique_ptr<InteractionSystem> Interactor;
 
-  HashModel* TransponderDataModel;
-
  public:
   explicit GuiKernel(QWidget* parent = nullptr);
   ~GuiKernel();
 
  public slots:
-  void on_AuthorizePushButton_slot(void);
-
-  // Программатор
-  void on_ProgramDeviceButton_slot(void);
-  void on_ReadDeviceFirmwareButton_slot(void);
-  void on_EraseDeviceButton_slot(void);
-  void on_ProgramDeviceUserDataButton_slot(void);
-  void on_ReadDeviceUserDataButton_slot(void);
-  void on_UnlockDeviceButton_slot(void);
-  void on_LockDeviceButton_slot(void);
-
-  // Стикер принтер
-  void on_PrintLastTransponderStickerButton_slot(void);
-  void on_PrintCustomTransponderStickerButton_slot(void);
-  void on_ExecuteStickerPrinterCommandScriptButton_slot(void);
-
   // Настройки
-  void on_ApplySettingsPushButton_slot(void);
+  void applySettingsPushButton_slot(void);
 
   // Верхнее меню
-  void on_MasterInterfaceRequest_slot(void);
-  void on_ProductionInterfaceRequest_slot(void);
-  void on_AuthorizationInterfaceRequest_slot(void);
+  void displayMasterInterface_slot(void);
+  void displayProductionInterface_slot(void);
+  void displayAuthorizationInterface_slot(void);
 
  private:
   Q_DISABLE_COPY_MOVE(GuiKernel);
@@ -76,30 +60,23 @@ class GuiKernel : public QMainWindow {
   bool checkNewSettings(void);
 
   void createAuthorizationInterface(void);
-  void connectAuthorizationInterface(void);
-
   void createMasterInterface(void);
-  void connectMasterInterface(void);
-
   void createProductionInterface(void);
-  void connectProductionInterface(void);
-
   void createTestingInterface(void);
-  void connectTestingInterface(void);
+
+  void connectCurrentGui(void);
 
   void createTopMenuActions(void);
   void createTopMenu(void);
 
-  void createManagerInstance(void);
+  void createManagersInstance(void);
   void createLoggerInstance(void);
   void createInteractorInstance(void);
 
-  void createModels(void);
   void registerMetaTypes(void);
 
  private slots:
-  void on_RequestProductionInterface_slot(void);
-  void on_VisibilityChanged_slot(void);
+  void currentGuiVisibilityChanged_slot(void);
   void displayTransponderData_slot(
       QSharedPointer<QHash<QString, QString>> data);
 
@@ -108,20 +85,6 @@ class GuiKernel : public QMainWindow {
 
   // Сигналы для логгера
   void loggerClear_signal(void);
-
-  void performLocalFirmwareLoading_signal(const QString& path);
-  void performFirmwareReading_signal(void);
-  void performFirmwareErasing_signal(void);
-  void performDataReading_signal(void);
-  void performDataLoading_signal(const QString& path);
-  void performDeviceUnlock_signal(void);
-  void performDeviceLock_signal(void);
-
-  void performLastTransponderStickerPrinting_signal(void);
-  void performCustomTransponderStickerPrinting_signal(
-      const QSharedPointer<QHash<QString, QString>> data);
-  void performStickerPrinterCommandScript_signal(
-      const QSharedPointer<QStringList> commandScript);
 };
 
 #endif  // GUI_KERNEL_H

@@ -1,16 +1,23 @@
 #ifndef ABSTRACTMANAGER_H
 #define ABSTRACTMANAGER_H
 
+#include <types.h>
 #include <QObject>
 
-class AbstractManager : public QObject
-{
-    Q_OBJECT
-public:
-    explicit AbstractManager(QObject *parent = nullptr);
+class AbstractManager : public QObject {
+  Q_OBJECT
+ public:
+  explicit AbstractManager(const QString& name);
+  virtual ~AbstractManager();
 
-signals:
+ private:
+  AbstractManager();
+  Q_DISABLE_COPY_MOVE(AbstractManager);
 
+ signals:
+  void logging(const QString& log);
+  void executionStarted(const QString& opName);
+  void executionFinished(const QString& opName, ReturnStatus ret);
 };
 
-#endif // ABSTRACTMANAGER_H
+#endif  // ABSTRACTMANAGER_H

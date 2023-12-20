@@ -6,7 +6,7 @@
 /*!
  * Authorization GUI mode and its widgets
  */
-class AuthorizationGUI : public AbstractGui {
+class AuthorizationGui : public AbstractGui {
   Q_OBJECT
 
  private:
@@ -44,11 +44,11 @@ class AuthorizationGUI : public AbstractGui {
    * Default constructor
    * \param[in] parent Window parent
    */
-  explicit AuthorizationGUI(QWidget* parent);
+  explicit AuthorizationGui(QWidget* parent);
   /*!
    * Default destructor
    */
-  ~AuthorizationGUI();
+  ~AuthorizationGui();
 
   /*!
    * No-op
@@ -57,7 +57,7 @@ class AuthorizationGUI : public AbstractGui {
 
  private:
   //! \cond
-  Q_DISABLE_COPY(AuthorizationGUI);
+  Q_DISABLE_COPY(AuthorizationGui);
   //! \endcond
   /*!
    * Initialize layout
