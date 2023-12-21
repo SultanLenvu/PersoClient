@@ -9,7 +9,7 @@
 #include "definitions.h"
 #include "gui_kernel.h"
 #include "master_gui.h"
-#include "network_manager.h"
+#include "production_manager.h"
 #include "production_gui.h"
 #include "programmer_manager.h"
 #include "sticker_printer_manager.h"
@@ -71,9 +71,9 @@ void GuiKernel::applySettingsPushButton_slot() {
   settings.setValue("log_system/extended_enable",
                     gui->LogSystemExtendedEnableCheckBox->isChecked());
 
-  settings.setValue("perso_client/server_ip",
+  settings.setValue("perso_server_connection/ip",
                     gui->PersoServerIpAddressLineEdit->text());
-  settings.setValue("perso_client/server_port",
+  settings.setValue("perso_server_connection/port",
                     gui->PersoServerPortLineEdit->text().toInt());
 
   settings.setValue("jlink_exe_programmer/exe_file_path",
@@ -330,7 +330,7 @@ void GuiKernel::createManagersInstance() {
           &ClientManager::performDataReading);
   connect(this, &GuiKernel::performDataLoading_signal, Manager,
           &ClientManager::performDataLoading);
-  connect(this, &GuiKernel::performDeviceUnlockMemory_signal, Manager,
+  connect(this, &GuiKernel::performDeviceunlockMemory_signal, Manager,
           &ClientManager::performDeviceUnlock);
   connect(this, &GuiKernel::performDeviceLock_signal, Manager,
           &ClientManager::performDeviceLock);

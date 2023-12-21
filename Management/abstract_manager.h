@@ -10,6 +10,9 @@ class AbstractManager : public QObject {
   explicit AbstractManager(const QString& name);
   virtual ~AbstractManager();
 
+ public slots:
+  virtual void applySettings(void) = 0;
+
  private:
   AbstractManager();
   Q_DISABLE_COPY_MOVE(AbstractManager);

@@ -11,6 +11,30 @@ enum class ReturnStatus {
   SyntaxError,
   SynchronizationError,
   FileOpenError,
+  InvalidFile,
+  DynamicLibraryMissing,
+
+  ServerConnectionError,
+  ServerNotResponding,
+  ServerDataTransmittingError,
+  ServerResponseSyntaxError,
+  ServerResponseDataBlockError,
+  ServerResponseProcessingError,
+  ServerInternalError,
+  ClientCommandParamError,
+
+  StickerPrinterInitError,
+  StickerPrinterConnectionError,
+
+  ProgrammatorError,
+};
+
+enum class ServerReturnStatus {
+  NoError = 0,
+  ParameterError,
+  SyntaxError,
+  SynchronizationError,
+  FileOpenError,
   InvalidProductionLineContext,
   UnauthorizedRequest,
 

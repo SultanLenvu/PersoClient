@@ -17,14 +17,13 @@ include_directories(General/)
 include_directories(Log/)
 include_directories(Programmers/)
 include_directories(Printing/)
-include_directories(ClientConnection/)
+include_directories(ServerConnection/)
+include_directories(ServerConnection/Commands/)
 
 qt_add_executable(PersoClient WIN32
-    Management/client_manager.cpp Management/client_manager.h
-    Management/perso_client.cpp Management/perso_client.h
     Management/global_environment.cpp Management/global_environment.h
     Management/abstract_manager.h Management/abstract_manager.cpp
-    Management/network_manager.h Management/network_manager.cpp
+    Management/production_manager.h Management/production_manager.cpp
     Management/programmer_manager.h Management/programmer_manager.cpp
     Management/sticker_printer_manager.h Management/sticker_printer_manager.cpp
 
@@ -56,28 +55,29 @@ qt_add_executable(PersoClient WIN32
     Log/log_system.cpp Log/log_system.h
     Log/widget_log_backend.cpp Log/widget_log_backend.h
 
-    Programmers/interface_programmer.cpp Programmers/interface_programmer.h
+    Programmers/abstract_programmer.cpp Programmers/abstract_programmer.h
     Programmers/jlink_exe_programmer.cpp Programmers/jlink_exe_programmer.h
 
     Printing/abstract_sticker_printer.cpp Printing/abstract_sticker_printer.h
     Printing/te310_printer.cpp Printing/te310_printer.h
 
-    ClientConnection/abstract_client_connection.h ClientConnection/abstract_client_connection.cpp
-    ClientConnection/client_connection.cpp ClientConnection/client_connection.h
-    ClientConnection/abstract_client_command.h ClientConnection/abstract_client_command.cpp
-    ClientConnection/echo_comand.h ClientConnection/echo_comand.cpp
-    ClientConnection/release_command.h ClientConnection/release_command.cpp
-    ClientConnection/release_confirm_command.h ClientConnection/release_confirm_command.cpp
-    ClientConnection/rerelease_command.h ClientConnection/rerelease_command.cpp
-    ClientConnection/rerelease_confirm_command.h ClientConnection/rerelease_confirm_command.cpp
-    ClientConnection/rollback_command.h ClientConnection/rollback_command.cpp
-    ClientConnection/box_sticker_print_command.h ClientConnection/box_sticker_print_command.cpp
-    ClientConnection/last_box_sticker_print_command.h ClientConnection/last_box_sticker_print_command.cpp
-    ClientConnection/pallet_sticker_print_command.h ClientConnection/pallet_sticker_print_command.cpp
-    ClientConnection/last_pallet_sticker_print_command.h ClientConnection/last_pallet_sticker_print_command.cpp
-    ClientConnection/log_in_command.h ClientConnection/log_in_command.cpp
-    ClientConnection/log_out_command.h ClientConnection/log_out_command.cpp
-    ClientConnection/update_command.h ClientConnection/update_command.cpp
+    ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
+    ServerConnection/abstract_server_connection.h ServerConnection/abstract_server_connection.cpp
+
+    ServerConnection/Commands/abstract_client_command.h ServerConnection/Commands/abstract_client_command.cpp
+    ServerConnection/Commands/echo_comand.h ServerConnection/Commands/echo_comand.cpp
+    ServerConnection/Commands/release_command.h ServerConnection/Commands/release_command.cpp
+    ServerConnection/Commands/release_confirm_command.h ServerConnection/Commands/release_confirm_command.cpp
+    ServerConnection/Commands/rerelease_command.h ServerConnection/Commands/rerelease_command.cpp
+    ServerConnection/Commands/rerelease_confirm_command.h ServerConnection/Commands/rerelease_confirm_command.cpp
+    ServerConnection/Commands/rollback_command.h ServerConnection/Commands/rollback_command.cpp
+    ServerConnection/Commands/box_sticker_print_command.h ServerConnection/Commands/box_sticker_print_command.cpp
+    ServerConnection/Commands/last_box_sticker_print_command.h ServerConnection/Commands/last_box_sticker_print_command.cpp
+    ServerConnection/Commands/pallet_sticker_print_command.h ServerConnection/Commands/pallet_sticker_print_command.cpp
+    ServerConnection/Commands/last_pallet_sticker_print_command.h ServerConnection/Commands/last_pallet_sticker_print_command.cpp
+    ServerConnection/Commands/log_in_command.h ServerConnection/Commands/log_in_command.cpp
+    ServerConnection/Commands/log_out_command.h ServerConnection/Commands/log_out_command.cpp
+    ServerConnection/Commands/update_command.h ServerConnection/Commands/update_command.cpp
 
     main.cpp
 )

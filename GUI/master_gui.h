@@ -60,8 +60,8 @@ class MasterGUI : public AbstractGui {
   QPushButton* ProgramDeviceUserDataButton;
   QPushButton* ReadDeviceUserDataButton;
   QSpacerItem* ButtonVerticalSpacer;
-  QPushButton* UnlockDeviceButton;
-  QPushButton* LockDeviceButton;
+  QPushButton* unlockMemoryButton;
+  QPushButton* lockMemoryButton;
   //============================================================
 
   /* Интерфейс для взаимодействия с принтером */

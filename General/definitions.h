@@ -8,7 +8,6 @@
 #define ORGANIZATION_NAME "PowerSyntez"
 
 #define MASTER_ACCESS_PASSWORD "1995"
-
 //===============================================================
 
 /* Определения для системы логгирования */
@@ -62,4 +61,21 @@
 #define SERIAL_NUMBER_DS_CHAR_LENGTH 16
 //===============================================================
 
-#endif // DEFINITIONS_H
+/* Определения для команд клиента */
+//===============================================================
+#define COMMAND_ECHO_LENGTH 2
+#define COMMAND_LOGIN_LENGTH 3
+#define COMMAND_LOGOUT_LENGTH 1
+#define COMMAND_UPDATE_LENGTH 1
+#define COMMAND_RELEASE_LENGTH 1
+#define COMMAND_CONFIRMRELEASE_LENGTH 2
+#define COMMAND_RERELEASE_LENGTH 2
+#define COMMAND_CONFIRMRERELEASE_LENGTH 3
+#define COMMAND_ROLLBACK_LENGTH 1
+
+#define COMMAND_PRINTBOXSTICKER_LENGTH 2
+#define COMMAND_PRINTLASTBOXSTICKER_LENGTH 1
+#define COMMAND_PRINTPALLETSTICKER_LENGTH 2
+#define COMMAND_PRINTLASTPALLETSTICKER_LENGTH 1
+//===============================================================
+#endif  // DEFINITIONS_H

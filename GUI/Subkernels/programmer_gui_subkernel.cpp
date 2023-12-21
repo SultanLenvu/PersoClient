@@ -47,9 +47,9 @@ void ProgrammerGuiSubkernel::connectMasterGui() {
   connect(gui->ProgramDeviceUserDataButton, &QPushButton::clicked, this,
           &ProgrammerGuiSubkernel::readUserData_guiSlot);
 
-  connect(gui->UnlockDeviceButton, &QPushButton::clicked, this,
+  connect(gui->unlockMemoryButton, &QPushButton::clicked, this,
           &ProgrammerGuiSubkernel::unlockMemory_guiSlot);
-  connect(gui->LockDeviceButton, &QPushButton::clicked, this,
+  connect(gui->lockMemoryButton, &QPushButton::clicked, this,
           &ProgrammerGuiSubkernel::lockMemory_guiSlot);
 }
 

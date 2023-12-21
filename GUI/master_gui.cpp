@@ -145,10 +145,10 @@ void MasterGUI::createProgrammatorTab() {
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ProgrammatorControlPanelLayout->addItem(ButtonVerticalSpacer);
 
-  UnlockDeviceButton = new QPushButton(QString("Разблокировать память"));
-  ProgrammatorControlPanelLayout->addWidget(UnlockDeviceButton);
-  LockDeviceButton = new QPushButton(QString("Заблокировать память"));
-  ProgrammatorControlPanelLayout->addWidget(LockDeviceButton);
+  unlockMemoryButton = new QPushButton(QString("Разблокировать память"));
+  ProgrammatorControlPanelLayout->addWidget(unlockMemoryButton);
+  lockMemoryButton = new QPushButton(QString("Заблокировать память"));
+  ProgrammatorControlPanelLayout->addWidget(lockMemoryButton);
 }
 
 void MasterGUI::createStickerPrinterTab() {
@@ -242,12 +242,12 @@ void MasterGUI::createSettingsTab() {
       new QLabel("IP адрес или URL сервера персонализации");
   PersoSettingsMainLayout->addWidget(PersoServerIpAddressLabel, 0, 0, 1, 1);
   PersoServerIpAddressLineEdit =
-      new QLineEdit(settings.value("perso_client/server_ip").toString());
+      new QLineEdit(settings.value("perso_server_connection/ip").toString());
   PersoSettingsMainLayout->addWidget(PersoServerIpAddressLineEdit, 0, 1, 1, 1);
   PersoServerPortLabel = new QLabel("Порт сервера персонализации");
   PersoSettingsMainLayout->addWidget(PersoServerPortLabel, 1, 0, 1, 1);
   PersoServerPortLineEdit =
-      new QLineEdit(settings.value("perso_client/server_port").toString());
+      new QLineEdit(settings.value("perso_server_connection/port").toString());
   PersoSettingsMainLayout->addWidget(PersoServerPortLineEdit, 1, 1, 1, 1);
 
   // Настройки программатора

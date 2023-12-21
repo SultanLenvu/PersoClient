@@ -37,7 +37,7 @@ class AbstractStickerPrinter : public QObject {
   virtual ReturnStatus printPalletSticker(const StringDictionary& param) = 0;
   virtual ReturnStatus printLastPalletSticker(void) = 0;
 
-  virtual ReturnStatus exec(const QStringList* commandScript) = 0;
+  virtual ReturnStatus exec(const QStringList& commandScript) = 0;
 
   virtual void applySetting(void) = 0;
 

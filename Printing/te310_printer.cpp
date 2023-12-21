@@ -47,7 +47,7 @@ ReturnStatus TE310Printer::printTransponderSticker(
     const StringDictionary& param) {
   if (!checkConfig()) {
     sendLog(QString("Не удалось подключиться к принтеру. Сброс"));
-    return ReturnStatus::PrinterConnectionError;
+    return ReturnStatus::StickerPrinterConnectionError;
   }
 
   // Проврека параметров
@@ -61,7 +61,7 @@ ReturnStatus TE310Printer::printTransponderSticker(
 
   if (!TscLib->isLoaded()) {
     sendLog("Библиотека не загружена. Сброс. ");
-    return ReturnStatus::PrinterLibraryError;
+    return ReturnStatus::DynamicLibraryMissing;
   }
 
   // Сохраняем данные стикера
@@ -86,7 +86,7 @@ ReturnStatus TE310Printer::printLastTransponderSticker() {
 ReturnStatus TE310Printer::printBoxSticker(const StringDictionary& param) {
   if (!checkConfig()) {
     sendLog(QString("Ошибка конфигурации. Сброс"));
-    return ReturnStatus::PrinterConnectionError;
+    return ReturnStatus::StickerPrinterConnectionError;
   }
 
   if (param.value("id").isEmpty() ||
@@ -159,7 +159,7 @@ ReturnStatus TE310Printer::printLastBoxSticker() {
 ReturnStatus TE310Printer::printPalletSticker(const StringDictionary& param) {
   if (!checkConfig()) {
     sendLog(QString("Ошибка конфигурации. Сброс"));
-    return ReturnStatus::PrinterConnectionError;
+    return ReturnStatus::StickerPrinterConnectionError;
   }
 
   if (param.value("id").isEmpty() ||
@@ -238,10 +238,10 @@ ReturnStatus TE310Printer::printLastPalletSticker() {
   return printPalletSticker(LastPalletSticker);
 }
 
-ReturnStatus TE310Printer::exec(const QStringList* commandScript) {
+ReturnStatus TE310Printer::exec(const QStringList& commandScript) {
   if (!checkConfig()) {
     sendLog(QString("Не удалось подключиться к принтеру. Сброс"));
-    return ReturnStatus::PrinterConnectionError;
+    return ReturnStatus::StickerPrinterConnectionError;
   }
 
 #ifdef __linux__
@@ -250,8 +250,8 @@ ReturnStatus TE310Printer::exec(const QStringList* commandScript) {
 #else
   openPort(objectName().toUtf8().data());
 #endif /* __linux__ */
-  for (int32_t i = 0; i < commandScript->size(); i++) {
-    sendCommand(commandScript->at(i).toUtf8().data());
+  for (int32_t i = 0; i < commandScript.size(); i++) {
+    sendCommand(commandScript.at(i).toUtf8().data());
   }
   closePort();
 

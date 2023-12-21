@@ -61,7 +61,7 @@ class TE310Printer : public AbstractStickerPrinter {
       const StringDictionary& param) override;
   virtual ReturnStatus printLastPalletSticker(void) override;
 
-  virtual ReturnStatus exec(const QStringList* commandScript) override;
+  virtual ReturnStatus exec(const QStringList& commandScript) override;
 
   virtual void applySetting(void) override;
 
