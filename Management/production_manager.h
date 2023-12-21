@@ -19,7 +19,6 @@ class ProductionManager : public AbstractManager {
   std::unique_ptr<QFile> Firmware;
 
   std::shared_ptr<StringDictionary> TransponderData;
-  std::shared_ptr<StringDictionary> PreviousTransponderData;
 
  public:
   explicit ProductionManager(const QString& name);
