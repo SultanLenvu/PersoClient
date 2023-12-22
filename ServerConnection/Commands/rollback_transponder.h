@@ -1,31 +1,31 @@
-#ifndef ECHOCOMMAND_H
-#define ECHOCOMMAND_H
+#ifndef ROLLBACKCOMMAND_H
+#define ROLLBACKCOMMAND_H
 
 #include "abstract_client_command.h"
+#include "definitions.h"
 
-class EchoCommand : public AbstractClientCommand {
+class RollbackTransponder : public AbstractClientCommand {
   Q_OBJECT
  private:
-  const QString Name = "echo";
-  const size_t Size = 2;
+  const QString Name = COMMAND_ROLLBACKTRANSPONDER_NAME;
+  const size_t ResponseSize = COMMAND_ROLLBACKTRANSPONDER_RESPONSE_SIZE;
 
  public:
-  explicit EchoCommand(const QString& name);
-  ~EchoCommand();
+  explicit RollbackTransponder(const QString& name);
+  ~RollbackTransponder();
 
   // AbstractClientCommand interface
  public:
   virtual const QString& name() override;
-  virtual ReturnStatus generate(QByteArray& dataBlock) override;
   virtual ReturnStatus generate(const StringDictionary& param,
                                 QByteArray& dataBlock) override;
-  virtual ReturnStatus processResponse(const QByteArray& dataBlock) override;
   virtual ReturnStatus processResponse(const QByteArray& dataBlock,
                                        StringDictionary& responseData) override;
-  virtual void clear() override;
 
  private:
-  Q_DISABLE_COPY_MOVE(EchoCommand)
+  Q_DISABLE_COPY_MOVE(RollbackTransponder)
+
+ signals:
 };
 
-#endif  // ECHOCOMMAND_H
+#endif  // ROLLBACKCOMMAND_H

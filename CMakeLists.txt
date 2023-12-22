@@ -65,22 +65,26 @@ qt_add_executable(PersoClient WIN32
     ServerConnection/abstract_server_connection.h ServerConnection/abstract_server_connection.cpp
 
     ServerConnection/Commands/abstract_client_command.h ServerConnection/Commands/abstract_client_command.cpp
-    ServerConnection/Commands/echo_comand.h ServerConnection/Commands/echo_comand.cpp
-    ServerConnection/Commands/release_command.h ServerConnection/Commands/release_command.cpp
-    ServerConnection/Commands/release_confirm_command.h ServerConnection/Commands/release_confirm_command.cpp
-    ServerConnection/Commands/rerelease_command.h ServerConnection/Commands/rerelease_command.cpp
-    ServerConnection/Commands/rerelease_confirm_command.h ServerConnection/Commands/rerelease_confirm_command.cpp
-    ServerConnection/Commands/rollback_command.h ServerConnection/Commands/rollback_command.cpp
-    ServerConnection/Commands/box_sticker_print_command.h ServerConnection/Commands/box_sticker_print_command.cpp
-    ServerConnection/Commands/last_box_sticker_print_command.h ServerConnection/Commands/last_box_sticker_print_command.cpp
-    ServerConnection/Commands/pallet_sticker_print_command.h ServerConnection/Commands/pallet_sticker_print_command.cpp
-    ServerConnection/Commands/last_pallet_sticker_print_command.h ServerConnection/Commands/last_pallet_sticker_print_command.cpp
-    ServerConnection/Commands/log_in_command.h ServerConnection/Commands/log_in_command.cpp
-    ServerConnection/Commands/log_out_command.h ServerConnection/Commands/log_out_command.cpp
-    ServerConnection/Commands/update_command.h ServerConnection/Commands/update_command.cpp
+    ServerConnection/Commands/echo.h ServerConnection/Commands/echo.cpp
+    ServerConnection/Commands/release_transponder.h ServerConnection/Commands/release_transponder.cpp
+    ServerConnection/Commands/confirm_transponder_release.h ServerConnection/Commands/confirm_transponder_release.cpp
+    ServerConnection/Commands/rerelease_transponder.h ServerConnection/Commands/rerelease_transponder.cpp
+    ServerConnection/Commands/confirm_transponder_rerelease.h ServerConnection/Commands/confirm_transponder_rerelease.cpp
+    ServerConnection/Commands/rollback_transponder.h ServerConnection/Commands/rollback_transponder.cpp
+    ServerConnection/Commands/print_box_sticker.h ServerConnection/Commands/print_box_sticker.cpp
+    ServerConnection/Commands/print_last_box_sticker.h ServerConnection/Commands/print_last_box_sticker.cpp
+    ServerConnection/Commands/print_pallet_sticker.h ServerConnection/Commands/print_pallet_sticker.cpp
+    ServerConnection/Commands/print_last_pallet_sticker.h ServerConnection/Commands/print_last_pallet_sticker.cpp
+    ServerConnection/Commands/log_in.h ServerConnection/Commands/log_in.cpp
+    ServerConnection/Commands/log_out.h ServerConnection/Commands/log_out.cpp
+    ServerConnection/Commands/get_current_transponder_data.h ServerConnection/Commands/get_current_transponder_data.cpp
+    ServerConnection/Commands/get_transponder_data.cpp ServerConnection/Commands/get_transponder_data.h
+    ServerConnection/Commands/refund_current_box.cpp ServerConnection/Commands/refund_current_box.h
+    ServerConnection/Commands/get_current_box_data.cpp ServerConnection/Commands/get_current_box_data.h
 
     main.cpp
-)
+    )
+
 target_link_libraries(PersoClient PRIVATE
     Qt::Core
     Qt::Gui

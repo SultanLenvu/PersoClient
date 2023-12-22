@@ -1,4 +1,4 @@
-#include "log_in_command.h"
+#include "log_in.h"
 
 LogInCommand::LogInCommand(const QString& name) : AbstractClientCommand(name) {}
 
@@ -6,10 +6,6 @@ LogInCommand::~LogInCommand() {}
 
 const QString& LogInCommand::name() {
   return Name;
-}
-
-ReturnStatus LogInCommand::generate(QByteArray& dataBlock) {
-  return ReturnStatus::ClientCommandParamError;
 }
 
 ReturnStatus LogInCommand::generate(const StringDictionary& param,
@@ -25,10 +21,6 @@ ReturnStatus LogInCommand::generate(const StringDictionary& param,
   return ReturnStatus::NoError;
 }
 
-ReturnStatus LogInCommand::processResponse(const QByteArray& dataBlock) {
-  return ReturnStatus::ServerResponseSyntaxError;
-}
-
 ReturnStatus LogInCommand::processResponse(const QByteArray& dataBlock,
                                            StringDictionary& responseData) {
   if (!processDataBlock(dataBlock)) {
@@ -36,17 +28,16 @@ ReturnStatus LogInCommand::processResponse(const QByteArray& dataBlock,
     return ReturnStatus::ServerResponseDataBlockError;
   }
 
-  if ((Response.size() != Size) || (Response["command_name"] != Name) ||
+  if ((Response.size() != ResponseSize) || (Response["command_name"] != Name) ||
       (!Response.contains("return_status"))) {
     return ReturnStatus::ServerResponseSyntaxError;
   }
 
-  responseData.insert("return_status", Response["return_status"].toString());
+  ReturnStatus ret = processReturnStatus(Response["return_status"].toString());
+  if (ret != ReturnStatus::NoError) {
+    sendLog("Получена ошибка при выполнении команды на сервере.");
+    return ret;
+  }
 
   return ReturnStatus::NoError;
-}
-
-void LogInCommand::clear() {
-  Request = QJsonObject();
-  Response = QJsonObject();
 }

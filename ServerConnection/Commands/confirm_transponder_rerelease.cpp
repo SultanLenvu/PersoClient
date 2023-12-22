@@ -1,37 +1,41 @@
-#include "rollback_command.h"
+#include "confirm_transponder_rerelease.h"
 #include "Management/global_environment.h"
 #include "ProductionDispatcher/abstract_production_dispatcher.h"
 
-RollbackCommand::RollbackCommand(const QString& name)
+RereleaseConfirmCommand::RereleaseConfirmCommand(const QString& name)
     : AbstractClientCommand(name) {
   Status = ReturnStatus::Unknown;
 
-  connect(this, &RollbackCommand::rollback_signal,
+  connect(this, &RereleaseConfirmCommand::confirmRerelease_signal,
           dynamic_cast<AbstractProductionDispatcher*>(
               GlobalEnvironment::instance()->getObject(
                   "GeneralProductionDispatcher")),
-          &AbstractProductionDispatcher::rollbackProductionLine,
+          &AbstractProductionDispatcher::confirmTransponderRerelease,
           Qt::BlockingQueuedConnection);
 }
 
-RollbackCommand::~RollbackCommand() {}
+RereleaseConfirmCommand::~RereleaseConfirmCommand() {}
 
-void RollbackCommand::process(const QJsonObject& command) {
+void RereleaseConfirmCommand::process(const QJsonObject& command) {
   if (command.size() != Size ||
       (command["command_name"] != Name) || !command.contains("login") ||
-      !command.contains("password")) {
+      !command.contains("password") || !command.contains("transpoder_ucid") ||
+      !command.contains("transpoder_pan")) {
     Status = ReturnStatus::SyntaxError;
     return;
   }
 
   Parameters.insert("login", command.value("login").toString());
   Parameters.insert("password", command.value("password").toString());
+  Parameters.insert("personal_account_number",
+                    command.value("transpoder_pan").toString());
+  Parameters.insert("ucid", command.value("transpoder_ucid").toString());
 
-  // Запрашиваем печать бокса
-  emit rollback_signal(Parameters, Status);
+  // Подтверждение выпуска транспондера
+  emit confirmRerelease_signal(Parameters, Status);
 }
 
-void RollbackCommand::generateResponse(QJsonObject& response) {
+void RereleaseConfirmCommand::generateResponse(QJsonObject& response) {
   response["response_name"] = Name;
 
   //  if (Status == ReturnStatus::NoError) {
@@ -47,7 +51,7 @@ void RollbackCommand::generateResponse(QJsonObject& response) {
   response["return_status"] = QString::number(static_cast<size_t>(Status));
 }
 
-void RollbackCommand::reset() {
+void RereleaseConfirmCommand::reset() {
   Parameters.clear();
   Result.clear();
   Status = ReturnStatus::Unknown;

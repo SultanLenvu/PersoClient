@@ -1,14 +1,15 @@
-#include "echo_comand.h"
+#include "echo.h"
 
-EchoCommand::EchoCommand(const QString& name) : AbstractClientCommand(name) {}
+Echo::Echo(const QString& name) : AbstractClientCommand(name) {}
 
-EchoCommand::~EchoCommand() {}
+Echo::~Echo() {}
 
-const QString& EchoCommand::name() {
+const QString& Echo::name() {
   return Name;
 }
 
-ReturnStatus EchoCommand::generate(QByteArray& dataBlock) {
+ReturnStatus Echo::generate(const StringDictionary& param,
+                            QByteArray& dataBlock) {
   // Заголовок команды
   Request["command_name"] = Name;
 
@@ -19,12 +20,8 @@ ReturnStatus EchoCommand::generate(QByteArray& dataBlock) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus EchoCommand::generate(const StringDictionary& param,
-                                   QByteArray& dataBlock) {
-  return ReturnStatus::ClientCommandParamError;
-}
-
-ReturnStatus EchoCommand::processResponse(const QByteArray& dataBlock) {
+ReturnStatus Echo::processResponse(const QByteArray& dataBlock,
+                                   StringDictionary& responseData) {
   if (!processDataBlock(dataBlock)) {
     sendLog("Получена ошибка при обработке полученного блока данных.");
     return ReturnStatus::ServerResponseDataBlockError;
@@ -41,14 +38,4 @@ ReturnStatus EchoCommand::processResponse(const QByteArray& dataBlock) {
   }
 
   return ReturnStatus::NoError;
-}
-
-ReturnStatus EchoCommand::processResponse(const QByteArray& dataBlock,
-                                          StringDictionary& responseData) {
-  return ReturnStatus::ServerResponseSyntaxError;
-}
-
-void EchoCommand::clear() {
-  Request = QJsonObject();
-  Response = QJsonObject();
 }

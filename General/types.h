@@ -20,63 +20,27 @@ enum class ReturnStatus {
   ServerResponseSyntaxError,
   ServerResponseDataBlockError,
   ServerResponseProcessingError,
-  ServerInternalError,
+
   ClientCommandParamError,
+
+  ServerInternalError,
+  ProductionLineMissed,
+  ProductionLineLaunchError,
+  ProductionLineAlreadyLaunched,
+  ProductionLineRollbackLimit,
+  ProductionLineNotActive,
+  ProductionLineNotInProcess,
+  ProductionLineCompleted,
+  OrderInProcessMissed,
+  IdenticalUcidError,
+  TransponderIncorrectRerelease,
+  CurrentOrderAssembled,
+  FreeBoxMissed,
 
   StickerPrinterInitError,
   StickerPrinterConnectionError,
 
   ProgrammatorError,
-};
-
-enum class ServerReturnStatus {
-  NoError = 0,
-  ParameterError,
-  SyntaxError,
-  SynchronizationError,
-  FileOpenError,
-  InvalidProductionLineContext,
-  UnauthorizedRequest,
-
-  DatabaseConnectionError,
-  DatabaseTransactionError,
-  DatabaseQueryError,
-
-  FirmwareGeneratorInitError,
-  StickerPrinterInitError,
-
-  RecordMissed,
-  ProductionLineMissed,
-  TranspoderMissed,
-  BoxMissed,
-  PalletMissed,
-  OrderMissed,
-  IssuerMissed,
-  MasterKeysMissed,
-
-  TransponderNotReleasedEarlier,
-  TransponderNotAwaitingConfirmation,
-  TransponderIncorrectRerelease,
-  IdenticalUcidError,
-  CurrentOrderAssembled,
-
-  ProductionLineLaunchError,
-  ProductionLineAlreadyLaunched,
-  ProductionLineNotActive,
-  ProductionLineNotInProcess,
-  ProductionLineCompleted,
-  ProductionLineShutdownError,
-  ProductionLineRollbackLimit,
-  OrderInProcessMissed,
-  FreeBoxMissed,
-
-  FirmwareGenerationError,
-
-  PrinterConnectionError,
-  PrinterLibraryError,
-  BoxStickerPrintError,
-  PalletStickerPrintError,
-  Unknown,
 };
 
 #endif  // TYPES_H

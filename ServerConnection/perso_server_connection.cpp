@@ -1,21 +1,21 @@
 #include <QDataStream>
 #include <QSettings>
 
-#include "box_sticker_print_command.h"
+#include "print_box_sticker.h"
 #include "definitions.h"
-#include "echo_comand.h"
-#include "last_box_sticker_print_command.h"
-#include "last_pallet_sticker_print_command.h"
-#include "log_in_command.h"
-#include "log_out_command.h"
-#include "pallet_sticker_print_command.h"
+#include "echo.h"
+#include "print_last_box_sticker.h"
+#include "print_last_pallet_sticker.h"
+#include "log_in.h"
+#include "log_out.h"
+#include "print_pallet_sticker.h"
 #include "perso_server_connection.h"
-#include "release_command.h"
-#include "release_confirm_command.h"
-#include "rerelease_command.h"
-#include "rerelease_confirm_command.h"
-#include "rollback_command.h"
-#include "update_command.h"
+#include "release_transponder.h"
+#include "confirm_transponder_release.h"
+#include "rerelease_transponder.h"
+#include "confirm_transponder_rerelease.h"
+#include "rollback_transponder.h"
+#include "get_current_transponder_data.h"
 
 PersoServerConnection::PersoServerConnection(const QString& name)
     : AbstractServerConnection(name) {
