@@ -4,15 +4,15 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class LogOutCommand : public AbstractClientCommand {
+class LogOut : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_LOGOUT_NAME;
   const size_t ResponseSize = COMMAND_LOGOUT_RESPONSE_SIZE;
 
  public:
-  explicit LogOutCommand(const QString& name);
-  ~LogOutCommand();
+  explicit LogOut(const QString& name);
+  ~LogOut();
 
   // AbstractClientCommand interface
  public:
@@ -23,7 +23,7 @@ class LogOutCommand : public AbstractClientCommand {
                                        StringDictionary& responseData) override;
 
  private:
-  Q_DISABLE_COPY_MOVE(LogOutCommand)
+  Q_DISABLE_COPY_MOVE(LogOut)
 
  signals:
 };

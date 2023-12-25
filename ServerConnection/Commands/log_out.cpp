@@ -1,13 +1,13 @@
 #include "log_out.h"
 
-LogOutCommand::LogOutCommand(const QString& name)
+LogOut::LogOut(const QString& name)
     : AbstractClientCommand(name) {}
 
-LogOutCommand::~LogOutCommand() {}
+LogOut::~LogOut() {}
 
-const QString& LogOutCommand::name() {}
+const QString& LogOut::name() {}
 
-ReturnStatus LogOutCommand::generate(const StringDictionary& param,
+ReturnStatus LogOut::generate(const StringDictionary& param,
                                      QByteArray& dataBlock) {
   // Заголовок команды
   Request["command_name"] = Name;
@@ -18,7 +18,7 @@ ReturnStatus LogOutCommand::generate(const StringDictionary& param,
   return ReturnStatus::NoError;
 }
 
-ReturnStatus LogOutCommand::processResponse(const QByteArray& dataBlock,
+ReturnStatus LogOut::processResponse(const QByteArray& dataBlock,
                                             StringDictionary& responseData) {
   if (!processDataBlock(dataBlock)) {
     sendLog("Получена ошибка при обработке полученного блока данных.");

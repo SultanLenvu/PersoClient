@@ -14,7 +14,7 @@ ReturnStatus Echo::generate(const StringDictionary& param,
   Request["command_name"] = Name;
 
   // Тело команды
-  Request["data"] = "test";
+  Request["data"] = param.value("data");
 
   generateDataBlock(dataBlock);
   return ReturnStatus::NoError;
@@ -27,15 +27,12 @@ ReturnStatus Echo::processResponse(const QByteArray& dataBlock,
     return ReturnStatus::ServerResponseDataBlockError;
   }
 
-  if ((Response.size() != Size) || (Response["command_name"] != Name) ||
+  if ((Response.size() != ResponseSize) || (Response["command_name"] != Name) ||
       (!Response.contains("data"))) {
     return ReturnStatus::ServerResponseSyntaxError;
   }
 
-  if (Request["data"] != Response["data"]) {
-    sendLog("Получена ошибка при обработке ответа.");
-    return ReturnStatus::ServerResponseProcessingError;
-  }
+  responseData["data"] = Response["data"].toString();
 
   return ReturnStatus::NoError;
 }

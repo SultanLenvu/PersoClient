@@ -2,33 +2,30 @@
 #define RERELEASECONFIRMCOMMAND_H
 
 #include "abstract_client_command.h"
+#include "definitions.h"
 
-class RereleaseConfirmCommand : public AbstractClientCommand {
+class ConfirmTransponderRerelease : public AbstractClientCommand {
   Q_OBJECT
  private:
-  const QString Name = "release_confirm";
-  const size_t Size = 5;
-
-  StringDictionary Parameters;
-  StringDictionary Result;
-  ReturnStatus Status;
+  const QString Name = COMMAND_CONFIRMTRANSPONDERRERELEASE_NAME;
+  const size_t ResponseSize = COMMAND_CONFIRMTRANSPONDERRERELEASE_RESPONSE_SIZE;
 
  public:
-  explicit RereleaseConfirmCommand(const QString& name);
-  ~RereleaseConfirmCommand();
+  explicit ConfirmTransponderRerelease(const QString& name);
+  ~ConfirmTransponderRerelease();
 
   // AbstractClientCommand interface
  public:
-  virtual void process(const QJsonObject& command) override;
-  virtual void generateResponse(QJsonObject& response) override;
-  virtual void reset(void) override;
+  virtual const QString& name() override;
+  virtual ReturnStatus generate(const StringDictionary& param,
+                                QByteArray& dataBlock) override;
+  virtual ReturnStatus processResponse(const QByteArray& dataBlock,
+                                       StringDictionary& responseData) override;
 
  private:
-  Q_DISABLE_COPY_MOVE(RereleaseConfirmCommand)
+  Q_DISABLE_COPY_MOVE(ConfirmTransponderRerelease)
 
  signals:
-  void confirmRerelease_signal(const StringDictionary& param,
-                               ReturnStatus& status);
 };
 
 #endif  // RERELEASECONFIRMCOMMAND_H

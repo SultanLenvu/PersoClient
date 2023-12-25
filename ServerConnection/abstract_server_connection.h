@@ -19,16 +19,23 @@ class AbstractServerConnection : public QObject {
   virtual ReturnStatus logIn(const StringDictionary& param) = 0;
   virtual ReturnStatus logOut(void) = 0;
 
-  virtual ReturnStatus update(StringDictionary& result) = 0;
+  virtual ReturnStatus requestBox(void) = 0;
+  virtual ReturnStatus getCurrentBoxData(StringDictionary& result) = 0;
+  virtual ReturnStatus completeCurrentBox(void) = 0;
+  virtual ReturnStatus refundCurrentBox(void) = 0;
+
+  virtual ReturnStatus getCurrentTransponderData(StringDictionary& result) = 0;
   virtual ReturnStatus getTransponderData(const StringDictionary& param,
                                           StringDictionary& result) = 0;
 
-  virtual ReturnStatus release(StringDictionary& result) = 0;
-  virtual ReturnStatus confirmRelease(const StringDictionary& param) = 0;
-  virtual ReturnStatus rerelease(const StringDictionary& param,
-                                 StringDictionary& result) = 0;
-  virtual ReturnStatus confirmRerelease(const StringDictionary& param);
-  virtual ReturnStatus rollback(void) = 0;
+  virtual ReturnStatus releaseTransponder(StringDictionary& result) = 0;
+  virtual ReturnStatus confirmTransponderRelease(
+      const StringDictionary& param) = 0;
+  virtual ReturnStatus rereleaseTransponder(const StringDictionary& param,
+                                            StringDictionary& result) = 0;
+  virtual ReturnStatus confirmTransponderRerelease(
+      const StringDictionary& param);
+  virtual ReturnStatus rollbackTransponder(void) = 0;
 
   virtual ReturnStatus printBoxSticker(const StringDictionary& param) = 0;
   virtual ReturnStatus printLastBoxSticker(void) = 0;

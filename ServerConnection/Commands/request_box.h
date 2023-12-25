@@ -1,18 +1,18 @@
-#ifndef ECHOCOMMAND_H
-#define ECHOCOMMAND_H
+#ifndef REQUESTBOX_H
+#define REQUESTBOX_H
 
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class Echo : public AbstractClientCommand {
+class RequestBox : public AbstractClientCommand {
   Q_OBJECT
  private:
-  const QString Name = COMMAND_ECHO_NAME;
-  const size_t ResponseSize = COMMAND_ECHO_RESPONSE_SIZE;
+  const QString Name = COMMAND_REQUESTBOX_NAME;
+  const size_t ResponseSize = COMMAND_REQUESTBOX_RESPONSE_SIZE;
 
  public:
-  explicit Echo(const QString& name);
-  ~Echo();
+  explicit RequestBox(const QString& name);
+  ~RequestBox();
 
   // AbstractClientCommand interface
  public:
@@ -23,7 +23,9 @@ class Echo : public AbstractClientCommand {
                                        StringDictionary& responseData) override;
 
  private:
-  Q_DISABLE_COPY_MOVE(Echo)
+  Q_DISABLE_COPY_MOVE(RequestBox)
+
+ signals:
 };
 
-#endif  // ECHOCOMMAND_H
+#endif  // REQUESTBOX_H

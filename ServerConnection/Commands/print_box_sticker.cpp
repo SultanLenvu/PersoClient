@@ -1,15 +1,15 @@
 #include "print_box_sticker.h"
 
-BoxStickerPrintCommand::BoxStickerPrintCommand(const QString& name)
+PrintBoxSticker::PrintBoxSticker(const QString& name)
     : AbstractClientCommand(name) {}
 
-BoxStickerPrintCommand::~BoxStickerPrintCommand() {}
+PrintBoxSticker::~PrintBoxSticker() {}
 
-const QString& BoxStickerPrintCommand::name() {
+const QString& PrintBoxSticker::name() {
   return Name;
 }
 
-ReturnStatus BoxStickerPrintCommand::generate(const StringDictionary& param,
+ReturnStatus PrintBoxSticker::generate(const StringDictionary& param,
                                               QByteArray& dataBlock) {
   // Заголовок команды
   Request["command_name"] = Name;
@@ -21,7 +21,7 @@ ReturnStatus BoxStickerPrintCommand::generate(const StringDictionary& param,
   return ReturnStatus::NoError;
 }
 
-ReturnStatus BoxStickerPrintCommand::processResponse(
+ReturnStatus PrintBoxSticker::processResponse(
     const QByteArray& dataBlock,
     StringDictionary& responseData) {
   if (!processDataBlock(dataBlock)) {

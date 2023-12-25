@@ -1,28 +1,25 @@
-#include "log_in.h"
+#include "request_box.h"
 
-LogIn::LogIn(const QString& name) : AbstractClientCommand(name) {}
+RequestBox::RequestBox(const QString& name) : AbstractClientCommand(name) {}
 
-LogIn::~LogIn() {}
+RequestBox::~RequestBox() {}
 
-const QString& LogIn::name() {
+const QString& RequestBox::name() {
   return Name;
 }
 
-ReturnStatus LogIn::generate(const StringDictionary& param,
-                                    QByteArray& dataBlock) {
-  // Заголовок команды
+ReturnStatus RequestBox::generate(const StringDictionary& param,
+                                  QByteArray& dataBlock) {
   Request["command_name"] = Name;
 
   // Тело команды
-  Request["login"] = param.value("login");
-  Request["password"] = param.value("password");
 
   generateDataBlock(dataBlock);
   return ReturnStatus::NoError;
 }
 
-ReturnStatus LogIn::processResponse(const QByteArray& dataBlock,
-                                           StringDictionary& responseData) {
+ReturnStatus RequestBox::processResponse(const QByteArray& dataBlock,
+                                         StringDictionary& responseData) {
   if (!processDataBlock(dataBlock)) {
     sendLog("Получена ошибка при обработке полученного блока данных.");
     return ReturnStatus::ServerResponseDataBlockError;

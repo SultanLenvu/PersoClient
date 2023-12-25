@@ -1,21 +1,26 @@
 #include <QDataStream>
 #include <QSettings>
 
-#include "print_box_sticker.h"
+#include "complete_current_box.h"
+#include "confirm_transponder_release.h"
+#include "confirm_transponder_rerelease.h"
 #include "definitions.h"
 #include "echo.h"
-#include "print_last_box_sticker.h"
-#include "print_last_pallet_sticker.h"
+#include "get_current_box_data.h"
+#include "get_current_transponder_data.h"
+#include "get_transponder_data.h"
 #include "log_in.h"
 #include "log_out.h"
-#include "print_pallet_sticker.h"
 #include "perso_server_connection.h"
+#include "print_box_sticker.h"
+#include "print_last_box_sticker.h"
+#include "print_last_pallet_sticker.h"
+#include "print_pallet_sticker.h"
+#include "refund_current_box.h"
 #include "release_transponder.h"
-#include "confirm_transponder_release.h"
+#include "request_box.h"
 #include "rerelease_transponder.h"
-#include "confirm_transponder_rerelease.h"
 #include "rollback_transponder.h"
-#include "get_current_transponder_data.h"
 
 PersoServerConnection::PersoServerConnection(const QString& name)
     : AbstractServerConnection(name) {
@@ -69,389 +74,155 @@ void PersoServerConnection::disconnect() {
 
 ReturnStatus PersoServerConnection::echo() {
   CurrentCommand = Commands.at(Echo);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary param, result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
 ReturnStatus PersoServerConnection::logIn(const StringDictionary& param) {
   CurrentCommand = Commands.at(LogIn);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(param, dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
 ReturnStatus PersoServerConnection::logOut() {
   CurrentCommand = Commands.at(LogOut);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary param, result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
-ReturnStatus PersoServerConnection::update(StringDictionary& context) {
-  CurrentCommand = Commands.at(Update);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
+ReturnStatus PersoServerConnection::requestBox() {
+  CurrentCommand = Commands.at(RequestBox);
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock, context);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-              QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary param, result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
-ReturnStatus PersoServerConnection::getTransponderData(const StringDictionary &param, StringDictionary &result)
-{
+ReturnStatus PersoServerConnection::getCurrentBoxData(
+    StringDictionary& result) {
+  CurrentCommand = Commands.at(GetCurrentBoxData);
 
+  StringDictionary param;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
-ReturnStatus PersoServerConnection::release(StringDictionary& result) {
-  CurrentCommand = Commands.at(Release);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
+ReturnStatus PersoServerConnection::completeCurrentBox() {
+  CurrentCommand = Commands.at(CompleteCurrentBox);
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock, result);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary param, result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
-ReturnStatus PersoServerConnection::confirmRelease(
+ReturnStatus PersoServerConnection::refundCurrentBox() {
+  CurrentCommand = Commands.at(RefundCurrentBox);
+
+  StringDictionary param, result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
+}
+
+ReturnStatus PersoServerConnection::getCurrentTransponderData(
+    StringDictionary& result) {
+  CurrentCommand = Commands.at(GetCurrentTransponderData);
+
+  StringDictionary param;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
+}
+
+ReturnStatus PersoServerConnection::getTransponderData(
+    const StringDictionary& param,
+    StringDictionary& result) {
+  CurrentCommand = Commands.at(GetTransponderData);
+
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
+}
+
+ReturnStatus PersoServerConnection::releaseTransponder(
+    StringDictionary& result) {
+  CurrentCommand = Commands.at(ReleaseTransponder);
+
+  StringDictionary param;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
+}
+
+ReturnStatus PersoServerConnection::confirmTransponderRelease(
     const StringDictionary& param) {
-  CurrentCommand = Commands.at(ConfirmRelease);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
+  CurrentCommand = Commands.at(ConfirmTransponderRelease);
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(param, dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
-ReturnStatus PersoServerConnection::rerelease(const StringDictionary& param,
-                                              StringDictionary& result) {
-  CurrentCommand = Commands.at(Rerelease);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
+ReturnStatus PersoServerConnection::rereleaseTransponder(
+    const StringDictionary& param,
+    StringDictionary& result) {
+  CurrentCommand = Commands.at(RereleaseTransponder);
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(param, dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock, result);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
-ReturnStatus PersoServerConnection::confirmRerelease(
+ReturnStatus PersoServerConnection::confirmTransponderRerelease(
     const StringDictionary& param) {
-  CurrentCommand = Commands.at(ConfirmRerelease);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
+  CurrentCommand = Commands.at(ConfirmTransponderRerelease);
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(param, dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
-ReturnStatus PersoServerConnection::rollback() {
-  CurrentCommand = Commands.at(Rollback);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
+ReturnStatus PersoServerConnection::rollbackTransponder() {
+  CurrentCommand = Commands.at(RollbackTransponder);
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary param, result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
 ReturnStatus PersoServerConnection::printBoxSticker(
     const StringDictionary& param) {
   CurrentCommand = Commands.at(PrintBoxSticker);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(param, dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
 ReturnStatus PersoServerConnection::printLastBoxSticker() {
   CurrentCommand = Commands.at(PrintLastBoxSticker);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary param, result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
 ReturnStatus PersoServerConnection::printPalletSticker(
-    const StringDictionary& data) {
+    const StringDictionary& param) {
   CurrentCommand = Commands.at(PrintPalletSticker);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(data, dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
 ReturnStatus PersoServerConnection::printLastPalletSticker() {
   CurrentCommand = Commands.at(PrintLastPalletSticker);
-  sendLog(
-      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
 
-  QByteArray dataBlock;
-  ReturnStatus ret = CurrentCommand->generate(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  ret = transmitDataBlock(dataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  if (!waitResponse()) {
-    return ReturnStatus::ServerNotResponding;
-  }
-
-  ret = CurrentCommand->processResponse(ReceivedDataBlock);
-  if (ret != ReturnStatus::NoError) {
-    return ret;
-  }
-
-  sendLog(
-      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  StringDictionary param, result;
+  ReturnStatus ret = processCurrentCommand(param, result);
+  return ret;
 }
 
 void PersoServerConnection::applySettings() {
@@ -469,6 +240,37 @@ void PersoServerConnection::loadSettings() {
 
 void PersoServerConnection::sendLog(const QString& log) {
   emit logging(objectName() + " - " + log);
+}
+
+ReturnStatus PersoServerConnection::processCurrentCommand(
+    const StringDictionary& param,
+    StringDictionary& result) {
+  sendLog(
+      QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
+
+  QByteArray dataBlock;
+  ReturnStatus ret = CurrentCommand->generate(param, dataBlock);
+  if (ret != ReturnStatus::NoError) {
+    return ret;
+  }
+
+  ret = transmitDataBlock(dataBlock);
+  if (ret != ReturnStatus::NoError) {
+    return ret;
+  }
+
+  if (!waitResponse()) {
+    return ReturnStatus::ServerNotResponding;
+  }
+
+  ret = CurrentCommand->processResponse(ReceivedDataBlock, result);
+  if (ret != ReturnStatus::NoError) {
+    return ret;
+  }
+
+  sendLog(
+      QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
+  return ReturnStatus::NoError;
 }
 
 ReturnStatus PersoServerConnection::transmitDataBlock(
@@ -558,7 +360,50 @@ void PersoServerConnection::createSocket(void) {
                    &PersoServerConnection::socketError_slot);
 }
 
-void PersoServerConnection::createCommands() {}
+void PersoServerConnection::createCommands() {
+  Commands[Echo] = std::shared_ptr<::AbstractClientCommand>(new ::Echo("Echo"));
+  Commands[LogIn] =
+      std::shared_ptr<::AbstractClientCommand>(new ::LogIn("LogIn"));
+  Commands[LogOut] =
+      std::shared_ptr<::AbstractClientCommand>(new ::LogOut("LogOut"));
+
+  Commands[RequestBox] =
+      std::shared_ptr<::AbstractClientCommand>(new ::RequestBox("RequestBox"));
+  Commands[GetCurrentBoxData] = std::shared_ptr<::AbstractClientCommand>(
+      new ::GetCurrentBoxData("GetCurrentBoxData"));
+  Commands[CompleteCurrentBox] = std::shared_ptr<::AbstractClientCommand>(
+      new ::CompleteCurrentBox("CompleteCurrentBox"));
+  Commands[RefundCurrentBox] = std::shared_ptr<::AbstractClientCommand>(
+      new ::RefundCurrentBox("RefundCurrentBox"));
+
+  Commands[GetCurrentTransponderData] =
+      std::shared_ptr<::AbstractClientCommand>(
+          new ::GetCurrentTransponderData("GetCurrentTransponderData"));
+  Commands[GetTransponderData] = std::shared_ptr<::AbstractClientCommand>(
+      new ::GetTransponderData("GetTransponderData"));
+
+  Commands[ReleaseTransponder] = std::shared_ptr<::AbstractClientCommand>(
+      new ::ReleaseTransponder("ReleaseTransponder"));
+  Commands[ConfirmTransponderRelease] =
+      std::shared_ptr<::AbstractClientCommand>(
+          new ::ConfirmTransponderRelease("ConfirmTransponderRelease"));
+  Commands[RereleaseTransponder] = std::shared_ptr<::AbstractClientCommand>(
+      new ::RereleaseTransponder("RereleaseTransponder"));
+  Commands[ConfirmTransponderRerelease] =
+      std::shared_ptr<::AbstractClientCommand>(
+          new ::ConfirmTransponderRerelease("ConfirmTransponderRerelease"));
+  Commands[RollbackTransponder] = std::shared_ptr<::RollbackTransponder>(
+      new ::RollbackTransponder("RollbackTransponder"));
+
+  Commands[PrintBoxSticker] = std::shared_ptr<::AbstractClientCommand>(
+      new ::PrintBoxSticker("PrintBoxSticker"));
+  Commands[PrintLastBoxSticker] = std::shared_ptr<::AbstractClientCommand>(
+      new ::PrintLastBoxSticker("PrintLastBoxSticker"));
+  Commands[PrintPalletSticker] = std::shared_ptr<::AbstractClientCommand>(
+      new ::PrintPalletSticker("PrintPalletSticker"));
+  Commands[PrintLastPalletSticker] = std::shared_ptr<::AbstractClientCommand>(
+      new ::PrintLastPalletSticker("PrintLastPalletSticker"));
+}
 
 void PersoServerConnection::socketConnected_slot() {
   sendLog("Соединение с сервером персонализации установлено. ");

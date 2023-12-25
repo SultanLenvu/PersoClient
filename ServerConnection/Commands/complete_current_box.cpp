@@ -1,28 +1,28 @@
-#include "log_in.h"
+#include "complete_current_box.h"
 
-LogIn::LogIn(const QString& name) : AbstractClientCommand(name) {}
+CompleteCurrentBox::CompleteCurrentBox(const QString& name)
+    : AbstractClientCommand(name) {}
 
-LogIn::~LogIn() {}
+CompleteCurrentBox::~CompleteCurrentBox() {}
 
-const QString& LogIn::name() {
+const QString& CompleteCurrentBox::name() {
   return Name;
 }
 
-ReturnStatus LogIn::generate(const StringDictionary& param,
-                                    QByteArray& dataBlock) {
-  // Заголовок команды
+ReturnStatus CompleteCurrentBox::generate(
+    const StringDictionary& param,
+    QByteArray& dataBlock) {  // Заголовок команды
   Request["command_name"] = Name;
 
   // Тело команды
-  Request["login"] = param.value("login");
-  Request["password"] = param.value("password");
 
   generateDataBlock(dataBlock);
   return ReturnStatus::NoError;
 }
 
-ReturnStatus LogIn::processResponse(const QByteArray& dataBlock,
-                                           StringDictionary& responseData) {
+ReturnStatus CompleteCurrentBox::processResponse(
+    const QByteArray& dataBlock,
+    StringDictionary& responseData) {
   if (!processDataBlock(dataBlock)) {
     sendLog("Получена ошибка при обработке полученного блока данных.");
     return ReturnStatus::ServerResponseDataBlockError;

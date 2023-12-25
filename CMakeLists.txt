@@ -81,6 +81,8 @@ qt_add_executable(PersoClient WIN32
     ServerConnection/Commands/get_transponder_data.cpp ServerConnection/Commands/get_transponder_data.h
     ServerConnection/Commands/refund_current_box.cpp ServerConnection/Commands/refund_current_box.h
     ServerConnection/Commands/get_current_box_data.cpp ServerConnection/Commands/get_current_box_data.h
+    ServerConnection/Commands/complete_current_box.h ServerConnection/Commands/complete_current_box.cpp
+    ServerConnection/Commands/request_box.h ServerConnection/Commands/request_box.cpp
 
     main.cpp
     )

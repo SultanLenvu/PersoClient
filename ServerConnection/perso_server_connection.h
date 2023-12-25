@@ -21,19 +21,25 @@ class PersoServerConnection : public AbstractServerConnection {
     Echo,
     LogIn,
     LogOut,
-    Update,
 
-    Release,
-    ConfirmRelease,
-    Rerelease,
-    ConfirmRerelease,
-    Rollback,
+    RequestBox,
+    GetCurrentBoxData,
+    CompleteCurrentBox,
+    RefundCurrentBox,
+
+    GetCurrentTransponderData,
+    GetTransponderData,
+
+    ReleaseTransponder,
+    ConfirmTransponderRelease,
+    RereleaseTransponder,
+    ConfirmTransponderRerelease,
+    RollbackTransponder,
 
     PrintBoxSticker,
     PrintLastBoxSticker,
     PrintPalletSticker,
     PrintLastPalletSticker,
-
   };
   Q_ENUM(CommandId)
 
@@ -66,22 +72,27 @@ class PersoServerConnection : public AbstractServerConnection {
   virtual ReturnStatus logIn(const StringDictionary& param) override;
   virtual ReturnStatus logOut() override;
 
-  virtual ReturnStatus update(StringDictionary& result) override;
+  virtual ReturnStatus requestBox(void) override;
+  virtual ReturnStatus getCurrentBoxData(StringDictionary& result) override;
+  virtual ReturnStatus completeCurrentBox(void) override;
+  virtual ReturnStatus refundCurrentBox(void) override;
+
+  virtual ReturnStatus getCurrentTransponderData(
+      StringDictionary& result) override;
   virtual ReturnStatus getTransponderData(const StringDictionary& param,
                                           StringDictionary& result) override;
 
-  virtual ReturnStatus release(StringDictionary& result) override;
-  virtual ReturnStatus confirmRelease(const StringDictionary& param) override;
-
-  virtual ReturnStatus rerelease(const StringDictionary& param,
-                                 StringDictionary& result) override;
-  virtual ReturnStatus confirmRerelease(const StringDictionary& param) override;
-
-  virtual ReturnStatus rollback(void) override;
+  virtual ReturnStatus releaseTransponder(StringDictionary& result) override;
+  virtual ReturnStatus confirmTransponderRelease(
+      const StringDictionary& param) override;
+  virtual ReturnStatus rereleaseTransponder(const StringDictionary& param,
+                                            StringDictionary& result) override;
+  virtual ReturnStatus confirmTransponderRerelease(
+      const StringDictionary& param) override;
+  virtual ReturnStatus rollbackTransponder(void) override;
 
   virtual ReturnStatus printBoxSticker(const StringDictionary& param) override;
   virtual ReturnStatus printLastBoxSticker(void) override;
-
   virtual ReturnStatus printPalletSticker(
       const StringDictionary& param) override;
   virtual ReturnStatus printLastPalletSticker(void) override;
@@ -93,6 +104,8 @@ class PersoServerConnection : public AbstractServerConnection {
   void loadSettings(void);
   void sendLog(const QString& log);
 
+  ReturnStatus processCurrentCommand(const StringDictionary& param,
+                                     StringDictionary& result);
   ReturnStatus transmitDataBlock(const QByteArray& dataBlock);
   bool waitResponse(void);
 

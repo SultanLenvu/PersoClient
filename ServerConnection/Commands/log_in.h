@@ -4,15 +4,15 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class LogInCommand : public AbstractClientCommand {
+class LogIn : public AbstractClientCommand {
   Q_OBJECT
  private:
-  const QString Name = COMMAND_ECHO_NAME;
-  const size_t ResponseSize = COMMAND_ECHO_RESPONSE_SIZE;
+  const QString Name = COMMAND_LOGIN_NAME;
+  const size_t ResponseSize = COMMAND_LOGIN_RESPONSE_SIZE;
 
  public:
-  explicit LogInCommand(const QString& name);
-  ~LogInCommand();
+  explicit LogIn(const QString& name);
+  ~LogIn();
 
   // AbstractClientCommand interface
  public:
@@ -23,7 +23,7 @@ class LogInCommand : public AbstractClientCommand {
                                        StringDictionary& responseData) override;
 
  private:
-  Q_DISABLE_COPY_MOVE(LogInCommand)
+  Q_DISABLE_COPY_MOVE(LogIn)
 
  signals:
 };

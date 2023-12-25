@@ -14,6 +14,10 @@ ReturnStatus RereleaseTransponder::generate(
     QByteArray& dataBlock) {  // Заголовок команды
   Request["command_name"] = Name;
 
+  if (!param.contains("transponder_pan")) {
+    return ReturnStatus::ParameterError;
+  }
+
   // Тело команды
   Request["transponder_pan"] = param["transponder_pan"];
 

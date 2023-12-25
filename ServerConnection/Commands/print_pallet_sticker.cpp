@@ -1,15 +1,15 @@
 #include "print_pallet_sticker.h"
 
-PalletStickerPrintCommand::PalletStickerPrintCommand(const QString& name)
+PrintPalletSticker::PrintPalletSticker(const QString& name)
     : AbstractClientCommand(name) {}
 
-PalletStickerPrintCommand::~PalletStickerPrintCommand() {}
+PrintPalletSticker::~PrintPalletSticker() {}
 
-const QString& PalletStickerPrintCommand::name() {
+const QString& PrintPalletSticker::name() {
   return Name;
 }
 
-ReturnStatus PalletStickerPrintCommand::generate(const StringDictionary& param,
+ReturnStatus PrintPalletSticker::generate(const StringDictionary& param,
                                                  QByteArray& dataBlock) {
   // Заголовок команды
   Request["command_name"] = Name;
@@ -21,7 +21,7 @@ ReturnStatus PalletStickerPrintCommand::generate(const StringDictionary& param,
   return ReturnStatus::NoError;
 }
 
-ReturnStatus PalletStickerPrintCommand::processResponse(
+ReturnStatus PrintPalletSticker::processResponse(
     const QByteArray& dataBlock,
     StringDictionary& responseData) {
   if (!processDataBlock(dataBlock)) {

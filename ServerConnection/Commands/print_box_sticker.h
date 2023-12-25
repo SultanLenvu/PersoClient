@@ -4,7 +4,7 @@
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class BoxStickerPrintCommand : public AbstractClientCommand {
+class PrintBoxSticker : public AbstractClientCommand {
   Q_OBJECT
  private:
   const QString Name = COMMAND_PRINTBOXSTICKER_NAME;
@@ -14,8 +14,8 @@ class BoxStickerPrintCommand : public AbstractClientCommand {
   ReturnStatus Status;
 
  public:
-  explicit BoxStickerPrintCommand(const QString& name);
-  ~BoxStickerPrintCommand();
+  explicit PrintBoxSticker(const QString& name);
+  ~PrintBoxSticker();
 
   // AbstractClientCommand interface
  public:
@@ -26,7 +26,7 @@ class BoxStickerPrintCommand : public AbstractClientCommand {
                                        StringDictionary& responseData) override;
 
  private:
-  Q_DISABLE_COPY_MOVE(BoxStickerPrintCommand)
+  Q_DISABLE_COPY_MOVE(PrintBoxSticker)
 
  signals:
 };

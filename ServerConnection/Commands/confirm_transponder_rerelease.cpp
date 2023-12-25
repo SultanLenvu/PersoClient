@@ -1,58 +1,49 @@
 #include "confirm_transponder_rerelease.h"
-#include "Management/global_environment.h"
-#include "ProductionDispatcher/abstract_production_dispatcher.h"
 
-RereleaseConfirmCommand::RereleaseConfirmCommand(const QString& name)
-    : AbstractClientCommand(name) {
-  Status = ReturnStatus::Unknown;
+ConfirmTransponderRerelease::ConfirmTransponderRerelease(const QString& name)
+    : AbstractClientCommand(name) {}
 
-  connect(this, &RereleaseConfirmCommand::confirmRerelease_signal,
-          dynamic_cast<AbstractProductionDispatcher*>(
-              GlobalEnvironment::instance()->getObject(
-                  "GeneralProductionDispatcher")),
-          &AbstractProductionDispatcher::confirmTransponderRerelease,
-          Qt::BlockingQueuedConnection);
+ConfirmTransponderRerelease::~ConfirmTransponderRerelease() {}
+
+const QString& ConfirmTransponderRerelease::name() {
+  return Name;
 }
 
-RereleaseConfirmCommand::~RereleaseConfirmCommand() {}
+ReturnStatus ConfirmTransponderRerelease::generate(const StringDictionary& param,
+                                               QByteArray& dataBlock) {
+  Request["command_name"] = Name;
 
-void RereleaseConfirmCommand::process(const QJsonObject& command) {
-  if (command.size() != Size ||
-      (command["command_name"] != Name) || !command.contains("login") ||
-      !command.contains("password") || !command.contains("transpoder_ucid") ||
-      !command.contains("transpoder_pan")) {
-    Status = ReturnStatus::SyntaxError;
-    return;
+  if (!param.contains("transponder_pan") ||
+      !param.contains("transponder_ucid")) {
+    return ReturnStatus::ParameterError;
   }
 
-  Parameters.insert("login", command.value("login").toString());
-  Parameters.insert("password", command.value("password").toString());
-  Parameters.insert("personal_account_number",
-                    command.value("transpoder_pan").toString());
-  Parameters.insert("ucid", command.value("transpoder_ucid").toString());
+  // Тело команды
+  Request["transponder_pan"] = param["transponder_pan"];
+  Request["transponder_ucid"] = param["transponder_ucid"];
 
-  // Подтверждение выпуска транспондера
-  emit confirmRerelease_signal(Parameters, Status);
+  generateDataBlock(dataBlock);
+  return ReturnStatus::NoError;
 }
 
-void RereleaseConfirmCommand::generateResponse(QJsonObject& response) {
-  response["response_name"] = Name;
+ReturnStatus ConfirmTransponderRerelease::processResponse(
+    const QByteArray& dataBlock,
+    StringDictionary& responseData) {
+  if (!processDataBlock(dataBlock)) {
+    sendLog("Получена ошибка при обработке полученного блока данных.");
+    return ReturnStatus::ServerResponseDataBlockError;
+  }
 
-  //  if (Status == ReturnStatus::NoError) {
-  //    response["transponder_sn"] = Result.value("transponder_sn");
-  //    response["transponder_pan"] = Result.value("transponder_pan");
-  //    response["box_id"] = Result.value("box_id");
-  //    response["pallet_id"] = Result.value("pallet_id");
-  //    response["order_id"] = Result.value("order_id");
-  //    response["issuer_name"] = Result.value("issuer_name");
-  //    response["transponder_model"] = Result.value("transponder_model");
-  //  }
+  if ((Response.size() != ResponseSize) || (Response["command_name"] != Name) ||
+      (!Response.contains("return_status"))) {
+    return ReturnStatus::ServerResponseSyntaxError;
+  }
 
-  response["return_status"] = QString::number(static_cast<size_t>(Status));
-}
+  ReturnStatus ret = processReturnStatus(Response["return_status"].toString());
+  if (ret != ReturnStatus::NoError) {
+    sendLog("Получена ошибка при выполнении команды на сервере.");
+    return ret;
+  }
 
-void RereleaseConfirmCommand::reset() {
-  Parameters.clear();
-  Result.clear();
-  Status = ReturnStatus::Unknown;
+  return ReturnStatus::NoError;
 }
