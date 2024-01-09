@@ -1,13 +1,10 @@
+#include <QMessageBox>
+
 #include "file_log_backend.h"
 
-FileLogBackend::FileLogBackend(QObject* parent) : LogBackend(parent) {
-  setObjectName("FileLogBackend");
+FileLogBackend::FileLogBackend(const QString& name) : LogBackend(name) {
   loadSettings();
   initialize();
-
-  connect(this, &FileLogBackend::notifyAboutError,
-          InteractionSystem::instance(),
-          &InteractionSystem::generateErrorMessage);
 }
 
 FileLogBackend::~FileLogBackend() {}
@@ -38,7 +35,9 @@ void FileLogBackend::initialize() {
   QDir logDir;
   if (!logDir.mkpath(QApplication::applicationDirPath() + "/logs")) {
     LogEnable = false;
-    emit notifyAboutError("Не удалось создать директорию для логгирования. ");
+    QMessageBox::critical(nullptr, "Ошибка",
+                          "Не удалось создать директорию для логгирования. ",
+                          QMessageBox::Ok);
     return;
   }
 
@@ -50,7 +49,9 @@ void FileLogBackend::initialize() {
       QDateTime::currentDateTime().toString("dd.MM.yyyy hh.mm.ss"));
   if (!CurrentLogFile.open(QIODevice::WriteOnly)) {
     LogEnable = false;
-    emit notifyAboutError("Не удалось открыть файл для логгирования. ");
+    QMessageBox::critical(nullptr, "Ошибка",
+                          "Не удалось открыть файл для логгирования. ",
+                          QMessageBox::Ok);
     return;
   }
 

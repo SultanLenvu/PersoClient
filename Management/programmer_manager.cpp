@@ -1,4 +1,5 @@
 #include "programmer_manager.h"
+#include "global_environment.h"
 #include "jlink_exe_programmer.h"
 #include "log_system.h"
 
@@ -161,6 +162,8 @@ void ProgrammerManager::loadSettings() {}
 void ProgrammerManager::createProgrammer() {
   Programmer = std::unique_ptr<AbstractProgrammer>(
       new JLinkExeProgrammer("JLinkExeProgrammer2"));
-  connect(Programmer.get(), &AbstractProgrammer::logging, LogSystem::instance(),
+  connect(Programmer.get(), &AbstractProgrammer::logging,
+          dynamic_cast<LogSystem*>(
+              GlobalEnvironment::instance()->getObject("LogSystem")),
           &LogSystem::generate);
 }

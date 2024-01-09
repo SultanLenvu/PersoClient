@@ -1,51 +1,22 @@
 #include "sticker_printer_gui_subkernel.h"
 #include "custom_transponder_sticker_dialog.h"
 #include "master_gui.h"
-#include "production_gui.h"
-#include "testing_gui.h"
+#include "production_assembler_gui.h"
+#include "production_tester_gui.h"
 
 StickerPrinterGuiSubkernel::StickerPrinterGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel{name} {}
 
 StickerPrinterGuiSubkernel::~StickerPrinterGuiSubkernel() {}
 
-void StickerPrinterGuiSubkernel::setCurrentGui(
-    std::shared_ptr<AbstractGui> gui) {
+void StickerPrinterGuiSubkernel::connectAuthorizationGui(
+    std::shared_ptr<AuthorizationGui> gui) {
   CurrentGui = gui;
-
-  switch (gui->type()) {
-    case AbstractGui::Production:
-      connectProductionGui();
-      break;
-    case AbstractGui::Testing:
-      connectTestingGui();
-      break;
-    case AbstractGui::Master:
-      connectMasterGui();
-      break;
-    default:
-      break;
-  }
 }
 
-void StickerPrinterGuiSubkernel::connectProductionGui() {
-  ProductionGUI* gui = dynamic_cast<ProductionGUI*>(CurrentGui.get());
-
-  connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
-          &StickerPrinterGuiSubkernel::printLastTransponderSticker_guiSlot);
-}
-
-void StickerPrinterGuiSubkernel::connectTestingGui() {
-  TestingGui* gui = dynamic_cast<TestingGui*>(CurrentGui.get());
-
-  connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
-          &StickerPrinterGuiSubkernel::printLastTransponderSticker_guiSlot);
-  connect(gui->PrintCustomTransponderStickerButton, &QPushButton::clicked, this,
-          &StickerPrinterGuiSubkernel::printCustomTransponderSticker_guiSlot);
-}
-
-void StickerPrinterGuiSubkernel::connectMasterGui() {
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGui.get());
+void StickerPrinterGuiSubkernel::connectMasterGui(
+    std::shared_ptr<MasterGui> gui) {
+  CurrentGui = gui;
 
   connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
           &StickerPrinterGuiSubkernel::printLastTransponderSticker_guiSlot);
@@ -55,6 +26,39 @@ void StickerPrinterGuiSubkernel::connectMasterGui() {
       gui->ExecuteStickerPrinterCommandScriptButton, &QPushButton::clicked,
       this,
       &StickerPrinterGuiSubkernel::executeStickerPrinterCommandScript_guiSlot);
+}
+
+void StickerPrinterGuiSubkernel::connectProductionAssemblerGui(
+    std::shared_ptr<ProductionAssemblerGui> gui) {
+  CurrentGui = gui;
+
+  connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
+          &StickerPrinterGuiSubkernel::printLastTransponderSticker_guiSlot);
+}
+
+void StickerPrinterGuiSubkernel::connectProductionTesterGui(
+    std::shared_ptr<ProductionTesterGui> gui) {
+  CurrentGui = gui;
+
+  connect(gui->PrintLastTransponderStickerButton, &QPushButton::clicked, this,
+          &StickerPrinterGuiSubkernel::printLastTransponderSticker_guiSlot);
+  connect(gui->PrintCustomTransponderStickerButton, &QPushButton::clicked, this,
+          &StickerPrinterGuiSubkernel::printCustomTransponderSticker_guiSlot);
+}
+
+void StickerPrinterGuiSubkernel::resetCurrentGui() {
+  CurrentGui.reset();
+}
+
+void StickerPrinterGuiSubkernel::connectManager(
+    const StickerPrinterManager* manager) const {
+  connect(this, &StickerPrinterGuiSubkernel::printLastTransponderSticker_signal,
+          manager, &StickerPrinterManager::printLastTransponderSticker);
+  connect(this,
+          &StickerPrinterGuiSubkernel::printCustomTransponderSticker_signal,
+          manager, &StickerPrinterManager::printCustomTransponderSticker);
+  connect(this, &StickerPrinterGuiSubkernel::executeCommandScript_signal,
+          manager, &StickerPrinterManager::executeCommandScript);
 }
 
 void StickerPrinterGuiSubkernel::printLastTransponderSticker_guiSlot() {
@@ -79,7 +83,7 @@ void StickerPrinterGuiSubkernel::printCustomTransponderSticker_guiSlot() {
 void StickerPrinterGuiSubkernel::executeStickerPrinterCommandScript_guiSlot() {
   emit loggerClear_signal();
 
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGui);
+  MasterGui* gui = dynamic_cast<MasterGui*>(CurrentGui.get());
   std::shared_ptr<QStringList> script(new QStringList(
       gui->StickerPrinterCommandSriptTextEdit->toPlainText().split("\n\r")));
   emit executeCommandScript_signal(script);

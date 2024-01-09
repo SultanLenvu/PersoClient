@@ -1,32 +1,25 @@
+#include <QSettings>
+
+#include "definitions.h"
 #include "interaction_system.h"
 
-InteractionSystem::InteractionSystem(QWidget* parent)
-    : QWidget(parent) {
-  setObjectName("InteractionSystem");
+InteractionSystem::InteractionSystem(const QString& name) : QObject(nullptr) {
+  setObjectName(name);
   loadSettings();
-
-  ProgressDialog = nullptr;
-  CurrentOperationStep = 0;
 
   // Создаем таймеры
   createTimers();
 }
 
-InteractionSystem* InteractionSystem::instance() {
-  static InteractionSystem interactor(nullptr);
-  return &interactor;
-}
-
 void InteractionSystem::generateMessage(const QString& data) {
-  QMessageBox::information(this, "Сообщение", data, QMessageBox::Ok);
+  QMessageBox::information(nullptr, "Сообщение", data, QMessageBox::Ok);
 }
 
 void InteractionSystem::generateErrorMessage(const QString& text) {
-  QMessageBox::critical(this, "Ошибка", text, QMessageBox::Ok);
+  QMessageBox::critical(nullptr, "Ошибка", text, QMessageBox::Ok);
 }
 
-void InteractionSystem::startOperationProgressDialog(
-    const QString& operationName) {
+void InteractionSystem::operationStarted(const QString& operationName) {
   QSettings settings;
 
   // Создаем  окно
@@ -50,8 +43,8 @@ void InteractionSystem::startOperationProgressDialog(
   ODMeter->start();
 }
 
-void InteractionSystem::finishOperationProgressDialog(
-    const QString& operationName) {
+void InteractionSystem::operationFinished(const QString& operationName,
+                                          ReturnStatus ret) {
   QSettings settings;
 
   // Измеряем и сохраняем длительность операции
@@ -70,55 +63,6 @@ void InteractionSystem::finishOperationProgressDialog(
   destroyProgressDialog();
 }
 
-bool InteractionSystem::getMasterPassword(QString& pass) {
-  MasterPasswordInputDialog dialog(this);
-
-  if (dialog.exec() == QDialog::Rejected) {
-    return false;
-  }
-
-  QHash<QString, QString> data;
-  dialog.getData(&data);
-
-  pass = data.value("password");
-  return true;
-}
-
-bool InteractionSystem::getAuthorizationData(QHash<QString, QString>* data) {
-  AuthorizationDialog dialog(this);
-
-  if (dialog.exec() == QDialog::Rejected) {
-    return false;
-  }
-
-  dialog.getData(data);
-  return true;
-}
-
-bool InteractionSystem::getTransponderStickerData(
-    QHash<QString, QString>* data) {
-  TransponderStickerScanDialog dialog(this);
-
-  if (dialog.exec() == QDialog::Rejected) {
-    return false;
-  }
-
-  dialog.getData(data);
-  return true;
-}
-
-bool InteractionSystem::getCustomTransponderStickerData(
-    QHash<QString, QString>* data) {
-  CustomTransponderStickerScanDialog dialog(this);
-
-  if (dialog.exec() == QDialog::Rejected) {
-    return false;
-  }
-
-  dialog.getData(data);
-  return true;
-}
-
 void InteractionSystem::applySettings() {
   sendLog("Применение новых настроек. ");
   loadSettings();
@@ -130,19 +74,15 @@ void InteractionSystem::applySettings() {
 
 void InteractionSystem::loadSettings() {
   QSettings settings;
-
-  LogEnable = settings.value("user_interaction_system/log_enable").toBool();
 }
 
 void InteractionSystem::sendLog(const QString& log) {
-  if (LogEnable) {
-    emit logging("InteractionSystem - " + log);
-  }
+  emit logging(objectName() + " - " + log);
 }
 
 void InteractionSystem::createProgressDialog() {
-  ProgressDialog =
-      new QProgressDialog("Выполнение операции...", "Закрыть", 0, 100);
+  ProgressDialog = std::unique_ptr<QProgressDialog>(
+      new QProgressDialog("Выполнение операции...", "Закрыть", 0, 100));
   ProgressDialog->setWindowModality(Qt::ApplicationModal);
   ProgressDialog->setAutoClose(false);
   ProgressDialog->show();
@@ -150,40 +90,38 @@ void InteractionSystem::createProgressDialog() {
 
 void InteractionSystem::destroyProgressDialog() {
   ProgressDialog->close();
-  delete ProgressDialog;
-  ProgressDialog = nullptr;
-  CurrentOperationStep = 0;
+  ProgressDialog.reset();
 }
 
 void InteractionSystem::createTimers() {
   // Таймер, отслеживающий длительность выполняющихся операций
-  ODTimer = new QTimer(this);
+  ODTimer = std::make_unique<QTimer>(new QTimer());
   ODTimer->setInterval(CLIENT_MANAGER_OPERATION_MAX_DURATION);
-  connect(ODTimer, &QTimer::timeout, this,
-          &InteractionSystem::on_ODTimerTimeout_slot);
-  connect(ODTimer, &QTimer::timeout, ODTimer, &QTimer::stop);
+  connect(ODTimer.get(), &QTimer::timeout, this,
+          &InteractionSystem::odTimerTimeout_slot);
+  connect(ODTimer.get(), &QTimer::timeout, ODTimer.get(), &QTimer::stop);
 
   // Таймер для измерения длительности операции
-  ODMeter = new QElapsedTimer();
+  ODMeter = std::unique_ptr<QElapsedTimer>(new QElapsedTimer());
 
   // Таймер, отслеживающий квант длительности операции
-  ODQTimer = new QTimer(this);
-  connect(ODQTimer, &QTimer::timeout, this,
-          &InteractionSystem::on_ODQTimerTimeout_slot);
+  ODQTimer = std::make_unique<QTimer>(new QTimer());
+  connect(ODQTimer.get(), &QTimer::timeout, this,
+          &InteractionSystem::odqTimerTimeout_slot);
 }
 
-void InteractionSystem::on_ODTimerTimeout_slot() {
+void InteractionSystem::odTimerTimeout_slot() {
   sendLog("Операция выполняется слишком долго. Сброс. ");
   generateErrorMessage("Операция выполняется слишком долго. Сброс. ");
 }
 
-void InteractionSystem::on_ODQTimerTimeout_slot() {
+void InteractionSystem::odqTimerTimeout_slot() {
   if (!ProgressDialog) {
     return;
   }
 
-  CurrentOperationStep++;
-  if (CurrentOperationStep < 100) {
-    ProgressDialog->setValue(CurrentOperationStep);
+  uint32_t cv = ProgressDialog->value();
+  if (cv < 100) {
+    ProgressDialog->setValue(++cv);
   }
 }

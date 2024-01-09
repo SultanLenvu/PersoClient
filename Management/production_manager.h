@@ -33,7 +33,7 @@ class ProductionManager : public AbstractManager {
 
   void releaseTransponder(void);
   void rereleaseTransponder(const std::shared_ptr<StringDictionary> param);
-  void rollbackProductionLine(void);
+  void rollbackTransponder(void);
 
   void printBoxSticker(const std::shared_ptr<StringDictionary> param);
   void printLastBoxSticker(void);

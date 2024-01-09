@@ -1,14 +1,21 @@
 cmake_minimum_required(VERSION 3.16)
 project(PersoClient VERSION 1.0 LANGUAGES C CXX)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+#========================================== INCLUSION OF QT ===========================================#
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
 find_package(QT NAMES Qt5 Qt6 REQUIRED COMPONENTS Core)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Network PrintSupport Core5Compat)
 find_package(Qt${QT_VERSION_MAJOR} OPTIONAL_COMPONENTS Widgets)
+#======================================================================================================#
 
-qt_standard_project_setup()
-
+#========================================== SOURCE DIRECTORIES ===========================================#
 include_directories(Management/)
 include_directories(GUI/)
 include_directories(GUI/Dialogs)
@@ -19,8 +26,9 @@ include_directories(Programmers/)
 include_directories(Printing/)
 include_directories(ServerConnection/)
 include_directories(ServerConnection/Commands/)
+#======================================================================================================#
 
-qt_add_executable(PersoClient WIN32
+add_executable(PersoClient WIN32
     Management/global_environment.cpp Management/global_environment.h
     Management/abstract_manager.h Management/abstract_manager.cpp
     Management/production_manager.h Management/production_manager.cpp
@@ -33,11 +41,11 @@ qt_add_executable(PersoClient WIN32
     GUI/interaction_system.cpp GUI/interaction_system.h
     GUI/gui_kernel.cpp GUI/gui_kernel.h
     GUI/master_gui.cpp GUI/master_gui.h
-    GUI/production_gui.cpp GUI/production_gui.h
-    GUI/testing_gui.cpp GUI/testing_gui.h
+    GUI/production_assembler_gui.cpp GUI/production_assembler_gui.h
+    GUI/production_tester_gui.cpp GUI/production_tester_gui.h
 
     GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
-    GUI/Subkernels/network_gui_subkernel.h GUI/Subkernels/network_gui_subkernel.cpp
+    GUI/Subkernels/production_gui_subkernel.h GUI/Subkernels/production_gui_subkernel.cpp
     GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
     GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
 
@@ -105,13 +113,6 @@ install(TARGETS PersoClient
     BUNDLE DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-
-qt_generate_deploy_app_script(
-    TARGET PersoClient
-    FILENAME_VARIABLE deploy_script
-    NO_UNSUPPORTED_PLATFORM_ERROR
-)
-install(SCRIPT ${deploy_script})
 
 add_custom_target(docs doxygen doxygen.conf
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}

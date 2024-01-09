@@ -3,9 +3,6 @@
 
 #include "abstract_input_dialog.h"
 
-/*!
- * Master password dialog
- */
 class MasterPasswordInputDialog : public AbstractInputDialog {
   Q_OBJECT
  private:

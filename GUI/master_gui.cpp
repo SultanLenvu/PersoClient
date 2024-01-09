@@ -1,6 +1,7 @@
 #include "master_gui.h"
+#include "General/definitions.h"
 
-MasterGUI::MasterGUI(QWidget* parent) : AbstractGui(parent, Master) {
+MasterGui::MasterGui(QWidget* parent) : AbstractGui(parent, Master) {
   // Вкладки с всеми интерфейсами
   Tabs = new QTabWidget();
   MainLayout->addWidget(Tabs);
@@ -25,25 +26,25 @@ MasterGUI::MasterGUI(QWidget* parent) : AbstractGui(parent, Master) {
   MainLayout->setStretch(1, 2);
 }
 
-MasterGUI::~MasterGUI() {}
+MasterGui::~MasterGui() {}
 
-void MasterGUI::update() {
+void MasterGui::update() {
   TransponderDataView->resizeColumnsToContents();
   TransponderDataView->update();
 }
 
-void MasterGUI::displayLogData(const QString& log) {
+void MasterGui::displayLogData(const QString& log) {
   if (GeneralLogs->toPlainText().count() > 500000)
     GeneralLogs->clear();
 
   GeneralLogs->appendPlainText(log);
 }
 
-void MasterGUI::clearLogDataDisplay() {
+void MasterGui::clearLogDataDisplay() {
   GeneralLogs->clear();
 }
 
-void MasterGUI::createServerTab() {
+void MasterGui::createServerTab() {
   ServerTab = new QWidget();
   Tabs->addTab(ServerTab, "Сервер");
 
@@ -65,8 +66,7 @@ void MasterGUI::createServerTab() {
       new QPushButton(QString("Отключиться от сервера персонализации"));
   ServerControlPanelLayout->addWidget(ServerDisconnectButton);
 
-  ServerEchoRequestButton =
-      new QPushButton(QString("Отправить эхо-запрос"));
+  ServerEchoRequestButton = new QPushButton(QString("Отправить эхо-запрос"));
   ServerControlPanelLayout->addWidget(ServerEchoRequestButton);
 
   ServerControlPanelVS1 =
@@ -80,9 +80,9 @@ void MasterGUI::createServerTab() {
   RereleaseTransponderButton =
       new QPushButton(QString("Перевыпустить транспондер"));
   ServerControlPanelLayout->addWidget(RereleaseTransponderButton);
-  RollbackProductionLinePushButton =
+  rollbackTransponderPushButton =
       new QPushButton(QString("Откатить производственную линию"));
-  ServerControlPanelLayout->addWidget(RollbackProductionLinePushButton);
+  ServerControlPanelLayout->addWidget(rollbackTransponderPushButton);
   ServerControlPanelVS2 =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ServerControlPanelLayout->addItem(ServerControlPanelVS2);
@@ -115,7 +115,7 @@ void MasterGUI::createServerTab() {
   ServerTabMainLayout->setStretch(1, 3);
 }
 
-void MasterGUI::createProgrammatorTab() {
+void MasterGui::createProgrammatorTab() {
   ProgrammatorTab = new QWidget();
   Tabs->addTab(ProgrammatorTab, "Программатор");
 
@@ -151,7 +151,7 @@ void MasterGUI::createProgrammatorTab() {
   ProgrammatorControlPanelLayout->addWidget(lockMemoryButton);
 }
 
-void MasterGUI::createStickerPrinterTab() {
+void MasterGui::createStickerPrinterTab() {
   StickerPrinterTab = new QWidget();
   Tabs->addTab(StickerPrinterTab, "Стикер принтер");
   // Загружаем настройки приложения
@@ -191,7 +191,7 @@ void MasterGUI::createStickerPrinterTab() {
       StickerPrinterCommandSriptTextEdit);
 }
 
-void MasterGUI::createSettingsTab() {
+void MasterGui::createSettingsTab() {
   SettingsTab = new QWidget();
   Tabs->addTab(SettingsTab, "Настройки");
   // Загружаем настройки приложения
@@ -268,7 +268,7 @@ void MasterGUI::createSettingsTab() {
   ProgrammerSettingsMainLayout->addWidget(ProgrammerExeFilePathPushButton, 0, 2,
                                           1, 1);
   connect(ProgrammerExeFilePathPushButton, &QPushButton::clicked, this,
-          &MasterGUI::on_ProgrammerExeFilePathPushButton_slot);
+          &MasterGui::on_ProgrammerExeFilePathPushButton_slot);
   ProgrammerSpeedLabel = new QLabel("Скорость работы (кГц)");
   ProgrammerSettingsMainLayout->addWidget(ProgrammerSpeedLabel, 1, 0, 1, 1);
   ProgrammerSpeedLineEdit =
@@ -293,7 +293,7 @@ void MasterGUI::createSettingsTab() {
   StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathPushButton,
                                               0, 2, 1, 1);
   connect(StickerPrinterLibPathPushButton, &QPushButton::clicked, this,
-          &MasterGUI::on_StickerPrinterLibPathPushButton_slot);
+          &MasterGui::on_StickerPrinterLibPathPushButton_slot);
 
   // Кнопка сохранения настроек
   ApplySettingsPushButton = new QPushButton("Применить изменения");
@@ -308,7 +308,7 @@ void MasterGUI::createSettingsTab() {
   SettingsMainLayout->addItem(SettingsHS1);
 }
 
-void MasterGUI::createLogWidgets() {
+void MasterGui::createLogWidgets() {
   // Виджеты для отображения логов
   GeneralLogGroup = new QGroupBox("Логи");
   MainLayout->addWidget(GeneralLogGroup);
@@ -325,13 +325,13 @@ void MasterGUI::createLogWidgets() {
   GeneralLogLayout->addWidget(GeneralLogs);
 }
 
-void MasterGUI::on_ProgrammerExeFilePathPushButton_slot() {
+void MasterGui::on_ProgrammerExeFilePathPushButton_slot() {
   QString filePath =
       QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.exe");
   ProgrammerExeFilePathLineEdit->setText(filePath);
 }
 
-void MasterGUI::on_StickerPrinterLibPathPushButton_slot() {
+void MasterGui::on_StickerPrinterLibPathPushButton_slot() {
   QString filePath =
       QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.dll");
   StickerPrinterLibPathLineEdit->setText(filePath);

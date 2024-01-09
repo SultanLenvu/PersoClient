@@ -3,16 +3,13 @@
 
 #include <QHostAddress>
 #include <QList>
-#include <QMutex>
 #include <QObject>
 #include <QSettings>
 #include <QThread>
 #include <QTime>
 #include <QUdpSocket>
 
-#include "file_log_backend.h"
 #include "log_backend.h"
-#include "widget_log_backend.h"
 
 /* Глобальная система логгирования */
 //==================================================================================
@@ -22,26 +19,22 @@ class LogSystem : public QObject {
 
  private:
   bool LogEnable;
-  bool ExtendedLogEnable;
 
-  QList<LogBackend*> Backends;
-  FileLogBackend* FileLogger;
-  WidgetLogBackend* WidgetLogger;
-
-  QMutex mutex;
+  std::vector<std::unique_ptr<LogBackend>> Backends;
 
  public:
+  explicit LogSystem(const QString& name);
   ~LogSystem();
-  static LogSystem* instance(void);
 
  public slots:
   void clear(void);
   void generate(const QString& log);
+  void applySettings(void);
 
  private:
   LogSystem();
-  explicit LogSystem(const QString& name);
   Q_DISABLE_COPY_MOVE(LogSystem)
+
   void loadSettings(void);
 };
 

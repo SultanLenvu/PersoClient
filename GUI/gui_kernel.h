@@ -8,20 +8,17 @@
 #include <QTextStream>
 #include <QtWidgets>
 
-#include "Log/log_system.h"
 #include "abstract_gui.h"
 #include "abstract_gui_subkernel.h"
 #include "abstract_manager.h"
 #include "interaction_system.h"
+#include "log_system.h"
 
 class GuiKernel : public QMainWindow {
   Q_OBJECT
 
  private:
   QSize DesktopGeometry;
-  std::shared_ptr<AbstractGui> CurrentGui;
-
-  std::vector<std::shared_ptr<AbstractGuiSubkernel>> Subkernels;
 
   // Верхнее меню
   //==================================================
@@ -33,13 +30,15 @@ class GuiKernel : public QMainWindow {
   QAction* AboutProgramAct;
   //==================================================
 
-  LogSystem* Logger;
-  std::unique_ptr<QThread> LoggerThread;
+  std::shared_ptr<AbstractGui> CurrentGui;
+  std::unordered_map<QString, std::shared_ptr<AbstractGuiSubkernel>> Subkernels;
+
+  std::unique_ptr<LogSystem> Logger;
+  std::unique_ptr<InteractionSystem> Interactor;
+  std::unique_ptr<QThread> ServiceThread;
 
   std::unordered_map<QString, std::shared_ptr<AbstractManager>> Managers;
   std::unique_ptr<QThread> ManagersThread;
-
-  std::unique_ptr<InteractionSystem> Interactor;
 
  public:
   explicit GuiKernel(QWidget* parent = nullptr);
@@ -49,42 +48,43 @@ class GuiKernel : public QMainWindow {
   // Настройки
   void applySettingsPushButton_slot(void);
 
-  // Верхнее меню
-  void displayMasterInterface_slot(void);
-  void displayProductionInterface_slot(void);
-  void displayAuthorizationInterface_slot(void);
+  void displayMasterGui_slot(void);
+  void displayProductionAssemblerGui_slot(void);
+  void displayProductionTesterGui_slot(void);
+  void displayAuthorizationGui_slot(void);
 
  private:
   Q_DISABLE_COPY_MOVE(GuiKernel);
   void loadSettings(void);
-  bool checkNewSettings(void);
-
-  void createAuthorizationInterface(void);
-  void createMasterInterface(void);
-  void createProductionInterface(void);
-  void createTestingInterface(void);
-
-  void connectCurrentGui(void);
+  void registerMetaTypes(void);
 
   void createTopMenuActions(void);
   void createTopMenu(void);
 
-  void createManagersInstance(void);
   void createLoggerInstance(void);
   void createInteractorInstance(void);
 
-  void registerMetaTypes(void);
+  void createManagersInstance(void);
 
- private slots:
-  void currentGuiVisibilityChanged_slot(void);
-  void displayTransponderData_slot(
-      QSharedPointer<QHash<QString, QString>> data);
+  void createGuiSubkernels(void);
+  void createProductionGuiSubkernel(void);
+  void createProgrammerGuiSubkernel(void);
+  void createStickerPrinterGuiSubkernel(void);
+
+  void createAuthorizationGui(void);
+  void connectAuthorizationGui(void);
+  void createMasterGui(void);
+  void connectMasterGui(void);
+  void createProductionAssemblerGui(void);
+  void connectProductionAssemblerGui(void);
+  void createProductionTesterGui(void);
+  void connectProductionTesterGui(void);
+
+  bool checkNewSettings(void);
 
  signals:
   void applySettings_signal(void);
-
-  // Сигналы для логгера
-  void loggerClear_signal(void);
+  void clearLogDisplay_signal(void);
 };
 
 #endif  // GUI_KERNEL_H

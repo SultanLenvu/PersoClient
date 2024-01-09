@@ -1,23 +1,19 @@
-#ifndef PRODUCTION_GUI_H
-#define PRODUCTION_GUI_H
+#ifndef PRODUCTION_ASSEMBLER_GUI_H
+#define PRODUCTION_ASSEMBLER_GUI_H
 
 #include <QTableView>
 
 #include "abstract_gui.h"
 
-/*!
- * Production GUI mode
- */
-class ProductionGUI : public AbstractGui {
+class ProductionAssemblerGui : public AbstractGui {
  public:
-  //! \cond
   QVBoxLayout* ControlPanelLayout;
 
   QGroupBox* TransponderGroup;
   QVBoxLayout* TransponderLayout;
   QPushButton* ReleaseTransponderButton;
   QSpacerItem* ButtonVerticalSpacer;
-  QPushButton* RollbackProductionLinePushButton;
+  QPushButton* rollbackTransponderPushButton;
   QPushButton* RereleaseTransponderButton;
 
   QGroupBox* PrintStickerGroup;
@@ -29,28 +25,15 @@ class ProductionGUI : public AbstractGui {
   QGroupBox* TransponderDataGroup;
   QVBoxLayout* TransponderDataLayout;
   QTableView* TransponderDataView;
-  //! \endcond
 
  public:
-  /*!
-   * Default constructor. Initialize widgets and layout
-   * \param parent Parent widget
-   */
-  explicit ProductionGUI(QWidget* parent);
-  /*!
-   * Default destructor
-   */
-  ~ProductionGUI();
+  explicit ProductionAssemblerGui(QWidget* parent);
+  ~ProductionAssemblerGui();
 
-  /*!
-   * Update sizes to match TransponderDataView column sizes
-   */
   virtual void update(void) override;
 
  private:
-  //! \cond
-  Q_DISABLE_COPY(ProductionGUI);
-  //! \endcond
+  Q_DISABLE_COPY_MOVE(ProductionAssemblerGui);
 };
 
-#endif  // PRODUCTION_GUI_H
+#endif  // PRODUCTION_ASSEMBLER_GUI_H

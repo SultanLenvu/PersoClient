@@ -6,17 +6,13 @@
 
 #include "Log/log_backend.h"
 
-/*!
- * Log backend to display log lines in master GUI.
- * \todo log to specific QWidget
- */
 class WidgetLogBackend : public LogBackend {
- Q_OBJECT
+  Q_OBJECT
  private:
   bool LogEnable;
 
  public:
-  explicit WidgetLogBackend(QObject* parent);
+  explicit WidgetLogBackend(const QString& name);
   ~WidgetLogBackend();
 
   virtual void writeLogLine(const QString& str) override;
@@ -24,7 +20,7 @@ class WidgetLogBackend : public LogBackend {
   virtual void applySettings() override;
 
  private:
-  Q_DISABLE_COPY(WidgetLogBackend);
+  Q_DISABLE_COPY_MOVE(WidgetLogBackend);
   void loadSettings(void);
 
  signals:

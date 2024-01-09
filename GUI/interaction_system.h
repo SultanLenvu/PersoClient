@@ -1,4 +1,4 @@
-#ifndef INTERACTION_SYSTEM_H
+﻿#ifndef INTERACTION_SYSTEM_H
 #define INTERACTION_SYSTEM_H
 
 #include <QElapsedTimer>
@@ -8,53 +8,48 @@
 #include <QObject>
 #include <QProgressBar>
 #include <QProgressDialog>
+#include <QTimer>
 
-/*!
- * Interaction system singleton. Show dialogs, messages, etc
- */
-class InteractionSystem : public QWidget {
+#include "types.h"
+
+class InteractionSystem : public QObject {
   Q_OBJECT
 
  private:
-  QProgressDialog* ProgressDialog;
-  uint32_t CurrentOperationStep;
+  std::unique_ptr<QProgressDialog> ProgressDialog;
 
-  QTimer* ODTimer;
-  QTimer* ODQTimer;
-  QElapsedTimer* ODMeter;
+  std::unique_ptr<QTimer> ODTimer;
+  std::unique_ptr<QTimer> ODQTimer;
+  std::unique_ptr<QElapsedTimer> ODMeter;
 
  public:
-  static InteractionSystem* instance(void);
+  explicit InteractionSystem(const QString& name);
 
  public slots:
   void generateMessage(const QString& data);
   void generateErrorMessage(const QString& text);
 
-  void startOperationProgressDialog(const QString& operationName);
-  void finishOperationProgressDialog(const QString& operationName);
-
-  bool getMasterPassword(QString& pass);
-  bool getAuthorizationData(QHash<QString, QString>* data);
-  bool getTransponderStickerData(QHash<QString, QString>* data);
-  bool getCustomTransponderStickerData(QHash<QString, QString>* data);
+  void operationStarted(const QString& opName);
+  void operationFinished(const QString& opName, ReturnStatus ret);
 
   void applySettings(void);
 
  private:
-  explicit InteractionSystem(QWidget* window);
-  Q_DISABLE_COPY(InteractionSystem)
-
+  Q_DISABLE_COPY_MOVE(InteractionSystem)
+  void sendLog(const QString& log);
   void loadSettings(void);
+
   void createProgressDialog(void);
   void destroyProgressDialog(void);
   void createTimers(void);
 
  private slots:
-  void on_ODTimerTimeout_slot(void);
-  void on_ODQTimerTimeout_slot(void);
+  void odTimerTimeout_slot(void);
+  void odqTimerTimeout_slot(void);
 
  signals:
   void abortCurrentOperation(void);
+  void logging(const QString& log);
 };
 
 #endif  // INTERACTION_SYSTEM_H

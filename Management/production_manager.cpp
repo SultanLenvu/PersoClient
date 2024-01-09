@@ -1,5 +1,6 @@
 #include "production_manager.h"
 #include "definitions.h"
+#include "global_environment.h"
 #include "jlink_exe_programmer.h"
 #include "log_system.h"
 #include "perso_server_connection.h"
@@ -46,7 +47,7 @@ void ProductionManager::initServerConnection(
   }
 
   // Запрашиваем данные текущего транспондера
-  ret = Server->update(*TransponderData);
+  ret = Server->getCurrentTransponderData(*TransponderData);
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("initServerConnection", ret);
     return;
@@ -112,7 +113,7 @@ void ProductionManager::releaseTransponder() {
   }
 
   // Выпускаем транспондер
-  ret = Server->release(result);
+  ret = Server->releaseTransponder(result);
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("releaseTransponder", ret);
     return;
@@ -147,14 +148,14 @@ void ProductionManager::releaseTransponder() {
 
   // Подтверждаем выпуск транспондера
   param.insert("transponder_ucid", ucid);
-  ret = Server->confirmRelease(param);
+  ret = Server->confirmTransponderRelease(param);
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("releaseTransponder", ret);
     return;
   }
 
   // Запрашиваем данные очередного транспондера
-  ret = Server->update(*TransponderData);
+  ret = Server->getCurrentTransponderData(*TransponderData);
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("releaseTransponder", ret);
     return;
@@ -195,7 +196,7 @@ void ProductionManager::rereleaseTransponder(
 
   // Перевыпускаем транспондер
   requestParam.insert("transponder_pan", param->value("transponder_pan"));
-  ret = Server->rerelease(requestParam, result);
+  ret = Server->rereleaseTransponder(requestParam, result);
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("rereleaseTransponder", ret);
     return;
@@ -230,7 +231,7 @@ void ProductionManager::rereleaseTransponder(
 
   // Подтверждаем перевыпуск транспондера
   requestParam.insert("transponder_ucid", ucid);
-  ret = Server->confirmRerelease(requestParam);
+  ret = Server->confirmTransponderRerelease(requestParam);
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("rereleaseTransponder", ret);
     return;
@@ -252,19 +253,19 @@ void ProductionManager::rereleaseTransponder(
   emit executionFinished("rereleaseTransponder", ret);
 }
 
-void ProductionManager::rollbackProductionLine() {
-  emit executionStarted("rollbackProductionLine");
+void ProductionManager::rollbackTransponder() {
+  emit executionStarted("rollbackTransponder");
   sendLog("Откат производственной линии. ");
 
   ReturnStatus ret;
-  ret = Server->rollback();
+  ret = Server->rollbackTransponder();
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("rollbackProductionLine", ret);
+    emit executionFinished("rollbackTransponder", ret);
     return;
   }
 
   // Запрашиваем данные очередного транспондера
-  ret = Server->update(*TransponderData);
+  ret = Server->getCurrentTransponderData(*TransponderData);
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("releaseTransponder", ret);
     return;
@@ -275,7 +276,7 @@ void ProductionManager::rollbackProductionLine() {
 
   // Завершаем операцию
   sendLog("Откат производственной линии успешно завершен. ");
-  emit executionFinished("rollbackProductionLine", ret);
+  emit executionFinished("rollbackTransponder", ret);
 }
 
 void ProductionManager::printBoxSticker(
@@ -353,7 +354,9 @@ void ProductionManager::sendLog(const QString& log) {
 void ProductionManager::createProgrammer() {
   Programmer = std::unique_ptr<AbstractProgrammer>(
       new JLinkExeProgrammer("JLinkExeProgrammer1"));
-  connect(Programmer.get(), &AbstractProgrammer::logging, LogSystem::instance(),
+  connect(Programmer.get(), &AbstractProgrammer::logging,
+          dynamic_cast<LogSystem*>(
+              GlobalEnvironment::instance()->getObject("LogSystem")),
           &LogSystem::generate);
 }
 
@@ -361,12 +364,16 @@ void ProductionManager::createServer() {
   Server = std::unique_ptr<AbstractServerConnection>(
       new PersoServerConnection("PersoServerConnection"));
   connect(Server.get(), &AbstractServerConnection::logging,
-          LogSystem::instance(), &LogSystem::generate);
+          dynamic_cast<LogSystem*>(
+              GlobalEnvironment::instance()->getObject("LogSystem")),
+          &LogSystem::generate);
 }
 
 void ProductionManager::createStickerPrinter() {
   StickerPrinter =
       std::unique_ptr<AbstractStickerPrinter>(new TE310Printer("TSC TE310"));
   connect(StickerPrinter.get(), &AbstractStickerPrinter::logging,
-          LogSystem::instance(), &LogSystem::generate);
+          dynamic_cast<LogSystem*>(
+              GlobalEnvironment::instance()->getObject("LogSystem")),
+          &LogSystem::generate);
 }

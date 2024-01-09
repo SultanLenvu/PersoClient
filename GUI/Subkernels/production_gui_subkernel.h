@@ -1,35 +1,51 @@
-#ifndef NETWORKGUISUBKERNEL_H
-#define NETWORKGUISUBKERNEL_H
+#ifndef ProductionGuiSubkernel_H
+#define ProductionGuiSubkernel_H
 
 #include "abstract_gui_subkernel.h"
 #include "hash_model.h"
+#include "production_manager.h"
 #include "types.h"
 
-class NetworkGuiSubkernel : public AbstractGuiSubkernel {
+class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   Q_OBJECT
+
+ private:
+  enum UserRole {
+    Tester,
+    Assembler,
+  };
+
  private:
   std::shared_ptr<AbstractGui> CurrentGui;
-  std::shared_ptr<AbstractManager> Manager;
 
   std::unique_ptr<HashModel> TransponderDataModel;
 
+  UserRole CurrentRole;
+
  public:
-  explicit NetworkGuiSubkernel(const QString& name);
-  ~NetworkGuiSubkernel();
+  explicit ProductionGuiSubkernel(const QString& name);
+  ~ProductionGuiSubkernel();
 
   // AbstractGuiSubkernel interface
  public:
-  virtual void setCurrentGui(std::shared_ptr<AbstractGui> gui) override;
+  virtual void connectAuthorizationGui(
+      std::shared_ptr<AuthorizationGui> gui) override;
+  virtual void connectMasterGui(std::shared_ptr<MasterGui> gui) override;
+  virtual void connectProductionAssemblerGui(
+      std::shared_ptr<ProductionAssemblerGui> gui) override;
+  virtual void connectProductionTesterGui(
+      std::shared_ptr<ProductionTesterGui> gui) override;
+  virtual void resetCurrentGui() override;
 
+ public:
+  void connectManager(const ProductionManager* manager) const;
+
+ public slots:
+  void authorizationCompleted_slot(void);
   void displayTransponderData(const std::shared_ptr<StringDictionary> data);
 
  private:
-  Q_DISABLE_COPY_MOVE(NetworkGuiSubkernel);
-
-  void connectAuthorizationGui(void);
-  void connectProductionGui(void);
-  void connectTestingGui(void);
-  void connectMasterGui(void);
+  Q_DISABLE_COPY_MOVE(ProductionGuiSubkernel);
 
   void connect_guiSlot(void);
   void disconnect_guiSlot(void);
@@ -37,7 +53,7 @@ class NetworkGuiSubkernel : public AbstractGuiSubkernel {
   void authorize_guiSlot(void);
   void releaseTransponder_guiSlot(void);
   void rereleaseTransponder_guiSlot(void);
-  void rollbackProductionLine_guiSlot(void);
+  void rollbackTransponder_guiSlot(void);
 
   void printBoxSticker_guiSlot(void);
   void printLastBoxSticker_guiSlot(void);
@@ -45,7 +61,8 @@ class NetworkGuiSubkernel : public AbstractGuiSubkernel {
   void printLastPalletSticker_guiSlot(void);
 
  signals:
-  void displayTestingGui(void);
+  void displayProductionAssemblerGui(void);
+  void displayProductionTesterGui(void);
 
   // Сигналы для менеджера
   void connectToServer_signal(void);
@@ -57,7 +74,7 @@ class NetworkGuiSubkernel : public AbstractGuiSubkernel {
   void releaseTransponder_signal();
   void rereleaseTransponder_signal(
       const std::shared_ptr<StringDictionary> param);
-  void rollbackProductionLine_signal(void);
+  void rollbackTransponder_signal(void);
 
   void printBoxSticker_signal(const std::shared_ptr<StringDictionary> data);
   void printLastBoxSticker_signal(void);
@@ -65,4 +82,4 @@ class NetworkGuiSubkernel : public AbstractGuiSubkernel {
   void printLastPalletSticker_signal(void);
 };
 
-#endif  // NETWORKGUISUBKERNEL_H
+#endif  // ProductionGuiSubkernel_H

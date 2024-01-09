@@ -3,8 +3,10 @@
 
 #include <QObject>
 
-#include "abstract_gui.h"
-#include "abstract_manager.h"
+#include "authorization_gui.h"
+#include "master_gui.h"
+#include "production_assembler_gui.h"
+#include "production_tester_gui.h"
 
 class AbstractGuiSubkernel : public QObject {
   Q_OBJECT
@@ -12,7 +14,12 @@ class AbstractGuiSubkernel : public QObject {
   explicit AbstractGuiSubkernel(const QString& name);
   virtual ~AbstractGuiSubkernel();
 
-  virtual void setCurrentGui(std::shared_ptr<AbstractGui> gui) = 0;
+  virtual void connectAuthorizationGui(
+      std::shared_ptr<AuthorizationGui> gui) = 0;
+  virtual void connectMasterGui(std::shared_ptr<MasterGui> gui) = 0;
+  virtual void connectProductionAssemblerGui(std::shared_ptr<ProductionAssemblerGui> gui) = 0;
+  virtual void connectProductionTesterGui(std::shared_ptr<ProductionTesterGui> gui) = 0;
+  virtual void resetCurrentGui(void);
 
  private:
   AbstractGuiSubkernel();

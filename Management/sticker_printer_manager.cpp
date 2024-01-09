@@ -1,4 +1,5 @@
 #include "sticker_printer_manager.h"
+#include "global_environment.h"
 #include "log_system.h"
 #include "te310_printer.h"
 
@@ -93,5 +94,7 @@ void StickerPrinterManager::createStickerPrinter() {
   StickerPrinter =
       std::unique_ptr<AbstractStickerPrinter>(new TE310Printer("TSC TE310"));
   connect(StickerPrinter.get(), &AbstractStickerPrinter::logging,
-          LogSystem::instance(), &LogSystem::generate);
+          dynamic_cast<LogSystem*>(
+              GlobalEnvironment::instance()->getObject("LogSystem")),
+          &LogSystem::generate);
 }

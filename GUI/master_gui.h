@@ -1,15 +1,10 @@
-#ifndef MASTERGUI_H
-#define MASTERGUI_H
+#ifndef MASTER_GUI_H
+#define MASTER_GUI_H
 
-#include "General/definitions.h"
 #include "abstract_gui.h"
 
-/*!
- * Master GUI mode
- */
-class MasterGUI : public AbstractGui {
+class MasterGui : public AbstractGui {
  public:
-  //! \cond
   QTabWidget* Tabs;
 
   // Виджеты для отображения логов
@@ -33,7 +28,7 @@ class MasterGUI : public AbstractGui {
   QPushButton* AuthorizePushButton;
   QPushButton* ReleaseTransponderButton;
   QPushButton* RereleaseTransponderButton;
-  QPushButton* RollbackProductionLinePushButton;
+  QPushButton* rollbackTransponderPushButton;
 
   QSpacerItem* ServerControlPanelVS2;
   QPushButton* PrintBoxStickerButton;
@@ -123,70 +118,27 @@ class MasterGUI : public AbstractGui {
 
   QSpacerItem* SettingsVS1;
   QSpacerItem* SettingsHS1;
-  //! \endcond
 
  public:
-  /*!
-   * Default constructor. Initialize
-   * \param[in] parent QObject parent
-   */
-  explicit MasterGUI(QWidget* parent);
-  /*!
-   * Default destructor
-   */
-  ~MasterGUI();
+  explicit MasterGui(QWidget* parent);
+  ~MasterGui();
 
-  /*!
-   * Resize TransponderInfoView to match amount of columns
-   */
   virtual void update(void) override;
 
  public slots:
-  /*!
-   * Show logs on the screen in GeneralLogs view
-   * \param[in] log new log line
-   */
   void displayLogData(const QString& log);
-  /*!
-   * Clear GeneralLogs view
-   */
   void clearLogDataDisplay(void);
 
  private:
-  //! \cond
-  Q_DISABLE_COPY(MasterGUI);
-  //! \endcond
-  /*!
-   * Create 'Server' tab widgets
-   * \todo Qt Designer?
-   */
+  Q_DISABLE_COPY(MasterGui);
   void createServerTab(void);
-  /*!
-   * Create 'Programmator' tab widgets
-   */
   void createProgrammatorTab(void);
-  /*!
-   * Create 'Sticker printer' tab widgets
-   */
-  void createStickerPrinterTab(void);
-  /*!
-   * Create 'Settings' tab widgets
-   */
   void createSettingsTab(void);
-  /*!
-   * Create logging-related widgets
-   */
   void createLogWidgets(void);
 
  private slots:
-  /*!
-   * Show file picker for JLink
-   */
   void on_ProgrammerExeFilePathPushButton_slot(void);
-  /*!
-   * Show file picker for TSC library
-   */
   void on_StickerPrinterLibPathPushButton_slot(void);
 };
 
-#endif  // MASTERGUI_H
+#endif  // MASTER_GUI_H

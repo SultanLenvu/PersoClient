@@ -1,14 +1,10 @@
-#ifndef TestingGui_H
-#define TestingGui_H
+#ifndef PRODUCTION_TESTER_GUI_H
+#define PRODUCTION_TESTER_GUI_H
 
 #include "abstract_gui.h"
 
-/*!
- * Testing interface
- */
-class TestingGui : public AbstractGui {
+class ProductionTesterGui : public AbstractGui {
  public:
-  //! \cond
   QVBoxLayout* ControlPanelLayout;
 
   QGroupBox* TransponderGroup;
@@ -27,27 +23,15 @@ class TestingGui : public AbstractGui {
   QGroupBox* TransponderDataGroup;
   QVBoxLayout* TransponderDataLayout;
   QTableView* TransponderDataView;
-  //! \endcond
- public:
-  /*!
-   * Construct object, create layout
-   * \param parent Parent layout
-   */
-  explicit TestingGui(QWidget* parent);
-  /*!
-   * Default no-op destructor
-   */
-  ~TestingGui();
 
-  /*!
-   * Update size to match contents width
-   */
+ public:
+  explicit ProductionTesterGui(QWidget* parent);
+  ~ProductionTesterGui();
+
   virtual void update(void) override;
 
  private:
-  //! \cond
-  Q_DISABLE_COPY(TestingGui);
-  //! \endcond
+  Q_DISABLE_COPY_MOVE(ProductionTesterGui);
 };
 
-#endif  // TestingGui_H
+#endif  // PRODUCTION_TESTER_GUI_H

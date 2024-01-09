@@ -7,33 +7,11 @@ ProgrammerGuiSubkernel ::ProgrammerGuiSubkernel(const QString& name)
 
 ProgrammerGuiSubkernel::~ProgrammerGuiSubkernel() {}
 
-void ProgrammerGuiSubkernel::setCurrentGui(std::shared_ptr<AbstractGui> gui) {
+void ProgrammerGuiSubkernel::connectAuthorizationGui(
+    std::shared_ptr<AuthorizationGui> gui) {}
+
+void ProgrammerGuiSubkernel::connectMasterGui(std::shared_ptr<MasterGui> gui) {
   CurrentGui = gui;
-
-  switch (gui->type()) {
-    case AbstractGui::Production:
-      connectProductionGui();
-      break;
-    case AbstractGui::Testing:
-      connectTestingGui();
-      break;
-    case AbstractGui::Master:
-      connectMasterGui();
-      break;
-    default:
-      break;
-  }
-}
-
-void ProgrammerGuiSubkernel::displayUcid_slot(
-    const std::shared_ptr<QString> ucid) {}
-
-void ProgrammerGuiSubkernel::connectProductionGui() {}
-
-void ProgrammerGuiSubkernel::connectTestingGui() {}
-
-void ProgrammerGuiSubkernel::connectMasterGui() {
-  MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGui.get());
 
   connect(gui->ProgramDeviceButton, &QPushButton::clicked, this,
           &ProgrammerGuiSubkernel::programMemory_guiSlot);
@@ -52,6 +30,45 @@ void ProgrammerGuiSubkernel::connectMasterGui() {
   connect(gui->lockMemoryButton, &QPushButton::clicked, this,
           &ProgrammerGuiSubkernel::lockMemory_guiSlot);
 }
+
+void ProgrammerGuiSubkernel::connectProductionAssemblerGui(
+    std::shared_ptr<ProductionAssemblerGui> gui) {
+  CurrentGui = gui;
+}
+
+void ProgrammerGuiSubkernel::connectProductionTesterGui(
+    std::shared_ptr<ProductionTesterGui> gui) {
+  CurrentGui = gui;
+}
+
+void ProgrammerGuiSubkernel::resetCurrentGui() {
+  CurrentGui.reset();
+}
+
+void ProgrammerGuiSubkernel::connectManager(
+    const ProgrammerManager* manager) const {
+  connect(this, &ProgrammerGuiSubkernel::programMemory_signal, manager,
+          &ProgrammerManager::programMemory);
+  connect(this, &ProgrammerGuiSubkernel::readMemory_signal, manager,
+          &ProgrammerManager::readMemory);
+  connect(this, &ProgrammerGuiSubkernel::eraseMemory_signal, manager,
+          &ProgrammerManager::eraseMemory);
+
+  connect(this, &ProgrammerGuiSubkernel::programUserData_signal, manager,
+          &ProgrammerManager::programUserData);
+  connect(this, &ProgrammerGuiSubkernel::readUserData_signal, manager,
+          &ProgrammerManager::readUserData);
+  connect(this, &ProgrammerGuiSubkernel::readUcid_signal, manager,
+          &ProgrammerManager::readUcid);
+
+  connect(this, &ProgrammerGuiSubkernel::unlockMemory_signal, manager,
+          &ProgrammerManager::unlockMemory);
+  connect(this, &ProgrammerGuiSubkernel::lockMemory_signal, manager,
+          &ProgrammerManager::lockMemory);
+}
+
+void ProgrammerGuiSubkernel::displayUcid_slot(
+    const std::shared_ptr<QString> ucid) {}
 
 void ProgrammerGuiSubkernel::programMemory_guiSlot() {
   emit loggerClear_signal();

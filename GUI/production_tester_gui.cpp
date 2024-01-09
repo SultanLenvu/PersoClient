@@ -1,7 +1,6 @@
-#include "production_gui.h"
+#include "production_tester_gui.h"
 
-ProductionGUI::ProductionGUI(QWidget* parent)
-    : AbstractGui(parent, Production) {
+ProductionTesterGui::ProductionTesterGui(QWidget* parent) : AbstractGui(parent, Testing) {
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
 
@@ -11,24 +10,14 @@ ProductionGUI::ProductionGUI(QWidget* parent)
   TransponderLayout = new QVBoxLayout();
   TransponderGroup->setLayout(TransponderLayout);
 
-  ReleaseTransponderButton =
-      new QPushButton(QString("Выпустить транспондер"));
-  ReleaseTransponderButton->setFont(QFont("Arial", 12, QFont::Bold));
-  TransponderLayout->addWidget(ReleaseTransponderButton);
-
-  ButtonVerticalSpacer =
-      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  TransponderLayout->addItem(ButtonVerticalSpacer);
-
-  RollbackProductionLinePushButton =
-      new QPushButton(QString("Произвести откат"));
-  RollbackProductionLinePushButton->setFont(QFont("Arial", 12, QFont::Bold));
-  TransponderLayout->addWidget(RollbackProductionLinePushButton);
-
   RereleaseTransponderButton =
       new QPushButton(QString("Перевыпустить транспондер"));
   RereleaseTransponderButton->setFont(QFont("Arial", 12, QFont::Bold));
   TransponderLayout->addWidget(RereleaseTransponderButton);
+
+  ControlPanelVS =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  ControlPanelLayout->addItem(ControlPanelVS);
 
   PrintStickerGroup = new QGroupBox("Печать");
   ControlPanelLayout->addWidget(PrintStickerGroup);
@@ -51,6 +40,11 @@ ProductionGUI::ProductionGUI(QWidget* parent)
   PrintBoxStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
   PrintStickerLayout->addWidget(PrintBoxStickerButton);
 
+  PrintPalletStickerButton =
+      new QPushButton(QString("Распечатать стикер для паллеты"));
+  PrintPalletStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
+  PrintStickerLayout->addWidget(PrintPalletStickerButton);
+
   TransponderDataGroup = new QGroupBox("Данные транспондера");
   MainLayout->addWidget(TransponderDataGroup);
 
@@ -64,9 +58,9 @@ ProductionGUI::ProductionGUI(QWidget* parent)
   MainLayout->setStretch(1, 3);
 }
 
-ProductionGUI::~ProductionGUI() {}
+ProductionTesterGui::~ProductionTesterGui() {}
 
-void ProductionGUI::update() {
+void ProductionTesterGui::update() {
   TransponderDataView->resizeColumnsToContents();
   TransponderDataView->update();
 }
