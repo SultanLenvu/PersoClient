@@ -31,7 +31,8 @@
  * - Timers
  * - Threads
  */
-class ClientManager : public QObject {
+class ClientManager : public QObject
+{
   Q_OBJECT
 
  private:
@@ -246,21 +247,21 @@ class ClientManager : public QObject {
    * \param[in] operationName what operation it was
    */
   void processClientError(PersoClient::ReturnStatus status,
-      const QString& operationName);
+                          const QString& operationName);
   /*!
    * Report Programmer errors to user
    * \param[in] status status to report
    * \param[in] operationName what operation it was
    */
   void processProgrammerError(IProgrammer::ReturnStatus status,
-      const QString& operationName);
+                              const QString& operationName);
   /*!
    * Report Programmer errors to user
    * \param[in] status status to report
    * \param[in] operationName what operation it was
    */
   void processStickerPrintersError(IStickerPrinter::ReturnStatus status,
-      const QString& operationName);
+                                   const QString& operationName);
 
  signals:
   /*!

@@ -22,7 +22,8 @@
  * Main window, which gets created in main.cpp
  * Holds loggers, client manager, and user interaction system.
  */
-class MainWindowKernel : public QMainWindow {
+class MainWindowKernel : public QMainWindow
+{
   Q_OBJECT
 
  private:

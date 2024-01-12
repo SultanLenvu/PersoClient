@@ -1,6 +1,7 @@
 #include "testing_gui.h"
 
-TestingGUI::TestingGUI(QWidget* parent) : AbstractGUI(parent, Testing) {
+TestingGUI::TestingGUI(QWidget* parent) : AbstractGUI(parent, Testing)
+{
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
 
@@ -60,7 +61,8 @@ TestingGUI::TestingGUI(QWidget* parent) : AbstractGUI(parent, Testing) {
 
 TestingGUI::~TestingGUI() {}
 
-void TestingGUI::update() {
+void TestingGUI::update()
+{
   TransponderDataView->resizeColumnsToContents();
   TransponderDataView->update();
 }

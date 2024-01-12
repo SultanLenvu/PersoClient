@@ -62,4 +62,4 @@
 #define SERIAL_NUMBER_DS_CHAR_LENGTH 16
 //===============================================================
 
-#endif // DEFINITIONS_H
+#endif  // DEFINITIONS_H

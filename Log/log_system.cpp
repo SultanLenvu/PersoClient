@@ -1,6 +1,7 @@
 #include "log_system.h"
 
-LogSystem::LogSystem(QObject* parent) : QObject(parent) {
+LogSystem::LogSystem(QObject* parent) : QObject(parent)
+{
   setObjectName("LogSystem");
   loadSettings();
 
@@ -13,23 +14,27 @@ LogSystem::LogSystem(QObject* parent) : QObject(parent) {
 
 LogSystem::~LogSystem() {}
 
-WidgetLogBackend* LogSystem::getWidgetLogger() {
+WidgetLogBackend* LogSystem::getWidgetLogger()
+{
   return WidgetLogger;
 }
 
-LogSystem* LogSystem::instance() {
+LogSystem* LogSystem::instance()
+{
   static LogSystem Logger(nullptr);
   return &Logger;
 }
 
-void LogSystem::clear() {
+void LogSystem::clear()
+{
   for (QList<LogBackend*>::iterator it = Backends.begin(); it != Backends.end();
        it++) {
     (*it)->clear();
   }
 }
 
-void LogSystem::generate(const QString& log) {
+void LogSystem::generate(const QString& log)
+{
   QTime time = QDateTime::currentDateTime().time();
   QString LogData = time.toString("hh:mm:ss.zzz - ") + log;
   for (QList<LogBackend*>::const_iterator it = Backends.constBegin();
@@ -38,7 +43,8 @@ void LogSystem::generate(const QString& log) {
   }
 }
 
-void LogSystem::applySettings() {
+void LogSystem::applySettings()
+{
   generate("LogSystem - Применение новых настроек. ");
   loadSettings();
 
@@ -52,6 +58,7 @@ void LogSystem::applySettings() {
  * Приватные методы
  */
 
-void LogSystem::loadSettings() {
+void LogSystem::loadSettings()
+{
   QSettings settings;
 }

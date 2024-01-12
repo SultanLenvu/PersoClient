@@ -6,7 +6,8 @@
 /*!
  * Master password dialog
  */
-class MasterPasswordInputDialog : public InputDialog {
+class MasterPasswordInputDialog : public InputDialog
+{
   Q_OBJECT
  private:
   //! \cond

@@ -9,7 +9,8 @@
 /*!
  * Dialog for authorization data
  */
-class AuthorizationDialog : public InputDialog {
+class AuthorizationDialog : public InputDialog
+{
   Q_OBJECT
 
  private:

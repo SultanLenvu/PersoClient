@@ -23,7 +23,8 @@
  * Object of this class accept log lines through signals and pass them to one
  * or more backends.
  */
-class LogSystem : public QObject {
+class LogSystem : public QObject
+{
   Q_OBJECT
 
  private:
@@ -33,7 +34,7 @@ class LogSystem : public QObject {
   FileLogBackend* FileLogger;
 
  public:
-  /*! Default destructor 
+  /*! Default destructor
    */
   ~LogSystem();
   /*!

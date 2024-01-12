@@ -1,12 +1,13 @@
 #include "input_dialog.h"
 
-InputDialog::InputDialog(QWidget* parent, DialogType type)
-    : QDialog(parent) {
+InputDialog::InputDialog(QWidget* parent, DialogType type) : QDialog(parent)
+{
   Type = type;
 }
 
 InputDialog::~InputDialog() {}
 
-InputDialog::DialogType InputDialog::type() const {
+InputDialog::DialogType InputDialog::type() const
+{
   return Type;
 }

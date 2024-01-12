@@ -13,7 +13,8 @@
 #include "GUI/interaction_system.h"
 #include "log_backend.h"
 
-class FileLogBackend : public LogBackend {
+class FileLogBackend : public LogBackend
+{
   Q_OBJECT
  private:
   bool LogEnable;

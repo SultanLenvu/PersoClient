@@ -4,7 +4,8 @@
 
 CustomTransponderStickerScanDialog::CustomTransponderStickerScanDialog(
     QWidget* parent)
-    : InputDialog(parent, CustomTransponderSticker) {
+    : InputDialog(parent, CustomTransponderSticker)
+{
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::screens().first()->size();
 
@@ -20,7 +21,8 @@ CustomTransponderStickerScanDialog::CustomTransponderStickerScanDialog(
 CustomTransponderStickerScanDialog::~CustomTransponderStickerScanDialog() {}
 
 void CustomTransponderStickerScanDialog::getData(
-    QHash<QString, QString>* data) const {
+    QHash<QString, QString>* data) const
+{
   if (!data) {
     return;
   }
@@ -35,7 +37,8 @@ void CustomTransponderStickerScanDialog::getData(
   data->insert("sn", SnInput->text());
 }
 
-void CustomTransponderStickerScanDialog::create() {
+void CustomTransponderStickerScanDialog::create()
+{
   MainLayout = new QGridLayout();
   setLayout(MainLayout);
 
@@ -81,12 +84,14 @@ void CustomTransponderStickerScanDialog::create() {
   MainLayout->addItem(MainLayoutVS, 4, 0, 1, 1);
 }
 
-void CustomTransponderStickerScanDialog::createMatchTable() {
+void CustomTransponderStickerScanDialog::createMatchTable()
+{
   MatchTable.insert("Квадрат", "Новое качество дорог");
   MatchTable.insert("Прямоугольник", "Магистраль северной столицы");
 }
 
-bool CustomTransponderStickerScanDialog::checkInput() const {
+bool CustomTransponderStickerScanDialog::checkInput() const
+{
   QString sn = SnInput->text();
   QString pan = PanInput->text();
 

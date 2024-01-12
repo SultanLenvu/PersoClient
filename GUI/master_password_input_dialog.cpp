@@ -1,7 +1,8 @@
 #include "master_password_input_dialog.h"
 
 MasterPasswordInputDialog::MasterPasswordInputDialog(QWidget* parent)
-    : InputDialog(parent, MasterPassword) {
+    : InputDialog(parent, MasterPassword)
+{
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::screens().first()->size();
 
@@ -15,7 +16,8 @@ MasterPasswordInputDialog::MasterPasswordInputDialog(QWidget* parent)
 
 MasterPasswordInputDialog::~MasterPasswordInputDialog() {}
 
-void MasterPasswordInputDialog::getData(QHash<QString, QString>* data) const {
+void MasterPasswordInputDialog::getData(QHash<QString, QString>* data) const
+{
   if (!data) {
     return;
   }
@@ -23,7 +25,8 @@ void MasterPasswordInputDialog::getData(QHash<QString, QString>* data) const {
   data->insert("password", PasswordLineEdit->text());
 }
 
-void MasterPasswordInputDialog::create() {
+void MasterPasswordInputDialog::create()
+{
   MainLayout = new QVBoxLayout();
   setLayout(MainLayout);
 

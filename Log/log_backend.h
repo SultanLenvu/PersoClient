@@ -11,7 +11,8 @@
  * lines. These backends are meant to be integrated with Qt metaobject system
  * so they can send signals and have slots.
  */
-class LogBackend : public QObject {
+class LogBackend : public QObject
+{
   Q_OBJECT
 
  public:

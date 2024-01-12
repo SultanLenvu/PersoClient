@@ -7,7 +7,8 @@
 /*!
  * Master GUI mode
  */
-class MasterGUI : public AbstractGUI {
+class MasterGUI : public AbstractGUI
+{
  public:
   //! \cond
   QTabWidget* Tabs;
@@ -121,7 +122,7 @@ class MasterGUI : public AbstractGUI {
 
  public:
   /*!
-   * Default constructor. Initialize 
+   * Default constructor. Initialize
    * \param[in] parent QObject parent
    */
   explicit MasterGUI(QWidget* parent);

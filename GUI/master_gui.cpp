@@ -1,6 +1,7 @@
 #include "master_gui.h"
 
-MasterGUI::MasterGUI(QWidget* parent) : AbstractGUI(parent, Master) {
+MasterGUI::MasterGUI(QWidget* parent) : AbstractGUI(parent, Master)
+{
   // Вкладки с всеми интерфейсами
   Tabs = new QTabWidget();
   MainLayout->addWidget(Tabs);
@@ -27,23 +28,27 @@ MasterGUI::MasterGUI(QWidget* parent) : AbstractGUI(parent, Master) {
 
 MasterGUI::~MasterGUI() {}
 
-void MasterGUI::update() {
+void MasterGUI::update()
+{
   TransponderDataView->resizeColumnsToContents();
   TransponderDataView->update();
 }
 
-void MasterGUI::displayLogData(const QString& log) {
+void MasterGUI::displayLogData(const QString& log)
+{
   if (GeneralLogs->toPlainText().count() > 500000)
     GeneralLogs->clear();
 
   GeneralLogs->appendPlainText(log);
 }
 
-void MasterGUI::clearLogDataDisplay() {
+void MasterGUI::clearLogDataDisplay()
+{
   GeneralLogs->clear();
 }
 
-void MasterGUI::createServerTab() {
+void MasterGUI::createServerTab()
+{
   ServerTab = new QWidget();
   Tabs->addTab(ServerTab, "Сервер");
 
@@ -65,7 +70,8 @@ void MasterGUI::createServerTab() {
       new QPushButton(QString("Отключиться от сервера персонализации"));
   ServerControlPanelLayout->addWidget(PersoServerDisconnectButton);
 
-  PersoServerEchoRequestButton = new QPushButton(QString("Отправить эхо-запрос"));
+  PersoServerEchoRequestButton =
+      new QPushButton(QString("Отправить эхо-запрос"));
   ServerControlPanelLayout->addWidget(PersoServerEchoRequestButton);
 
   ButtonVerticalSpacer1 =
@@ -102,7 +108,8 @@ void MasterGUI::createServerTab() {
   ServerTabMainLayout->setStretch(1, 3);
 }
 
-void MasterGUI::createProgrammatorTab() {
+void MasterGUI::createProgrammatorTab()
+{
   ProgrammatorTab = new QWidget();
   Tabs->addTab(ProgrammatorTab, "Программатор");
 
@@ -138,7 +145,8 @@ void MasterGUI::createProgrammatorTab() {
   ProgrammatorControlPanelLayout->addWidget(LockDeviceButton);
 }
 
-void MasterGUI::createStickerPrinterTab() {
+void MasterGUI::createStickerPrinterTab()
+{
   StickerPrinterTab = new QWidget();
   Tabs->addTab(StickerPrinterTab, "Стикер принтер");
   // Загружаем настройки приложения
@@ -178,7 +186,8 @@ void MasterGUI::createStickerPrinterTab() {
       StickerPrinterCommandSriptTextEdit);
 }
 
-void MasterGUI::createSettingsTab() {
+void MasterGUI::createSettingsTab()
+{
   SettingsTab = new QWidget();
   Tabs->addTab(SettingsTab, "Настройки");
   // Загружаем настройки приложения
@@ -295,7 +304,8 @@ void MasterGUI::createSettingsTab() {
   SettingsMainLayout->addItem(SettingsHS1);
 }
 
-void MasterGUI::createLogWidgets() {
+void MasterGUI::createLogWidgets()
+{
   // Виджеты для отображения логов
   GeneralLogGroup = new QGroupBox("Логи");
   MainLayout->addWidget(GeneralLogGroup);
@@ -312,13 +322,15 @@ void MasterGUI::createLogWidgets() {
   GeneralLogLayout->addWidget(GeneralLogs);
 }
 
-void MasterGUI::on_ProgrammerExeFilePathPushButton_slot() {
+void MasterGUI::on_ProgrammerExeFilePathPushButton_slot()
+{
   QString filePath =
       QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.exe");
   ProgrammerExeFilePathLineEdit->setText(filePath);
 }
 
-void MasterGUI::on_StickerPrinterLibPathPushButton_slot() {
+void MasterGUI::on_StickerPrinterLibPathPushButton_slot()
+{
   QString filePath =
       QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.dll");
   StickerPrinterLibPathLineEdit->setText(filePath);

@@ -8,7 +8,8 @@
 /*!
  * Production GUI mode
  */
-class ProductionGUI : public AbstractGUI {
+class ProductionGUI : public AbstractGUI
+{
  public:
   //! \cond
   QVBoxLayout* ControlPanelLayout;

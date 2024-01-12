@@ -10,8 +10,9 @@
  * Log backend to display log lines in master GUI.
  * \todo log to specific QWidget
  */
-class WidgetLogBackend : public LogBackend {
- Q_OBJECT
+class WidgetLogBackend : public LogBackend
+{
+  Q_OBJECT
  private:
   bool LogEnable;
 

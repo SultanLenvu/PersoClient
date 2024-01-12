@@ -17,8 +17,9 @@
 /*!
  * Interaction system singleton. Show dialogs, messages, etc
  */
-class InteractionSystem : public QWidget {
- Q_OBJECT
+class InteractionSystem : public QWidget
+{
+  Q_OBJECT
 
  private:
   //! Is logging enabled
@@ -56,7 +57,7 @@ class InteractionSystem : public QWidget {
   /*!
    * Create progress dialog with createProgressDialog,
    * read quant duration, start ODQTimer with that duration,
-   * and start ODTimer and ODMeter 
+   * and start ODTimer and ODMeter
    */
   void startOperationProgressDialog(const QString& operationName);
   /*!

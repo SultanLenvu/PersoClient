@@ -1,17 +1,20 @@
 #include "authorization_gui.h"
 
 AuthorizationGUI::AuthorizationGUI(QWidget* parent)
-    : AbstractGUI(parent, Authorization) {
+    : AbstractGUI(parent, Authorization)
+{
   create();
 }
 
-AuthorizationGUI::~AuthorizationGUI() {
+AuthorizationGUI::~AuthorizationGUI()
+{
   //  qDebug() << "Deleted.";
 }
 
 void AuthorizationGUI::update() {}
 
-void AuthorizationGUI::create() {
+void AuthorizationGUI::create()
+{
   GeneralLayout = new QVBoxLayout();
   MainLayout->addLayout(GeneralLayout);
 
@@ -38,7 +41,8 @@ void AuthorizationGUI::create() {
   GeneralLayout->addItem(ControlPanelVS);
 }
 
-void AuthorizationGUI::createAuthorizationGroup() {
+void AuthorizationGUI::createAuthorizationGroup()
+{
   AuthorizationGroup = new QGroupBox("Авторизация");
   AuthorizationGroup->setAlignment(Qt::AlignCenter);
   GeneralLayout->insertWidget(GeneralLayout->indexOf(ControlPanelVS) - 1,
@@ -66,8 +70,8 @@ void AuthorizationGUI::createAuthorizationGroup() {
   PasswordLayout->addWidget(PasswordLineEdit);
 }
 
-void AuthorizationGUI::on_ModeChoiceCurrentTextChanged_slot(
-    const QString& text) {
+void AuthorizationGUI::on_ModeChoiceCurrentTextChanged_slot(const QString& text)
+{
   if (text == "Тестирование") {
     GeneralLayout->removeWidget(AuthorizationGroup);
     delete AuthorizationGroup;

@@ -9,14 +9,16 @@
 
 /*! \brief Sticker printer interface
  */
-class IStickerPrinter : public QObject {
- Q_OBJECT
+class IStickerPrinter : public QObject
+{
+  Q_OBJECT
  public:
   /*! Subclass type
-  */
-  enum StickerPrinterType {
-   Unknown,
-   TE310,
+   */
+  enum StickerPrinterType
+  {
+    Unknown,
+    TE310,
   };
   //! \cond
   Q_ENUM(StickerPrinterType);
@@ -24,7 +26,8 @@ class IStickerPrinter : public QObject {
 
   /*! Sticker Printer operations return statuses
    */
-  enum ReturnStatus {
+  enum ReturnStatus
+  {
     ParameterError,
     LibraryMissed,
     ConnectionError,

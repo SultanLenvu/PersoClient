@@ -11,13 +11,14 @@
  *
  * This class represents transponder info contained in a database
  */
-class HashModel : public QAbstractTableModel {
+class HashModel : public QAbstractTableModel
+{
  private:
   //! Data container
   QHash<QString, QVariant> HashTable;
   //! Table of Russian names for headers
   QHash<QString, QString> TransponderDataMatchTable;
-  
+
   //! Data values
   QVector<QVariant> Values;
   //! Data keys
@@ -80,7 +81,7 @@ class HashModel : public QAbstractTableModel {
 
   /*!
    * Get header names
-   * \return 
+   * \return
    * - QVariant() if section value is more than amount of available
    *   data or if role is not Qt::DisplayRole or if orientation is
    *   neither Qt::Horizontal or Qt::Vertical
@@ -88,8 +89,8 @@ class HashModel : public QAbstractTableModel {
    * - name of section'th column otherwise
    */
   QVariant headerData(int section,
-    Qt::Orientation orientation,
-    int role = Qt::DisplayRole) const override;
+                      Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
 
  private:
   //! \cond
