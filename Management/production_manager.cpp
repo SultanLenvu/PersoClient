@@ -9,8 +9,6 @@
 ProductionManager::ProductionManager(const QString& name)
     : AbstractManager{name} {
   loadSettings();
-
-  TransponderData = std::shared_ptr<StringDictionary>(new StringDictionary());
 }
 
 ProductionManager::~ProductionManager() {}
