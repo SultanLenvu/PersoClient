@@ -22,19 +22,23 @@ class InteractionSystem : public QObject {
   std::unique_ptr<QTimer> ODQTimer;
   std::unique_ptr<QElapsedTimer> ODMeter;
 
+  std::unordered_map<ReturnStatus, QString> MessageTable;
+
  public:
   explicit InteractionSystem(const QString& name);
+  ~InteractionSystem();
 
  public slots:
   void generateMessage(const QString& data);
   void generateErrorMessage(const QString& text);
 
-  void operationStarted(const QString& opName);
-  void operationFinished(const QString& opName, ReturnStatus ret);
+  void processOperationStart(const QString& opName);
+  void processOperationFinish(const QString& opName, ReturnStatus ret);
 
   void applySettings(void);
 
  private:
+  InteractionSystem();
   Q_DISABLE_COPY_MOVE(InteractionSystem)
   void sendLog(const QString& log);
   void loadSettings(void);
@@ -42,6 +46,9 @@ class InteractionSystem : public QObject {
   void createProgressDialog(void);
   void destroyProgressDialog(void);
   void createTimers(void);
+  void createMessageTable(void);
+
+  void processReturnStatus(ReturnStatus ret);
 
  private slots:
   void odTimerTimeout_slot(void);

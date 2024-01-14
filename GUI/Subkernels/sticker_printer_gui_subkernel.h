@@ -2,14 +2,12 @@
 #define STICKERPRINTERGUISUBKERNEL_H
 
 #include "abstract_gui_subkernel.h"
-#include "types.h"
-
-#include "sticker_printer_manager.h"
 
 class StickerPrinterGuiSubkernel : public AbstractGuiSubkernel {
   Q_OBJECT
  private:
-  std::shared_ptr<AbstractGui> CurrentGui;
+  AbstractGui* CurrentGui;
+  std::shared_ptr<AbstractManager> Manager;
 
  public:
   explicit StickerPrinterGuiSubkernel(const QString& name);
@@ -17,19 +15,20 @@ class StickerPrinterGuiSubkernel : public AbstractGuiSubkernel {
 
   // AbstractGuiSubkernel interface
  public:
-  virtual void connectAuthorizationGui(
-      std::shared_ptr<AuthorizationGui> gui) override;
-  virtual void connectMasterGui(std::shared_ptr<MasterGui> gui) override;
-  virtual void connectProductionAssemblerGui(
-      std::shared_ptr<ProductionAssemblerGui> gui) override;
-  virtual void connectProductionTesterGui(std::shared_ptr<ProductionTesterGui> gui) override;
-  virtual void resetCurrentGui() override;
-
- public:
-  void connectManager(const StickerPrinterManager* manager) const;
+  virtual void connectGui(AbstractGui* gui) override;
+  virtual void connectManager(
+      std::shared_ptr<AbstractManager> manager) override;
+  virtual void reset() override;
 
  private:
   Q_DISABLE_COPY_MOVE(StickerPrinterGuiSubkernel);
+
+  void connectAuthorizationGui();
+  void connectMasterGui();
+  void connectProductionAssemblerGui();
+  void connectProductionTesterGui();
+
+  void connectStickerPrinterManager(void) const;
 
   void printLastTransponderSticker_guiSlot(void);
   void printCustomTransponderSticker_guiSlot(void);

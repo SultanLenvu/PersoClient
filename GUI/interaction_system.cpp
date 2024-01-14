@@ -1,7 +1,9 @@
 #include <QSettings>
 
 #include "definitions.h"
+#include "global_environment.h"
 #include "interaction_system.h"
+#include "log_system.h"
 
 InteractionSystem::InteractionSystem(const QString& name) : QObject(nullptr) {
   setObjectName(name);
@@ -9,7 +11,18 @@ InteractionSystem::InteractionSystem(const QString& name) : QObject(nullptr) {
 
   // Создаем таймеры
   createTimers();
+
+  // Создаем таблицу сообщений
+  createMessageTable();
+
+  GlobalEnvironment::instance()->registerObject(this);
+  connect(this, &InteractionSystem::logging,
+          dynamic_cast<LogSystem*>(
+              GlobalEnvironment::instance()->getObject("LogSystem")),
+          &LogSystem::generate);
 }
+
+InteractionSystem::~InteractionSystem() {}
 
 void InteractionSystem::generateMessage(const QString& data) {
   QMessageBox::information(nullptr, "Сообщение", data, QMessageBox::Ok);
@@ -19,7 +32,7 @@ void InteractionSystem::generateErrorMessage(const QString& text) {
   QMessageBox::critical(nullptr, "Ошибка", text, QMessageBox::Ok);
 }
 
-void InteractionSystem::operationStarted(const QString& operationName) {
+void InteractionSystem::processOperationStart(const QString& operationName) {
   QSettings settings;
 
   // Создаем  окно
@@ -43,8 +56,8 @@ void InteractionSystem::operationStarted(const QString& operationName) {
   ODMeter->start();
 }
 
-void InteractionSystem::operationFinished(const QString& operationName,
-                                          ReturnStatus ret) {
+void InteractionSystem::processOperationFinish(const QString& operationName,
+                                               ReturnStatus ret) {
   QSettings settings;
 
   // Измеряем и сохраняем длительность операции
@@ -61,6 +74,9 @@ void InteractionSystem::operationFinished(const QString& operationName,
 
   // Закрываем окно
   destroyProgressDialog();
+
+  // Обрабатываем статус возврата
+  processReturnStatus(ret);
 }
 
 void InteractionSystem::applySettings() {
@@ -71,6 +87,8 @@ void InteractionSystem::applySettings() {
 /*
  * Приватные методы
  */
+
+InteractionSystem::InteractionSystem() {}
 
 void InteractionSystem::loadSettings() {
   QSettings settings;
@@ -85,12 +103,20 @@ void InteractionSystem::createProgressDialog() {
       new QProgressDialog("Выполнение операции...", "Закрыть", 0, 100));
   ProgressDialog->setWindowModality(Qt::ApplicationModal);
   ProgressDialog->setAutoClose(false);
+  ProgressDialog->setValue(0);
   ProgressDialog->show();
 }
 
 void InteractionSystem::destroyProgressDialog() {
   ProgressDialog->close();
-  ProgressDialog.reset();
+
+  /* !!!
+   * Если здесь очищать помять под ProgressDialog, то происходит
+   * необъяснимый вылет, почему это так, я не смог разобраться.
+   * Вылет происходит при завершении какой-либо операции.
+   */
+  //  ProgressDialog.reset();
+  //  sendLog("PD destroyed.");
 }
 
 void InteractionSystem::createTimers() {
@@ -110,17 +136,92 @@ void InteractionSystem::createTimers() {
           &InteractionSystem::odqTimerTimeout_slot);
 }
 
+void InteractionSystem::createMessageTable() {
+  MessageTable[ReturnStatus::NoError] = "Выполнено.";
+  MessageTable[ReturnStatus::ParameterError] = "Получена ошибка параметра.";
+  MessageTable[ReturnStatus::SyntaxError] = "Получена синтаксическая ошибка.";
+  MessageTable[ReturnStatus::SynchronizationError] =
+      "Получена ошибка синхронизации.";
+  MessageTable[ReturnStatus::FileOpenError] =
+      "Получена ошибка при открытии файла.";
+  MessageTable[ReturnStatus::InvalidFile] =
+      "Не удалось открыть некорректный файл.";
+  MessageTable[ReturnStatus::DynamicLibraryMissing] =
+      "Не найдена динамическая библиотека.";
+
+  MessageTable[ReturnStatus::ServerConnectionError] =
+      "Не удалось подключиться к серверу.";
+  MessageTable[ReturnStatus::ServerNotResponding] = "Сервер не отвечает.";
+  MessageTable[ReturnStatus::ServerDataTransmittingError] =
+      "Получена ошибка при отправке данных.";
+  MessageTable[ReturnStatus::ServerResponseSyntaxError] =
+      "Получена синтаксическая ошибка при обработке ответа от сервера.";
+  MessageTable[ReturnStatus::ServerResponseDataBlockError] =
+      "Получена ошибка обработке блока данных от сервера.";
+  MessageTable[ReturnStatus::ServerResponseProcessingError] =
+      "Получена ошибка при обработке ответа от сервера.";
+
+  MessageTable[ReturnStatus::ClientCommandParamError] =
+      "Получена ошибка в параметре клиентской комаенды.";
+
+  MessageTable[ReturnStatus::ServerInternalError] =
+      "Получена серверная ошибка.";
+  MessageTable[ReturnStatus::ProductionLineMissed] =
+      "Производственная линия не найдена.";
+  MessageTable[ReturnStatus::ProductionLineLaunchError] =
+      "Не удалось запустить производственную линию.";
+  MessageTable[ReturnStatus::ProductionLineAlreadyLaunched] =
+      "Производственная линия уже запущена.";
+  MessageTable[ReturnStatus::ProductionLineRollbackLimit] =
+      "Достигнут лимит отката для производственной линии.";
+  MessageTable[ReturnStatus::ProductionLineNotActive] =
+      "Производственная линия не активирована.";
+  MessageTable[ReturnStatus::ProductionLineNotInProcess] =
+      "Отствует заказ для сборки.";
+  MessageTable[ReturnStatus::ProductionLineCompleted] =
+      "Производственная линия завершила свою работу.";
+  MessageTable[ReturnStatus::OrderInProcessMissed] =
+      "Не найден заказ для сборки.";
+  MessageTable[ReturnStatus::IdenticalUcidError] =
+      "Получена ошибка идентификатора печатной платы.";
+  MessageTable[ReturnStatus::TransponderIncorrectRerelease] =
+      "Получена ошибка при перевыпуске транспондера.";
+  MessageTable[ReturnStatus::CurrentOrderAssembled] =
+      "Сборка текущего заказа успешно завершена.";
+  MessageTable[ReturnStatus::FreeBoxMissed] =
+      "Не найден свободный бокс для сборки.";
+
+  MessageTable[ReturnStatus::StickerPrinterInitError] =
+      "Не удалось инициализировать принтер стикеров.";
+  MessageTable[ReturnStatus::StickerPrinterConnectionError] =
+      "Не удалось подключиться к принтеру стикеров.";
+
+  MessageTable[ReturnStatus::ProgrammatorError] =
+      "Получена ошибка программатора.";
+}
+
+void InteractionSystem::processReturnStatus(ReturnStatus ret) {
+  if (ret == ReturnStatus::NoError) {
+    QMessageBox::information(nullptr, "Сообщение", MessageTable[ret],
+                             QMessageBox::Ok);
+  } else {
+    QMessageBox::critical(nullptr, "Ошибка", MessageTable[ret],
+                          QMessageBox::Ok);
+  }
+}
+
 void InteractionSystem::odTimerTimeout_slot() {
   sendLog("Операция выполняется слишком долго. Сброс. ");
   generateErrorMessage("Операция выполняется слишком долго. Сброс. ");
 }
 
 void InteractionSystem::odqTimerTimeout_slot() {
-  if (!ProgressDialog) {
-    return;
-  }
+  //  if (!ProgressDialog) {
+  //    return;
+  //  }
 
   uint32_t cv = ProgressDialog->value();
+  //  sendLog(QString("quant %1").arg(QString::number(cv)));
   if (cv < 100) {
     ProgressDialog->setValue(++cv);
   }

@@ -2,12 +2,12 @@
 #define PROGRAMMERGUISUBKERNEL_H
 
 #include "abstract_gui_subkernel.h"
-#include "programmer_manager.h"
 
 class ProgrammerGuiSubkernel : public AbstractGuiSubkernel {
   Q_OBJECT
  private:
-  std::shared_ptr<AbstractGui> CurrentGui;
+  AbstractGui* CurrentGui;
+  std::shared_ptr<AbstractManager> Manager;
 
  public:
   explicit ProgrammerGuiSubkernel(const QString& name);
@@ -15,22 +15,23 @@ class ProgrammerGuiSubkernel : public AbstractGuiSubkernel {
 
   // AbstractGuiSubkernel interface
  public:
-  virtual void connectAuthorizationGui(
-      std::shared_ptr<AuthorizationGui> gui) override;
-  virtual void connectMasterGui(std::shared_ptr<MasterGui> gui) override;
-  virtual void connectProductionAssemblerGui(
-      std::shared_ptr<ProductionAssemblerGui> gui) override;
-  virtual void connectProductionTesterGui(std::shared_ptr<ProductionTesterGui> gui) override;
-  virtual void resetCurrentGui() override;
-
- public:
-  void connectManager(const ProgrammerManager* manager) const;
+  virtual void connectGui(AbstractGui* gui) override;
+  virtual void connectManager(
+      std::shared_ptr<AbstractManager> manager) override;
+  virtual void reset() override;
 
  public slots:
   void displayUcid_slot(const std::shared_ptr<QString> ucid);
 
  private:
   Q_DISABLE_COPY_MOVE(ProgrammerGuiSubkernel);
+
+  void connectAuthorizationGui();
+  void connectMasterGui();
+  void connectProductionAssemblerGui();
+  void connectProductionTesterGui();
+
+  void connectProgrammerManager(void) const;
 
   void programMemory_guiSlot(void);
   void readMemory_guiSlot(void);

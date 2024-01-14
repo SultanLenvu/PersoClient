@@ -23,14 +23,15 @@ class GuiKernel : public QMainWindow {
   // Верхнее меню
   //==================================================
   QMenu* ServiceMenu;
-  QMenu* HelpMenu;
+  QAction* OpenMasterGuiAct;
+  QAction* OpenAuthorizationGuiAct;
+  QAction* OpenSettingsDialogAct;
 
-  QAction* OpenMasterInterfaceAct;
-  QAction* OpenAuthorizationInterfaceAct;
+  QMenu* HelpMenu;
   QAction* AboutProgramAct;
   //==================================================
 
-  std::shared_ptr<AbstractGui> CurrentGui;
+  AbstractGui* CurrentGui;
   std::unordered_map<QString, std::shared_ptr<AbstractGuiSubkernel>> Subkernels;
 
   std::unique_ptr<LogSystem> Logger;
@@ -45,16 +46,17 @@ class GuiKernel : public QMainWindow {
   ~GuiKernel();
 
  public slots:
-  // Настройки
-  void applySettingsPushButton_slot(void);
+  void applySettings(void);
 
   void displayMasterGui_slot(void);
   void displayProductionAssemblerGui_slot(void);
   void displayProductionTesterGui_slot(void);
   void displayAuthorizationGui_slot(void);
+  void displaySettingsDialog_slot(void);
 
  private:
   Q_DISABLE_COPY_MOVE(GuiKernel);
+  void sendLog(const QString& log);
   void loadSettings(void);
   void registerMetaTypes(void);
 
@@ -72,18 +74,15 @@ class GuiKernel : public QMainWindow {
   void createStickerPrinterGuiSubkernel(void);
 
   void createAuthorizationGui(void);
-  void connectAuthorizationGui(void);
   void createMasterGui(void);
-  void connectMasterGui(void);
   void createProductionAssemblerGui(void);
-  void connectProductionAssemblerGui(void);
   void createProductionTesterGui(void);
-  void connectProductionTesterGui(void);
-
-  bool checkNewSettings(void);
+  void connectGui(void);
 
  signals:
   void applySettings_signal(void);
+
+  void logging(const QString& log);
   void clearLogDisplay_signal(void);
 };
 

@@ -13,6 +13,11 @@ class StickerPrinterManager : public AbstractManager {
   explicit StickerPrinterManager(const QString& name);
   ~StickerPrinterManager();
 
+  // AbstractManager interface
+ public:
+  virtual void onInstanceThreadStarted(void) override;
+  virtual Type type() const override;
+
  public slots:
   virtual void applySettings(void) override;
 

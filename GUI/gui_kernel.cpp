@@ -5,6 +5,7 @@
 
 #include "authorization_gui.h"
 #include "definitions.h"
+#include "global_environment.h"
 #include "gui_kernel.h"
 #include "master_gui.h"
 #include "master_password_input_dialog.h"
@@ -14,17 +15,20 @@
 #include "production_tester_gui.h"
 #include "programmer_gui_subkernel.h"
 #include "programmer_manager.h"
+#include "settings_dialog.h"
 #include "sticker_printer_gui_subkernel.h"
 #include "sticker_printer_manager.h"
-#include "widget_log_backend.h"
 
 GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
   setObjectName("GuiKernel");
   CurrentGui = nullptr;
-  DesktopGeometry = QApplication::screens().first()->size();
-
-  // Загружаем настройки приложения
   loadSettings();
+  DesktopGeometry = QApplication::primaryScreen()->size();
+
+  /* !!!
+   * Порядок создания сущностей критически важен
+   * !!!
+   */
 
   // Создаем действия для верхнего меню
   createTopMenuActions();
@@ -42,10 +46,13 @@ GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
   createGuiSubkernels();
 
   // Создаем графический интерфейс для авторизации
-  createAuthorizationGui();
+  //  createAuthorizationGui();
+  createMasterGui();
 
   // Регистрируем типы
   registerMetaTypes();
+
+  GlobalEnvironment::instance()->registerObject(this);
 }
 
 GuiKernel::~GuiKernel() {
@@ -56,40 +63,9 @@ GuiKernel::~GuiKernel() {
   ServiceThread->wait();
 }
 
-void GuiKernel::applySettingsPushButton_slot() {
-  MasterGui* gui = dynamic_cast<MasterGui*>(CurrentGui.get());
-  QSettings settings;
-
-  emit clearLogDisplay_signal();
-
-  // Проверка пользовательского ввода
-  if (!checkNewSettings()) {
-    Interactor->generateErrorMessage(
-        "Введены некорректные данные для настроек. ");
-    return;
-  }
-
-  settings.setValue("log_system/global_enable",
-                    gui->LogSystemGlobalEnableCheckBox->isChecked());
-  settings.setValue("log_system/extended_enable",
-                    gui->LogSystemExtendedEnableCheckBox->isChecked());
-
-  settings.setValue("perso_server_connection/ip",
-                    gui->PersoServerIpAddressLineEdit->text());
-  settings.setValue("perso_server_connection/port",
-                    gui->PersoServerPortLineEdit->text().toInt());
-
-  settings.setValue("jlink_exe_programmer/exe_file_path",
-                    gui->ProgrammerExeFilePathLineEdit->text());
-  settings.setValue("jlink_exe_programmer/speed",
-                    gui->ProgrammerSpeedLineEdit->text());
-
-  settings.setValue("te310_printer/library_path",
-                    gui->StickerPrinterLibPathLineEdit->text());
-
-  // Применение новых настроек
+void GuiKernel::applySettings() {
+  sendLog("Применение новых настроек. ");
   emit applySettings_signal();
-  Interactor->generateMessage("Новые настройки успешно применены. ");
 }
 
 void GuiKernel::displayMasterGui_slot() {
@@ -122,6 +98,18 @@ void GuiKernel::displayAuthorizationGui_slot() {
   createAuthorizationGui();
 }
 
+void GuiKernel::displaySettingsDialog_slot() {
+  SettingsDialog dialog(this);
+  connect(&dialog, &SettingsDialog::applyNewSettings, this,
+          &GuiKernel::applySettings);
+
+  dialog.exec();
+}
+
+void GuiKernel::sendLog(const QString& log) {
+  emit logging(objectName() + " - " + log);
+}
+
 void GuiKernel::loadSettings() {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
   QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
@@ -142,8 +130,11 @@ void GuiKernel::registerMetaTypes() {
 
 void GuiKernel::createLoggerInstance() {
   Logger = std::unique_ptr<LogSystem>(new LogSystem("LogSystem"));
+  connect(this, &GuiKernel::logging, Logger.get(), &LogSystem::generate);
   connect(this, &GuiKernel::clearLogDisplay_signal, Logger.get(),
           &LogSystem::clear);
+  connect(this, &GuiKernel::applySettings_signal, Logger.get(),
+          &LogSystem::applySettings);
 
   ServiceThread = std::unique_ptr<QThread>(new QThread());
 
@@ -154,6 +145,8 @@ void GuiKernel::createLoggerInstance() {
 void GuiKernel::createInteractorInstance() {
   Interactor = std::unique_ptr<InteractionSystem>(
       new InteractionSystem("InteractionSystem"));
+  connect(this, &GuiKernel::applySettings_signal, Interactor.get(),
+          &InteractionSystem::applySettings);
 }
 
 void GuiKernel::createManagersInstance() {
@@ -168,12 +161,11 @@ void GuiKernel::createManagersInstance() {
   ManagersThread = std::unique_ptr<QThread>(new QThread());
 
   for (auto it = Managers.cbegin(); it != Managers.cend(); it++) {
-    connect(it->second.get(), &AbstractManager::logging, Logger.get(),
-            &LogSystem::generate);
-    connect(it->second.get(), &AbstractManager::executionStarted,
-            Interactor.get(), &InteractionSystem::operationStarted);
-    connect(it->second.get(), &AbstractManager::executionStarted,
-            Interactor.get(), &InteractionSystem::operationFinished);
+    connect(this, &GuiKernel::applySettings_signal, it->second.get(),
+            &AbstractManager::applySettings);
+
+    connect(ManagersThread.get(), &QThread::started, it->second.get(),
+            &AbstractManager::onInstanceThreadStarted);
 
     it->second.get()->moveToThread(ManagersThread.get());
   }
@@ -190,25 +182,18 @@ void GuiKernel::createAuthorizationGui() {
   setMinimumWidth(DesktopGeometry.width() * 0.2);
 
   // Создаем интерфейс
-  CurrentGui = std::shared_ptr<AbstractGui>(new AuthorizationGui(this));
-  setCentralWidget(CurrentGui.get());
+  CurrentGui = new AuthorizationGui(this);
+  setCentralWidget(CurrentGui);
   CurrentGui->showMaximized();
 
   adjustSize();
   setFixedSize(size());
 
   // Подключаем интерфейс
-  connectAuthorizationGui();
+  connectGui();
 
   // Создаем верхнее меню
   createTopMenu();
-}
-
-void GuiKernel::connectAuthorizationGui() {
-  for (auto it = Subkernels.cbegin(); it != Subkernels.cend(); it++) {
-    it->second->connectAuthorizationGui(
-        dynamic_cast<std::shared_ptr<AuthorizationGui>>(CurrentGui));
-  }
 }
 
 void GuiKernel::createMasterGui() {
@@ -223,26 +208,10 @@ void GuiKernel::createMasterGui() {
   setCentralWidget(CurrentGui);
 
   // Подключаем интерфейс
-  connectMasterInterface();
+  connectGui();
 
   // Создаем верхнее меню
   createTopMenu();
-}
-
-void GuiKernel::connectMasterGui() {}
-
-void GuiKernel::connectMasterInterface() {
-  MasterGui* gui = dynamic_cast<MasterGui*>(CurrentGui);
-  connect(LogSystem::instance()->getWidgetLogger(),
-          &WidgetLogBackend::displayLog_signal, gui,
-          &MasterGui::displayLogData);
-  connect(LogSystem::instance()->getWidgetLogger(),
-          &WidgetLogBackend::clearLogDisplay_signal, gui,
-          &MasterGui::clearLogDataDisplay);
-
-  // Настройки
-  connect(gui->ApplySettingsPushButton, &QPushButton::clicked, this,
-          &GuiKernel::applySettingsPushButton_slot);
 }
 
 void GuiKernel::createProductionAssemblerGui() {
@@ -255,13 +224,11 @@ void GuiKernel::createProductionAssemblerGui() {
   setCentralWidget(CurrentGui);
 
   // Подключаем интерфейс
-  connectProductionInterface();
+  connectGui();
 
   // Создаем верхнее меню
   createTopMenu();
 }
-
-void GuiKernel::connectProductionAssemblerGui() {}
 
 void GuiKernel::createProductionTesterGui() {
   // Настраиваем размер главного окна
@@ -273,22 +240,34 @@ void GuiKernel::createProductionTesterGui() {
   CurrentGui = new ProductionTesterGui(this);
   setCentralWidget(CurrentGui);
 
+  // Подключаем интерфейс
+  connectGui();
+
   // Создаем верхнее меню
   createTopMenu();
 }
 
-void GuiKernel::connectProductionTesterGui() {}
+void GuiKernel::connectGui() {
+  for (auto it = Subkernels.cbegin(); it != Subkernels.cend(); it++) {
+    it->second->connectGui(CurrentGui);
+  }
+}
 
 void GuiKernel::createTopMenuActions() {
-  OpenMasterInterfaceAct = new QAction("Мастер доступ", this);
-  OpenMasterInterfaceAct->setStatusTip("Открыть мастер интерфейс");
-  connect(OpenMasterInterfaceAct, &QAction::triggered, this,
+  OpenMasterGuiAct = new QAction("Мастер доступ", this);
+  OpenMasterGuiAct->setStatusTip("Открыть мастер интерфейс");
+  connect(OpenMasterGuiAct, &QAction::triggered, this,
           &GuiKernel::displayMasterGui_slot);
 
-  OpenAuthorizationInterfaceAct = new QAction("Авторизация", this);
-  OpenAuthorizationInterfaceAct->setStatusTip("Открыть интерфейс авторизации");
-  connect(OpenAuthorizationInterfaceAct, &QAction::triggered, this,
+  OpenAuthorizationGuiAct = new QAction("Авторизация", this);
+  OpenAuthorizationGuiAct->setStatusTip("Открыть интерфейс авторизации");
+  connect(OpenAuthorizationGuiAct, &QAction::triggered, this,
           &GuiKernel::displayAuthorizationGui_slot);
+
+  OpenSettingsDialogAct = new QAction("Настройки", this);
+  OpenSettingsDialogAct->setStatusTip("Открыть интерфейс настроек");
+  connect(OpenSettingsDialogAct, &QAction::triggered, this,
+          &GuiKernel::displaySettingsDialog_slot);
 
   AboutProgramAct = new QAction("О программе", this);
   AboutProgramAct->setStatusTip("Показать сведения о программе");
@@ -301,18 +280,19 @@ void GuiKernel::createTopMenu() {
   // Создаем меню
   ServiceMenu = menuBar()->addMenu("Сервис");
   switch (CurrentGui->type()) {
-    case AbstractGui::Testing:
-    case AbstractGui::Production:
-      ServiceMenu->addAction(OpenMasterInterfaceAct);
-      ServiceMenu->addAction(OpenAuthorizationInterfaceAct);
+    case AbstractGui::ProductionTester:
+    case AbstractGui::ProductionAssembler:
+      ServiceMenu->addAction(OpenMasterGuiAct);
+      ServiceMenu->addAction(OpenAuthorizationGuiAct);
       break;
     case AbstractGui::Master:
-      ServiceMenu->addAction(OpenAuthorizationInterfaceAct);
+      ServiceMenu->addAction(OpenAuthorizationGuiAct);
       break;
     case AbstractGui::Authorization:
-      ServiceMenu->addAction(OpenMasterInterfaceAct);
+      ServiceMenu->addAction(OpenMasterGuiAct);
       break;
   }
+  ServiceMenu->addAction(OpenSettingsDialogAct);
 
   HelpMenu = menuBar()->addMenu("Справка");
   HelpMenu->addAction(AboutProgramAct);
@@ -336,8 +316,7 @@ void GuiKernel::createProductionGuiSubkernel() {
           &ProductionGuiSubkernel::displayProductionAssemblerGui, this,
           &GuiKernel::displayProductionTesterGui_slot);
 
-  subkernel->connectManager(
-      dynamic_cast<ProductionManager*>(Managers["ProductionManager"].get()));
+  subkernel->connectManager(Managers["ProductionManager"]);
 
   Subkernels["ProductionGuiSubkernel"] = subkernel;
 }
@@ -346,8 +325,7 @@ void GuiKernel::createProgrammerGuiSubkernel() {
   std::shared_ptr<ProgrammerGuiSubkernel> subkernel(
       new ProgrammerGuiSubkernel("ProgrammerGuiSubkernel"));
 
-  subkernel->connectManager(
-      dynamic_cast<ProgrammerManager*>(Managers["ProgrammerManager"].get()));
+  subkernel->connectManager(Managers["ProgrammerManager"]);
 
   Subkernels["ProgrammerGuiSubkernel"] = subkernel;
 }
@@ -356,41 +334,7 @@ void GuiKernel::createStickerPrinterGuiSubkernel() {
   std::shared_ptr<StickerPrinterGuiSubkernel> subkernel(
       new StickerPrinterGuiSubkernel("StickerPrinterGuiSubkernel"));
 
-  subkernel->connectManager(dynamic_cast<StickerPrinterManager*>(
-      Managers["StickerPrinterManager"].get()));
+  subkernel->connectManager(Managers["StickerPrinterManager"]);
 
   Subkernels["StickerPrinterGuiSubkernel"] = subkernel;
-}
-
-bool GuiKernel::checkNewSettings() {
-  MasterGui* gui = dynamic_cast<MasterGui*>(CurrentGui.get());
-
-  QHostAddress IP = QHostAddress(gui->PersoServerIpAddressLineEdit->text());
-  uint32_t speed = gui->ProgrammerSpeedLineEdit->text().toUInt();
-
-  if (IP.isNull()) {
-    return false;
-  }
-
-  int32_t port = gui->PersoServerPortLineEdit->text().toInt();
-
-  if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
-    return false;
-  }
-
-  QFileInfo info(gui->ProgrammerExeFilePathLineEdit->text());
-  if ((!info.exists()) || (!info.isExecutable())) {
-    return false;
-  }
-
-  if (speed == 0) {
-    return false;
-  }
-
-  info.setFile(gui->StickerPrinterLibPathLineEdit->text());
-  if ((!info.exists()) || (info.suffix() != "dll")) {
-    return false;
-  }
-
-  return true;
 }

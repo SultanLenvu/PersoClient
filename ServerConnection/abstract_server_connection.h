@@ -14,7 +14,7 @@ class AbstractServerConnection : public QObject {
   virtual ReturnStatus connect(void) = 0;
   virtual void disconnect(void) = 0;
 
-  virtual ReturnStatus echo(void);
+  virtual ReturnStatus echo(void) = 0;
 
   virtual ReturnStatus logIn(const StringDictionary& param) = 0;
   virtual ReturnStatus logOut(void) = 0;
@@ -34,7 +34,7 @@ class AbstractServerConnection : public QObject {
   virtual ReturnStatus rereleaseTransponder(const StringDictionary& param,
                                             StringDictionary& result) = 0;
   virtual ReturnStatus confirmTransponderRerelease(
-      const StringDictionary& param);
+      const StringDictionary& param) = 0;
   virtual ReturnStatus rollbackTransponder(void) = 0;
 
   virtual ReturnStatus printBoxSticker(const StringDictionary& param) = 0;

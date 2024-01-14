@@ -10,6 +10,14 @@ ProgrammerManager::ProgrammerManager(const QString& name)
 
 ProgrammerManager::~ProgrammerManager() {}
 
+void ProgrammerManager::onInstanceThreadStarted() {
+  createProgrammer();
+}
+
+AbstractManager::Type ProgrammerManager::type() const {
+  return Type::Programmer;
+}
+
 void ProgrammerManager::applySettings() {
   sendLog("Применение новых настроек.");
   loadSettings();

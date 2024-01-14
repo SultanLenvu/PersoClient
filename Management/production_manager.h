@@ -18,22 +18,37 @@ class ProductionManager : public AbstractManager {
 
   std::unique_ptr<QFile> Firmware;
 
-  std::shared_ptr<StringDictionary> TransponderData;
+  StringDictionary BoxData;
+  StringDictionary TransponderData;
 
  public:
   explicit ProductionManager(const QString& name);
   ~ProductionManager();
 
+  // AbstractManager interface
+ public:
+  virtual void onInstanceThreadStarted(void) override;
+  virtual Type type() const override;
+
  public slots:
   virtual void applySettings(void) override;
 
+  void connectToServer(void);
+  void disconnectFromServer(void);
   void initServerConnection(const std::shared_ptr<StringDictionary> param);
   void resetServerConnection(void);
   void echoServer(void);
 
+  void requestBox(void);
+  void getCurrentBoxData(void);
+  void refundCurrentBox(void);
+  void completeCurrentBox(void);
+
   void releaseTransponder(void);
   void rereleaseTransponder(const std::shared_ptr<StringDictionary> param);
   void rollbackTransponder(void);
+  void getCurrentTransponderData(void);
+  void getTransponderData(const std::shared_ptr<StringDictionary> param);
 
   void printBoxSticker(const std::shared_ptr<StringDictionary> param);
   void printLastBoxSticker(void);
@@ -50,8 +65,8 @@ class ProductionManager : public AbstractManager {
   void createStickerPrinter(void);
 
  signals:
-  void displayTransponderData_signal(
-      const std::shared_ptr<StringDictionary> data);
+  void displayTransponderData_signal(const StringDictionary& data);
+  void displayBoxData_signal(const StringDictionary& data);
   void authorizationCompleted(void);
 };
 

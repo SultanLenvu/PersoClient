@@ -1,7 +1,7 @@
 #include "production_assembler_gui.h"
 
 ProductionAssemblerGui::ProductionAssemblerGui(QWidget* parent)
-    : AbstractGui(parent, Production) {
+    : AbstractGui(parent) {
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
 
@@ -11,8 +11,7 @@ ProductionAssemblerGui::ProductionAssemblerGui(QWidget* parent)
   TransponderLayout = new QVBoxLayout();
   TransponderGroup->setLayout(TransponderLayout);
 
-  ReleaseTransponderButton =
-      new QPushButton(QString("Выпустить транспондер"));
+  ReleaseTransponderButton = new QPushButton(QString("Выпустить транспондер"));
   ReleaseTransponderButton->setFont(QFont("Arial", 12, QFont::Bold));
   TransponderLayout->addWidget(ReleaseTransponderButton);
 
@@ -20,10 +19,9 @@ ProductionAssemblerGui::ProductionAssemblerGui(QWidget* parent)
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   TransponderLayout->addItem(ButtonVerticalSpacer);
 
-  rollbackTransponderPushButton =
-      new QPushButton(QString("Произвести откат"));
-  rollbackTransponderPushButton->setFont(QFont("Arial", 12, QFont::Bold));
-  TransponderLayout->addWidget(rollbackTransponderPushButton);
+  RollbackTransponderPushButton = new QPushButton(QString("Произвести откат"));
+  RollbackTransponderPushButton->setFont(QFont("Arial", 12, QFont::Bold));
+  TransponderLayout->addWidget(RollbackTransponderPushButton);
 
   RereleaseTransponderButton =
       new QPushButton(QString("Перевыпустить транспондер"));
@@ -69,4 +67,8 @@ ProductionAssemblerGui::~ProductionAssemblerGui() {}
 void ProductionAssemblerGui::update() {
   TransponderDataView->resizeColumnsToContents();
   TransponderDataView->update();
+}
+
+AbstractGui::GuiType ProductionAssemblerGui::type() {
+  return ProductionAssembler;
 }

@@ -6,34 +6,34 @@
 #include <QString>
 #include <QVector>
 
-class HashModel : public QAbstractTableModel {
+#include "types.h"
+
+class TableModel : public QAbstractTableModel {
  private:
-  QHash<QString, QVariant> HashTable;
-  QHash<QString, QString> TransponderDataMatchTable;
+  std::shared_ptr<StringDictionary> MatchTable;
 
   QVector<QVariant> Values;
   QVector<QVariant> Headers;
 
  public:
-  explicit HashModel(const QString& name);
-  ~HashModel();
+  TableModel();
+  ~TableModel();
 
-  void buildTransponderData(const QHash<QString, QString>* map);
+  void setData(const StringDictionary& table);
+  void setMatchTable(std::shared_ptr<StringDictionary> match);
   void clear(void);
   bool isEmpty(void) const;
-  const QHash<QString, QVariant>* map(void) const;
 
+  // QAbstractTableModel interface
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
   QVariant data(const QModelIndex& index, int role) const override;
-
   QVariant headerData(int section,
                       Qt::Orientation orientation,
                       int role = Qt::DisplayRole) const override;
 
  private:
-  Q_DISABLE_COPY_MOVE(HashModel);
-  void createMatchTables(void);
+  Q_DISABLE_COPY_MOVE(TableModel);
 };
 
 #endif  // HASH_MODEL_H

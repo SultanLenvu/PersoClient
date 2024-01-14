@@ -14,6 +14,11 @@ class ProgrammerManager : public AbstractManager {
   explicit ProgrammerManager(const QString& name);
   ~ProgrammerManager();
 
+  // AbstractManager interface
+ public:
+  virtual void onInstanceThreadStarted(void) override;
+  virtual Type type() const override;
+
  public slots:
   virtual void applySettings(void) override;
 

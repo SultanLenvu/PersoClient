@@ -7,8 +7,19 @@
 class AbstractManager : public QObject {
   Q_OBJECT
  public:
+  enum Type {
+    Production,
+    Programmer,
+    StickerPrinter,
+  };
+  Q_ENUM(Type)
+
+ public:
   explicit AbstractManager(const QString& name);
   virtual ~AbstractManager();
+
+  virtual void onInstanceThreadStarted(void) = 0;
+  virtual Type type() const = 0;
 
  public slots:
   virtual void applySettings(void) = 0;

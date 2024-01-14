@@ -10,6 +10,14 @@ StickerPrinterManager::StickerPrinterManager(const QString& name)
 
 StickerPrinterManager::~StickerPrinterManager() {}
 
+void StickerPrinterManager::onInstanceThreadStarted() {
+  createStickerPrinter();
+}
+
+AbstractManager::Type StickerPrinterManager::type() const {
+  return Type::StickerPrinter;
+}
+
 void StickerPrinterManager::applySettings() {
   sendLog("Применение новых настроек. ");
   loadSettings();

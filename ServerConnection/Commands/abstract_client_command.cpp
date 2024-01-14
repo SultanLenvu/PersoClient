@@ -12,8 +12,8 @@ AbstractClientCommand::AbstractClientCommand(const QString& name)
 AbstractClientCommand::~AbstractClientCommand() {}
 
 void AbstractClientCommand::clear() {
-  Request = QJsonObject();
-  Response = QJsonObject();
+  //  Request = QJsonObject();
+  //  Response = QJsonObject();
 }
 
 AbstractClientCommand::AbstractClientCommand() {}

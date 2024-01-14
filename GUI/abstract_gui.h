@@ -10,23 +10,19 @@ class AbstractGui : public QWidget {
   enum GuiType {
     Authorization,
     Master,
-    Production,
-    Testing,
+    ProductionAssembler,
+    ProductionTester,
   };
 
  public:
   QHBoxLayout* MainLayout;
 
- private:
-  GuiType Type;
-
  public:
-  AbstractGui(QWidget* parent, GuiType type);
+  AbstractGui(QWidget* parent);
   virtual ~AbstractGui();
 
   virtual void update(void) = 0;
-
-  GuiType type(void);
+  virtual GuiType type(void) = 0;
 
  private:
   Q_DISABLE_COPY_MOVE(AbstractGui);

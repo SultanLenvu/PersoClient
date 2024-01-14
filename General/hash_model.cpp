@@ -1,72 +1,61 @@
 #include "hash_model.h"
 
-HashModel::HashModel(const QString& name) : QAbstractTableModel(nullptr) {
-  setObjectName(name);
-  createMatchTables();
-}
+TableModel::TableModel() : QAbstractTableModel(nullptr) {}
 
-HashModel::~HashModel() {}
+TableModel::~TableModel() {}
 
-void HashModel::buildTransponderData(const QHash<QString, QString>* map) {
-  // Проверка на существование
-  if (!map) {
-    return;
-  }
-
+void TableModel::setData(const StringDictionary& table) {
   beginResetModel();
 
   // Очищаем старые данные
-  HashTable.clear();
   Values.clear();
   Headers.clear();
 
   // Устанавливаем новые данные
-  for (QHash<QString, QString>::const_iterator it1 = map->constBegin();
-       it1 != map->constEnd(); it1++) {
+  for (QHash<QString, QString>::const_iterator it1 = table.constBegin();
+       it1 != table.constEnd(); it1++) {
     Values.append(it1.value());
-    Headers.append(TransponderDataMatchTable.value(it1.key()));
-    HashTable.insert(TransponderDataMatchTable.value(it1.key()), it1.value());
+    Headers.append(MatchTable->value(it1.key()));
   }
 
   endResetModel();
 }
 
-void HashModel::clear() {
+void TableModel::setMatchTable(std::shared_ptr<StringDictionary> match) {
+  MatchTable = match;
+}
+
+void TableModel::clear() {
   beginResetModel();
 
-  HashTable.clear();
   Values.clear();
   Headers.clear();
 
   endResetModel();
 }
 
-bool HashModel::isEmpty() const {
-  return HashTable.isEmpty();
+bool TableModel::isEmpty() const {
+  return Values.isEmpty();
 }
 
-const QHash<QString, QVariant>* HashModel::map() const {
-  return &HashTable;
-}
-
-int HashModel::columnCount(const QModelIndex& parent) const {
-  if (HashTable.isEmpty()) {
+int TableModel::columnCount(const QModelIndex& parent) const {
+  if (Values.isEmpty()) {
     return 0;
   }
 
   return 1;
 }
 
-int HashModel::rowCount(const QModelIndex& parent) const {
-  return HashTable.size();
+int TableModel::rowCount(const QModelIndex& parent) const {
+  return Values.size();
 }
 
-QVariant HashModel::data(const QModelIndex& index, int role) const {
+QVariant TableModel::data(const QModelIndex& index, int role) const {
   if (index.column() > 1) {
     return QVariant();
   }
 
-  if (index.row() > (HashTable.size())) {
+  if (index.row() > (Values.size())) {
     return QVariant();
   }
 
@@ -76,10 +65,10 @@ QVariant HashModel::data(const QModelIndex& index, int role) const {
     return QVariant();
 }
 
-QVariant HashModel::headerData(int section,
-                               Qt::Orientation orientation,
-                               int role) const {
-  if (section > (HashTable.size())) {
+QVariant TableModel::headerData(int section,
+                                Qt::Orientation orientation,
+                                int role) const {
+  if (section > (Values.size())) {
     return QVariant();
   }
 
@@ -95,14 +84,4 @@ QVariant HashModel::headerData(int section,
   } else {
     return QVariant();
   }
-}
-
-void HashModel::createMatchTables() {
-  TransponderDataMatchTable.insert("sn", "Серийный номер");
-  TransponderDataMatchTable.insert("pan", "PAN");
-  TransponderDataMatchTable.insert("issuer_name", "Компания-заказчик");
-  TransponderDataMatchTable.insert("box_id", "Идентификатор бокса");
-  TransponderDataMatchTable.insert("pallet_id", "Идентификатор паллеты");
-  TransponderDataMatchTable.insert("order_id", "Идентификатор заказа");
-  TransponderDataMatchTable.insert("transponder_model", "Модель транспондера");
 }

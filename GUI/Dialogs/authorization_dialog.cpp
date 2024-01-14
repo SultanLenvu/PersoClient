@@ -6,26 +6,42 @@ AuthorizationDialog::AuthorizationDialog(QWidget* parent)
   DesktopGeometry = QApplication::primaryScreen()->size();
 
   // Создаем диалоговое окно
-  setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
-              DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1);
-  setMinimumWidth(DesktopGeometry.width() * 0.2);
+  create();
+
+  //  setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
+  //              DesktopGeometry.width() * 0.1, DesktopGeometry.height() *
+  //              0.1);
   setWindowTitle("Авторизация");
   adjustSize();
   setFixedSize(size());
-
-  create();
 }
 
 AuthorizationDialog::~AuthorizationDialog() {}
 
+AbstractInputDialog::InputDialogType AuthorizationDialog::type() const {
+  return Authorization;
+}
+
 void AuthorizationDialog::getData(StringDictionary& data) const {
   data.insert("login", LoginLineEdit->text());
   data.insert("password", PasswordLineEdit->text());
+  data.insert("mode", ModeChoice->currentText());
 }
 
 void AuthorizationDialog::create() {
   MainLayout = new QVBoxLayout();
   setLayout(MainLayout);
+
+  ModeChoiceLayout = new QHBoxLayout();
+  MainLayout->addLayout(ModeChoiceLayout);
+
+  ModeChoiceLabel = new QLabel("Режим работы");
+  ModeChoiceLayout->addWidget(ModeChoiceLabel);
+  ModeChoice = new QComboBox();
+  ModeChoice->addItem("Сборка");
+  ModeChoice->addItem("Тестирование");
+  ModeChoiceLayout->addWidget(ModeChoice);
+  ModeChoice->setCurrentIndex(0);
 
   LoginLayout = new QHBoxLayout();
   MainLayout->addLayout(LoginLayout);

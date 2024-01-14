@@ -1,7 +1,6 @@
 #include "authorization_gui.h"
 
-AuthorizationGui::AuthorizationGui(QWidget* parent)
-    : AbstractGui(parent, Authorization) {
+AuthorizationGui::AuthorizationGui(QWidget* parent) : AbstractGui(parent) {
   create();
 }
 
@@ -10,6 +9,10 @@ AuthorizationGui::~AuthorizationGui() {
 }
 
 void AuthorizationGui::update() {}
+
+AbstractGui::GuiType AuthorizationGui::type() {
+  return Authorization;
+}
 
 void AuthorizationGui::create() {
   GeneralLayout = new QVBoxLayout();
@@ -21,11 +24,9 @@ void AuthorizationGui::create() {
   ModeChoiceLabel = new QLabel("Режим работы");
   ModeChoiceLayout->addWidget(ModeChoiceLabel);
   ModeChoice = new QComboBox();
-  ModeChoice->addItem("Производство");
+  ModeChoice->addItem("Сборка");
   ModeChoice->addItem("Тестирование");
   GeneralLayout->addWidget(ModeChoice);
-  connect(ModeChoice, &QComboBox::currentTextChanged, this,
-          &AuthorizationGui::on_ModeChoiceCurrentTextChanged_slot);
   ModeChoice->setCurrentIndex(0);
 
   createAuthorizationGroup();
@@ -64,17 +65,4 @@ void AuthorizationGui::createAuthorizationGroup() {
   PasswordLineEdit = new QLineEdit();
   PasswordLineEdit->setEchoMode(QLineEdit::Password);
   PasswordLayout->addWidget(PasswordLineEdit);
-}
-
-void AuthorizationGui::on_ModeChoiceCurrentTextChanged_slot(
-    const QString& text) {
-  if (text == "Тестирование") {
-    GeneralLayout->removeWidget(AuthorizationGroup);
-    delete AuthorizationGroup;
-  } else {
-    createAuthorizationGroup();
-  }
-
-  adjustSize();
-  emit visibilityChanged();
 }

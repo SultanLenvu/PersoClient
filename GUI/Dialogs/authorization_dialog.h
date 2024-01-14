@@ -13,9 +13,14 @@ class AuthorizationDialog : public AbstractInputDialog {
   QSize DesktopGeometry;
   QVBoxLayout* MainLayout;
 
+  QHBoxLayout* ModeChoiceLayout;
+  QLabel* ModeChoiceLabel;
+  QComboBox* ModeChoice;
+
   QHBoxLayout* LoginLayout;
   QLabel* LoginLabel;
   QLineEdit* LoginLineEdit;
+
   QHBoxLayout* PasswordLayout;
   QLabel* PasswordLabel;
   QLineEdit* PasswordLineEdit;
@@ -30,10 +35,13 @@ class AuthorizationDialog : public AbstractInputDialog {
   explicit AuthorizationDialog(QWidget* parent);
   ~AuthorizationDialog();
 
+  // AbstractInputDialog interface
+ public:
+  virtual InputDialogType type() const override;
   virtual void getData(StringDictionary& data) const override;
 
  private:
-  Q_DISABLE_COPY(AuthorizationDialog);
+  Q_DISABLE_COPY_MOVE(AuthorizationDialog);
   void create(void);
 };
 #endif  // AUTHORIZATIONDIALOG_H

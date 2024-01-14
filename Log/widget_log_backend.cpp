@@ -10,7 +10,8 @@ WidgetLogBackend::WidgetLogBackend(const QString& name) : LogBackend(name) {
 WidgetLogBackend::~WidgetLogBackend() {}
 
 void WidgetLogBackend::writeLogLine(const QString& str) {
-  emit displayLog_signal(str);
+  if (LogEnable)
+    emit displayLog_signal(str);
 }
 
 void WidgetLogBackend::clear() {

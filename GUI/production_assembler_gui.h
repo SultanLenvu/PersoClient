@@ -13,7 +13,7 @@ class ProductionAssemblerGui : public AbstractGui {
   QVBoxLayout* TransponderLayout;
   QPushButton* ReleaseTransponderButton;
   QSpacerItem* ButtonVerticalSpacer;
-  QPushButton* rollbackTransponderPushButton;
+  QPushButton* RollbackTransponderPushButton;
   QPushButton* RereleaseTransponderButton;
 
   QGroupBox* PrintStickerGroup;
@@ -21,6 +21,10 @@ class ProductionAssemblerGui : public AbstractGui {
   QPushButton* PrintLastTransponderStickerButton;
   QPushButton* PrintCustomTransponderStickerButton;
   QPushButton* PrintBoxStickerButton;
+
+  QGroupBox* BoxDataGroup;
+  QVBoxLayout* BoxDataLayout;
+  QTableView* BoxDataView;
 
   QGroupBox* TransponderDataGroup;
   QVBoxLayout* TransponderDataLayout;
@@ -31,6 +35,7 @@ class ProductionAssemblerGui : public AbstractGui {
   ~ProductionAssemblerGui();
 
   virtual void update(void) override;
+  virtual GuiType type(void) override;
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionAssemblerGui);

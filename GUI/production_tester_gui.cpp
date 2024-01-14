@@ -1,6 +1,7 @@
 #include "production_tester_gui.h"
 
-ProductionTesterGui::ProductionTesterGui(QWidget* parent) : AbstractGui(parent, Testing) {
+ProductionTesterGui::ProductionTesterGui(QWidget* parent)
+    : AbstractGui(parent) {
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
 
@@ -63,4 +64,8 @@ ProductionTesterGui::~ProductionTesterGui() {}
 void ProductionTesterGui::update() {
   TransponderDataView->resizeColumnsToContents();
   TransponderDataView->update();
+}
+
+AbstractGui::GuiType ProductionTesterGui::type() {
+  return ProductionTester;
 }

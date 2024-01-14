@@ -25,16 +25,28 @@ class MasterGui : public AbstractGui {
   QPushButton* ServerEchoRequestButton;
   QSpacerItem* ServerControlPanelVS1;
 
+  QPushButton* RequestBoxButton;
+  QPushButton* GetCurrentBoxDataButton;
+  QPushButton* RefundCurrentBoxButton;
+  QPushButton* CompleteCurrentBoxButton;
+  QSpacerItem* ServerControlPanelVS2;
+
   QPushButton* AuthorizePushButton;
   QPushButton* ReleaseTransponderButton;
   QPushButton* RereleaseTransponderButton;
-  QPushButton* rollbackTransponderPushButton;
+  QPushButton* RollbackTransponderPushButton;
+  QPushButton* GetCurrentTransponderDataButton;
+  QPushButton* GetTransponderDataButton;
+  QSpacerItem* ServerControlPanelVS3;
 
-  QSpacerItem* ServerControlPanelVS2;
   QPushButton* PrintBoxStickerButton;
   QPushButton* PrintLastBoxStickerButton;
   QPushButton* PrintPalletStickerButton;
   QPushButton* PrintLastPalletStickerButton;
+
+  QGroupBox* BoxDataGroup;
+  QVBoxLayout* BoxDataLayout;
+  QTableView* BoxDataView;
 
   QGroupBox* TransponderDataGroup;
   QVBoxLayout* TransponderDataLayout;
@@ -77,68 +89,25 @@ class MasterGui : public AbstractGui {
   QPlainTextEdit* StickerPrinterCommandSriptTextEdit;
   //============================================================
 
-  /* Настройки клиента */
-  //============================================================
-  QWidget* SettingsTab;
-  QHBoxLayout* SettingsMainLayout;
-  QVBoxLayout* SettingsMainSubLayout;
-  QPushButton* ApplySettingsPushButton;
-
-  // Настойки логгирования
-  QGroupBox* LogSystemSettingsGroupBox;
-  QGridLayout* LogSystemSettingsMainLayout;
-  QLabel* LogSystemGlobalEnableLabel;
-  QCheckBox* LogSystemGlobalEnableCheckBox;
-  QLabel* LogSystemExtendedEnableLabel;
-  QCheckBox* LogSystemExtendedEnableCheckBox;
-
-  // Сеть
-  QGroupBox* PersoSettingsGroupBox;
-  QGridLayout* PersoSettingsMainLayout;
-  QLabel* PersoServerIpAddressLabel;
-  QLineEdit* PersoServerIpAddressLineEdit;
-  QLabel* PersoServerPortLabel;
-  QLineEdit* PersoServerPortLineEdit;
-
-  // Программатор
-  QGroupBox* ProgrammerSettingsGroupBox;
-  QGridLayout* ProgrammerSettingsMainLayout;
-  QLabel* ProgrammerExeFilePathLabel;
-  QLineEdit* ProgrammerExeFilePathLineEdit;
-  QPushButton* ProgrammerExeFilePathPushButton;
-  QLabel* ProgrammerSpeedLabel;
-  QLineEdit* ProgrammerSpeedLineEdit;
-
-  // Принтер
-  QGroupBox* StickerPrinterSettingsGroupBox;
-  QGridLayout* StickerPrinterSettingsMainLayout;
-  QLabel* StickerPrinterLibPathLabel;
-  QLineEdit* StickerPrinterLibPathLineEdit;
-  QPushButton* StickerPrinterLibPathPushButton;
-
-  QSpacerItem* SettingsVS1;
-  QSpacerItem* SettingsHS1;
-
  public:
   explicit MasterGui(QWidget* parent);
   ~MasterGui();
 
   virtual void update(void) override;
-
- public slots:
-  void displayLogData(const QString& log);
-  void clearLogDataDisplay(void);
+  virtual GuiType type(void) override;
 
  private:
   Q_DISABLE_COPY(MasterGui);
   void createServerTab(void);
   void createProgrammatorTab(void);
-  void createSettingsTab(void);
+  void createStickerPrinterTab(void);
   void createLogWidgets(void);
 
+  void connectDepedencies(void);
+
  private slots:
-  void on_ProgrammerExeFilePathPushButton_slot(void);
-  void on_StickerPrinterLibPathPushButton_slot(void);
+  void displayLog(const QString& log);
+  void clearLogDisplay(void);
 };
 
 #endif  // MASTER_GUI_H

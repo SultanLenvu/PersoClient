@@ -1,17 +1,54 @@
 #include "programmer_gui_subkernel.h"
-
 #include "master_gui.h"
+#include "programmer_manager.h"
 
 ProgrammerGuiSubkernel ::ProgrammerGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel{name} {}
 
 ProgrammerGuiSubkernel::~ProgrammerGuiSubkernel() {}
 
-void ProgrammerGuiSubkernel::connectAuthorizationGui(
-    std::shared_ptr<AuthorizationGui> gui) {}
-
-void ProgrammerGuiSubkernel::connectMasterGui(std::shared_ptr<MasterGui> gui) {
+void ProgrammerGuiSubkernel::connectGui(AbstractGui* gui) {
   CurrentGui = gui;
+
+  switch (CurrentGui->type()) {
+    case AbstractGui::Authorization:
+      connectAuthorizationGui();
+      break;
+    case AbstractGui::Master:
+      connectMasterGui();
+      break;
+    case AbstractGui::ProductionAssembler:
+      connectProductionAssemblerGui();
+      break;
+    case AbstractGui::ProductionTester:
+      connectProductionTesterGui();
+      break;
+    default:
+      break;
+  }
+}
+
+void ProgrammerGuiSubkernel::connectManager(
+    std::shared_ptr<AbstractManager> manager) {
+  if (manager->type() != AbstractManager::Programmer) {
+    return;
+  }
+
+  Manager = manager;
+  connectProgrammerManager();
+}
+
+void ProgrammerGuiSubkernel::reset() {
+  Manager.reset();
+}
+
+void ProgrammerGuiSubkernel::displayUcid_slot(
+    const std::shared_ptr<QString> ucid) {}
+
+void ProgrammerGuiSubkernel::connectAuthorizationGui() {}
+
+void ProgrammerGuiSubkernel::connectMasterGui() {
+  MasterGui* gui = dynamic_cast<MasterGui*>(CurrentGui);
 
   connect(gui->ProgramDeviceButton, &QPushButton::clicked, this,
           &ProgrammerGuiSubkernel::programMemory_guiSlot);
@@ -31,22 +68,13 @@ void ProgrammerGuiSubkernel::connectMasterGui(std::shared_ptr<MasterGui> gui) {
           &ProgrammerGuiSubkernel::lockMemory_guiSlot);
 }
 
-void ProgrammerGuiSubkernel::connectProductionAssemblerGui(
-    std::shared_ptr<ProductionAssemblerGui> gui) {
-  CurrentGui = gui;
-}
+void ProgrammerGuiSubkernel::connectProductionAssemblerGui() {}
 
-void ProgrammerGuiSubkernel::connectProductionTesterGui(
-    std::shared_ptr<ProductionTesterGui> gui) {
-  CurrentGui = gui;
-}
+void ProgrammerGuiSubkernel::connectProductionTesterGui() {}
 
-void ProgrammerGuiSubkernel::resetCurrentGui() {
-  CurrentGui.reset();
-}
+void ProgrammerGuiSubkernel::connectProgrammerManager() const {
+  ProgrammerManager* manager = dynamic_cast<ProgrammerManager*>(Manager.get());
 
-void ProgrammerGuiSubkernel::connectManager(
-    const ProgrammerManager* manager) const {
   connect(this, &ProgrammerGuiSubkernel::programMemory_signal, manager,
           &ProgrammerManager::programMemory);
   connect(this, &ProgrammerGuiSubkernel::readMemory_signal, manager,
@@ -67,11 +95,8 @@ void ProgrammerGuiSubkernel::connectManager(
           &ProgrammerManager::lockMemory);
 }
 
-void ProgrammerGuiSubkernel::displayUcid_slot(
-    const std::shared_ptr<QString> ucid) {}
-
 void ProgrammerGuiSubkernel::programMemory_guiSlot() {
-  emit loggerClear_signal();
+  emit clearLogDisplay_signal();
 
   std::shared_ptr<QString> path(new QString(QFileDialog::getOpenFileName(
       nullptr, "Выберите файл", "", "Все файлы (*.*)")));
@@ -79,19 +104,19 @@ void ProgrammerGuiSubkernel::programMemory_guiSlot() {
 }
 
 void ProgrammerGuiSubkernel::readMemory_guiSlot() {
-  emit loggerClear_signal();
+  emit clearLogDisplay_signal();
 
   emit readMemory_signal();
 }
 
 void ProgrammerGuiSubkernel::eraseMemory_guiSlot() {
-  emit loggerClear_signal();
+  emit clearLogDisplay_signal();
 
   emit eraseMemory_signal();
 }
 
 void ProgrammerGuiSubkernel::programUserData_guiSlot() {
-  emit loggerClear_signal();
+  emit clearLogDisplay_signal();
 
   std::shared_ptr<QString> path(new QString(QFileDialog::getOpenFileName(
       nullptr, "Выберите файл", "", "Все файлы (*.*)")));
@@ -99,23 +124,23 @@ void ProgrammerGuiSubkernel::programUserData_guiSlot() {
 }
 
 void ProgrammerGuiSubkernel::readUserData_guiSlot() {
-  emit loggerClear_signal();
+  emit clearLogDisplay_signal();
 
   emit readUserData_signal();
 }
 
 void ProgrammerGuiSubkernel::readUcid_guiSlot() {
-  emit loggerClear_signal();
+  emit clearLogDisplay_signal();
 }
 
 void ProgrammerGuiSubkernel::unlockMemory_guiSlot() {
-  emit loggerClear_signal();
+  emit clearLogDisplay_signal();
 
   emit unlockMemory_signal();
 }
 
 void ProgrammerGuiSubkernel::lockMemory_guiSlot() {
-  emit loggerClear_signal();
+  emit clearLogDisplay_signal();
 
   emit lockMemory_signal();
 }

@@ -1,7 +1,8 @@
 #include "master_gui.h"
-#include "General/definitions.h"
+#include "global_environment.h"
+#include "widget_log_backend.h"
 
-MasterGui::MasterGui(QWidget* parent) : AbstractGui(parent, Master) {
+MasterGui::MasterGui(QWidget* parent) : AbstractGui(parent) {
   // Вкладки с всеми интерфейсами
   Tabs = new QTabWidget();
   MainLayout->addWidget(Tabs);
@@ -15,11 +16,11 @@ MasterGui::MasterGui(QWidget* parent) : AbstractGui(parent, Master) {
   // Интерфейс для взаимодействия с принтером стикером
   createStickerPrinterTab();
 
-  // Интерфейс для изменения настроек
-  createSettingsTab();
-
   // Виджеты для отображения логов
   createLogWidgets();
+
+  // Подключаем внешние зависимости
+  connectDepedencies();
 
   // Настройка пропорции между объектами на макете
   MainLayout->setStretch(0, 3);
@@ -33,15 +34,8 @@ void MasterGui::update() {
   TransponderDataView->update();
 }
 
-void MasterGui::displayLogData(const QString& log) {
-  if (GeneralLogs->toPlainText().count() > 500000)
-    GeneralLogs->clear();
-
-  GeneralLogs->appendPlainText(log);
-}
-
-void MasterGui::clearLogDataDisplay() {
-  GeneralLogs->clear();
+AbstractGui::GuiType MasterGui::type() {
+  return Master;
 }
 
 void MasterGui::createServerTab() {
@@ -65,13 +59,24 @@ void MasterGui::createServerTab() {
   ServerDisconnectButton =
       new QPushButton(QString("Отключиться от сервера персонализации"));
   ServerControlPanelLayout->addWidget(ServerDisconnectButton);
-
   ServerEchoRequestButton = new QPushButton(QString("Отправить эхо-запрос"));
   ServerControlPanelLayout->addWidget(ServerEchoRequestButton);
-
   ServerControlPanelVS1 =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ServerControlPanelLayout->addItem(ServerControlPanelVS1);
+
+  RequestBoxButton = new QPushButton(QString("Запросить бокс"));
+  ServerControlPanelLayout->addWidget(RequestBoxButton);
+  GetCurrentBoxDataButton =
+      new QPushButton(QString("Запросить данные текущего бокса"));
+  ServerControlPanelLayout->addWidget(GetCurrentBoxDataButton);
+  RefundCurrentBoxButton = new QPushButton(QString("Вернуть бокс"));
+  ServerControlPanelLayout->addWidget(RefundCurrentBoxButton);
+  CompleteCurrentBoxButton = new QPushButton(QString("Завершить сборку бокса"));
+  ServerControlPanelLayout->addWidget(CompleteCurrentBoxButton);
+  ServerControlPanelVS2 =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  ServerControlPanelLayout->addItem(ServerControlPanelVS2);
 
   AuthorizePushButton = new QPushButton(QString("Авторизироваться"));
   ServerControlPanelLayout->addWidget(AuthorizePushButton);
@@ -80,12 +85,18 @@ void MasterGui::createServerTab() {
   RereleaseTransponderButton =
       new QPushButton(QString("Перевыпустить транспондер"));
   ServerControlPanelLayout->addWidget(RereleaseTransponderButton);
-  rollbackTransponderPushButton =
-      new QPushButton(QString("Откатить производственную линию"));
-  ServerControlPanelLayout->addWidget(rollbackTransponderPushButton);
-  ServerControlPanelVS2 =
+  RollbackTransponderPushButton =
+      new QPushButton(QString("Откатить транспондер"));
+  ServerControlPanelLayout->addWidget(RollbackTransponderPushButton);
+  GetCurrentTransponderDataButton =
+      new QPushButton(QString("Запросить данные текущего транспондера"));
+  ServerControlPanelLayout->addWidget(GetCurrentTransponderDataButton);
+  GetTransponderDataButton =
+      new QPushButton(QString("Запросить данные транспондера"));
+  ServerControlPanelLayout->addWidget(GetTransponderDataButton);
+  ServerControlPanelVS3 =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  ServerControlPanelLayout->addItem(ServerControlPanelVS2);
+  ServerControlPanelLayout->addItem(ServerControlPanelVS3);
 
   PrintBoxStickerButton =
       new QPushButton(QString("Распечатать стикер для бокса"));
@@ -100,6 +111,16 @@ void MasterGui::createServerTab() {
       new QPushButton(QString("Распечатать последний стикер для паллеты"));
   ServerControlPanelLayout->addWidget(PrintLastPalletStickerButton);
 
+  // Представление данных о боксе
+  BoxDataGroup = new QGroupBox("Данные бокса");
+  ServerTabMainLayout->addWidget(BoxDataGroup);
+
+  BoxDataLayout = new QVBoxLayout();
+  BoxDataGroup->setLayout(BoxDataLayout);
+
+  BoxDataView = new QTableView();
+  BoxDataLayout->addWidget(BoxDataView);
+
   // Представление данных о транспондере
   TransponderDataGroup = new QGroupBox("Данные транспондера");
   ServerTabMainLayout->addWidget(TransponderDataGroup);
@@ -112,7 +133,8 @@ void MasterGui::createServerTab() {
 
   // Настройка пропорции между объектами на макете
   ServerTabMainLayout->setStretch(0, 1);
-  ServerTabMainLayout->setStretch(1, 3);
+  ServerTabMainLayout->setStretch(1, 1);
+  ServerTabMainLayout->setStretch(2, 1);
 }
 
 void MasterGui::createProgrammatorTab() {
@@ -191,123 +213,6 @@ void MasterGui::createStickerPrinterTab() {
       StickerPrinterCommandSriptTextEdit);
 }
 
-void MasterGui::createSettingsTab() {
-  SettingsTab = new QWidget();
-  Tabs->addTab(SettingsTab, "Настройки");
-  // Загружаем настройки приложения
-  QSettings settings;
-
-  // Главный макет меню настроек
-  SettingsMainLayout = new QHBoxLayout();
-  SettingsTab->setLayout(SettingsMainLayout);
-
-  SettingsMainSubLayout = new QVBoxLayout();
-  SettingsMainLayout->addLayout(SettingsMainSubLayout);
-
-  // Система логгирования
-  LogSystemSettingsGroupBox = new QGroupBox(QString("Система логгирования"));
-  SettingsMainSubLayout->addWidget(LogSystemSettingsGroupBox);
-
-  LogSystemSettingsMainLayout = new QGridLayout();
-  LogSystemSettingsGroupBox->setLayout(LogSystemSettingsMainLayout);
-
-  LogSystemGlobalEnableLabel = new QLabel("Глобальное логгирование вкл/выкл");
-  LogSystemSettingsMainLayout->addWidget(LogSystemGlobalEnableLabel, 0, 0, 1,
-                                         1);
-  LogSystemGlobalEnableCheckBox = new QCheckBox();
-  LogSystemGlobalEnableCheckBox->setCheckState(
-      settings.value("log_system/global_enable").toBool() ? Qt::Checked
-                                                          : Qt::Unchecked);
-  LogSystemSettingsMainLayout->addWidget(LogSystemGlobalEnableCheckBox, 0, 1, 1,
-                                         1);
-  LogSystemExtendedEnableLabel =
-      new QLabel("Расширенное логгирование вкл/выкл");
-  LogSystemSettingsMainLayout->addWidget(LogSystemExtendedEnableLabel, 1, 0, 1,
-                                         1);
-  LogSystemExtendedEnableCheckBox = new QCheckBox();
-  LogSystemExtendedEnableCheckBox->setCheckState(
-      settings.value("log_system/Extended_enable").toBool() ? Qt::Checked
-                                                            : Qt::Unchecked);
-  LogSystemSettingsMainLayout->addWidget(LogSystemExtendedEnableCheckBox, 1, 1,
-                                         1, 1);
-
-  // Сеть
-  PersoSettingsGroupBox = new QGroupBox(QString("Сетевые настройки"));
-  SettingsMainSubLayout->addWidget(PersoSettingsGroupBox);
-
-  PersoSettingsMainLayout = new QGridLayout();
-  PersoSettingsGroupBox->setLayout(PersoSettingsMainLayout);
-
-  PersoServerIpAddressLabel =
-      new QLabel("IP адрес или URL сервера персонализации");
-  PersoSettingsMainLayout->addWidget(PersoServerIpAddressLabel, 0, 0, 1, 1);
-  PersoServerIpAddressLineEdit =
-      new QLineEdit(settings.value("perso_server_connection/ip").toString());
-  PersoSettingsMainLayout->addWidget(PersoServerIpAddressLineEdit, 0, 1, 1, 1);
-  PersoServerPortLabel = new QLabel("Порт сервера персонализации");
-  PersoSettingsMainLayout->addWidget(PersoServerPortLabel, 1, 0, 1, 1);
-  PersoServerPortLineEdit =
-      new QLineEdit(settings.value("perso_server_connection/port").toString());
-  PersoSettingsMainLayout->addWidget(PersoServerPortLineEdit, 1, 1, 1, 1);
-
-  // Настройки программатора
-  ProgrammerSettingsGroupBox = new QGroupBox(QString("Программатор"));
-  SettingsMainSubLayout->addWidget(ProgrammerSettingsGroupBox);
-
-  ProgrammerSettingsMainLayout = new QGridLayout();
-  ProgrammerSettingsGroupBox->setLayout(ProgrammerSettingsMainLayout);
-
-  ProgrammerExeFilePathLabel = new QLabel("Путь к JLink.exe");
-  ProgrammerSettingsMainLayout->addWidget(ProgrammerExeFilePathLabel, 0, 0, 1,
-                                          1);
-  ProgrammerExeFilePathLineEdit = new QLineEdit(
-      settings.value("jlink_exe_programmer/exe_file_path").toString());
-  ProgrammerSettingsMainLayout->addWidget(ProgrammerExeFilePathLineEdit, 0, 1,
-                                          1, 1);
-  ProgrammerExeFilePathPushButton = new QPushButton("Обзор");
-  ProgrammerSettingsMainLayout->addWidget(ProgrammerExeFilePathPushButton, 0, 2,
-                                          1, 1);
-  connect(ProgrammerExeFilePathPushButton, &QPushButton::clicked, this,
-          &MasterGui::on_ProgrammerExeFilePathPushButton_slot);
-  ProgrammerSpeedLabel = new QLabel("Скорость работы (кГц)");
-  ProgrammerSettingsMainLayout->addWidget(ProgrammerSpeedLabel, 1, 0, 1, 1);
-  ProgrammerSpeedLineEdit =
-      new QLineEdit(settings.value("jlink_exe_programmer/speed").toString());
-  ProgrammerSettingsMainLayout->addWidget(ProgrammerSpeedLineEdit, 1, 1, 1, 2);
-
-  // Настройки принтера
-  StickerPrinterSettingsGroupBox = new QGroupBox(QString("Стикер-принтер"));
-  SettingsMainSubLayout->addWidget(StickerPrinterSettingsGroupBox);
-
-  StickerPrinterSettingsMainLayout = new QGridLayout();
-  StickerPrinterSettingsGroupBox->setLayout(StickerPrinterSettingsMainLayout);
-
-  StickerPrinterLibPathLabel = new QLabel("Путь к библиотеке");
-  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLabel, 0, 0,
-                                              1, 1);
-  StickerPrinterLibPathLineEdit =
-      new QLineEdit(settings.value("te310_printer/library_path").toString());
-  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathLineEdit, 0,
-                                              1, 1, 1);
-  StickerPrinterLibPathPushButton = new QPushButton("Обзор");
-  StickerPrinterSettingsMainLayout->addWidget(StickerPrinterLibPathPushButton,
-                                              0, 2, 1, 1);
-  connect(StickerPrinterLibPathPushButton, &QPushButton::clicked, this,
-          &MasterGui::on_StickerPrinterLibPathPushButton_slot);
-
-  // Кнопка сохранения настроек
-  ApplySettingsPushButton = new QPushButton("Применить изменения");
-  SettingsMainSubLayout->addWidget(ApplySettingsPushButton);
-
-  // Сжимаем позиционирование
-  SettingsVS1 =
-      new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  SettingsMainSubLayout->addItem(SettingsVS1);
-  SettingsHS1 =
-      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
-  SettingsMainLayout->addItem(SettingsHS1);
-}
-
 void MasterGui::createLogWidgets() {
   // Виджеты для отображения логов
   GeneralLogGroup = new QGroupBox("Логи");
@@ -325,14 +230,24 @@ void MasterGui::createLogWidgets() {
   GeneralLogLayout->addWidget(GeneralLogs);
 }
 
-void MasterGui::on_ProgrammerExeFilePathPushButton_slot() {
-  QString filePath =
-      QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.exe");
-  ProgrammerExeFilePathLineEdit->setText(filePath);
+void MasterGui::connectDepedencies() {
+  WidgetLogBackend* ls = dynamic_cast<WidgetLogBackend*>(
+      GlobalEnvironment::instance()->getObject("WidgetLogBackend"));
+  assert(ls != nullptr);
+
+  connect(ls, &WidgetLogBackend::displayLog_signal, this,
+          &MasterGui::displayLog);
+  connect(ls, &WidgetLogBackend::clearLogDisplay_signal, this,
+          &MasterGui::clearLogDisplay);
 }
 
-void MasterGui::on_StickerPrinterLibPathPushButton_slot() {
-  QString filePath =
-      QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.dll");
-  StickerPrinterLibPathLineEdit->setText(filePath);
+void MasterGui::displayLog(const QString& log) {
+  if (GeneralLogs->toPlainText().size() > 500000)
+    GeneralLogs->clear();
+
+  GeneralLogs->appendPlainText(log);
+}
+
+void MasterGui::clearLogDisplay() {
+  GeneralLogs->clear();
 }

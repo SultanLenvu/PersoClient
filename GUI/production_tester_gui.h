@@ -29,6 +29,7 @@ class ProductionTesterGui : public AbstractGui {
   ~ProductionTesterGui();
 
   virtual void update(void) override;
+  virtual GuiType type(void) override;
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionTesterGui);

@@ -1,10 +1,9 @@
 #include <QSettings>
 
 #include "file_log_backend.h"
+#include "global_environment.h"
 #include "log_system.h"
 #include "widget_log_backend.h"
-
-LogSystem::~LogSystem() {}
 
 LogSystem::LogSystem(const QString& name) : QObject(nullptr) {
   setObjectName(name);
@@ -12,14 +11,16 @@ LogSystem::LogSystem(const QString& name) : QObject(nullptr) {
 
   Backends.push_back(
       std::unique_ptr<LogBackend>(new WidgetLogBackend("WidgetLogBackend")));
-
   Backends.push_back(
       std::unique_ptr<LogBackend>(new FileLogBackend("FileLogBackend")));
+
+  GlobalEnvironment::instance()->registerObject(this);
 }
 
+LogSystem::~LogSystem() {}
+
 void LogSystem::clear() {
-  for (std::vector<std::unique_ptr<LogBackend>>::iterator it = Backends.begin();
-       it != Backends.end(); it++) {
+  for (auto it = Backends.begin(); it != Backends.end(); it++) {
     (*it)->clear();
   }
 }
@@ -31,26 +32,26 @@ void LogSystem::generate(const QString& log) {
 
   QTime time = QDateTime::currentDateTime().time();
   QString LogData = time.toString("hh:mm:ss.zzz - ") + log;
-  for (std::vector<std::unique_ptr<LogBackend>>::const_iterator it =
-           Backends.begin();
-       it != Backends.end(); it++) {
+  for (auto it = Backends.begin(); it != Backends.end(); it++) {
     (*it)->writeLogLine(LogData);
   }
 }
 
 void LogSystem::applySettings() {
+  generate(objectName() + " - Применение новых настроек.");
   loadSettings();
+
+  for (auto it = Backends.begin(); it != Backends.end(); it++) {
+    (*it)->applySettings();
+  }
 }
 
-LogSystem::LogSystem() {
-  QSettings settings;
-
-  LogEnable = settings.value("log_system/global_enable").toBool();
-}
 
 /*
  * Приватные методы
  */
+
+LogSystem::LogSystem() {}
 
 void LogSystem::loadSettings() {
   QSettings settings;

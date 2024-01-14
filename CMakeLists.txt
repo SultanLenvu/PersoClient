@@ -36,7 +36,6 @@ add_executable(PersoClient WIN32
     Management/sticker_printer_manager.h Management/sticker_printer_manager.cpp
 
     GUI/abstract_gui.cpp GUI/abstract_gui.h
-    GUI/authorization_dialog.cpp GUI/authorization_dialog.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
     GUI/interaction_system.cpp GUI/interaction_system.h
     GUI/gui_kernel.cpp GUI/gui_kernel.h
@@ -49,10 +48,12 @@ add_executable(PersoClient WIN32
     GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
     GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
 
+    GUI/Dialogs/authorization_dialog.cpp GUI/Dialogs/authorization_dialog.h
     GUI/Dialogs/master_password_input_dialog.cpp GUI/Dialogs/master_password_input_dialog.h
     GUI/Dialogs/custom_transponder_sticker_dialog.cpp GUI/Dialogs/custom_transponder_sticker_dialog.h
     GUI/Dialogs/transponder_sticker_scan_dialog.cpp GUI/Dialogs/transponder_sticker_scan_dialog.h
     GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
+    GUI/Dialogs/settings_dialog.cpp GUI/Dialogs/settings_dialog.h
 
     General/definitions.h
     General/hash_model.cpp General/hash_model.h
@@ -71,7 +72,6 @@ add_executable(PersoClient WIN32
 
     ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
     ServerConnection/abstract_server_connection.h ServerConnection/abstract_server_connection.cpp
-
     ServerConnection/Commands/abstract_client_command.h ServerConnection/Commands/abstract_client_command.cpp
     ServerConnection/Commands/echo.h ServerConnection/Commands/echo.cpp
     ServerConnection/Commands/release_transponder.h ServerConnection/Commands/release_transponder.cpp

@@ -3,8 +3,6 @@
 
 #include "abstract_gui_subkernel.h"
 #include "hash_model.h"
-#include "production_manager.h"
-#include "types.h"
 
 class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   Q_OBJECT
@@ -16,11 +14,15 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   };
 
  private:
-  std::shared_ptr<AbstractGui> CurrentGui;
+  UserRole Role;
+  AbstractGui* CurrentGui;
+  std::shared_ptr<AbstractManager> Manager;
 
-  std::unique_ptr<HashModel> TransponderDataModel;
+  std::unique_ptr<TableModel> BoxDataModel;
+  std::unique_ptr<TableModel> TransponderDataModel;
 
-  UserRole CurrentRole;
+  std::shared_ptr<StringDictionary> TransponderDataMatchTable;
+  std::shared_ptr<StringDictionary> BoxDataMatchTable;
 
  public:
   explicit ProductionGuiSubkernel(const QString& name);
@@ -28,37 +30,49 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
 
   // AbstractGuiSubkernel interface
  public:
-  virtual void connectAuthorizationGui(
-      std::shared_ptr<AuthorizationGui> gui) override;
-  virtual void connectMasterGui(std::shared_ptr<MasterGui> gui) override;
-  virtual void connectProductionAssemblerGui(
-      std::shared_ptr<ProductionAssemblerGui> gui) override;
-  virtual void connectProductionTesterGui(
-      std::shared_ptr<ProductionTesterGui> gui) override;
-  virtual void resetCurrentGui() override;
-
- public:
-  void connectManager(const ProductionManager* manager) const;
+  virtual void connectGui(AbstractGui* gui) override;
+  virtual void connectManager(
+      std::shared_ptr<AbstractManager> manager) override;
+  virtual void reset() override;
 
  public slots:
   void authorizationCompleted_slot(void);
-  void displayTransponderData(const std::shared_ptr<StringDictionary> data);
+  void displayTransponderData(const StringDictionary& data);
+  void displayBoxData(const StringDictionary& data);
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionGuiSubkernel);
+
+  void connectAuthorizationGui(void);
+  void connectMasterGui(void);
+  void connectProductionAssemblerGui(void);
+  void connectProductionTesterGui(void);
+
+  void connectProductionManager(void) const;
 
   void connect_guiSlot(void);
   void disconnect_guiSlot(void);
   void echoRequest_guiSlot(void);
   void authorize_guiSlot(void);
+
+  void requestBox_guiSlot(void);
+  void getCurrentBoxData_guiSlot(void);
+  void refundCurrentBox_guiSlot(void);
+  void completeCurrentBox_guiSlot(void);
+
   void releaseTransponder_guiSlot(void);
   void rereleaseTransponder_guiSlot(void);
   void rollbackTransponder_guiSlot(void);
+  void getCurrentTransponderData_guiSlot(void);
+  void getTransponderData_guiSlot(void);
 
   void printBoxSticker_guiSlot(void);
   void printLastBoxSticker_guiSlot(void);
   void printPalletSticker_guiSlot(void);
   void printLastPalletSticker_guiSlot(void);
+
+  void createModels(void);
+  void createMatchTables(void);
 
  signals:
   void displayProductionAssemblerGui(void);
@@ -67,14 +81,20 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   // Сигналы для менеджера
   void connectToServer_signal(void);
   void disconnectFromServer_signal(void);
-
   void echoServer_signal(void);
   void authorize_signal(const std::shared_ptr<StringDictionary> param);
+
+  void requestBox_signal(void);
+  void getCurrentBoxData_signal(void);
+  void refundCurrentBox_signal(void);
+  void completeCurrentBox_signal(void);
 
   void releaseTransponder_signal();
   void rereleaseTransponder_signal(
       const std::shared_ptr<StringDictionary> param);
   void rollbackTransponder_signal(void);
+  void getCurrentTransponderData_signal(void);
+  void getTransponderData_signal(const std::shared_ptr<StringDictionary> param);
 
   void printBoxSticker_signal(const std::shared_ptr<StringDictionary> data);
   void printLastBoxSticker_signal(void);
