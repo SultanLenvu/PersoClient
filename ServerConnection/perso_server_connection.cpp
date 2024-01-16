@@ -24,6 +24,8 @@
 
 PersoServerConnection::PersoServerConnection(const QString& name)
     : AbstractServerConnection(name) {
+  ReceivedDataBlockSize = 0;
+
   loadSettings();
 
   // Создаем сокет
@@ -444,6 +446,7 @@ void PersoServerConnection::socketReadyRead_slot() {
       // Останавливаем цикл ожидания
       emit stopResponseWaiting();
       ReceivedDataBlockSize = 0;
+      return;
     }
   }
 
