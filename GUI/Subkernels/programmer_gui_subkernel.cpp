@@ -58,9 +58,9 @@ void ProgrammerGuiSubkernel::connectMasterGui() {
           &ProgrammerGuiSubkernel::eraseMemory_guiSlot);
 
   connect(gui->ReadDeviceUserDataButton, &QPushButton::clicked, this,
-          &ProgrammerGuiSubkernel::programUserData_guiSlot);
-  connect(gui->ProgramDeviceUserDataButton, &QPushButton::clicked, this,
           &ProgrammerGuiSubkernel::readUserData_guiSlot);
+  connect(gui->ProgramDeviceUserDataButton, &QPushButton::clicked, this,
+          &ProgrammerGuiSubkernel::programUserData_guiSlot);
 
   connect(gui->unlockMemoryButton, &QPushButton::clicked, this,
           &ProgrammerGuiSubkernel::unlockMemory_guiSlot);

@@ -76,6 +76,7 @@ ReturnStatus PersoServerConnection::echo() {
   CurrentCommand = Commands.at(Echo);
 
   StringDictionary param, result;
+  param.insert("data", "test");
   ReturnStatus ret = processCurrentCommand(param, result);
   return ret;
 }
@@ -276,9 +277,6 @@ ReturnStatus PersoServerConnection::processCurrentCommand(
 ReturnStatus PersoServerConnection::transmitDataBlock(
     const QByteArray& dataBlock) {
   ReturnStatus ret;
-  // Ответный блок данных еще не получен
-  ReceivedDataBlockSize = 0;
-
   // Проверяем подключение к серверу персонализации
   if (!Socket->isOpen()) {
     sendLog("Соединение с сервером персонализации не установлено.");
@@ -298,7 +296,11 @@ ReturnStatus PersoServerConnection::transmitDataBlock(
     // В противном случае дробим блок данных на части и последовательно
     // отправляем
     for (int32_t i = 0; i < dataBlock.size(); i += ONETIME_TRANSMIT_DATA_SIZE) {
-      Socket->write(dataBlock.mid(i, ONETIME_TRANSMIT_DATA_SIZE));
+      if (Socket->write(dataBlock.mid(i, ONETIME_TRANSMIT_DATA_SIZE)) == -1) {
+        sendLog(QString("Получена ошибка при отправке %1 части блока данных.")
+                    .arg(QString::number(i)));
+        return ReturnStatus::ServerDataTransmittingError;
+      }
     }
   }
 
@@ -416,7 +418,7 @@ void PersoServerConnection::socketDisconnected_slot() {
 void PersoServerConnection::socketReadyRead_slot() {
   QDataStream deserializator(Socket.get());  // Дессериализатор
   deserializator.setVersion(
-      QDataStream::Qt_5_12);  // Настраиваем версию десериализатора
+      QDataStream::Qt_6_5);  // Настраиваем версию десериализатора
 
   // Если блок данных еще не начал формироваться
   if (ReceivedDataBlockSize == 0) {

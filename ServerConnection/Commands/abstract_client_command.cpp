@@ -4,9 +4,17 @@
 #include <QIODevice>
 #include <QJsonDocument>
 
+#include "global_environment.h"
+#include "log_system.h"
+
 AbstractClientCommand::AbstractClientCommand(const QString& name)
     : QObject{nullptr} {
   setObjectName(name);
+
+  connect(this, &AbstractClientCommand::logging,
+          dynamic_cast<LogSystem*>(
+              GlobalEnvironment::instance()->getObject("LogSystem")),
+          &LogSystem::generate);
 }
 
 AbstractClientCommand::~AbstractClientCommand() {}
@@ -28,12 +36,16 @@ void AbstractClientCommand::generateDataBlock(QByteArray& dataBlock) {
   // Инициализируем блок данных и сериализатор
   dataBlock.clear();
   QDataStream serializator(&dataBlock, QIODevice::WriteOnly);
-  serializator.setVersion(QDataStream::Qt_5_12);
+  serializator.setVersion(QDataStream::Qt_6_5);
 
   // Формируем единый блок данных для отправки
   serializator << uint32_t(0) << requestDocument.toJson();
   serializator.device()->seek(0);
   serializator << uint32_t(dataBlock.size() - sizeof(uint32_t));
+
+  sendLog(QString("Размер отправляемого блока данных: %1")
+              .arg(QString::number(dataBlock.size())));
+  sendLog(QString("Отправляемый блок данных: %1").arg(dataBlock));
 }
 
 bool AbstractClientCommand::processDataBlock(const QByteArray& dataBlock) {

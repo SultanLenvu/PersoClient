@@ -61,6 +61,8 @@ void MasterGui::createServerTab() {
   ServerControlPanelLayout->addWidget(ServerDisconnectButton);
   ServerEchoRequestButton = new QPushButton(QString("Отправить эхо-запрос"));
   ServerControlPanelLayout->addWidget(ServerEchoRequestButton);
+  AuthorizePushButton = new QPushButton(QString("Авторизироваться"));
+  ServerControlPanelLayout->addWidget(AuthorizePushButton);
   ServerControlPanelVS1 =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ServerControlPanelLayout->addItem(ServerControlPanelVS1);
@@ -78,8 +80,6 @@ void MasterGui::createServerTab() {
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ServerControlPanelLayout->addItem(ServerControlPanelVS2);
 
-  AuthorizePushButton = new QPushButton(QString("Авторизироваться"));
-  ServerControlPanelLayout->addWidget(AuthorizePushButton);
   ReleaseTransponderButton = new QPushButton(QString("Выпустить транспондер"));
   ServerControlPanelLayout->addWidget(ReleaseTransponderButton);
   RereleaseTransponderButton =

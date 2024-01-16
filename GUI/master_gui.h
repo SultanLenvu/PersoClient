@@ -23,6 +23,7 @@ class MasterGui : public AbstractGui {
   QPushButton* ServerConnectPushButton;
   QPushButton* ServerDisconnectButton;
   QPushButton* ServerEchoRequestButton;
+  QPushButton* AuthorizePushButton;
   QSpacerItem* ServerControlPanelVS1;
 
   QPushButton* RequestBoxButton;
@@ -31,7 +32,6 @@ class MasterGui : public AbstractGui {
   QPushButton* CompleteCurrentBoxButton;
   QSpacerItem* ServerControlPanelVS2;
 
-  QPushButton* AuthorizePushButton;
   QPushButton* ReleaseTransponderButton;
   QPushButton* RereleaseTransponderButton;
   QPushButton* RollbackTransponderPushButton;

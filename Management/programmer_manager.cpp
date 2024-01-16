@@ -33,7 +33,7 @@ void ProgrammerManager::programMemory(const std::shared_ptr<QString> path) {
   ReturnStatus ret;
   QFile firmware(*path);
 
-  ret = Programmer->programUserData(firmware);
+  ret = Programmer->programMemory(firmware);
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("programMemory", ret);
     return;
