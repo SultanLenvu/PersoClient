@@ -56,7 +56,7 @@ add_executable(PersoClient WIN32
     GUI/Dialogs/settings_dialog.cpp GUI/Dialogs/settings_dialog.h
 
     General/definitions.h
-    General/hash_model.cpp General/hash_model.h
+    General/hash_table_model.cpp General/hash_table_model.h
     General/types.h
 
     Log/file_log_backend.cpp Log/file_log_backend.h

@@ -54,6 +54,7 @@ bool AbstractClientCommand::processDataBlock(const QByteArray& dataBlock) {
 
   // Если пришел некорректный JSON
   if (status.error != QJsonParseError::NoError) {
+    sendLog("Получена ошибка при обработке полученного блока данных.");
     return false;
   }
 

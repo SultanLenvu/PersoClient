@@ -267,12 +267,11 @@ void TE310Printer::applySetting() {
 void TE310Printer::loadSetting() {
   QSettings settings;
 
-  LogEnable = settings.value("log_system/global_enable").toBool();
   TscLibPath = settings.value("te310_printer/library_path").toString();
 }
 
 void TE310Printer::sendLog(const QString& log) {
-  emit const_cast<TE310Printer*>(this)->logging(objectName() + " - " + log);
+  emit logging(QString("%1 - %2").arg(objectName(), log));
 }
 
 bool TE310Printer::loadTscLib() {

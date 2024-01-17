@@ -1,5 +1,5 @@
-#ifndef HASH_MODEL_H
-#define HASH_MODEL_H
+#ifndef HASH_TABLE_MODEL_H
+#define HASH_TABLE_MODEL_H
 
 #include <QAbstractTableModel>
 #include <QHash>
@@ -8,7 +8,7 @@
 
 #include "types.h"
 
-class TableModel : public QAbstractTableModel {
+class HashTableModel : public QAbstractTableModel {
  private:
   std::shared_ptr<StringDictionary> MatchTable;
 
@@ -16,8 +16,8 @@ class TableModel : public QAbstractTableModel {
   QVector<QVariant> Headers;
 
  public:
-  TableModel();
-  ~TableModel();
+  HashTableModel();
+  ~HashTableModel();
 
   void setData(const StringDictionary& table);
   void setMatchTable(std::shared_ptr<StringDictionary> match);
@@ -33,7 +33,7 @@ class TableModel : public QAbstractTableModel {
                       int role = Qt::DisplayRole) const override;
 
  private:
-  Q_DISABLE_COPY_MOVE(TableModel);
+  Q_DISABLE_COPY_MOVE(HashTableModel);
 };
 
-#endif  // HASH_MODEL_H
+#endif  // HASH_TABLE_MODEL_H

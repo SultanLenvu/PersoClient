@@ -1,10 +1,10 @@
-#include "hash_model.h"
+#include "hash_table_model.h"
 
-TableModel::TableModel() : QAbstractTableModel(nullptr) {}
+HashTableModel::HashTableModel() : QAbstractTableModel(nullptr) {}
 
-TableModel::~TableModel() {}
+HashTableModel::~HashTableModel() {}
 
-void TableModel::setData(const StringDictionary& table) {
+void HashTableModel::setData(const StringDictionary& table) {
   beginResetModel();
 
   // Очищаем старые данные
@@ -21,11 +21,11 @@ void TableModel::setData(const StringDictionary& table) {
   endResetModel();
 }
 
-void TableModel::setMatchTable(std::shared_ptr<StringDictionary> match) {
+void HashTableModel::setMatchTable(std::shared_ptr<StringDictionary> match) {
   MatchTable = match;
 }
 
-void TableModel::clear() {
+void HashTableModel::clear() {
   beginResetModel();
 
   Values.clear();
@@ -34,11 +34,11 @@ void TableModel::clear() {
   endResetModel();
 }
 
-bool TableModel::isEmpty() const {
+bool HashTableModel::isEmpty() const {
   return Values.isEmpty();
 }
 
-int TableModel::columnCount(const QModelIndex& parent) const {
+int HashTableModel::columnCount(const QModelIndex& parent) const {
   if (Values.isEmpty()) {
     return 0;
   }
@@ -46,11 +46,11 @@ int TableModel::columnCount(const QModelIndex& parent) const {
   return 1;
 }
 
-int TableModel::rowCount(const QModelIndex& parent) const {
+int HashTableModel::rowCount(const QModelIndex& parent) const {
   return Values.size();
 }
 
-QVariant TableModel::data(const QModelIndex& index, int role) const {
+QVariant HashTableModel::data(const QModelIndex& index, int role) const {
   if (index.column() > 1) {
     return QVariant();
   }
@@ -65,7 +65,7 @@ QVariant TableModel::data(const QModelIndex& index, int role) const {
     return QVariant();
 }
 
-QVariant TableModel::headerData(int section,
+QVariant HashTableModel::headerData(int section,
                                 Qt::Orientation orientation,
                                 int role) const {
   if (section > (Values.size())) {

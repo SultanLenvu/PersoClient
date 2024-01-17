@@ -20,7 +20,6 @@ class TE310Printer : public AbstractStickerPrinter {
 #endif /* __linux__ */
 
  private:
-  bool LogEnable;
 #ifdef __linux__
   QHostAddress IPAddress;
   int Port;

@@ -24,7 +24,7 @@ InteractionSystem::InteractionSystem(const QString& name) : QObject(nullptr) {
 
 InteractionSystem::~InteractionSystem() {}
 
-void InteractionSystem::generateMessage(const QString& data) {
+void InteractionSystem::generateMessage(const QString& text) {
   QMessageBox::information(nullptr, "Сообщение", data, QMessageBox::Ok);
 }
 

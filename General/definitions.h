@@ -63,7 +63,7 @@
 
 /* Определения для команд клиента */
 //===============================================================
-#define COMMAND_ECHO_RESPONSE_SIZE 2
+#define COMMAND_ECHO_RESPONSE_SIZE 3
 #define COMMAND_LOGIN_RESPONSE_SIZE 2
 #define COMMAND_LOGOUT_RESPONSE_SIZE 2
 

@@ -334,10 +334,10 @@ void ProductionGuiSubkernel::printLastPalletSticker_guiSlot() {
 }
 
 void ProductionGuiSubkernel::createModels() {
-  TransponderDataModel = std::unique_ptr<TableModel>(new TableModel());
+  TransponderDataModel = std::unique_ptr<HashTableModel>(new HashTableModel());
   TransponderDataModel->setMatchTable(TransponderDataMatchTable);
 
-  BoxDataModel = std::unique_ptr<TableModel>(new TableModel());
+  BoxDataModel = std::unique_ptr<HashTableModel>(new HashTableModel());
   BoxDataModel->setMatchTable(BoxDataMatchTable);
 }
 

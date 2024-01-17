@@ -2,7 +2,7 @@
 #define ProductionGuiSubkernel_H
 
 #include "abstract_gui_subkernel.h"
-#include "hash_model.h"
+#include "hash_table_model.h"
 
 class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   Q_OBJECT
@@ -18,8 +18,8 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   AbstractGui* CurrentGui;
   std::shared_ptr<AbstractManager> Manager;
 
-  std::unique_ptr<TableModel> BoxDataModel;
-  std::unique_ptr<TableModel> TransponderDataModel;
+  std::unique_ptr<HashTableModel> BoxDataModel;
+  std::unique_ptr<HashTableModel> TransponderDataModel;
 
   std::shared_ptr<StringDictionary> TransponderDataMatchTable;
   std::shared_ptr<StringDictionary> BoxDataMatchTable;

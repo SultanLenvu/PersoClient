@@ -228,6 +228,11 @@ ReturnStatus PersoServerConnection::printLastPalletSticker() {
   return ret;
 }
 
+void PersoServerConnection::reset() {
+  ReceivedDataBlock.clear();
+  ReceivedDataBlockSize = 0;
+}
+
 void PersoServerConnection::applySettings() {
   sendLog("Применение новых настроек. ");
   loadSettings();
@@ -270,6 +275,9 @@ ReturnStatus PersoServerConnection::processCurrentCommand(
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
+
+  // Очистка
+  reset();
 
   sendLog(
       QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
@@ -450,9 +458,6 @@ void PersoServerConnection::socketReadyRead_slot() {
     }
   }
 
-  sendLog(QString("Размер принятых данных: %1. ")
-              .arg(QString::number(Socket->bytesAvailable())));
-
   // Дожидаемся пока весь блок данных придет целиком
   if (Socket->bytesAvailable() < ReceivedDataBlockSize) {
     sendLog("Блок получен не целиком. Ожидается прием следующих частей. ");
@@ -463,6 +468,10 @@ void PersoServerConnection::socketReadyRead_slot() {
 
   // Если блок был получен целиком, то осуществляем его дессериализацию
   deserializator >> ReceivedDataBlock;
+
+  sendLog(QString("Размер полученного блока данных: %1. ")
+              .arg(QString::number(ReceivedDataBlock.size())));
+  sendLog(QString("Полученный блок данных: %1 ").arg(ReceivedDataBlock));
 
   // Останавливаем цикл ожидания
   emit stopResponseWaiting();

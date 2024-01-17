@@ -23,12 +23,12 @@ ReturnStatus Echo::generate(const StringDictionary& param,
 ReturnStatus Echo::processResponse(const QByteArray& dataBlock,
                                    StringDictionary& responseData) {
   if (!processDataBlock(dataBlock)) {
-    sendLog("Получена ошибка при обработке полученного блока данных.");
     return ReturnStatus::ServerResponseDataBlockError;
   }
 
   if ((Response.size() != ResponseSize) || (Response["command_name"] != Name) ||
       (!Response.contains("data"))) {
+    sendLog("Получена синтаксическая ошибка при обработке серверного ответа.");
     return ReturnStatus::ServerResponseSyntaxError;
   }
 
