@@ -42,6 +42,7 @@ class AbstractServerConnection : public QObject {
   virtual ReturnStatus printPalletSticker(const StringDictionary& param) = 0;
   virtual ReturnStatus printLastPalletSticker(void) = 0;
 
+  virtual void reset(void) = 0;
   virtual void applySettings(void) = 0;
 
  private:

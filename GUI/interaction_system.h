@@ -29,7 +29,7 @@ class InteractionSystem : public QObject {
   ~InteractionSystem();
 
  public slots:
-  void generateMessage(const QString& data);
+  void generateMessage(const QString& text);
   void generateErrorMessage(const QString& text);
 
   void processOperationStart(const QString& opName);
