@@ -1,7 +1,7 @@
 #include "production_gui.h"
 
-ProductionGUI::ProductionGUI(QWidget* parent)
-    : AbstractGUI(parent, Production) {
+ProductionGUI::ProductionGUI(QWidget* parent) : AbstractGUI(parent, Production)
+{
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
 
@@ -66,7 +66,8 @@ ProductionGUI::ProductionGUI(QWidget* parent)
 
 ProductionGUI::~ProductionGUI() {}
 
-void ProductionGUI::update() {
+void ProductionGUI::update()
+{
   TransponderDataView->resizeColumnsToContents();
   TransponderDataView->update();
 }

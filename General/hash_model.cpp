@@ -1,13 +1,15 @@
 #include "hash_model.h"
 
-HashModel::HashModel(QObject* parent) : QAbstractTableModel(parent) {
+HashModel::HashModel(QObject* parent) : QAbstractTableModel(parent)
+{
   setObjectName("HashModel");
   createMatchTables();
 }
 
 HashModel::~HashModel() {}
 
-void HashModel::buildTransponderData(const QHash<QString, QString>* map) {
+void HashModel::buildTransponderData(const QHash<QString, QString>* map)
+{
   // Проверка на существование
   if (!map) {
     return;
@@ -31,7 +33,8 @@ void HashModel::buildTransponderData(const QHash<QString, QString>* map) {
   endResetModel();
 }
 
-void HashModel::clear() {
+void HashModel::clear()
+{
   beginResetModel();
 
   HashTable.clear();
@@ -41,15 +44,18 @@ void HashModel::clear() {
   endResetModel();
 }
 
-bool HashModel::isEmpty() const {
+bool HashModel::isEmpty() const
+{
   return HashTable.isEmpty();
 }
 
-const QHash<QString, QVariant>* HashModel::map() const {
+const QHash<QString, QVariant>* HashModel::map() const
+{
   return &HashTable;
 }
 
-int HashModel::columnCount(const QModelIndex& parent) const {
+int HashModel::columnCount(const QModelIndex& parent) const
+{
   if (HashTable.isEmpty()) {
     return 0;
   }
@@ -57,11 +63,13 @@ int HashModel::columnCount(const QModelIndex& parent) const {
   return 1;
 }
 
-int HashModel::rowCount(const QModelIndex& parent) const {
+int HashModel::rowCount(const QModelIndex& parent) const
+{
   return HashTable.size();
 }
 
-QVariant HashModel::data(const QModelIndex& index, int role) const {
+QVariant HashModel::data(const QModelIndex& index, int role) const
+{
   if (index.column() > 1) {
     return QVariant();
   }
@@ -78,7 +86,8 @@ QVariant HashModel::data(const QModelIndex& index, int role) const {
 
 QVariant HashModel::headerData(int section,
                                Qt::Orientation orientation,
-                               int role) const {
+                               int role) const
+{
   if (section > (HashTable.size())) {
     return QVariant();
   }
@@ -97,7 +106,8 @@ QVariant HashModel::headerData(int section,
   }
 }
 
-void HashModel::createMatchTables() {
+void HashModel::createMatchTables()
+{
   TransponderDataMatchTable.insert("sn", "Серийный номер");
   TransponderDataMatchTable.insert("pan", "PAN");
   TransponderDataMatchTable.insert("issuer_name", "Компания-заказчик");

@@ -1,18 +1,20 @@
 #include "interface_programmer.h"
 
-IProgrammer::IProgrammer(QObject* parent, ProgrammerType type)
-    : QObject(parent) {
+IProgrammer::IProgrammer(QObject* parent, ProgrammerType type) : QObject(parent)
+{
   setObjectName("IProgrammer");
   Type = type;
 }
 
 IProgrammer::~IProgrammer() {}
 
-IProgrammer::ProgrammerType IProgrammer::type() const {
+IProgrammer::ProgrammerType IProgrammer::type() const
+{
   return Type;
 }
 
-bool IProgrammer::checkFirmwareFile(const QFile* firmware) {
+bool IProgrammer::checkFirmwareFile(const QFile* firmware)
+{
   if (!firmware) {
     return false;
   }
@@ -30,7 +32,8 @@ bool IProgrammer::checkFirmwareFile(const QFile* firmware) {
   return true;
 }
 
-bool IProgrammer::checkDataFile(const QFile* data) {
+bool IProgrammer::checkDataFile(const QFile* data)
+{
   if (!data) {
     return false;
   }

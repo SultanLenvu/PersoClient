@@ -21,51 +21,54 @@
  * \brief PersoServer client
  * Holds connection data and methods to access server services
  */
-class PersoClient : public QObject {
- Q_OBJECT
+class PersoClient : public QObject
+{
+  Q_OBJECT
  public:
   //! Command execution statuses
-  enum ReturnStatus {
-   Completed,
-   FirmwareFileSavingError,
-   RequestParameterError,
-   ServerConnectionError,
-   ServerNotResponding,
-   ServerConnectionTerminated,
-   ResponseParsingError,
-   ResponseSyntaxError,
-   AuthorizationNotExist,
-   AuthorizationAccessDenied,
-   AuthorizationNotActive,
-   // Статусы возврата от сервера
-   CommandSyntaxError,
-   DatabaseError,
-   TransponderNotFound,
-   TransponderNotReleasedEarlier,
-   AwaitingConfirmationError,
-   IdenticalUcidError,
-   ProductionLineMissed,
-   ProductionLineNotActive,
-   CurrentOrderRunOut,
-   CurrentOrderAssembled,
-   ProductionLineRollbackLimitError,
-   BoxStickerPrintError,
-   PalletStickerPrintError,
-   NextTransponderNotFound,
-   StartBoxAssemblingError,
-   StartPalletAssemblingError,
+  enum ReturnStatus
+  {
+    Completed,
+    FirmwareFileSavingError,
+    RequestParameterError,
+    ServerConnectionError,
+    ServerNotResponding,
+    ServerConnectionTerminated,
+    ResponseParsingError,
+    ResponseSyntaxError,
+    AuthorizationNotExist,
+    AuthorizationAccessDenied,
+    AuthorizationNotActive,
+    // Статусы возврата от сервера
+    CommandSyntaxError,
+    DatabaseError,
+    TransponderNotFound,
+    TransponderNotReleasedEarlier,
+    AwaitingConfirmationError,
+    IdenticalUcidError,
+    ProductionLineMissed,
+    ProductionLineNotActive,
+    CurrentOrderRunOut,
+    CurrentOrderAssembled,
+    ProductionLineRollbackLimitError,
+    BoxStickerPrintError,
+    PalletStickerPrintError,
+    NextTransponderNotFound,
+    StartBoxAssemblingError,
+    StartPalletAssemblingError,
   };
   //! \cond
   Q_ENUM(ReturnStatus);
   //! \endcond
 
   //! PersoClient statuses
-  enum InstanceState {
-   Ready,
-   CreatingRequest,
-   WaitingServerConnection,
-   WaitingResponse,
-   ProcessingResponse,
+  enum InstanceState
+  {
+    Ready,
+    CreatingRequest,
+    WaitingServerConnection,
+    WaitingResponse,
+    ProcessingResponse,
   };
   //! \cond
   Q_ENUM(InstanceState);
@@ -167,9 +170,9 @@ class PersoClient : public QObject {
    * firmware and responseData will be saved to private fields
    */
   ReturnStatus requestTransponderRelease(
-    const QHash<QString, QString>* requestData,
-    QFile* firmware,
-    QHash<QString, QString>* responseData);
+      const QHash<QString, QString>* requestData,
+      QFile* firmware,
+      QHash<QString, QString>* responseData);
   /*!
    * Request transponder release confirmation
    * \param[in] requestData Map which should contain
@@ -178,7 +181,7 @@ class PersoClient : public QObject {
    * or what transmitDataBlock returns otherwise
    */
   ReturnStatus requestTransponderReleaseConfirm(
-    const QHash<QString, QString>* requestData);
+      const QHash<QString, QString>* requestData);
   /*!
    * Request transponder re-release
    * \param[in] requestData Map which should contain
@@ -187,13 +190,13 @@ class PersoClient : public QObject {
    * \param responseData Map to write response to
    * \return RequestParameterError if any of the arguments are nullptr,
    * or what transmitBlock returns otherwise
-   * 
+   *
    * reponseData and firmware will be saved to private fields
    */
   ReturnStatus requestTransponderRerelease(
-    const QHash<QString, QString>* requestData,
-    QFile* firmware,
-    QHash<QString, QString>* responseData);
+      const QHash<QString, QString>* requestData,
+      QFile* firmware,
+      QHash<QString, QString>* responseData);
   /*!
    * Request transponder re-release confirmation
    * \param[in] requestData Map which should contain
@@ -202,7 +205,7 @@ class PersoClient : public QObject {
    * what transmitDataBlock returns
    */
   ReturnStatus requestTransponderRereleaseConfirm(
-    const QHash<QString, QString>* requestData);
+      const QHash<QString, QString>* requestData);
   /*!
    * Request production line rollback
    * \param[in] requestData Map which must contain "login" and "password"
@@ -211,7 +214,7 @@ class PersoClient : public QObject {
    * what transmitDataBlock returns
    */
   ReturnStatus requestProductionLineRollback(
-    const QHash<QString, QString>* requestData);
+      const QHash<QString, QString>* requestData);
 
   /*!
    * Request box sticker printing
@@ -220,7 +223,7 @@ class PersoClient : public QObject {
    * return code of transmitDataBlock
    */
   ReturnStatus requestBoxStickerPrint(
-    const QHash<QString, QString>* requestData);
+      const QHash<QString, QString>* requestData);
   /*!
    * Request box sticker re-printing
    * \return return code of transmitDataBlock
@@ -233,7 +236,7 @@ class PersoClient : public QObject {
    * return code of transmitDataBlock otherwise
    */
   ReturnStatus requestPalletStickerPrint(
-    const QHash<QString, QString>* requestData);
+      const QHash<QString, QString>* requestData);
   /*!
    * Request pallet sticker re-printing
    * \return return code of transmitDataBlock
@@ -310,7 +313,7 @@ class PersoClient : public QObject {
    * contain "login", "password" and "ucid" keys
    */
   void createTransponderReleaseConfirm(
-    const QHash<QString, QString>* requestData);
+      const QHash<QString, QString>* requestData);
   /*!
    * Compose transponder re-release request and
    * store it in CurrentCommand
@@ -325,7 +328,7 @@ class PersoClient : public QObject {
    * "login", "password", "pan" and "ucid" keys
    */
   void createTransponderRereleaseConfirm(
-    const QHash<QString, QString>* requestData);
+      const QHash<QString, QString>* requestData);
   /*!
    * Compose production line rollback request and store it in
    * CurrentCommand

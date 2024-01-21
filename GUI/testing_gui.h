@@ -6,7 +6,8 @@
 /*!
  * Testing interface
  */
-class TestingGUI : public AbstractGUI {
+class TestingGUI : public AbstractGUI
+{
  public:
   //! \cond
   QVBoxLayout* ControlPanelLayout;

@@ -1,6 +1,7 @@
 #include "perso_client.h"
 
-PersoClient::PersoClient(QObject* parent) : QObject(parent) {
+PersoClient::PersoClient(QObject* parent) : QObject(parent)
+{
   setObjectName("PersoClient");
   loadSettings();
 
@@ -18,12 +19,14 @@ PersoClient::PersoClient(QObject* parent) : QObject(parent) {
   createServerStatusMatchTable();
 }
 
-PersoClient::~PersoClient() {
+PersoClient::~PersoClient()
+{
   if (Socket->isOpen())
     Socket->disconnectFromHost();
 }
 
-PersoClient::ReturnStatus PersoClient::connectToServer() {
+PersoClient::ReturnStatus PersoClient::connectToServer()
+{
   // Подключаемся к серверу персонализации
   if (!processingServerConnection()) {
     return ServerConnectionError;
@@ -32,7 +35,8 @@ PersoClient::ReturnStatus PersoClient::connectToServer() {
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::disconnectFromServer() {
+PersoClient::ReturnStatus PersoClient::disconnectFromServer()
+{
   if (Socket->isOpen()) {
     Socket->disconnectFromHost();
     sendLog("Отключение от сервера персонализации. ");
@@ -43,7 +47,8 @@ PersoClient::ReturnStatus PersoClient::disconnectFromServer() {
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::requestEcho() {
+PersoClient::ReturnStatus PersoClient::requestEcho()
+{
   // Создаем запрос
   CurrentState = CreatingRequest;
   createEcho();
@@ -53,7 +58,8 @@ PersoClient::ReturnStatus PersoClient::requestEcho() {
 }
 
 PersoClient::ReturnStatus PersoClient::requestAuthorize(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   // Создаем запрос
   CurrentState = CreatingRequest;
 
@@ -71,7 +77,8 @@ PersoClient::ReturnStatus PersoClient::requestAuthorize(
 PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
     const QHash<QString, QString>* requestData,
     QFile* firmware,
-    QHash<QString, QString>* responseData) {
+    QHash<QString, QString>* responseData)
+{
   // Проверка на существование
   if ((!requestData) || (!firmware) || (!responseData)) {
     sendLog("Получены некорректные параметры запроса. Сброс.");
@@ -89,7 +96,8 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRelease(
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderReleaseConfirm(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   // Проверка на существование
   if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -107,7 +115,8 @@ PersoClient::ReturnStatus PersoClient::requestTransponderReleaseConfirm(
 PersoClient::ReturnStatus PersoClient::requestTransponderRerelease(
     const QHash<QString, QString>* requestData,
     QFile* firmware,
-    QHash<QString, QString>* responseData) {
+    QHash<QString, QString>* responseData)
+{
   // Проверка на существование
   if ((!requestData) || (!firmware) || (!responseData)) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -125,7 +134,8 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRerelease(
 }
 
 PersoClient::ReturnStatus PersoClient::requestTransponderRereleaseConfirm(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   // Проверка на существование
   if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -141,7 +151,8 @@ PersoClient::ReturnStatus PersoClient::requestTransponderRereleaseConfirm(
 }
 
 PersoClient::ReturnStatus PersoClient::requestProductionLineRollback(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   // Проверка на существование
   if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -157,7 +168,8 @@ PersoClient::ReturnStatus PersoClient::requestProductionLineRollback(
 }
 
 PersoClient::ReturnStatus PersoClient::requestBoxStickerPrint(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   // Проверка на существование
   if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -172,7 +184,8 @@ PersoClient::ReturnStatus PersoClient::requestBoxStickerPrint(
   return transmitDataBlock();
 }
 
-PersoClient::ReturnStatus PersoClient::requestBoxStickerReprint() {
+PersoClient::ReturnStatus PersoClient::requestBoxStickerReprint()
+{
   // Создаем запрос
   CurrentState = CreatingRequest;
   createBoxStickerReprint();
@@ -182,7 +195,8 @@ PersoClient::ReturnStatus PersoClient::requestBoxStickerReprint() {
 }
 
 PersoClient::ReturnStatus PersoClient::requestPalletStickerPrint(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   // Проверка на существование
   if (!requestData) {
     sendLog("Получены не корректные параметры запроса. Сброс.");
@@ -197,7 +211,8 @@ PersoClient::ReturnStatus PersoClient::requestPalletStickerPrint(
   return transmitDataBlock();
 }
 
-PersoClient::ReturnStatus PersoClient::requestPalletStickerReprint() {
+PersoClient::ReturnStatus PersoClient::requestPalletStickerReprint()
+{
   // Создаем запрос
   CurrentState = CreatingRequest;
   createPalletStickerReprint();
@@ -206,7 +221,8 @@ PersoClient::ReturnStatus PersoClient::requestPalletStickerReprint() {
   return transmitDataBlock();
 }
 
-void PersoClient::applySettings() {
+void PersoClient::applySettings()
+{
   sendLog("Применение новых настроек. ");
   loadSettings();
 }
@@ -215,24 +231,27 @@ void PersoClient::applySettings() {
  * Приватные  методы
  */
 
-void PersoClient::loadSettings() {
+void PersoClient::loadSettings()
+{
   QSettings settings;
 
   LogEnable = settings.value("log_system/global_enable").toBool();
   ExtendedLoggingEnable = settings.value("log_system/extended_enable").toBool();
 
-  PersoServerAddress = QHostAddress(
-      settings.value("perso_client/server_ip").toString());
+  PersoServerAddress =
+      QHostAddress(settings.value("perso_client/server_ip").toString());
   PersoServerPort = settings.value("perso_client/server_port").toInt();
 }
 
-void PersoClient::sendLog(const QString& log) {
+void PersoClient::sendLog(const QString& log)
+{
   if (LogEnable) {
     emit logging(QString("%1 - %2").arg(objectName(), log));
   }
 }
 
-bool PersoClient::processingServerConnection() {
+bool PersoClient::processingServerConnection()
+{
   sendLog("Подключение к серверу персонализации. ");
   // Подключаемся к серверу персонализации
   Socket->connectToHost(PersoServerAddress, PersoServerPort);
@@ -252,7 +271,8 @@ bool PersoClient::processingServerConnection() {
   return true;
 }
 
-bool PersoClient::processingDataBlock() {
+bool PersoClient::processingDataBlock()
+{
   QJsonParseError status;
   QJsonDocument responseDocument =
       QJsonDocument::fromJson(ReceivedDataBlock, &status);
@@ -275,7 +295,8 @@ bool PersoClient::processingDataBlock() {
   return true;
 }
 
-void PersoClient::createTransmittedDataBlock(void) {
+void PersoClient::createTransmittedDataBlock(void)
+{
   QJsonDocument requestDocument(CurrentCommand);
 
   sendLog(QString("Размер команды: %1 ")
@@ -297,7 +318,8 @@ void PersoClient::createTransmittedDataBlock(void) {
   serializator << uint32_t(TransmittedDataBlock.size() - sizeof(uint32_t));
 }
 
-PersoClient::ReturnStatus PersoClient::transmitDataBlock() {
+PersoClient::ReturnStatus PersoClient::transmitDataBlock()
+{
   ReturnStatus ret;
   // Ответный блок данных еще не получен
   ReceivedDataBlockSize = 0;
@@ -395,7 +417,8 @@ PersoClient::ReturnStatus PersoClient::transmitDataBlock() {
   return ret;
 }
 
-void PersoClient::createEcho(void) {
+void PersoClient::createEcho(void)
+{
   sendLog("Формирование команды echo. ");
 
   // Заголовок команды
@@ -406,7 +429,8 @@ void PersoClient::createEcho(void) {
 }
 
 void PersoClient::createAuthorization(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   sendLog("Формирование команды athorization. ");
 
   // Заголовок команды
@@ -418,7 +442,8 @@ void PersoClient::createAuthorization(
 }
 
 void PersoClient::createTransponderRelease(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   sendLog("Формирование команды transponder_release. ");
 
   // Заголовок команды
@@ -430,7 +455,8 @@ void PersoClient::createTransponderRelease(
 }
 
 void PersoClient::createTransponderReleaseConfirm(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   sendLog("Формирование команды transponder_release_confirm. ");
 
   // Заголовок команды
@@ -443,7 +469,8 @@ void PersoClient::createTransponderReleaseConfirm(
 }
 
 void PersoClient::createTransponderRerelease(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   sendLog("Формирование команды transponder_rerelease. ");
 
   // Заголовок команды
@@ -456,7 +483,8 @@ void PersoClient::createTransponderRerelease(
 }
 
 void PersoClient::createTransponderRereleaseConfirm(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   sendLog("Формирование команды transponder_rerelease_confirm. ");
 
   // Заголовок команды
@@ -470,7 +498,8 @@ void PersoClient::createTransponderRereleaseConfirm(
 }
 
 void PersoClient::createProductionLineRollback(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   sendLog("Формирование команды production_line_rollback. ");
 
   // Заголовок команды
@@ -482,7 +511,8 @@ void PersoClient::createProductionLineRollback(
 }
 
 void PersoClient::createBoxStickerPrint(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   sendLog("Формирование команды print_box_sticker. ");
 
   // Заголовок команды
@@ -492,7 +522,8 @@ void PersoClient::createBoxStickerPrint(
   CurrentCommand["pan"] = requestData->value("pan");
 }
 
-void PersoClient::createBoxStickerReprint() {
+void PersoClient::createBoxStickerReprint()
+{
   sendLog("Формирование команды print_last_box_sticker. ");
 
   // Заголовок команды
@@ -500,7 +531,8 @@ void PersoClient::createBoxStickerReprint() {
 }
 
 void PersoClient::createPalletStickerPrint(
-    const QHash<QString, QString>* requestData) {
+    const QHash<QString, QString>* requestData)
+{
   sendLog("Формирование команды print_pallet_sticker. ");
 
   // Заголовок команды
@@ -513,28 +545,32 @@ void PersoClient::createPalletStickerPrint(
   createTransmittedDataBlock();
 }
 
-void PersoClient::createPalletStickerReprint() {
+void PersoClient::createPalletStickerReprint()
+{
   sendLog("Формирование команды print_last_pallet_sticker. ");
 
   // Заголовок команды
   CurrentCommand["command_name"] = "print_last_pallet_sticker";
 }
 
-PersoClient::ReturnStatus PersoClient::processEcho(void) {
+PersoClient::ReturnStatus PersoClient::processEcho(void)
+{
   sendLog("Обработка ответа на команду Echo. ");
 
   sendLog("Команда Echo успешно выполнена. ");
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::processAuthorization(void) {
+PersoClient::ReturnStatus PersoClient::processAuthorization(void)
+{
   sendLog("Обработка ответа на команду TransponderRelease. ");
 
   sendLog("Команда Authorization успешно выполнена. ");
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::processTransponderRelease() {
+PersoClient::ReturnStatus PersoClient::processTransponderRelease()
+{
   sendLog("Обработка ответа на команду transponder_release. ");
 
   // Сохраняем присланный файл прошивки
@@ -565,14 +601,16 @@ PersoClient::ReturnStatus PersoClient::processTransponderRelease() {
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::processTransponderReleaseConfirm() {
+PersoClient::ReturnStatus PersoClient::processTransponderReleaseConfirm()
+{
   sendLog("Обработка ответа на команду transponder_release_confirm. ");
 
   sendLog("Команда TransponderReleaseConfirm успешно выполнена. ");
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::processTransponderRerelease() {
+PersoClient::ReturnStatus PersoClient::processTransponderRerelease()
+{
   sendLog("Обработка ответа на команду transponder_rerelease. ");
 
   // Сохраняем присланный файл прошивки
@@ -603,49 +641,56 @@ PersoClient::ReturnStatus PersoClient::processTransponderRerelease() {
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::processTransponderRereleaseConfirm() {
+PersoClient::ReturnStatus PersoClient::processTransponderRereleaseConfirm()
+{
   sendLog("Обработка ответа на команду transponder_rerelease_confirm. ");
 
   sendLog("Команда transponder_rerelease_confirm успешно выполнена. ");
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::processProductionLineRollback() {
+PersoClient::ReturnStatus PersoClient::processProductionLineRollback()
+{
   sendLog("Обработка ответа на команду production_line_rollback. ");
 
   sendLog("Команда production_line_rollback успешно выполнена. ");
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::processPrintBoxSticker() {
+PersoClient::ReturnStatus PersoClient::processPrintBoxSticker()
+{
   sendLog("Обработка ответа на команду print_box_sticker. ");
 
   sendLog("Команда print_box_sticker успешно выполнена. ");
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::processPrintLastBoxSticker() {
+PersoClient::ReturnStatus PersoClient::processPrintLastBoxSticker()
+{
   sendLog("Обработка ответа на команду print_last_box_sticker. ");
 
   sendLog("Команда print_last_box_sticker успешно выполнена. ");
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::processPrintPalletSticker() {
+PersoClient::ReturnStatus PersoClient::processPrintPalletSticker()
+{
   sendLog("Обработка ответа на команду print_pallet_sticker. ");
 
   sendLog("Команда print_pallet_sticker успешно выполнена. ");
   return Completed;
 }
 
-PersoClient::ReturnStatus PersoClient::processPrintLastPalletSticker() {
+PersoClient::ReturnStatus PersoClient::processPrintLastPalletSticker()
+{
   sendLog("Обработка ответа на команду print_last_pallet_sticker. ");
 
   sendLog("Команда print_last_pallet_sticker успешно выполнена. ");
   return Completed;
 }
 
-void PersoClient::createTimers() {
+void PersoClient::createTimers()
+{
   WaitTimer = new QTimer(this);
   WaitTimer->setInterval(PERSO_SERVER_CONNECTION_WAITING_TIME);
   connect(WaitTimer, &QTimer::timeout, this,
@@ -665,7 +710,8 @@ void PersoClient::createTimers() {
           &QEventLoop::quit);
 }
 
-void PersoClient::createSocket() {
+void PersoClient::createSocket()
+{
   Socket = new QTcpSocket(this);
   connect(Socket, &QTcpSocket::connected, this,
           &PersoClient::on_SocketConnected_slot);
@@ -677,7 +723,8 @@ void PersoClient::createSocket() {
           &PersoClient::on_SocketError_slot);
 }
 
-void PersoClient::createResponseHandlers() {
+void PersoClient::createResponseHandlers()
+{
   ResponseHandlers.insert("echo", &PersoClient::processEcho);
   ResponseHandlers.insert("authorization", &PersoClient::processAuthorization);
   ResponseHandlers.insert("transponder_release",
@@ -700,7 +747,8 @@ void PersoClient::createResponseHandlers() {
                           &PersoClient::processPrintLastPalletSticker);
 }
 
-void PersoClient::createResponseTemplates() {
+void PersoClient::createResponseTemplates()
+{
   QSharedPointer<QVector<QString>> echoSyntax(new QVector<QString>());
   echoSyntax->append("data");
   echoSyntax->append("return_status");
@@ -777,7 +825,8 @@ void PersoClient::createResponseTemplates() {
                            printLastPalletStickerSyntax);
 }
 
-void PersoClient::createServerStatusMatchTable() {
+void PersoClient::createServerStatusMatchTable()
+{
   ServerStatusMatchTable.insert("1", CommandSyntaxError);
   ServerStatusMatchTable.insert("2", DatabaseError);
   ServerStatusMatchTable.insert("3", TransponderNotFound);
@@ -796,15 +845,18 @@ void PersoClient::createServerStatusMatchTable() {
   ServerStatusMatchTable.insert("16", StartPalletAssemblingError);
 }
 
-void PersoClient::on_SocketConnected_slot() {
+void PersoClient::on_SocketConnected_slot()
+{
   sendLog("Соединение с сервером персонализации установлено. ");
 }
 
-void PersoClient::on_SocketDisconnected_slot() {
+void PersoClient::on_SocketDisconnected_slot()
+{
   sendLog("Соединение с сервером персонализации отключено. ");
 }
 
-void PersoClient::on_SocketReadyRead_slot() {
+void PersoClient::on_SocketReadyRead_slot()
+{
   QDataStream deserializator(Socket);  // Дессериализатор
   deserializator.setVersion(
       QDataStream::Qt_5_12);  // Настраиваем версию десериализатора
@@ -854,14 +906,15 @@ void PersoClient::on_SocketReadyRead_slot() {
   emit stopResponseWaiting();
 }
 
-void PersoClient::on_SocketError_slot(
-    QAbstractSocket::SocketError socketError) {
+void PersoClient::on_SocketError_slot(QAbstractSocket::SocketError socketError)
+{
   Socket->abort();
   sendLog(QString("Ошибка сети: %1. %2.")
               .arg(QString::number(socketError), Socket->errorString()));
 }
 
-void PersoClient::on_WaitTimerTimeout_slot() {
+void PersoClient::on_WaitTimerTimeout_slot()
+{
   Socket->abort();
   ReceivedDataBlock.clear();
   sendLog("Время ожидания вышло. ");

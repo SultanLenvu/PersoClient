@@ -7,7 +7,8 @@
 #include "mainwindow_kernel.h"
 #include "Log/widget_log_backend.h"
 
-MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
+MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent)
+{
   setObjectName("MainWindowKernel");
   CurrentGUI = nullptr;
   DesktopGeometry = QApplication::screens().first()->size();
@@ -37,7 +38,8 @@ MainWindowKernel::MainWindowKernel(QWidget* parent) : QMainWindow(parent) {
   registerMetaTypes();
 }
 
-MainWindowKernel::~MainWindowKernel() {
+MainWindowKernel::~MainWindowKernel()
+{
   ManagerThread->exit();
   ManagerThread->wait();
 
@@ -45,7 +47,8 @@ MainWindowKernel::~MainWindowKernel() {
   LoggerThread->wait();
 }
 
-void MainWindowKernel::on_AuthorizePushButton_slot() {
+void MainWindowKernel::on_AuthorizePushButton_slot()
+{
   AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
 
   if (gui->ModeChoice->currentText() == "Производство") {
@@ -62,57 +65,66 @@ void MainWindowKernel::on_AuthorizePushButton_slot() {
   }
 }
 
-void MainWindowKernel::on_ProgramDeviceButton_slot() {
+void MainWindowKernel::on_ProgramDeviceButton_slot()
+{
   emit loggerClear_signal();
 
   emit performLocalFirmwareLoading_signal(QFileDialog::getOpenFileName(
       nullptr, "Выберите файл", "", "Все файлы (*.*)"));
 }
 
-void MainWindowKernel::on_ReadDeviceFirmwareButton_slot() {
+void MainWindowKernel::on_ReadDeviceFirmwareButton_slot()
+{
   emit loggerClear_signal();
 
   emit performFirmwareReading_signal();
 }
 
-void MainWindowKernel::on_EraseDeviceButton_slot() {
+void MainWindowKernel::on_EraseDeviceButton_slot()
+{
   emit loggerClear_signal();
 
   emit performFirmwareErasing_signal();
 }
 
-void MainWindowKernel::on_ProgramDeviceUserDataButton_slot() {
+void MainWindowKernel::on_ProgramDeviceUserDataButton_slot()
+{
   emit loggerClear_signal();
 
   emit performDataLoading_signal(QFileDialog::getOpenFileName(
       nullptr, "Выберите файл", "", "Все файлы (*.*)"));
 }
 
-void MainWindowKernel::on_ReadDeviceUserDataButton_slot() {
+void MainWindowKernel::on_ReadDeviceUserDataButton_slot()
+{
   emit loggerClear_signal();
 
   emit performDataReading_signal();
 }
 
-void MainWindowKernel::on_UnlockDeviceButton_slot() {
+void MainWindowKernel::on_UnlockDeviceButton_slot()
+{
   emit loggerClear_signal();
 
   emit performDeviceUnlock_signal();
 }
 
-void MainWindowKernel::on_LockDeviceButton_slot() {
+void MainWindowKernel::on_LockDeviceButton_slot()
+{
   emit loggerClear_signal();
 
   emit performDeviceLock_signal();
 }
 
-void MainWindowKernel::on_PrintLastTransponderStickerButton_slot() {
+void MainWindowKernel::on_PrintLastTransponderStickerButton_slot()
+{
   emit loggerClear_signal();
 
   emit performLastTransponderStickerPrinting_signal();
 }
 
-void MainWindowKernel::on_PrintCustomTransponderStickerButton_slot() {
+void MainWindowKernel::on_PrintCustomTransponderStickerButton_slot()
+{
   QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
 
   emit loggerClear_signal();
@@ -129,7 +141,8 @@ void MainWindowKernel::on_PrintCustomTransponderStickerButton_slot() {
   emit performCustomTransponderStickerPrinting_signal(data);
 }
 
-void MainWindowKernel::on_ExecuteStickerPrinterCommandScriptButton_slot() {
+void MainWindowKernel::on_ExecuteStickerPrinterCommandScriptButton_slot()
+{
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   emit loggerClear_signal();
 
@@ -138,7 +151,8 @@ void MainWindowKernel::on_ExecuteStickerPrinterCommandScriptButton_slot() {
   emit performStickerPrinterCommandScript_signal(commandScript);
 }
 
-void MainWindowKernel::on_ApplySettingsPushButton_slot() {
+void MainWindowKernel::on_ApplySettingsPushButton_slot()
+{
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   QSettings settings;
 
@@ -174,25 +188,29 @@ void MainWindowKernel::on_ApplySettingsPushButton_slot() {
   Interactor->generateMessage("Новые настройки успешно применены. ");
 }
 
-void MainWindowKernel::on_PersoServerConnectPushButton_slot() {
+void MainWindowKernel::on_PersoServerConnectPushButton_slot()
+{
   emit loggerClear_signal();
 
   emit performServerConnecting_signal();
 }
 
-void MainWindowKernel::on_PersoServerDisconnectButton_slot() {
+void MainWindowKernel::on_PersoServerDisconnectButton_slot()
+{
   emit loggerClear_signal();
 
   emit performServerDisconnecting_signal();
 }
 
-void MainWindowKernel::on_PersoServerEchoRequestButton_slot() {
+void MainWindowKernel::on_PersoServerEchoRequestButton_slot()
+{
   emit loggerClear_signal();
 
   emit performServerEcho_signal();
 }
 
-void MainWindowKernel::on_MasterAuthorizePushButton_slot() {
+void MainWindowKernel::on_MasterAuthorizePushButton_slot()
+{
   QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
   Interactor->getAuthorizationData(data.get());
 
@@ -203,13 +221,15 @@ void MainWindowKernel::on_MasterAuthorizePushButton_slot() {
   emit performServerAuthorization_signal(data);
 }
 
-void MainWindowKernel::on_LoadTransponderFirmwareButton_slot() {
+void MainWindowKernel::on_LoadTransponderFirmwareButton_slot()
+{
   emit loggerClear_signal();
 
   emit performTransponderFirmwareLoading_signal();
 }
 
-void MainWindowKernel::on_ReloadTransponderFirmwareButton_slot() {
+void MainWindowKernel::on_ReloadTransponderFirmwareButton_slot()
+{
   emit loggerClear_signal();
 
   QHash<QString, QString> stickerData;
@@ -225,13 +245,15 @@ void MainWindowKernel::on_ReloadTransponderFirmwareButton_slot() {
   emit performTransponderFirmwareReloading_signal(stickerData.value("pan"));
 }
 
-void MainWindowKernel::on_RollbackProductionLinePushButton_slot() {
+void MainWindowKernel::on_RollbackProductionLinePushButton_slot()
+{
   emit loggerClear_signal();
 
   emit rollbackProductionLine_signal();
 }
 
-void MainWindowKernel::on_PrintBoxStickerButton_slot() {
+void MainWindowKernel::on_PrintBoxStickerButton_slot()
+{
   QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
 
   emit loggerClear_signal();
@@ -248,7 +270,8 @@ void MainWindowKernel::on_PrintBoxStickerButton_slot() {
   emit performBoxStickerPrinting_signal(data);
 }
 
-void MainWindowKernel::on_PrintPalletStickerButton_slot() {
+void MainWindowKernel::on_PrintPalletStickerButton_slot()
+{
   QSharedPointer<QHash<QString, QString>> data(new QHash<QString, QString>);
 
   emit loggerClear_signal();
@@ -265,7 +288,8 @@ void MainWindowKernel::on_PrintPalletStickerButton_slot() {
   emit performPalletStickerPrinting_signal(data);
 }
 
-void MainWindowKernel::on_MasterInterfaceRequest_slot() {
+void MainWindowKernel::on_MasterInterfaceRequest_slot()
+{
   QString pass;
   if (!Interactor->getMasterPassword(pass)) {
     return;
@@ -280,15 +304,18 @@ void MainWindowKernel::on_MasterInterfaceRequest_slot() {
   createMasterInterface();
 }
 
-void MainWindowKernel::on_ProductionInterfaceRequest_slot() {
+void MainWindowKernel::on_ProductionInterfaceRequest_slot()
+{
   createProductionInterface();
 }
 
-void MainWindowKernel::on_AuthorizationInterfaceRequest_slot() {
+void MainWindowKernel::on_AuthorizationInterfaceRequest_slot()
+{
   createAuthorizationInterface();
 }
 
-void MainWindowKernel::loadSettings() {
+void MainWindowKernel::loadSettings()
+{
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
   QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
   QCoreApplication::setApplicationName(PROGRAM_NAME);
@@ -298,7 +325,8 @@ void MainWindowKernel::loadSettings() {
                      QCoreApplication::applicationDirPath());
 }
 
-bool MainWindowKernel::checkNewSettings() {
+bool MainWindowKernel::checkNewSettings()
+{
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
 
   QHostAddress IP = QHostAddress(gui->PersoServerIpAddressLineEdit->text());
@@ -331,7 +359,8 @@ bool MainWindowKernel::checkNewSettings() {
   return true;
 }
 
-void MainWindowKernel::createAuthorizationInterface() {
+void MainWindowKernel::createAuthorizationInterface()
+{
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
@@ -354,7 +383,8 @@ void MainWindowKernel::createAuthorizationInterface() {
   createTopMenu();
 }
 
-void MainWindowKernel::connectAuthorizationInterface() {
+void MainWindowKernel::connectAuthorizationInterface()
+{
   AuthorizationGUI* gui = dynamic_cast<AuthorizationGUI*>(CurrentGUI);
 
   connect(gui->AuthorizePushButton, &QPushButton::clicked, this,
@@ -363,7 +393,8 @@ void MainWindowKernel::connectAuthorizationInterface() {
           &MainWindowKernel::on_VisibilityChanged_slot);
 }
 
-void MainWindowKernel::createMasterInterface() {
+void MainWindowKernel::createMasterInterface()
+{
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
@@ -381,7 +412,8 @@ void MainWindowKernel::createMasterInterface() {
   createTopMenu();
 }
 
-void MainWindowKernel::connectMasterInterface() {
+void MainWindowKernel::connectMasterInterface()
+{
   MasterGUI* gui = dynamic_cast<MasterGUI*>(CurrentGUI);
   connect(LogSystem::instance()->getWidgetLogger(),
           &WidgetLogBackend::displayLog_signal, gui,
@@ -439,7 +471,8 @@ void MainWindowKernel::connectMasterInterface() {
   gui->TransponderDataView->setModel(TransponderDataModel);
 }
 
-void MainWindowKernel::createProductionInterface() {
+void MainWindowKernel::createProductionInterface()
+{
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
@@ -456,8 +489,9 @@ void MainWindowKernel::createProductionInterface() {
   createTopMenu();
 }
 
-void MainWindowKernel::connectProductionInterface() {
-  ProductionGUI *gui = dynamic_cast<ProductionGUI *>(CurrentGUI);
+void MainWindowKernel::connectProductionInterface()
+{
+  ProductionGUI* gui = dynamic_cast<ProductionGUI*>(CurrentGUI);
 
   connect(gui->LoadTransponderFirmwareButton, &QPushButton::clicked, this,
           &MainWindowKernel::on_LoadTransponderFirmwareButton_slot);
@@ -476,7 +510,8 @@ void MainWindowKernel::connectProductionInterface() {
   gui->TransponderDataView->setModel(TransponderDataModel);
 }
 
-void MainWindowKernel::createTestingInterface() {
+void MainWindowKernel::createTestingInterface()
+{
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
@@ -493,7 +528,8 @@ void MainWindowKernel::createTestingInterface() {
   createTopMenu();
 }
 
-void MainWindowKernel::connectTestingInterface() {
+void MainWindowKernel::connectTestingInterface()
+{
   TestingGUI* gui = dynamic_cast<TestingGUI*>(CurrentGUI);
 
   connect(gui->ReloadTransponderFirmwareButton, &QPushButton::clicked, this,
@@ -511,7 +547,8 @@ void MainWindowKernel::connectTestingInterface() {
   gui->TransponderDataView->setModel(TransponderDataModel);
 }
 
-void MainWindowKernel::createTopMenuActions() {
+void MainWindowKernel::createTopMenuActions()
+{
   OpenMasterInterfaceAct = new QAction("Мастер доступ", this);
   OpenMasterInterfaceAct->setStatusTip("Открыть мастер интерфейс");
   connect(OpenMasterInterfaceAct, &QAction::triggered, this,
@@ -526,7 +563,8 @@ void MainWindowKernel::createTopMenuActions() {
   AboutProgramAct->setStatusTip("Показать сведения о программе");
 }
 
-void MainWindowKernel::createTopMenu() {
+void MainWindowKernel::createTopMenu()
+{
   // Удаляем предыдущее топ меню
   menuBar()->clear();
 
@@ -551,7 +589,8 @@ void MainWindowKernel::createTopMenu() {
   HelpMenu->addAction(AboutProgramAct);
 }
 
-void MainWindowKernel::createManagerInstance() {
+void MainWindowKernel::createManagerInstance()
+{
   Manager = new ClientManager(nullptr);
   connect(Manager, &ClientManager::logging, LogSystem::instance(),
           &LogSystem::generate);
@@ -626,7 +665,8 @@ void MainWindowKernel::createManagerInstance() {
   ManagerThread->start();
 }
 
-void MainWindowKernel::createLoggerInstance() {
+void MainWindowKernel::createLoggerInstance()
+{
   Logger = LogSystem::instance();
   connect(this, &MainWindowKernel::applySettings_signal, Logger,
           &LogSystem::applySettings);
@@ -641,7 +681,8 @@ void MainWindowKernel::createLoggerInstance() {
   LoggerThread->start();
 }
 
-void MainWindowKernel::createInteractorInstance() {
+void MainWindowKernel::createInteractorInstance()
+{
   Interactor = InteractionSystem::instance();
   connect(Interactor, &InteractionSystem::logging, Logger,
           &LogSystem::generate);
@@ -649,26 +690,31 @@ void MainWindowKernel::createInteractorInstance() {
           &InteractionSystem::applySettings);
 }
 
-void MainWindowKernel::createModels() {
+void MainWindowKernel::createModels()
+{
   TransponderDataModel = new HashModel(this);
 }
 
-void MainWindowKernel::registerMetaTypes() {
+void MainWindowKernel::registerMetaTypes()
+{
   qRegisterMetaType<QSharedPointer<QHash<QString, QString>>>(
       "QSharedPointer<QHash<QString, QString> >");
 }
 
-void MainWindowKernel::on_RequestProductionInterface_slot() {
+void MainWindowKernel::on_RequestProductionInterface_slot()
+{
   createProductionInterface();
 }
 
-void MainWindowKernel::on_VisibilityChanged_slot() {
+void MainWindowKernel::on_VisibilityChanged_slot()
+{
   adjustSize();
   setFixedSize(size());
 }
 
 void MainWindowKernel::displayTransponderData_slot(
-    QSharedPointer<QHash<QString, QString>> data) {
+    QSharedPointer<QHash<QString, QString>> data)
+{
   TransponderDataModel->buildTransponderData(data.get());
   CurrentGUI->update();
 }

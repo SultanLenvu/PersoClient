@@ -10,7 +10,8 @@
  * This class implements IStickerPrinter for TE310 printers through
  * TSC library functions
  */
-class TE310Printer : public IStickerPrinter {
+class TE310Printer : public IStickerPrinter
+{
   Q_OBJECT
 
  private:
@@ -66,7 +67,7 @@ class TE310Printer : public IStickerPrinter {
    * Validate configuration: check if TSC library path is correct,
    * and printers are available
    * \return true if everything is OK, false otherwise
-   * \todo printers' (un)availability is not configuration issue 
+   * \todo printers' (un)availability is not configuration issue
    */
   virtual bool checkConfiguration(void) override;
 

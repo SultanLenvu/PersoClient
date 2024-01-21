@@ -1,6 +1,7 @@
 #include "file_log_backend.h"
 
-FileLogBackend::FileLogBackend(QObject* parent) : LogBackend(parent) {
+FileLogBackend::FileLogBackend(QObject* parent) : LogBackend(parent)
+{
   setObjectName("FileLogBackend");
   loadSettings();
   initialize();
@@ -12,21 +13,25 @@ FileLogBackend::FileLogBackend(QObject* parent) : LogBackend(parent) {
 
 FileLogBackend::~FileLogBackend() {}
 
-void FileLogBackend::writeLogLine(const QString& str) {
+void FileLogBackend::writeLogLine(const QString& str)
+{
   if (LogEnable) {
     LogTextStream << str << "\n";
   }
 }
 
-void FileLogBackend::clear() { /* No-op */
+void FileLogBackend::clear()
+{ /* No-op */
 }
 
-void FileLogBackend::applySettings() {
+void FileLogBackend::applySettings()
+{
   loadSettings();
   initialize();
 }
 
-void FileLogBackend::loadSettings() {
+void FileLogBackend::loadSettings()
+{
   QSettings settings;
 
   CurrentLogDir = QApplication::applicationDirPath() + "/logs";
@@ -34,7 +39,8 @@ void FileLogBackend::loadSettings() {
   LogFileMaxNumber = settings.value("log_system/log_file_max_number").toInt();
 }
 
-void FileLogBackend::initialize() {
+void FileLogBackend::initialize()
+{
   QDir logDir;
   if (!logDir.mkpath(QApplication::applicationDirPath() + "/logs")) {
     LogEnable = false;
@@ -60,7 +66,8 @@ void FileLogBackend::initialize() {
   LogTextStream.setDevice(&CurrentLogFile);
 }
 
-void FileLogBackend::removeOldestLogFiles() {
+void FileLogBackend::removeOldestLogFiles()
+{
   QDir directory(CurrentLogDir);
 
   // Получаем список файлов в директории

@@ -1,15 +1,16 @@
 #include "jlink_exe_programmer.h"
 
 JLinkExeProgrammer::JLinkExeProgrammer(QObject* parent)
-    : IProgrammer(parent, JLink) {
+    : IProgrammer(parent, JLink)
+{
   JLinkProcess = nullptr;
   loadSettings();
 }
 
-JLinkExeProgrammer::~JLinkExeProgrammer() {
-}
+JLinkExeProgrammer::~JLinkExeProgrammer() {}
 
-JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::getUcid(QString* ucid) {
+JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::getUcid(QString* ucid)
+{
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
@@ -49,7 +50,8 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::getUcid(QString* ucid) {
 }
 
 JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadFirmware(
-    QFile* firmware) {
+    QFile* firmware)
+{
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
     sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
@@ -87,7 +89,8 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadFirmware(
 }
 
 JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadFirmwareWithUnlock(
-    QFile* firmware) {
+    QFile* firmware)
+{
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
     sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
@@ -140,7 +143,8 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadFirmwareWithUnlock(
   }
 }
 
-JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readFirmware(void) {
+JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readFirmware(void)
+{
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
@@ -168,7 +172,8 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readFirmware(void) {
   }
 }
 
-JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::eraseFirmware() {
+JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::eraseFirmware()
+{
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
@@ -192,7 +197,8 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::eraseFirmware() {
     return ProgrammatorError;
 }
 
-JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readData(void) {
+JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readData(void)
+{
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
@@ -225,7 +231,8 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::readData(void) {
   }
 }
 
-JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadData(QFile* data) {
+JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadData(QFile* data)
+{
   // Проверка корректности присланной прошивки
   if (!checkDataFile(data)) {
     sendLog(QString("Получен некорректный файл с данными. Сброс. "));
@@ -263,7 +270,8 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::loadData(QFile* data) {
   }
 }
 
-JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::unlockDevice() {
+JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::unlockDevice()
+{
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
@@ -298,8 +306,8 @@ JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::unlockDevice() {
   }
 }
 
-JLinkExeProgrammer::ReturnStatus
-JLinkExeProgrammer::lockDevice() {  // Проверка на существование программы
+JLinkExeProgrammer::ReturnStatus JLinkExeProgrammer::lockDevice()
+{  // Проверка на существование программы
   // адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
@@ -335,12 +343,14 @@ JLinkExeProgrammer::lockDevice() {  // Проверка на существов�
   }
 }
 
-void JLinkExeProgrammer::applySettings() {
+void JLinkExeProgrammer::applySettings()
+{
   sendLog("Применение новых настроек. ");
   loadSettings();
 }
 
-void JLinkExeProgrammer::sendLog(const QString& log) {
+void JLinkExeProgrammer::sendLog(const QString& log)
+{
   if (LogEnable) {
     emit logging(QString("%1 - %2").arg(objectName(), log));
   }
@@ -350,7 +360,8 @@ void JLinkExeProgrammer::sendLog(const QString& log) {
  * Приватные методы
  */
 
-void JLinkExeProgrammer::loadSettings() {
+void JLinkExeProgrammer::loadSettings()
+{
   QSettings settings;
 
   LogEnable = settings.value("log_system/global_enable").toBool();
@@ -364,7 +375,8 @@ void JLinkExeProgrammer::loadSettings() {
   Speed = settings.value("jlink_exe_programmer/speed").toUInt();
 }
 
-void JLinkExeProgrammer::executeJLinkScript() {
+void JLinkExeProgrammer::executeJLinkScript()
+{
   // Добавляем завершение скрипта
   // Посылаем сигнал Reset на МК
   JLinkScript->write(QByteArray("r\n"));
@@ -397,7 +409,8 @@ void JLinkExeProgrammer::executeJLinkScript() {
   }
 }
 
-void JLinkExeProgrammer::initScript() {
+void JLinkExeProgrammer::initScript()
+{
   // Удаляем старый скрипт для адаптера
   QFileInfo info(JLINK_COMMAND_SCRIPT_DEFAULT_NAME);
   if ((info.exists()) && (info.isFile())) {

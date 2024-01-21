@@ -8,7 +8,8 @@
 /*!
  * Dialog for creating custom stickers
  */
-class CustomTransponderStickerScanDialog : public InputDialog {
+class CustomTransponderStickerScanDialog : public InputDialog
+{
  private:
   //! \cond
   QSize DesktopGeometry;
@@ -84,4 +85,4 @@ class CustomTransponderStickerScanDialog : public InputDialog {
   bool checkInput(void) const;
 };
 
-#endif // CUSTOMTRANSPONDERSTICKERDIALOG_H
+#endif  // CUSTOMTRANSPONDERSTICKERDIALOG_H

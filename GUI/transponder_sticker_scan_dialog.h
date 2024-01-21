@@ -9,7 +9,8 @@
 /*!
  * Transponder sticker dialog
  */
-class TransponderStickerScanDialog : public InputDialog {
+class TransponderStickerScanDialog : public InputDialog
+{
   Q_OBJECT
 
  private:

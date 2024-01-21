@@ -7,13 +7,20 @@
 /*!
  * GUI ADT
  */
-class AbstractGUI : public QWidget {
+class AbstractGUI : public QWidget
+{
   Q_OBJECT
  public:
   /*!
    * GUI subclass types
    */
-  enum GuiType { Authorization, Master, Production, Testing };
+  enum GuiType
+  {
+    Authorization,
+    Master,
+    Production,
+    Testing
+  };
 
  public:
   /*!

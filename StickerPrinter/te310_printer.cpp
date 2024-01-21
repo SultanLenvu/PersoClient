@@ -1,7 +1,8 @@
 #include "te310_printer.h"
 
 TE310Printer::TE310Printer(QObject* parent, const QString& name)
-    : IStickerPrinter(parent, TE310) {
+    : IStickerPrinter(parent, TE310)
+{
   setObjectName("TE310Printer");
   Name = name;
   loadSetting();
@@ -10,7 +11,8 @@ TE310Printer::TE310Printer(QObject* parent, const QString& name)
   loadTscLib();
 }
 
-bool TE310Printer::checkConfiguration() {
+bool TE310Printer::checkConfiguration()
+{
   sendLog("Проверка конфигурации. ");
 
   if (!loadTscLib()) {
@@ -41,7 +43,8 @@ bool TE310Printer::checkConfiguration() {
 }
 
 IStickerPrinter::ReturnStatus TE310Printer::printTransponderSticker(
-    const QHash<QString, QString>* parameters) {
+    const QHash<QString, QString>* parameters)
+{
   if (LibError) {
     sendLog(QString("Отсутствует библиотека для работы с принтером. Сброс"));
     return LibraryMissed;
@@ -82,12 +85,14 @@ IStickerPrinter::ReturnStatus TE310Printer::printTransponderSticker(
   return Completed;
 }
 
-IStickerPrinter::ReturnStatus TE310Printer::printLastTransponderSticker() {
+IStickerPrinter::ReturnStatus TE310Printer::printLastTransponderSticker()
+{
   return printTransponderSticker(&LastTransponderSticker);
 }
 
 IStickerPrinter::ReturnStatus TE310Printer::printBoxSticker(
-    const QHash<QString, QString>* parameters) {
+    const QHash<QString, QString>* parameters)
+{
   if (LibError) {
     sendLog(QString("Отсутствует библиотека для работы с принтером. Сброс"));
     return LibraryMissed;
@@ -158,12 +163,14 @@ IStickerPrinter::ReturnStatus TE310Printer::printBoxSticker(
   return Completed;
 }
 
-IStickerPrinter::ReturnStatus TE310Printer::printLastBoxSticker() {
+IStickerPrinter::ReturnStatus TE310Printer::printLastBoxSticker()
+{
   return printBoxSticker(&LastBoxSticker);
 }
 
 IStickerPrinter::ReturnStatus TE310Printer::printPalletSticker(
-    const QHash<QString, QString>* parameters) {
+    const QHash<QString, QString>* parameters)
+{
   if (LibError) {
     sendLog(QString("Отсутствует библиотека для работы с принтером. Сброс"));
     return LibraryMissed;
@@ -243,12 +250,14 @@ IStickerPrinter::ReturnStatus TE310Printer::printPalletSticker(
   return Completed;
 }
 
-IStickerPrinter::ReturnStatus TE310Printer::printLastPalletSticker() {
+IStickerPrinter::ReturnStatus TE310Printer::printLastPalletSticker()
+{
   return printPalletSticker(&LastPalletSticker);
 }
 
 IStickerPrinter::ReturnStatus TE310Printer::exec(
-    const QStringList* commandScript) {
+    const QStringList* commandScript)
+{
   if (LibError) {
     sendLog(QString("Отсутствует библиотека для работы с принтером. Сброс"));
     return LibraryMissed;
@@ -268,7 +277,8 @@ IStickerPrinter::ReturnStatus TE310Printer::exec(
   return Completed;
 }
 
-void TE310Printer::applySetting() {
+void TE310Printer::applySetting()
+{
   sendLog("Применение новых настроек.");
 
   loadSetting();
@@ -276,20 +286,23 @@ void TE310Printer::applySetting() {
   loadTscLib();
 }
 
-void TE310Printer::loadSetting() {
+void TE310Printer::loadSetting()
+{
   QSettings settings;
 
   LogEnable = settings.value("log_system/global_enable").toBool();
   TscLibPath = settings.value("te310_printer/library_path").toString();
 }
 
-void TE310Printer::sendLog(const QString& log) {
+void TE310Printer::sendLog(const QString& log)
+{
   if (LogEnable) {
     emit logging("TE310Printer - " + log);
   }
 }
 
-bool TE310Printer::loadTscLib() {
+bool TE310Printer::loadTscLib()
+{
   if (!TscLib->load()) {
     LibError = true;
 
@@ -311,7 +324,8 @@ bool TE310Printer::loadTscLib() {
   return true;
 }
 
-void TE310Printer::printNkdSticker(const QHash<QString, QString>* parameters) {
+void TE310Printer::printNkdSticker(const QHash<QString, QString>* parameters)
+{
   openPort(Name.toUtf8().data());
   sendCommand("SIZE 27 mm, 27 mm");
   sendCommand("GAP 2 mm,2 mm");
@@ -335,7 +349,8 @@ void TE310Printer::printNkdSticker(const QHash<QString, QString>* parameters) {
   closePort();
 }
 
-void TE310Printer::printZsdSticker(const QHash<QString, QString>* parameters) {
+void TE310Printer::printZsdSticker(const QHash<QString, QString>* parameters)
+{
   openPort(Name.toUtf8().data());
   sendCommand("SIZE 30 mm, 20 mm");
   sendCommand("GAP 2 mm, 1 mm");

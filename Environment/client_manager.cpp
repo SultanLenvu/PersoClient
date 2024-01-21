@@ -1,6 +1,7 @@
 #include "client_manager.h"
 
-ClientManager::ClientManager(QObject* parent) : QObject(parent) {
+ClientManager::ClientManager(QObject* parent) : QObject(parent)
+{
   setObjectName("ClientManager");
   loadSettings();
 
@@ -17,12 +18,12 @@ ClientManager::ClientManager(QObject* parent) : QObject(parent) {
   CurrentPassword = PRODUCTION_LINE_DEFAULT_PASSWORD;
 }
 
-ClientManager::~ClientManager() {
-}
+ClientManager::~ClientManager() {}
 
 void ClientManager::on_InstanceThreadStarted_slot() {}
 
-void ClientManager::performServerConnecting() {
+void ClientManager::performServerConnecting()
+{
   startOperationPerforming("performServerConnecting");
 
   sendLog("Подключение к серверу персонализации. ");
@@ -35,7 +36,8 @@ void ClientManager::performServerConnecting() {
   finishOperationPerforming("performServerConnecting");
 }
 
-void ClientManager::performServerDisconnecting() {
+void ClientManager::performServerDisconnecting()
+{
   startOperationPerforming("performServerDisconnecting");
 
   sendLog("Отключение от сервера персонализации. ");
@@ -49,7 +51,8 @@ void ClientManager::performServerDisconnecting() {
   finishOperationPerforming("performServerDisconnecting");
 }
 
-void ClientManager::performServerEcho() {
+void ClientManager::performServerEcho()
+{
   startOperationPerforming("performServerEcho");
 
   sendLog("Отправка эхо-запроса на сервер персонализации. ");
@@ -64,7 +67,8 @@ void ClientManager::performServerEcho() {
 }
 
 void ClientManager::performServerAuthorization(
-    const QSharedPointer<QHash<QString, QString>> data) {
+    const QSharedPointer<QHash<QString, QString>> data)
+{
   startOperationPerforming("performServerAuthorization");
 
   sendLog("Авторизация на сервере персонализации. ");
@@ -85,7 +89,8 @@ void ClientManager::performServerAuthorization(
   finishOperationPerforming("performServerAuthorization");
 }
 
-void ClientManager::performTransponderFirmwareLoading() {
+void ClientManager::performTransponderFirmwareLoading()
+{
   startOperationPerforming("performTransponderFirmwareLoading");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -139,9 +144,8 @@ void ClientManager::performTransponderFirmwareLoading() {
   emit displayTransponderData_signal(transponderData);
 
   sendLog("Печать стикера для транспондера.");
-  stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(
-          (const QHash<QString, QString>*)transponderData.get());
+  stickerPrinterStatus = StickerPrinter->printTransponderSticker(
+      (const QHash<QString, QString>*)transponderData.get());
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
@@ -163,7 +167,8 @@ void ClientManager::performTransponderFirmwareLoading() {
   finishOperationPerforming("performTransponderFirmwareLoading");
 }
 
-void ClientManager::performTransponderFirmwareReloading(const QString& pan) {
+void ClientManager::performTransponderFirmwareReloading(const QString& pan)
+{
   startOperationPerforming("performTransponderFirmwareReloading");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -218,9 +223,8 @@ void ClientManager::performTransponderFirmwareReloading(const QString& pan) {
   emit displayTransponderData_signal(transponderData);
 
   sendLog("Печать стикера для транспондера.");
-  stickerPrinterStatus =
-      StickerPrinter->printTransponderSticker(
-          (const QHash<QString, QString>*)transponderData.get());
+  stickerPrinterStatus = StickerPrinter->printTransponderSticker(
+      (const QHash<QString, QString>*)transponderData.get());
   if (stickerPrinterStatus != IStickerPrinter::Completed) {
     processStickerPrintersError(stickerPrinterStatus,
                                 "performTransponderFirmwareLoading");
@@ -242,7 +246,8 @@ void ClientManager::performTransponderFirmwareReloading(const QString& pan) {
   finishOperationPerforming("performTransponderFirmwareReloading");
 }
 
-void ClientManager::rollbackProductionLine() {
+void ClientManager::rollbackProductionLine()
+{
   startOperationPerforming("rollbackProductionLine");
   sendLog("Откат производственной линии. ");
 
@@ -260,7 +265,8 @@ void ClientManager::rollbackProductionLine() {
 }
 
 void ClientManager::performBoxStickerPrinting(
-    const QSharedPointer<QHash<QString, QString>> param) {
+    const QSharedPointer<QHash<QString, QString>> param)
+{
   startOperationPerforming("printBoxStickerOnServer");
   sendLog("Запрос печати стикера для бокса на сервере. ");
 
@@ -275,7 +281,8 @@ void ClientManager::performBoxStickerPrinting(
 }
 
 void ClientManager::performPalletStickerPrinting(
-    const QSharedPointer<QHash<QString, QString>> param) {
+    const QSharedPointer<QHash<QString, QString>> param)
+{
   startOperationPerforming("printPalletStickerOnServer");
   sendLog("Запрос печати стикера для паллеты на сервере. ");
 
@@ -289,7 +296,8 @@ void ClientManager::performPalletStickerPrinting(
   finishOperationPerforming("printPalletStickerOnServer");
 }
 
-void ClientManager::performLocalFirmwareLoading(const QString& path) {
+void ClientManager::performLocalFirmwareLoading(const QString& path)
+{
   startOperationPerforming("performLocalFirmwareLoading");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -313,7 +321,8 @@ void ClientManager::performLocalFirmwareLoading(const QString& path) {
   finishOperationPerforming("performLocalFirmwareLoading");
 }
 
-void ClientManager::performFirmwareReading() {
+void ClientManager::performFirmwareReading()
+{
   startOperationPerforming("performFirmwareReading");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -329,7 +338,8 @@ void ClientManager::performFirmwareReading() {
   finishOperationPerforming("performFirmwareReading");
 }
 
-void ClientManager::performFirmwareErasing() {
+void ClientManager::performFirmwareErasing()
+{
   startOperationPerforming("performFirmwareErasing");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -345,7 +355,8 @@ void ClientManager::performFirmwareErasing() {
   finishOperationPerforming("performFirmwareErasing");
 }
 
-void ClientManager::performDataReading() {
+void ClientManager::performDataReading()
+{
   startOperationPerforming("performDataReading");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -361,7 +372,8 @@ void ClientManager::performDataReading() {
   finishOperationPerforming("performDataReading");
 }
 
-void ClientManager::performDataLoading(const QString& path) {
+void ClientManager::performDataLoading(const QString& path)
+{
   startOperationPerforming("performDataLoading");
 
   // Создаем файл с данными
@@ -379,7 +391,8 @@ void ClientManager::performDataLoading(const QString& path) {
   finishOperationPerforming("performDataLoading");
 }
 
-void ClientManager::performDeviceUnlock() {
+void ClientManager::performDeviceUnlock()
+{
   startOperationPerforming("performDeviceUnlock");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -395,7 +408,8 @@ void ClientManager::performDeviceUnlock() {
   finishOperationPerforming("performDeviceUnlock");
 }
 
-void ClientManager::performDeviceLock() {
+void ClientManager::performDeviceLock()
+{
   startOperationPerforming("performDeviceLock");
 
   IProgrammer::ReturnStatus programmerStatus;
@@ -411,7 +425,8 @@ void ClientManager::performDeviceLock() {
   finishOperationPerforming("performDeviceLock");
 }
 
-void ClientManager::performLastTransponderStickerPrinting() {
+void ClientManager::performLastTransponderStickerPrinting()
+{
   startOperationPerforming("performLastTransponderStickerPrinting");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
@@ -429,7 +444,8 @@ void ClientManager::performLastTransponderStickerPrinting() {
 }
 
 void ClientManager::performCustomTransponderStickerPrinting(
-    const QSharedPointer<QHash<QString, QString>> data) {
+    const QSharedPointer<QHash<QString, QString>> data)
+{
   startOperationPerforming("performStickerPrinterCommandScript");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
@@ -448,7 +464,8 @@ void ClientManager::performCustomTransponderStickerPrinting(
 }
 
 void ClientManager::performStickerPrinterCommandScript(
-    const QSharedPointer<QStringList> commandScript) {
+    const QSharedPointer<QStringList> commandScript)
+{
   startOperationPerforming("performStickerPrinterCommandScript");
 
   IStickerPrinter::ReturnStatus stickerPrinterStatus;
@@ -465,7 +482,8 @@ void ClientManager::performStickerPrinterCommandScript(
   finishOperationPerforming("performStickerPrinterCommandScript");
 }
 
-void ClientManager::applySettings() {
+void ClientManager::applySettings()
+{
   sendLog("Применение новых настроек. ");
   loadSettings();
 
@@ -474,19 +492,22 @@ void ClientManager::applySettings() {
   StickerPrinter->applySetting();
 }
 
-void ClientManager::loadSettings() {
+void ClientManager::loadSettings()
+{
   QSettings settings;
 
   LogEnable = settings.value("log_system/global_enable").toBool();
 }
 
-void ClientManager::sendLog(const QString& log) const {
+void ClientManager::sendLog(const QString& log) const
+{
   if (LogEnable) {
     emit logging(QString("%1 - %2").arg(objectName(), log));
   }
 }
 
-void ClientManager::createProgrammerInstance() {
+void ClientManager::createProgrammerInstance()
+{
   Programmer = new JLinkExeProgrammer(this);
   connect(Programmer, &IProgrammer::logging, LogSystem::instance(),
           &LogSystem::generate);
@@ -503,7 +524,8 @@ void ClientManager::createProgrammerInstance() {
   ProgrammerReturnStatusMatch.insert(IProgrammer::Completed, "Выполнено.");
 }
 
-void ClientManager::createClientInstance() {
+void ClientManager::createClientInstance()
+{
   Client = new PersoClient(this);
   connect(Client, &PersoClient::logging, LogSystem::instance(),
           &LogSystem::generate);
@@ -570,7 +592,8 @@ void ClientManager::createClientInstance() {
       "Получена ошибка при запуске сборки очередной паллеты. ");
 }
 
-void ClientManager::createStickerPrinterInstance() {
+void ClientManager::createStickerPrinterInstance()
+{
   StickerPrinter = new TE310Printer(this, "TSC TE310");
   connect(StickerPrinter, &IStickerPrinter::logging, LogSystem::instance(),
           &LogSystem::generate);
@@ -590,7 +613,8 @@ void ClientManager::createStickerPrinterInstance() {
                                          "Выполнено.");
 }
 
-void ClientManager::startOperationPerforming(const QString& operationName) {
+void ClientManager::startOperationPerforming(const QString& operationName)
+{
   // Блокируем мьютекс
   Mutex.lock();
 
@@ -598,7 +622,8 @@ void ClientManager::startOperationPerforming(const QString& operationName) {
   emit operationPerformingStarted(operationName);
 }
 
-void ClientManager::finishOperationPerforming(const QString& operationName) {
+void ClientManager::finishOperationPerforming(const QString& operationName)
+{
   // Сигнал о завершении текущей операции
   emit operationPerformingFinished(operationName);
 
@@ -610,14 +635,16 @@ void ClientManager::finishOperationPerforming(const QString& operationName) {
 }
 
 void ClientManager::processClientError(PersoClient::ReturnStatus status,
-                                       const QString& operationName) {
+                                       const QString& operationName)
+{
   emit operationPerformingFinished(operationName);
   emit notifyUserAboutError(ClientReturnStatusMatch.value(status));
   Mutex.unlock();
 }
 
 void ClientManager::processProgrammerError(IProgrammer::ReturnStatus status,
-                                           const QString& operationName) {
+                                           const QString& operationName)
+{
   sendLog(ProgrammerReturnStatusMatch.value(status));
   emit operationPerformingFinished(operationName);
   emit notifyUserAboutError(ProgrammerReturnStatusMatch.value(status));
@@ -626,7 +653,8 @@ void ClientManager::processProgrammerError(IProgrammer::ReturnStatus status,
 
 void ClientManager::processStickerPrintersError(
     IStickerPrinter::ReturnStatus status,
-    const QString& operationName) {
+    const QString& operationName)
+{
   sendLog(StickerPrinterReturnStatusMatch.value(status));
   emit operationPerformingFinished(operationName);
   emit notifyUserAboutError(StickerPrinterReturnStatusMatch.value(status));

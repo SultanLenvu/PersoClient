@@ -1,7 +1,8 @@
 #include "transponder_sticker_scan_dialog.h"
 
 TransponderStickerScanDialog::TransponderStickerScanDialog(QWidget* parent)
-    : InputDialog(parent, TransponderStickerScan) {
+    : InputDialog(parent, TransponderStickerScan)
+{
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::screens().first()->size();
 
@@ -16,8 +17,8 @@ TransponderStickerScanDialog::TransponderStickerScanDialog(QWidget* parent)
 
 TransponderStickerScanDialog::~TransponderStickerScanDialog() {}
 
-void TransponderStickerScanDialog::getData(
-    QHash<QString, QString>* data) const {
+void TransponderStickerScanDialog::getData(QHash<QString, QString>* data) const
+{
   if (!data) {
     return;
   }
@@ -36,7 +37,8 @@ void TransponderStickerScanDialog::getData(
   }
 }
 
-void TransponderStickerScanDialog::create() {
+void TransponderStickerScanDialog::create()
+{
   MainLayout = new QVBoxLayout();
   setLayout(MainLayout);
 
@@ -62,7 +64,8 @@ void TransponderStickerScanDialog::create() {
   MainLayout->addItem(MainLayoutVS);
 }
 
-bool TransponderStickerScanDialog::checkInput(QStringList& input) const {
+bool TransponderStickerScanDialog::checkInput(QStringList& input) const
+{
   if (input.size() == 2) {
     return checkPan(input[0]) && checkSn(input[1]);
   } else if (input.size() == 1) {
@@ -72,7 +75,8 @@ bool TransponderStickerScanDialog::checkInput(QStringList& input) const {
   }
 }
 
-bool TransponderStickerScanDialog::checkPan(const QString& pan) const {
+bool TransponderStickerScanDialog::checkPan(const QString& pan) const
+{
   if (pan.length() != PAN_CHAR_LENGTH) {
     return false;
   }
@@ -82,7 +86,8 @@ bool TransponderStickerScanDialog::checkPan(const QString& pan) const {
   return match.hasMatch();
 }
 
-bool TransponderStickerScanDialog::checkSn(const QString& sn) const {
+bool TransponderStickerScanDialog::checkSn(const QString& sn) const
+{
   if (sn.length() != SERIAL_NUMBER_DS_CHAR_LENGTH) {
     return false;
   }

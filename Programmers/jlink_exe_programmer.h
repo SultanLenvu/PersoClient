@@ -11,8 +11,9 @@
 /*!
  * \brief JLink.exe programmer
  */
-class JLinkExeProgrammer : public IProgrammer {
- Q_OBJECT
+class JLinkExeProgrammer : public IProgrammer
+{
+  Q_OBJECT
  private:
   //! is logging enabled
   bool LogEnable;
@@ -21,12 +22,12 @@ class JLinkExeProgrammer : public IProgrammer {
   //! Speed to pass to JLink
   uint32_t Speed;
   //! Pointer to JLink process
-  QProcess *JLinkProcess;
+  QProcess* JLinkProcess;
 
   /*! File to write JLink script to
    * TODO why not pipes and writing the script to stdin?
    */
-  QFile *JLinkScript;
+  QFile* JLinkScript;
 
   //! Arguments for JLink
   QStringList ProcessArguments;
@@ -123,4 +124,4 @@ class JLinkExeProgrammer : public IProgrammer {
   void initScript(void);
 };
 
-#endif // JLINKMANUALPROGRAMMER_H
+#endif  // JLINKMANUALPROGRAMMER_H
