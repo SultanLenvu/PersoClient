@@ -25,7 +25,7 @@ InteractionSystem::InteractionSystem(const QString& name) : QObject(nullptr) {
 InteractionSystem::~InteractionSystem() {}
 
 void InteractionSystem::generateMessage(const QString& text) {
-  QMessageBox::information(nullptr, "Сообщение", data, QMessageBox::Ok);
+  QMessageBox::information(nullptr, "Сообщение", text, QMessageBox::Ok);
 }
 
 void InteractionSystem::generateErrorMessage(const QString& text) {
@@ -166,6 +166,16 @@ void InteractionSystem::createMessageTable() {
 
   MessageTable[ReturnStatus::ServerInternalError] =
       "Получена серверная ошибка.";
+
+  MessageTable[ReturnStatus::OrderMultiplyAssembly] =
+      "Несколько заказов одновременно находятся в процессе сборки.";
+  MessageTable[ReturnStatus::OrderAssemblyMissing] =
+      "Отсутствуют заказы в процессе сборки.";
+
+  MessageTable[ReturnStatus::BoxCompletelyAssembled] = "Бокс полностью собран.";
+  MessageTable[ReturnStatus::BoxNotCompletelyAssembled] =
+      "Бокс не собран полностью.";
+
   MessageTable[ReturnStatus::ProductionLineMissed] =
       "Производственная линия не найдена.";
   MessageTable[ReturnStatus::ProductionLineLaunchError] =

@@ -80,6 +80,7 @@ ReturnStatus PersoServerConnection::echo() {
   StringDictionary param, result;
   param.insert("data", "test");
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -88,6 +89,7 @@ ReturnStatus PersoServerConnection::logIn(const StringDictionary& param) {
 
   StringDictionary result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -96,6 +98,7 @@ ReturnStatus PersoServerConnection::logOut() {
 
   StringDictionary param, result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -104,6 +107,7 @@ ReturnStatus PersoServerConnection::requestBox() {
 
   StringDictionary param, result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -113,6 +117,7 @@ ReturnStatus PersoServerConnection::getCurrentBoxData(
 
   StringDictionary param;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -121,6 +126,7 @@ ReturnStatus PersoServerConnection::completeCurrentBox() {
 
   StringDictionary param, result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -129,6 +135,7 @@ ReturnStatus PersoServerConnection::refundCurrentBox() {
 
   StringDictionary param, result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -147,6 +154,7 @@ ReturnStatus PersoServerConnection::getTransponderData(
   CurrentCommand = Commands.at(GetTransponderData);
 
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -156,6 +164,7 @@ ReturnStatus PersoServerConnection::releaseTransponder(
 
   StringDictionary param;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -165,6 +174,7 @@ ReturnStatus PersoServerConnection::confirmTransponderRelease(
 
   StringDictionary result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -174,6 +184,7 @@ ReturnStatus PersoServerConnection::rereleaseTransponder(
   CurrentCommand = Commands.at(RereleaseTransponder);
 
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -183,6 +194,7 @@ ReturnStatus PersoServerConnection::confirmTransponderRerelease(
 
   StringDictionary result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -191,6 +203,7 @@ ReturnStatus PersoServerConnection::rollbackTransponder() {
 
   StringDictionary param, result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -200,6 +213,7 @@ ReturnStatus PersoServerConnection::printBoxSticker(
 
   StringDictionary result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -208,6 +222,7 @@ ReturnStatus PersoServerConnection::printLastBoxSticker() {
 
   StringDictionary param, result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -217,6 +232,7 @@ ReturnStatus PersoServerConnection::printPalletSticker(
 
   StringDictionary result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
   return ret;
 }
 
@@ -225,12 +241,8 @@ ReturnStatus PersoServerConnection::printLastPalletSticker() {
 
   StringDictionary param, result;
   ReturnStatus ret = processCurrentCommand(param, result);
-  return ret;
-}
 
-void PersoServerConnection::reset() {
-  ReceivedDataBlock.clear();
-  ReceivedDataBlockSize = 0;
+  return ret;
 }
 
 void PersoServerConnection::applySettings() {
@@ -256,6 +268,9 @@ ReturnStatus PersoServerConnection::processCurrentCommand(
   sendLog(
       QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
 
+  // Очистка
+  clearBuffer();
+
   QByteArray dataBlock;
   ReturnStatus ret = CurrentCommand->generate(param, dataBlock);
   if (ret != ReturnStatus::NoError) {
@@ -275,9 +290,6 @@ ReturnStatus PersoServerConnection::processCurrentCommand(
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
-
-  // Очистка
-  reset();
 
   sendLog(
       QString("Команда '%1' успешно выполнена.").arg(CurrentCommand->name()));
@@ -415,6 +427,11 @@ void PersoServerConnection::createCommands() {
       new ::PrintPalletSticker("PrintPalletSticker"));
   Commands[PrintLastPalletSticker] = std::shared_ptr<::AbstractClientCommand>(
       new ::PrintLastPalletSticker("PrintLastPalletSticker"));
+}
+
+void PersoServerConnection::clearBuffer() {
+  ReceivedDataBlock.clear();
+  ReceivedDataBlockSize = 0;
 }
 
 void PersoServerConnection::socketConnected_slot() {

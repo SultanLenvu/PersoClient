@@ -96,7 +96,6 @@ class PersoServerConnection : public AbstractServerConnection {
       const StringDictionary& param) override;
   virtual ReturnStatus printLastPalletSticker(void) override;
 
-  virtual void reset(void) override;
   virtual void applySettings(void) override;
 
  private:
@@ -113,6 +112,8 @@ class PersoServerConnection : public AbstractServerConnection {
   void createTimers(void);
   void createSocket(void);
   void createCommands(void);
+
+  void clearBuffer(void);
 
  private slots:
   void socketConnected_slot(void);

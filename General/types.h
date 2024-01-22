@@ -24,6 +24,13 @@ enum class ReturnStatus {
   ClientCommandParamError,
 
   ServerInternalError,
+
+  OrderMultiplyAssembly,
+  OrderAssemblyMissing,
+
+  BoxCompletelyAssembled,
+  BoxNotCompletelyAssembled,
+
   ProductionLineMissed,
   ProductionLineLaunchError,
   ProductionLineAlreadyLaunched,

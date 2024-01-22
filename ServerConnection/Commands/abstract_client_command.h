@@ -34,6 +34,12 @@ class AbstractClientCommand : public QObject {
     IssuerMissed,
     MasterKeysMissed,
 
+    OrderMultiplyAssembly,
+    OrderAssemblyMissing,
+
+    BoxCompletelyAssembled,
+    BoxNotCompletelyAssembled,
+
     TransponderNotReleasedEarlier,
     TransponderNotAwaitingConfirmation,
     TransponderIncorrectRerelease,
@@ -42,6 +48,7 @@ class AbstractClientCommand : public QObject {
 
     ProductionLineLaunchError,
     ProductionLineAlreadyLaunched,
+    ProductionLineAlreadyInProcess,
     ProductionLineNotActive,
     ProductionLineNotInProcess,
     ProductionLineCompleted,

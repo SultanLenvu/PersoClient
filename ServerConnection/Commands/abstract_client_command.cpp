@@ -15,6 +15,9 @@ AbstractClientCommand::AbstractClientCommand(const QString& name)
           dynamic_cast<LogSystem*>(
               GlobalEnvironment::instance()->getObject("LogSystem")),
           &LogSystem::generate);
+
+  createCrtMap();
+  createCrtLogMap();
 }
 
 AbstractClientCommand::~AbstractClientCommand() {}
@@ -66,9 +69,9 @@ bool AbstractClientCommand::processDataBlock(const QByteArray& dataBlock) {
 ReturnStatus AbstractClientCommand::processReturnStatus(const QString& ret) {
   CommandReturnStatus cret = static_cast<CommandReturnStatus>(ret.toInt());
 
-  sendLog(CrtLogMap.at(cret));
+  sendLog(CrtLogMap[cret]);
 
-  return CrtMap.at(cret);
+  return CrtMap[cret];
 }
 
 void AbstractClientCommand::createCrtMap() {
@@ -79,10 +82,14 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[FileOpenError] = ReturnStatus::ServerInternalError;
   CrtMap[InvalidProductionLineContext] = ReturnStatus::ServerInternalError;
   CrtMap[UnauthorizedRequest] = ReturnStatus::ServerInternalError;
+
   CrtMap[DatabaseConnectionError] = ReturnStatus::ServerInternalError;
   CrtMap[DatabaseTransactionError] = ReturnStatus::ServerInternalError;
+  CrtMap[DatabaseQueryError] = ReturnStatus::ServerInternalError;
+
   CrtMap[FirmwareGeneratorInitError] = ReturnStatus::ServerInternalError;
   CrtMap[StickerPrinterInitError] = ReturnStatus::ServerInternalError;
+
   CrtMap[RecordMissed] = ReturnStatus::ServerInternalError;
   CrtMap[ProductionLineMissed] = ReturnStatus::ProductionLineMissed;
   CrtMap[TranspoderMissed] = ReturnStatus::ServerInternalError;
@@ -90,14 +97,21 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[PalletMissed] = ReturnStatus::ServerInternalError;
   CrtMap[OrderMissed] = ReturnStatus::ServerInternalError;
   CrtMap[MasterKeysMissed] = ReturnStatus::ServerInternalError;
+
+  CrtMap[OrderMultiplyAssembly] = ReturnStatus::OrderMultiplyAssembly;
+  CrtMap[OrderAssemblyMissing] = ReturnStatus::OrderAssemblyMissing;
+
+  CrtMap[BoxCompletelyAssembled] = ReturnStatus::BoxCompletelyAssembled;
+  CrtMap[BoxNotCompletelyAssembled] = ReturnStatus::BoxNotCompletelyAssembled;
+
   CrtMap[TransponderNotReleasedEarlier] = ReturnStatus::ServerInternalError;
   CrtMap[TransponderNotAwaitingConfirmation] =
       ReturnStatus::ServerInternalError;
   CrtMap[TransponderIncorrectRerelease] =
       ReturnStatus::TransponderIncorrectRerelease;
-  CrtMap[IssuerMissed] = ReturnStatus::ServerInternalError;
   CrtMap[IdenticalUcidError] = ReturnStatus::IdenticalUcidError;
   CrtMap[CurrentOrderAssembled] = ReturnStatus::CurrentOrderAssembled;
+
   CrtMap[ProductionLineLaunchError] = ReturnStatus::ProductionLineLaunchError;
   CrtMap[ProductionLineAlreadyLaunched] =
       ReturnStatus::ProductionLineAlreadyLaunched;
@@ -110,7 +124,9 @@ void AbstractClientCommand::createCrtMap() {
       ReturnStatus::ProductionLineRollbackLimit;
   CrtMap[OrderInProcessMissed] = ReturnStatus::OrderInProcessMissed;
   CrtMap[FreeBoxMissed] = ReturnStatus::FreeBoxMissed;
+
   CrtMap[FirmwareGenerationError] = ReturnStatus::ServerInternalError;
+
   CrtMap[PrinterConnectionError] = ReturnStatus::ServerInternalError;
   CrtMap[PrinterLibraryError] = ReturnStatus::ServerInternalError;
   CrtMap[BoxStickerPrintError] = ReturnStatus::ServerInternalError;

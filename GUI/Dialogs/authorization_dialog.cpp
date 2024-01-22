@@ -25,23 +25,11 @@ AbstractInputDialog::InputDialogType AuthorizationDialog::type() const {
 void AuthorizationDialog::getData(StringDictionary& data) const {
   data.insert("login", LoginLineEdit->text());
   data.insert("password", PasswordLineEdit->text());
-  data.insert("mode", ModeChoice->currentText());
 }
 
 void AuthorizationDialog::create() {
   MainLayout = new QVBoxLayout();
   setLayout(MainLayout);
-
-  ModeChoiceLayout = new QHBoxLayout();
-  MainLayout->addLayout(ModeChoiceLayout);
-
-  ModeChoiceLabel = new QLabel("Режим работы");
-  ModeChoiceLayout->addWidget(ModeChoiceLabel);
-  ModeChoice = new QComboBox();
-  ModeChoice->addItem("Сборка");
-  ModeChoice->addItem("Тестирование");
-  ModeChoiceLayout->addWidget(ModeChoice);
-  ModeChoice->setCurrentIndex(0);
 
   LoginLayout = new QHBoxLayout();
   MainLayout->addLayout(LoginLayout);

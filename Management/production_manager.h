@@ -35,7 +35,7 @@ class ProductionManager : public AbstractManager {
 
   void connectToServer(void);
   void disconnectFromServer(void);
-  void initServerConnection(const std::shared_ptr<StringDictionary> param);
+  void launchProductionLine(const std::shared_ptr<StringDictionary> param);
   void resetServerConnection(void);
   void echoServer(void);
 

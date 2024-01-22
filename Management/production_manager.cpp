@@ -59,28 +59,22 @@ void ProductionManager::disconnectFromServer() {
   emit executionFinished("connectToServer", ReturnStatus::NoError);
 }
 
-void ProductionManager::initServerConnection(
+void ProductionManager::launchProductionLine(
     const std::shared_ptr<StringDictionary> param) {
-  emit executionStarted("initServerConnection");
+  emit executionStarted("launchProductionLine");
   sendLog("Инициализация соединения с сервером. ");
 
   ReturnStatus ret;
-  ret = Server->connect();
-  if (ret != ReturnStatus::NoError) {
-    emit executionFinished("initServerConnection", ret);
-    return;
-  }
-
   ret = Server->logIn(*param);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("initServerConnection", ret);
+    emit executionFinished("launchProductionLine", ret);
     return;
   }
 
   // Запрашиваем данные текущего транспондера
   ret = Server->getCurrentTransponderData(TransponderData);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("initServerConnection", ret);
+    emit executionFinished("launchProductionLine", ret);
     return;
   }
 
@@ -89,7 +83,7 @@ void ProductionManager::initServerConnection(
 
   // Завершаем операцию
   sendLog("Соединение с сервером успешно инициализировано. ");
-  emit executionFinished("initServerConnection", ret);
+  emit executionFinished("launchProductionLine", ret);
 }
 
 void ProductionManager::resetServerConnection() {

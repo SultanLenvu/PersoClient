@@ -13,10 +13,6 @@ class AuthorizationDialog : public AbstractInputDialog {
   QSize DesktopGeometry;
   QVBoxLayout* MainLayout;
 
-  QHBoxLayout* ModeChoiceLayout;
-  QLabel* ModeChoiceLabel;
-  QComboBox* ModeChoice;
-
   QHBoxLayout* LoginLayout;
   QLabel* LoginLabel;
   QLineEdit* LoginLineEdit;

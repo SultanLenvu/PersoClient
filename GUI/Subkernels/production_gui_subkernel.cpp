@@ -156,7 +156,7 @@ void ProductionGuiSubkernel::connectProductionManager() const {
           &ProductionManager::disconnectFromServer);
 
   connect(this, &ProductionGuiSubkernel::authorize_signal, manager,
-          &ProductionManager::initServerConnection);
+          &ProductionManager::launchProductionLine);
   connect(manager, &ProductionManager::authorizationCompleted, this,
           &ProductionGuiSubkernel::authorizationCompleted_slot);
 
