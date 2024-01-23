@@ -145,14 +145,18 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[InvalidProductionLineContext] =
       "Server return status: InvalidProductionLineContext";
   CrtLogMap[UnauthorizedRequest] = "Server return status: UnauthorizedRequest";
+
   CrtLogMap[DatabaseConnectionError] =
       "Server return status: DatabaseConnectionError";
   CrtLogMap[DatabaseTransactionError] =
       "Server return status: DatabaseTransactionError";
+  CrtLogMap[DatabaseQueryError] = "Server return status: DatabaseQueryError";
+
   CrtLogMap[FirmwareGeneratorInitError] =
       "Server return status: FirmwareGeneratorInitError";
   CrtLogMap[StickerPrinterInitError] =
       "Server return status: StickerPrinterInitError";
+
   CrtLogMap[RecordMissed] = "Server return status: RecordMissed";
   CrtLogMap[ProductionLineMissed] =
       "Server return status: ProductionLineMissed";
@@ -161,6 +165,17 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[PalletMissed] = "Server return status: PalletMissed";
   CrtLogMap[OrderMissed] = "Server return status: OrderMissed";
   CrtLogMap[MasterKeysMissed] = "Server return status: MasterKeysMissed";
+
+  CrtLogMap[OrderMultiplyAssembly] =
+      "Server return status: OrderMultiplyAssembly";
+  CrtLogMap[OrderAssemblyMissing] =
+      "Server return status: OrderAssemblyMissingы";
+
+  CrtLogMap[BoxCompletelyAssembled] =
+      "Server return status: BoxCompletelyAssembled";
+  CrtLogMap[BoxNotCompletelyAssembled] =
+      "Server return status: BoxNotCompletelyAssembled";
+
   CrtLogMap[TransponderNotReleasedEarlier] =
       "Server return status: TransponderNotReleasedEarlier";
   CrtLogMap[TransponderNotAwaitingConfirmation] =
@@ -171,6 +186,7 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[IdenticalUcidError] = "Server return status: IdenticalUcidError";
   CrtLogMap[CurrentOrderAssembled] =
       "Server return status: CurrentOrderAssembled";
+
   CrtLogMap[ProductionLineLaunchError] =
       "Server return status: ProductionLineLaunchError";
   CrtLogMap[ProductionLineAlreadyLaunched] =
@@ -190,8 +206,10 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[OrderInProcessMissed] =
       "Server return status: OrderInProcessMissed";
   CrtLogMap[FreeBoxMissed] = "Server return status: FreeBoxMissed";
+
   CrtLogMap[FirmwareGenerationError] =
       "Server return status: FirmwareGenerationError";
+
   CrtLogMap[PrinterConnectionError] =
       "Server return status: PrinterConnectionError";
   CrtLogMap[PrinterLibraryError] = "Server return status: PrinterLibraryError";
