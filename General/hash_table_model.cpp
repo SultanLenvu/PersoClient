@@ -1,6 +1,9 @@
 #include "hash_table_model.h"
 
-HashTableModel::HashTableModel() : QAbstractTableModel(nullptr) {}
+HashTableModel::HashTableModel(const QString& name)
+    : QAbstractTableModel(nullptr) {
+  setObjectName(name);
+}
 
 HashTableModel::~HashTableModel() {}
 
@@ -12,10 +15,10 @@ void HashTableModel::setData(const StringDictionary& table) {
   Headers.clear();
 
   // Устанавливаем новые данные
-  for (QHash<QString, QString>::const_iterator it1 = table.constBegin();
-       it1 != table.constEnd(); it1++) {
-    Values.append(it1.value());
-    Headers.append(MatchTable->value(it1.key()));
+  for (auto itb = table.constBegin(), ite = table.constEnd(); itb != ite;
+       ++itb) {
+    Values.append(itb.value());
+    Headers.append(MatchTable->value(itb.key()));
   }
 
   endResetModel();

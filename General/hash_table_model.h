@@ -16,7 +16,7 @@ class HashTableModel : public QAbstractTableModel {
   QVector<QVariant> Headers;
 
  public:
-  HashTableModel();
+  HashTableModel(const QString& name);
   ~HashTableModel();
 
   void setData(const StringDictionary& table);

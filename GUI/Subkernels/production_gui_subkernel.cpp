@@ -12,7 +12,6 @@ ProductionGuiSubkernel::ProductionGuiSubkernel(const QString& name)
   Role = Assembler;
 
   createModels();
-  createMatchTables();
 }
 
 ProductionGuiSubkernel::~ProductionGuiSubkernel() {}
@@ -118,6 +117,10 @@ void ProductionGuiSubkernel::connectMasterGui() {
           &ProductionGuiSubkernel::printPalletSticker_guiSlot);
   connect(gui->PrintLastPalletStickerButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::printLastPalletSticker_guiSlot);
+
+  // Связывание моделей и представлений
+  gui->TransponderDataView->setModel(TransponderDataModel.get());
+  gui->BoxDataView->setModel(BoxDataModel.get());
 }
 
 void ProductionGuiSubkernel::connectProductionAssemblerGui() {
@@ -133,6 +136,10 @@ void ProductionGuiSubkernel::connectProductionAssemblerGui() {
 
   connect(gui->PrintBoxStickerButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::printBoxSticker_guiSlot);
+
+  // Связывание моделей и представлений
+  gui->TransponderDataView->setModel(TransponderDataModel.get());
+  gui->BoxDataView->setModel(BoxDataModel.get());
 }
 
 void ProductionGuiSubkernel::connectProductionTesterGui() {
@@ -145,6 +152,7 @@ void ProductionGuiSubkernel::connectProductionTesterGui() {
 
   // Связывание моделей и представлений
   gui->TransponderDataView->setModel(TransponderDataModel.get());
+  //  gui->BoxDataView->setModel(BoxDataModel.get());
 }
 
 void ProductionGuiSubkernel::connectProductionManager() const {
@@ -334,29 +342,27 @@ void ProductionGuiSubkernel::printLastPalletSticker_guiSlot() {
 }
 
 void ProductionGuiSubkernel::createModels() {
-  TransponderDataModel = std::unique_ptr<HashTableModel>(new HashTableModel());
-  TransponderDataModel->setMatchTable(TransponderDataMatchTable);
+  std::shared_ptr<StringDictionary> tMatchTable(new StringDictionary());
+  tMatchTable->insert("transponder_sn", "Серийный номер");
+  tMatchTable->insert("transponder_ucid", "UCID");
+  tMatchTable->insert("transponder_pan", "PAN");
+  tMatchTable->insert("box_id", "Идентификатор бокса");
+  tMatchTable->insert("transponder_release_counter", "Количество выпусков");
 
-  BoxDataModel = std::unique_ptr<HashTableModel>(new HashTableModel());
-  BoxDataModel->setMatchTable(BoxDataMatchTable);
-}
+  TransponderDataModel = std::unique_ptr<HashTableModel>(
+      new HashTableModel("TransponderDataNodel"));
+  TransponderDataModel->setMatchTable(tMatchTable);
 
-void ProductionGuiSubkernel::createMatchTables() {
-  TransponderDataMatchTable =
-      std::shared_ptr<StringDictionary>(new StringDictionary());
-  TransponderDataMatchTable->insert("sn", "Серийный номер");
-  TransponderDataMatchTable->insert("pan", "PAN");
-  TransponderDataMatchTable->insert("issuer_name", "Компания-заказчик");
-  TransponderDataMatchTable->insert("box_id", "Идентификатор бокса");
-  TransponderDataMatchTable->insert("pallet_id", "Идентификатор паллеты");
-  TransponderDataMatchTable->insert("order_id", "Идентификатор заказа");
-  TransponderDataMatchTable->insert("transponder_model", "Модель транспондера");
+  std::shared_ptr<StringDictionary> bMatchTable(new StringDictionary());
+  bMatchTable = std::shared_ptr<StringDictionary>(new StringDictionary());
+  bMatchTable->insert("quantity", "Емкость бокса");
+  bMatchTable->insert("assembled_units", "Собрано транспондеров");
+  bMatchTable->insert("assembling_start", "Начало сборки");
+  bMatchTable->insert("assembling_stop", "Конец сборки");
+  bMatchTable->insert("pallet_id", "Идентификатор паллеты");
+  bMatchTable->insert("order_id", "Идентификатор заказа");
 
-  BoxDataMatchTable = std::shared_ptr<StringDictionary>(new StringDictionary());
-  BoxDataMatchTable->insert("quantity", "Емкость бокса");
-  BoxDataMatchTable->insert("assembled_units", "Собрано транспондеров");
-  BoxDataMatchTable->insert("assembling_start", "Начало сборки");
-  BoxDataMatchTable->insert("assembling_stop", "Конец сборки");
-  BoxDataMatchTable->insert("pallet_id", "Идентификатор паллеты");
-  BoxDataMatchTable->insert("order_id", "Идентификатор заказа");
+  BoxDataModel =
+      std::unique_ptr<HashTableModel>(new HashTableModel("BoxDataNodel"));
+  BoxDataModel->setMatchTable(bMatchTable);
 }

@@ -21,9 +21,6 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   std::unique_ptr<HashTableModel> BoxDataModel;
   std::unique_ptr<HashTableModel> TransponderDataModel;
 
-  std::shared_ptr<StringDictionary> TransponderDataMatchTable;
-  std::shared_ptr<StringDictionary> BoxDataMatchTable;
-
  public:
   explicit ProductionGuiSubkernel(const QString& name);
   ~ProductionGuiSubkernel();
@@ -72,7 +69,6 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   void printLastPalletSticker_guiSlot(void);
 
   void createModels(void);
-  void createMatchTables(void);
 
  signals:
   void displayProductionAssemblerGui(void);
