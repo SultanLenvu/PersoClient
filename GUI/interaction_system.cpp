@@ -140,7 +140,7 @@ void InteractionSystem::createMessageTable() {
   MessageTable[ReturnStatus::NoError] = "Выполнено.";
   MessageTable[ReturnStatus::ParameterError] = "Получена ошибка параметра.";
   MessageTable[ReturnStatus::SyntaxError] = "Получена синтаксическая ошибка.";
-  MessageTable[ReturnStatus::SynchronizationError] =
+  MessageTable[ReturnStatus::ConsistencyViolation] =
       "Получена ошибка синхронизации.";
   MessageTable[ReturnStatus::FileOpenError] =
       "Получена ошибка при открытии файла.";
@@ -169,13 +169,13 @@ void InteractionSystem::createMessageTable() {
 
   MessageTable[ReturnStatus::OrderMultiplyAssembly] =
       "Несколько заказов одновременно находятся в процессе сборки.";
-  MessageTable[ReturnStatus::OrderAssemblyMissing] =
+  MessageTable[ReturnStatus::OrderInProcessMissed] =
       "Отсутствуют заказы в процессе сборки.";
 
-  MessageTable[ReturnStatus::BoxCompletelyAssembled] = "Бокс полностью собран.";
-  MessageTable[ReturnStatus::BoxNotCompletelyAssembled] =
-      "Бокс не собран полностью.";
-
+  MessageTable[ReturnStatus::ProductionLineContextNotAuthorized] =
+      "Контекст производственной линии не авторизирован.";
+  MessageTable[ReturnStatus::ProductionLineNotLaunched] =
+      "Производственная линия не запущена.";
   MessageTable[ReturnStatus::ProductionLineMissed] =
       "Производственная линия не найдена.";
   MessageTable[ReturnStatus::ProductionLineLaunchError] =
@@ -190,8 +190,11 @@ void InteractionSystem::createMessageTable() {
       "Отствует заказ для сборки.";
   MessageTable[ReturnStatus::ProductionLineCompleted] =
       "Производственная линия завершила свою работу.";
-  MessageTable[ReturnStatus::OrderInProcessMissed] =
-      "Не найден заказ для сборки.";
+
+  MessageTable[ReturnStatus::BoxCompletelyAssembled] = "Бокс полностью собран.";
+  MessageTable[ReturnStatus::BoxNotCompletelyAssembled] =
+      "Бокс не собран полностью.";
+
   MessageTable[ReturnStatus::IdenticalUcidError] =
       "Получена ошибка идентификатора печатной платы.";
   MessageTable[ReturnStatus::TransponderIncorrectRerelease] =

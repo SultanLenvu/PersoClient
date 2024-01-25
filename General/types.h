@@ -9,7 +9,7 @@ enum class ReturnStatus {
   NoError = 0,
   ParameterError,
   SyntaxError,
-  SynchronizationError,
+  ConsistencyViolation,
   FileOpenError,
   InvalidFile,
   DynamicLibraryMissing,
@@ -26,11 +26,10 @@ enum class ReturnStatus {
   ServerInternalError,
 
   OrderMultiplyAssembly,
-  OrderAssemblyMissing,
+  OrderInProcessMissed,
 
-  BoxCompletelyAssembled,
-  BoxNotCompletelyAssembled,
-
+  ProductionLineContextNotAuthorized,
+  ProductionLineNotLaunched,
   ProductionLineMissed,
   ProductionLineLaunchError,
   ProductionLineAlreadyLaunched,
@@ -38,7 +37,10 @@ enum class ReturnStatus {
   ProductionLineNotActive,
   ProductionLineNotInProcess,
   ProductionLineCompleted,
-  OrderInProcessMissed,
+
+  BoxCompletelyAssembled,
+  BoxNotCompletelyAssembled,
+
   IdenticalUcidError,
   TransponderIncorrectRerelease,
   CurrentOrderAssembled,

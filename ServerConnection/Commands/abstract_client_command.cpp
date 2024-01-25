@@ -76,12 +76,11 @@ ReturnStatus AbstractClientCommand::processReturnStatus(const QString& ret) {
 
 void AbstractClientCommand::createCrtMap() {
   CrtMap[NoError] = ReturnStatus::NoError;
+  CrtMap[DynamicLibraryMissing] = ReturnStatus::ServerInternalError;
   CrtMap[ParameterError] = ReturnStatus::ServerInternalError;
   CrtMap[SyntaxError] = ReturnStatus::ServerInternalError;
-  CrtMap[SynchronizationError] = ReturnStatus::ServerInternalError;
+  CrtMap[ConsistencyViolation] = ReturnStatus::ServerInternalError;
   CrtMap[FileOpenError] = ReturnStatus::ServerInternalError;
-  CrtMap[InvalidProductionLineContext] = ReturnStatus::ServerInternalError;
-  CrtMap[UnauthorizedRequest] = ReturnStatus::ServerInternalError;
 
   CrtMap[DatabaseConnectionError] = ReturnStatus::ServerInternalError;
   CrtMap[DatabaseTransactionError] = ReturnStatus::ServerInternalError;
@@ -99,7 +98,7 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[MasterKeysMissed] = ReturnStatus::ServerInternalError;
 
   CrtMap[OrderMultiplyAssembly] = ReturnStatus::OrderMultiplyAssembly;
-  CrtMap[OrderAssemblyMissing] = ReturnStatus::OrderAssemblyMissing;
+  CrtMap[OrderInProcessMissed] = ReturnStatus::OrderInProcessMissed;
 
   CrtMap[BoxCompletelyAssembled] = ReturnStatus::BoxCompletelyAssembled;
   CrtMap[BoxNotCompletelyAssembled] = ReturnStatus::BoxNotCompletelyAssembled;
@@ -112,24 +111,25 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[IdenticalUcidError] = ReturnStatus::IdenticalUcidError;
   CrtMap[CurrentOrderAssembled] = ReturnStatus::CurrentOrderAssembled;
 
+  CrtMap[ProductionLineContextNotAuthorized] =
+      ReturnStatus::ProductionLineContextNotAuthorized;
+  CrtMap[ProductionLineNotLaunched] = ReturnStatus::ProductionLineNotLaunched;
   CrtMap[ProductionLineLaunchError] = ReturnStatus::ProductionLineLaunchError;
   CrtMap[ProductionLineAlreadyLaunched] =
       ReturnStatus::ProductionLineAlreadyLaunched;
   CrtMap[ProductionLineNotActive] = ReturnStatus::ProductionLineNotActive;
   CrtMap[ProductionLineNotInProcess] = ReturnStatus::ProductionLineNotInProcess;
   CrtMap[ProductionLineCompleted] = ReturnStatus::ProductionLineCompleted;
-  CrtMap[ProductionLineNotInProcess] = ReturnStatus::ProductionLineNotInProcess;
   CrtMap[ProductionLineShutdownError] = ReturnStatus::ServerInternalError;
+
+  CrtMap[ProductionLineNotInProcess] = ReturnStatus::ProductionLineNotInProcess;
   CrtMap[ProductionLineRollbackLimit] =
       ReturnStatus::ProductionLineRollbackLimit;
-  CrtMap[OrderInProcessMissed] = ReturnStatus::OrderInProcessMissed;
   CrtMap[FreeBoxMissed] = ReturnStatus::FreeBoxMissed;
 
   CrtMap[FirmwareGenerationError] = ReturnStatus::ServerInternalError;
 
-  CrtMap[PrinterConnectionError] = ReturnStatus::ServerInternalError;
-  CrtMap[PrinterLibraryError] = ReturnStatus::ServerInternalError;
-  CrtMap[BoxStickerPrintError] = ReturnStatus::ServerInternalError;
+  CrtMap[StickerPrinterConnectionError] = ReturnStatus::ServerInternalError;
   CrtMap[BoxStickerPrintError] = ReturnStatus::ServerInternalError;
   CrtMap[PalletStickerPrintError] = ReturnStatus::ServerInternalError;
   CrtMap[Unknown] = ReturnStatus::ServerInternalError;
@@ -137,14 +137,13 @@ void AbstractClientCommand::createCrtMap() {
 
 void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[NoError] = "Server return status: NoError. ";
+  CrtLogMap[DynamicLibraryMissing] =
+      "Server return status: DynamicLibraryMissing. ";
   CrtLogMap[ParameterError] = "Server return status: ParameterError";
   CrtLogMap[SyntaxError] = "Server return status: SyntaxError";
-  CrtLogMap[SynchronizationError] =
-      "Server return status: SynchronizationError";
+  CrtLogMap[ConsistencyViolation] =
+      "Server return status: ConsistencyViolation";
   CrtLogMap[FileOpenError] = "Server return status: FileOpenError";
-  CrtLogMap[InvalidProductionLineContext] =
-      "Server return status: InvalidProductionLineContext";
-  CrtLogMap[UnauthorizedRequest] = "Server return status: UnauthorizedRequest";
 
   CrtLogMap[DatabaseConnectionError] =
       "Server return status: DatabaseConnectionError";
@@ -168,7 +167,7 @@ void AbstractClientCommand::createCrtLogMap() {
 
   CrtLogMap[OrderMultiplyAssembly] =
       "Server return status: OrderMultiplyAssembly";
-  CrtLogMap[OrderAssemblyMissing] =
+  CrtLogMap[OrderInProcessMissed] =
       "Server return status: OrderAssemblyMissingы";
 
   CrtLogMap[BoxCompletelyAssembled] =
@@ -187,6 +186,10 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[CurrentOrderAssembled] =
       "Server return status: CurrentOrderAssembled";
 
+  CrtLogMap[ProductionLineContextNotAuthorized] =
+      "Server return status: ProductionLineContextNotAuthorized";
+  CrtLogMap[ProductionLineNotLaunched] =
+      "Server return status: ProductionLineNotLaunched";
   CrtLogMap[ProductionLineLaunchError] =
       "Server return status: ProductionLineLaunchError";
   CrtLogMap[ProductionLineAlreadyLaunched] =
@@ -197,24 +200,20 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: ProductionLineNotInProcess";
   CrtLogMap[ProductionLineCompleted] =
       "Server return status: ProductionLineCompleted";
-  CrtLogMap[ProductionLineNotInProcess] =
-      "Server return status: ProductionLineNotInProcess";
   CrtLogMap[ProductionLineShutdownError] =
       "Server return status: ProductionLineShutdownError";
+
+  CrtLogMap[ProductionLineNotInProcess] =
+      "Server return status: ProductionLineNotInProcess";
   CrtLogMap[ProductionLineRollbackLimit] =
       "Server return status: ProductionLineRollbackLimit";
-  CrtLogMap[OrderInProcessMissed] =
-      "Server return status: OrderInProcessMissed";
   CrtLogMap[FreeBoxMissed] = "Server return status: FreeBoxMissed";
 
   CrtLogMap[FirmwareGenerationError] =
       "Server return status: FirmwareGenerationError";
 
-  CrtLogMap[PrinterConnectionError] =
-      "Server return status: PrinterConnectionError";
-  CrtLogMap[PrinterLibraryError] = "Server return status: PrinterLibraryError";
-  CrtLogMap[BoxStickerPrintError] =
-      "Server return status: BoxStickerPrintError";
+  CrtLogMap[StickerPrinterConnectionError] =
+      "Server return status: StickerPrinterConnectionError";
   CrtLogMap[BoxStickerPrintError] =
       "Server return status: BoxStickerPrintError";
   CrtLogMap[PalletStickerPrintError] =

@@ -35,11 +35,10 @@ ReturnStatus GetTransponderData::processResponse(
 
   responseData["transponder_sn"] = Response["transponder_sn"].toString();
   responseData["transponder_pan"] = Response["transponder_pan"].toString();
+  responseData["transponder_ucid"] = Response["transponder_ucid"].toString();
+  responseData["transponder_release_counter"] =
+      Response["transponder_release_counter"].toString();
   responseData["box_id"] = Response["box_id"].toString();
-  responseData["pallet_id"] = Response["pallet_id"].toString();
-  responseData["order_id"] = Response["order_id"].toString();
-  responseData["issuer_name"] = Response["issuer_name"].toString();
-  responseData["transponder_model"] = Response["transponder_model"].toString();
 
   ReturnStatus ret = processReturnStatus(Response["return_status"].toString());
   if (ret != ReturnStatus::NoError) {

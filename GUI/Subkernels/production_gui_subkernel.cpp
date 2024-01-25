@@ -158,18 +158,24 @@ void ProductionGuiSubkernel::connectProductionTesterGui() {
 void ProductionGuiSubkernel::connectProductionManager() const {
   ProductionManager* manager = dynamic_cast<ProductionManager*>(Manager.get());
 
+  // Сигналы от подядра
   connect(this, &ProductionGuiSubkernel::connectToServer_signal, manager,
           &ProductionManager::connectToServer);
   connect(this, &ProductionGuiSubkernel::disconnectFromServer_signal, manager,
           &ProductionManager::disconnectFromServer);
-
-  connect(this, &ProductionGuiSubkernel::authorize_signal, manager,
-          &ProductionManager::launchProductionLine);
-  connect(manager, &ProductionManager::authorizationCompleted, this,
-          &ProductionGuiSubkernel::authorizationCompleted_slot);
-
   connect(this, &ProductionGuiSubkernel::echoServer_signal, manager,
           &ProductionManager::echoServer);
+  connect(this, &ProductionGuiSubkernel::authorize_signal, manager,
+          &ProductionManager::launchProductionLine);
+
+  connect(this, &ProductionGuiSubkernel::requestBox_signal, manager,
+          &ProductionManager::requestBox);
+  connect(this, &ProductionGuiSubkernel::getCurrentBoxData_signal, manager,
+          &ProductionManager::getCurrentBoxData);
+  connect(this, &ProductionGuiSubkernel::refundCurrentBox_signal, manager,
+          &ProductionManager::refundCurrentBox);
+  connect(this, &ProductionGuiSubkernel::completeCurrentBox_signal, manager,
+          &ProductionManager::completeCurrentBox);
 
   connect(this, &ProductionGuiSubkernel::releaseTransponder_signal, manager,
           &ProductionManager::releaseTransponder);
@@ -177,6 +183,10 @@ void ProductionGuiSubkernel::connectProductionManager() const {
           &ProductionManager::rereleaseTransponder);
   connect(this, &ProductionGuiSubkernel::rollbackTransponder_signal, manager,
           &ProductionManager::rollbackTransponder);
+  connect(this, &ProductionGuiSubkernel::getCurrentTransponderData_signal,
+          manager, &ProductionManager::getCurrentTransponderData);
+  connect(this, &ProductionGuiSubkernel::getTransponderData_signal, manager,
+          &ProductionManager::getTransponderData);
 
   connect(this, &ProductionGuiSubkernel::printBoxSticker_signal, manager,
           &ProductionManager::printBoxSticker);
@@ -187,6 +197,9 @@ void ProductionGuiSubkernel::connectProductionManager() const {
   connect(this, &ProductionGuiSubkernel::printLastPalletSticker_signal, manager,
           &ProductionManager::printLastPalletSticker);
 
+  // Сигналы от менеджера
+  connect(manager, &ProductionManager::authorizationCompleted, this,
+          &ProductionGuiSubkernel::authorizationCompleted_slot);
   connect(manager, &ProductionManager::displayTransponderData_signal, this,
           &ProductionGuiSubkernel::displayTransponderData);
   connect(manager, &ProductionManager::displayBoxData_signal, this,
@@ -355,12 +368,14 @@ void ProductionGuiSubkernel::createModels() {
 
   std::shared_ptr<StringDictionary> bMatchTable(new StringDictionary());
   bMatchTable = std::shared_ptr<StringDictionary>(new StringDictionary());
-  bMatchTable->insert("quantity", "Емкость бокса");
-  bMatchTable->insert("assembled_units", "Собрано транспондеров");
-  bMatchTable->insert("assembling_start", "Начало сборки");
-  bMatchTable->insert("assembling_stop", "Конец сборки");
+  bMatchTable->insert("box_id", "Идентификатор бокса");
+  bMatchTable->insert("box_quantity", "Емкость бокса");
+  bMatchTable->insert("box_assembled_units", "Собрано транспондеров");
+  bMatchTable->insert("box_assembling_start", "Начало сборки");
+  bMatchTable->insert("box_assembling_end", "Конец сборки");
   bMatchTable->insert("pallet_id", "Идентификатор паллеты");
-  bMatchTable->insert("order_id", "Идентификатор заказа");
+  bMatchTable->insert("production_line_id",
+                      "Идентификатор производственной линии");
 
   BoxDataModel =
       std::unique_ptr<HashTableModel>(new HashTableModel("BoxDataNodel"));

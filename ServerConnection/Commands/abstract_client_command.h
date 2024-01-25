@@ -11,17 +11,17 @@ class AbstractClientCommand : public QObject {
 
   enum CommandReturnStatus {
     NoError = 0,
+    DynamicLibraryMissing,
     ParameterError,
     SyntaxError,
-    SynchronizationError,
+    ConsistencyViolation,
     FileOpenError,
-    InvalidProductionLineContext,
-    UnauthorizedRequest,
 
     DatabaseConnectionError,
     DatabaseTransactionError,
     DatabaseQueryError,
 
+    ProductionLineLaunchSystemInitError,
     FirmwareGeneratorInitError,
     StickerPrinterInitError,
 
@@ -35,7 +35,7 @@ class AbstractClientCommand : public QObject {
     MasterKeysMissed,
 
     OrderMultiplyAssembly,
-    OrderAssemblyMissing,
+    OrderInProcessMissed,
 
     BoxCompletelyAssembled,
     BoxNotCompletelyAssembled,
@@ -46,21 +46,23 @@ class AbstractClientCommand : public QObject {
     IdenticalUcidError,
     CurrentOrderAssembled,
 
+    ProductionLineContextNotAuthorized,
+    ProductionLineNotLaunched,
     ProductionLineLaunchError,
     ProductionLineAlreadyLaunched,
     ProductionLineAlreadyInProcess,
     ProductionLineNotActive,
-    ProductionLineNotInProcess,
     ProductionLineCompleted,
     ProductionLineShutdownError,
+
+    ProductionLineNotInProcess,
     ProductionLineRollbackLimit,
-    OrderInProcessMissed,
+    UncompletedBoxMissed,
     FreeBoxMissed,
 
     FirmwareGenerationError,
 
-    PrinterConnectionError,
-    PrinterLibraryError,
+    StickerPrinterConnectionError,
     BoxStickerPrintError,
     PalletStickerPrintError,
     Unknown,

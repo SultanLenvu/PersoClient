@@ -71,16 +71,6 @@ void ProductionManager::launchProductionLine(
     return;
   }
 
-  // Запрашиваем данные текущего транспондера
-  ret = Server->getCurrentTransponderData(TransponderData);
-  if (ret != ReturnStatus::NoError) {
-    emit executionFinished("launchProductionLine", ret);
-    return;
-  }
-
-  // Запрашиваем отображение данных транспондера
-  emit displayTransponderData_signal(TransponderData);
-
   // Завершаем операцию
   sendLog("Соединение с сервером успешно инициализировано. ");
   emit executionFinished("launchProductionLine", ret);
@@ -118,11 +108,6 @@ void ProductionManager::requestBox() {
   sendLog("Выполнение запроса бокса. ");
 
   ReturnStatus ret;
-  ret = Server->requestBox();
-  if (ret != ReturnStatus::NoError) {
-    emit executionFinished("requestBox", ret);
-    return;
-  }
 
   ret = Server->requestBox();
   if (ret != ReturnStatus::NoError) {
@@ -139,6 +124,16 @@ void ProductionManager::requestBox() {
   }
 
   emit displayBoxData_signal(BoxData);
+
+  // Запрашиваем данные текущего транспондера
+  ret = Server->getCurrentTransponderData(TransponderData);
+  if (ret != ReturnStatus::NoError) {
+    emit executionFinished("launchProductionLine", ret);
+    return;
+  }
+
+  // Запрашиваем отображение данных транспондера
+  emit displayTransponderData_signal(TransponderData);
 
   // Завершаем операцию
   sendLog("Бокс для сборки получен. ");

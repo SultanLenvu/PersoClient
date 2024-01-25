@@ -32,16 +32,18 @@ ReturnStatus GetCurrentBoxData::processResponse(
     return ReturnStatus::ServerResponseSyntaxError;
   }
 
-  responseData["quantity"] = Response["quantity"].toString();
-  responseData["in_process"] = Response["in_process"].toString();
-  responseData["id"] = Response["id"].toString();
+  responseData["box_id"] = Response["box_id"].toString();
+  responseData["box_in_process"] = Response["box_in_process"].toString();
+  responseData["box_quantity"] = Response["box_quantity"].toString();
+  responseData["box_assembled_units"] =
+      Response["box_assembled_units"].toString();
+  responseData["box_assembling_start"] =
+      Response["box_assembling_start"].toString();
+  responseData["box_assembling_end"] =
+      Response["box_assembling_end"].toString();
   responseData["pallet_id"] = Response["pallet_id"].toString();
   responseData["production_line_id"] =
       Response["production_line_id"].toString();
-  responseData["transponder_id"] = Response["transponder_id"].toString();
-  responseData["assembled_units"] = Response["assembled_units"].toString();
-  responseData["assembling_start"] = Response["assembling_start"].toString();
-  responseData["assembling_end"] = Response["assembling_end"].toString();
 
   ReturnStatus ret = processReturnStatus(Response["return_status"].toString());
   if (ret != ReturnStatus::NoError) {
