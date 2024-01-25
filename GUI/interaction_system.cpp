@@ -138,6 +138,8 @@ void InteractionSystem::createTimers() {
 
 void InteractionSystem::createMessageTable() {
   MessageTable[ReturnStatus::NoError] = "Выполнено.";
+  MessageTable[ReturnStatus::DynamicLibraryMissing] =
+      "Не найдена динамическая библиотека.";
   MessageTable[ReturnStatus::ParameterError] = "Получена ошибка параметра.";
   MessageTable[ReturnStatus::SyntaxError] = "Получена синтаксическая ошибка.";
   MessageTable[ReturnStatus::ConsistencyViolation] =
@@ -146,8 +148,6 @@ void InteractionSystem::createMessageTable() {
       "Получена ошибка при открытии файла.";
   MessageTable[ReturnStatus::InvalidFile] =
       "Не удалось открыть некорректный файл.";
-  MessageTable[ReturnStatus::DynamicLibraryMissing] =
-      "Не найдена динамическая библиотека.";
 
   MessageTable[ReturnStatus::ServerConnectionError] =
       "Не удалось подключиться к серверу.";
@@ -163,46 +163,58 @@ void InteractionSystem::createMessageTable() {
 
   MessageTable[ReturnStatus::ClientCommandParamError] =
       "Получена ошибка в параметре клиентской комаенды.";
-
   MessageTable[ReturnStatus::ServerInternalError] =
       "Получена серверная ошибка.";
+
+  MessageTable[ReturnStatus::ClientCommandParamError] =
+      "Получена ошибка в параметре клиентской комаенды.";
+  MessageTable[ReturnStatus::ServerInternalError] =
+      "Получена серверная ошибка.";
+
+  MessageTable[ReturnStatus::ProductionLineMissed] =
+      "Производственная линия не найдена.";
+  MessageTable[ReturnStatus::TranspoderMissed] = "Транспондер не найден.";
+  MessageTable[ReturnStatus::BoxMissed] = "Бокс не найден.";
+  MessageTable[ReturnStatus::PalletMissed] = "Паллета не найдена.";
+  MessageTable[ReturnStatus::OrderMissed] = "Заказ не найден.";
+  MessageTable[ReturnStatus::MasterKeysMissed] =
+      "Ключи безопасности не найдены.";
 
   MessageTable[ReturnStatus::OrderMultiplyAssembly] =
       "Несколько заказов одновременно находятся в процессе сборки.";
   MessageTable[ReturnStatus::OrderInProcessMissed] =
       "Отсутствуют заказы в процессе сборки.";
 
+  MessageTable[ReturnStatus::FreeBoxMissed] =
+      "Не найден свободный бокс для сборки.";
+  MessageTable[ReturnStatus::BoxCompletelyAssembled] =
+      "Все транспондеры в боксе собраны.";
+  MessageTable[ReturnStatus::BoxNotCompletelyAssembled] =
+      "В боксе собраны не все транспондеры.";
+
+  MessageTable[ReturnStatus::TransponderIncorrectRerelease] =
+      "Получена ошибка при перевыпуске транспондера.";
+  MessageTable[ReturnStatus::IdenticalUcidError] =
+      "Получена ошибка идентификатора печатной платы.";
+  MessageTable[ReturnStatus::CurrentOrderAssembled] =
+      "Сборка текущего заказа успешно завершена.";
+
   MessageTable[ReturnStatus::ProductionLineContextNotAuthorized] =
       "Контекст производственной линии не авторизирован.";
   MessageTable[ReturnStatus::ProductionLineNotLaunched] =
       "Производственная линия не запущена.";
-  MessageTable[ReturnStatus::ProductionLineMissed] =
-      "Производственная линия не найдена.";
   MessageTable[ReturnStatus::ProductionLineLaunchError] =
       "Не удалось запустить производственную линию.";
   MessageTable[ReturnStatus::ProductionLineAlreadyLaunched] =
       "Производственная линия уже запущена.";
-  MessageTable[ReturnStatus::ProductionLineRollbackLimit] =
-      "Достигнут лимит отката для производственной линии.";
   MessageTable[ReturnStatus::ProductionLineNotActive] =
       "Производственная линия не активирована.";
-  MessageTable[ReturnStatus::ProductionLineNotInProcess] =
-      "Отствует заказ для сборки.";
   MessageTable[ReturnStatus::ProductionLineCompleted] =
       "Производственная линия завершила свою работу.";
-
-  MessageTable[ReturnStatus::BoxCompletelyAssembled] = "Бокс полностью собран.";
-  MessageTable[ReturnStatus::BoxNotCompletelyAssembled] =
-      "Бокс не собран полностью.";
-
-  MessageTable[ReturnStatus::IdenticalUcidError] =
-      "Получена ошибка идентификатора печатной платы.";
-  MessageTable[ReturnStatus::TransponderIncorrectRerelease] =
-      "Получена ошибка при перевыпуске транспондера.";
-  MessageTable[ReturnStatus::CurrentOrderAssembled] =
-      "Сборка текущего заказа успешно завершена.";
-  MessageTable[ReturnStatus::FreeBoxMissed] =
-      "Не найден свободный бокс для сборки.";
+  MessageTable[ReturnStatus::ProductionLineNotInProcess] =
+      "Отствует заказ для сборки.";
+  MessageTable[ReturnStatus::ProductionLineRollbackLimit] =
+      "Достигнут лимит отката для производственной линии.";
 
   MessageTable[ReturnStatus::StickerPrinterInitError] =
       "Не удалось инициализировать принтер стикеров.";

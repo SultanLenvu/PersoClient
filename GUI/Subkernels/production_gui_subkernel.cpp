@@ -368,14 +368,19 @@ void ProductionGuiSubkernel::createModels() {
 
   std::shared_ptr<StringDictionary> bMatchTable(new StringDictionary());
   bMatchTable = std::shared_ptr<StringDictionary>(new StringDictionary());
-  bMatchTable->insert("box_id", "Идентификатор бокса");
+  bMatchTable->insert("box_id", "ID бокса");
+  bMatchTable->insert("box_in_process", "В процессе");
   bMatchTable->insert("box_quantity", "Емкость бокса");
+
   bMatchTable->insert("box_assembled_units", "Собрано транспондеров");
   bMatchTable->insert("box_assembling_start", "Начало сборки");
   bMatchTable->insert("box_assembling_end", "Конец сборки");
-  bMatchTable->insert("pallet_id", "Идентификатор паллеты");
-  bMatchTable->insert("production_line_id",
-                      "Идентификатор производственной линии");
+
+  bMatchTable->insert("first_transponder_sn", "Первый транспондер");
+  bMatchTable->insert("last_transponder_sn", "Последний транспондер");
+
+  bMatchTable->insert("pallet_id", "ID паллеты");
+  bMatchTable->insert("production_line_id", "ID производственной линии");
 
   BoxDataModel =
       std::unique_ptr<HashTableModel>(new HashTableModel("BoxDataNodel"));

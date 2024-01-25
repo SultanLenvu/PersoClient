@@ -91,11 +91,11 @@ void AbstractClientCommand::createCrtMap() {
 
   CrtMap[RecordMissed] = ReturnStatus::ServerInternalError;
   CrtMap[ProductionLineMissed] = ReturnStatus::ProductionLineMissed;
-  CrtMap[TranspoderMissed] = ReturnStatus::ServerInternalError;
-  CrtMap[BoxMissed] = ReturnStatus::ServerInternalError;
-  CrtMap[PalletMissed] = ReturnStatus::ServerInternalError;
-  CrtMap[OrderMissed] = ReturnStatus::ServerInternalError;
-  CrtMap[MasterKeysMissed] = ReturnStatus::ServerInternalError;
+  CrtMap[TranspoderMissed] = ReturnStatus::TranspoderMissed;
+  CrtMap[BoxMissed] = ReturnStatus::BoxMissed;
+  CrtMap[PalletMissed] = ReturnStatus::PalletMissed;
+  CrtMap[OrderMissed] = ReturnStatus::OrderMissed;
+  CrtMap[MasterKeysMissed] = ReturnStatus::MasterKeysMissed;
 
   CrtMap[OrderMultiplyAssembly] = ReturnStatus::OrderMultiplyAssembly;
   CrtMap[OrderInProcessMissed] = ReturnStatus::OrderInProcessMissed;
@@ -118,7 +118,6 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[ProductionLineAlreadyLaunched] =
       ReturnStatus::ProductionLineAlreadyLaunched;
   CrtMap[ProductionLineNotActive] = ReturnStatus::ProductionLineNotActive;
-  CrtMap[ProductionLineNotInProcess] = ReturnStatus::ProductionLineNotInProcess;
   CrtMap[ProductionLineCompleted] = ReturnStatus::ProductionLineCompleted;
   CrtMap[ProductionLineShutdownError] = ReturnStatus::ServerInternalError;
 

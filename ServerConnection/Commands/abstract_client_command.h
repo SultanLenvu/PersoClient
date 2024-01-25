@@ -37,6 +37,7 @@ class AbstractClientCommand : public QObject {
     OrderMultiplyAssembly,
     OrderInProcessMissed,
 
+    FreeBoxMissed,
     BoxCompletelyAssembled,
     BoxNotCompletelyAssembled,
 
@@ -54,11 +55,8 @@ class AbstractClientCommand : public QObject {
     ProductionLineNotActive,
     ProductionLineCompleted,
     ProductionLineShutdownError,
-
     ProductionLineNotInProcess,
     ProductionLineRollbackLimit,
-    UncompletedBoxMissed,
-    FreeBoxMissed,
 
     FirmwareGenerationError,
 

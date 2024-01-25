@@ -7,12 +7,12 @@ using StringDictionary = QHash<QString, QString>;
 
 enum class ReturnStatus {
   NoError = 0,
+  DynamicLibraryMissing,
   ParameterError,
   SyntaxError,
   ConsistencyViolation,
   FileOpenError,
   InvalidFile,
-  DynamicLibraryMissing,
 
   ServerConnectionError,
   ServerNotResponding,
@@ -22,29 +22,34 @@ enum class ReturnStatus {
   ServerResponseProcessingError,
 
   ClientCommandParamError,
-
   ServerInternalError,
+
+  ProductionLineMissed,
+  TranspoderMissed,
+  BoxMissed,
+  PalletMissed,
+  OrderMissed,
+  MasterKeysMissed,
 
   OrderMultiplyAssembly,
   OrderInProcessMissed,
 
-  ProductionLineContextNotAuthorized,
-  ProductionLineNotLaunched,
-  ProductionLineMissed,
-  ProductionLineLaunchError,
-  ProductionLineAlreadyLaunched,
-  ProductionLineRollbackLimit,
-  ProductionLineNotActive,
-  ProductionLineNotInProcess,
-  ProductionLineCompleted,
-
+  FreeBoxMissed,
   BoxCompletelyAssembled,
   BoxNotCompletelyAssembled,
 
-  IdenticalUcidError,
   TransponderIncorrectRerelease,
+  IdenticalUcidError,
   CurrentOrderAssembled,
-  FreeBoxMissed,
+
+  ProductionLineContextNotAuthorized,
+  ProductionLineNotLaunched,
+  ProductionLineLaunchError,
+  ProductionLineAlreadyLaunched,
+  ProductionLineNotActive,
+  ProductionLineCompleted,
+  ProductionLineNotInProcess,
+  ProductionLineRollbackLimit,
 
   StickerPrinterInitError,
   StickerPrinterConnectionError,
