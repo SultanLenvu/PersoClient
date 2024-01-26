@@ -100,6 +100,9 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[OrderMultiplyAssembly] = ReturnStatus::OrderMultiplyAssembly;
   CrtMap[OrderInProcessMissed] = ReturnStatus::OrderInProcessMissed;
 
+  CrtMap[BoxAlreadyRequested] = ReturnStatus::BoxAlreadyRequested;
+  CrtMap[BoxNotRequested] = ReturnStatus::BoxNotRequested;
+  CrtMap[FreeBoxMissed] = ReturnStatus::FreeBoxMissed;
   CrtMap[BoxCompletelyAssembled] = ReturnStatus::BoxCompletelyAssembled;
   CrtMap[BoxNotCompletelyAssembled] = ReturnStatus::BoxNotCompletelyAssembled;
 
@@ -120,11 +123,9 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[ProductionLineNotActive] = ReturnStatus::ProductionLineNotActive;
   CrtMap[ProductionLineCompleted] = ReturnStatus::ProductionLineCompleted;
   CrtMap[ProductionLineShutdownError] = ReturnStatus::ServerInternalError;
-
   CrtMap[ProductionLineNotInProcess] = ReturnStatus::ProductionLineNotInProcess;
   CrtMap[ProductionLineRollbackLimit] =
       ReturnStatus::ProductionLineRollbackLimit;
-  CrtMap[FreeBoxMissed] = ReturnStatus::FreeBoxMissed;
 
   CrtMap[FirmwareGenerationError] = ReturnStatus::ServerInternalError;
 
@@ -169,6 +170,9 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[OrderInProcessMissed] =
       "Server return status: OrderAssemblyMissingы";
 
+  CrtLogMap[BoxAlreadyRequested] = "Server return status: BoxAlreadyRequested";
+  CrtLogMap[BoxNotRequested] = "Server return status: BoxNotRequested";
+  CrtLogMap[FreeBoxMissed] = "Server return status: FreeBoxMissed";
   CrtLogMap[BoxCompletelyAssembled] =
       "Server return status: BoxCompletelyAssembled";
   CrtLogMap[BoxNotCompletelyAssembled] =
@@ -206,7 +210,6 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: ProductionLineNotInProcess";
   CrtLogMap[ProductionLineRollbackLimit] =
       "Server return status: ProductionLineRollbackLimit";
-  CrtLogMap[FreeBoxMissed] = "Server return status: FreeBoxMissed";
 
   CrtLogMap[FirmwareGenerationError] =
       "Server return status: FirmwareGenerationError";

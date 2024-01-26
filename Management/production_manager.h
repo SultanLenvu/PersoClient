@@ -61,7 +61,7 @@ class ProductionManager : public AbstractManager {
   void sendLog(const QString& log);
 
   void createProgrammer(void);
-  void createServer(void);
+  void createServerConnection(void);
   void createStickerPrinter(void);
 
  signals:

@@ -64,7 +64,7 @@ ProductionAssemblerGui::ProductionAssemblerGui(QWidget* parent)
 
 ProductionAssemblerGui::~ProductionAssemblerGui() {}
 
-void ProductionAssemblerGui::update() {
+void ProductionAssemblerGui::updateModelViews(void) {
   TransponderDataView->resizeColumnsToContents();
   TransponderDataView->update();
 }

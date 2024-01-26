@@ -73,6 +73,7 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
  signals:
   void displayProductionAssemblerGui(void);
   void displayProductionTesterGui(void);
+  void updateModelViews(void);
 
   // Сигналы для менеджера
   void connectToServer_signal(void);

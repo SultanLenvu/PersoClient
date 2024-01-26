@@ -8,7 +8,7 @@ AuthorizationGui::~AuthorizationGui() {
   //  qDebug() << "Deleted.";
 }
 
-void AuthorizationGui::update() {}
+void AuthorizationGui::updateModelViews() {}
 
 AbstractGui::GuiType AuthorizationGui::type() {
   return Authorization;

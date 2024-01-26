@@ -37,6 +37,8 @@ class AbstractClientCommand : public QObject {
     OrderMultiplyAssembly,
     OrderInProcessMissed,
 
+    BoxAlreadyRequested,
+    BoxNotRequested,
     FreeBoxMissed,
     BoxCompletelyAssembled,
     BoxNotCompletelyAssembled,

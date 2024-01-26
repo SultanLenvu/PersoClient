@@ -12,7 +12,7 @@ enum class ReturnStatus {
   SyntaxError,
   ConsistencyViolation,
   FileOpenError,
-  InvalidFile,
+  InvalidFirmwareFile,
 
   ServerConnectionError,
   ServerNotResponding,
@@ -34,6 +34,8 @@ enum class ReturnStatus {
   OrderMultiplyAssembly,
   OrderInProcessMissed,
 
+  BoxAlreadyRequested,
+  BoxNotRequested,
   FreeBoxMissed,
   BoxCompletelyAssembled,
   BoxNotCompletelyAssembled,

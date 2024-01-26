@@ -28,7 +28,7 @@ class ProductionTesterGui : public AbstractGui {
   explicit ProductionTesterGui(QWidget* parent);
   ~ProductionTesterGui();
 
-  virtual void update(void) override;
+  virtual void updateModelViews(void) override;
   virtual GuiType type(void) override;
 
  private:

@@ -15,7 +15,7 @@ ProductionManager::~ProductionManager() {}
 
 void ProductionManager::onInstanceThreadStarted() {
   createProgrammer();
-  createServer();
+  createServerConnection();
   createStickerPrinter();
 }
 
@@ -105,7 +105,7 @@ void ProductionManager::echoServer() {
 
 void ProductionManager::requestBox() {
   emit executionStarted("requestBox");
-  sendLog("Выполнение запроса бокса. ");
+  sendLog("Запрос бокса. ");
 
   ReturnStatus ret;
 
@@ -125,16 +125,6 @@ void ProductionManager::requestBox() {
 
   emit displayBoxData_signal(BoxData);
 
-  // Запрашиваем данные текущего транспондера
-  ret = Server->getCurrentTransponderData(TransponderData);
-  if (ret != ReturnStatus::NoError) {
-    emit executionFinished("launchProductionLine", ret);
-    return;
-  }
-
-  // Запрашиваем отображение данных транспондера
-  emit displayTransponderData_signal(TransponderData);
-
   // Завершаем операцию
   sendLog("Бокс для сборки получен. ");
   emit executionFinished("requestBox", ret);
@@ -142,7 +132,7 @@ void ProductionManager::requestBox() {
 
 void ProductionManager::getCurrentBoxData() {
   emit executionStarted("getCurrentBoxData");
-  sendLog("Выполнение запроса бокса. ");
+  sendLog("Запрос данных текущего бокса. ");
 
   ReturnStatus ret = Server->getCurrentBoxData(BoxData);
   if (ret != ReturnStatus::NoError) {
@@ -170,16 +160,11 @@ void ProductionManager::refundCurrentBox() {
     return;
   }
 
-  // Проверить, что будет если запросить данные бокса после возврата
-  //  ret = Server->getCurrentBoxData(BoxData);
-  //  if (ret != ReturnStatus::NoError) {
-  //    emit executionFinished("refundCurrentBox", ret);
-  //    sendLog("Не удалось получить данные текущего бокса. ");
-  //    return;
-  //  }
-
   BoxData.clear();
   emit displayBoxData_signal(BoxData);
+
+  TransponderData.clear();
+  emit displayTransponderData_signal(TransponderData);
 
   // Завершаем операцию
   sendLog("Текущий бокс успешно возвращен. ");
@@ -212,7 +197,7 @@ void ProductionManager::releaseTransponder() {
 
   ReturnStatus ret;
   QString ucid;
-  QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
+  QFile firmware(FIRMWARE_TEMP_FILE_NAME);
   StringDictionary result;
   StringDictionary param;
 
@@ -222,6 +207,7 @@ void ProductionManager::releaseTransponder() {
     emit executionFinished("releaseTransponder", ret);
     return;
   }
+  sendLog("Flash-память разблокирована.");
 
   // Считываем UCID
   ret = Programmer->readUcid(ucid);
@@ -229,6 +215,7 @@ void ProductionManager::releaseTransponder() {
     emit executionFinished("releaseTransponder", ret);
     return;
   }
+  sendLog(QString("Считанный UCID: %1.").arg(ucid));
 
   // Выпускаем транспондер
   ret = Server->releaseTransponder(result);
@@ -236,6 +223,7 @@ void ProductionManager::releaseTransponder() {
     emit executionFinished("releaseTransponder", ret);
     return;
   }
+  sendLog(QString("Транспондер выпущен."));
 
   // Сохраняем присланный файл прошивки
   if (!firmware.open(QIODevice::WriteOnly)) {
@@ -244,8 +232,10 @@ void ProductionManager::releaseTransponder() {
   }
 
   // Сохраняем прошивку в файл
-  firmware.write(QByteArray::fromBase64(result.value("firmware").toUtf8()));
+  firmware.write(
+      QByteArray::fromBase64(result.value("transponder_firmware").toUtf8()));
   firmware.close();
+  sendLog(QString("Прошивка транспондера получена."));
 
   // Загружаем прошивку
   ret = Programmer->programMemory(firmware);
@@ -253,6 +243,7 @@ void ProductionManager::releaseTransponder() {
     emit executionFinished("releaseTransponder", ret);
     return;
   }
+  sendLog(QString("Прошивка загружена в микроконтроллер."));
 
   // Удаляем файл прошивки
   firmware.remove();
@@ -263,6 +254,7 @@ void ProductionManager::releaseTransponder() {
     emit executionFinished("releaseTransponder", ret);
     return;
   }
+  sendLog(QString("Стикер распечатан."));
 
   // Подтверждаем выпуск транспондера
   param.insert("transponder_ucid", ucid);
@@ -271,13 +263,15 @@ void ProductionManager::releaseTransponder() {
     emit executionFinished("releaseTransponder", ret);
     return;
   }
+  sendLog(QString("Выпуск транспондера подтвержден."));
 
-  // Запрашиваем данные очередного транспондера
+  // Запрашиваем данные подтвержденного транспондера
   ret = Server->getCurrentTransponderData(TransponderData);
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("releaseTransponder", ret);
     return;
   }
+  sendLog(QString("Данные подтвержденного транспондера получены."));
 
   // Запрашиваем отображение данных транспондера
   emit displayTransponderData_signal(TransponderData);
@@ -517,20 +511,16 @@ void ProductionManager::createProgrammer() {
           &LogSystem::generate);
 }
 
-void ProductionManager::createServer() {
+void ProductionManager::createServerConnection() {
   Server = std::unique_ptr<AbstractServerConnection>(
       new PersoServerConnection("PersoServerConnection"));
-  connect(Server.get(), &AbstractServerConnection::logging,
-          dynamic_cast<LogSystem*>(
-              GlobalEnvironment::instance()->getObject("LogSystem")),
-          &LogSystem::generate);
 }
 
 void ProductionManager::createStickerPrinter() {
   StickerPrinter =
       std::unique_ptr<AbstractStickerPrinter>(new TE310Printer("TSC TE310"));
-  connect(StickerPrinter.get(), &AbstractStickerPrinter::logging,
-          dynamic_cast<LogSystem*>(
-              GlobalEnvironment::instance()->getObject("LogSystem")),
-          &LogSystem::generate);
+
+  if (!StickerPrinter->init()) {
+    sendLog("Не удалось инициализировать принтер стикеров.");
+  }
 }

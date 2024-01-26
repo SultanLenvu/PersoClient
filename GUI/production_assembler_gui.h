@@ -34,7 +34,7 @@ class ProductionAssemblerGui : public AbstractGui {
   explicit ProductionAssemblerGui(QWidget* parent);
   ~ProductionAssemblerGui();
 
-  virtual void update(void) override;
+  virtual void updateModelViews(void) override;
   virtual GuiType type(void) override;
 
  private:

@@ -23,15 +23,21 @@ MasterGui::MasterGui(QWidget* parent) : AbstractGui(parent) {
   connectDepedencies();
 
   // Настройка пропорции между объектами на макете
-  MainLayout->setStretch(0, 3);
+  MainLayout->setStretch(0, 5);
   MainLayout->setStretch(1, 2);
 }
 
 MasterGui::~MasterGui() {}
 
-void MasterGui::update() {
+void MasterGui::updateModelViews() {
+  ProductionLineDataView->resizeColumnsToContents();
+  ProductionLineDataView->update();
+
   TransponderDataView->resizeColumnsToContents();
   TransponderDataView->update();
+
+  BoxDataView->resizeColumnsToContents();
+  BoxDataView->update();
 }
 
 AbstractGui::GuiType MasterGui::type() {
@@ -52,12 +58,10 @@ void MasterGui::createServerTab() {
   ServerControlPanelLayout = new QVBoxLayout();
   ServerControlPanel->setLayout(ServerControlPanelLayout);
 
-  ServerConnectPushButton =
-      new QPushButton(QString("Подключиться к серверу персонализации"));
+  ServerConnectPushButton = new QPushButton(QString("Подключиться"));
   ServerControlPanelLayout->addWidget(ServerConnectPushButton);
 
-  ServerDisconnectButton =
-      new QPushButton(QString("Отключиться от сервера персонализации"));
+  ServerDisconnectButton = new QPushButton(QString("Отключиться"));
   ServerControlPanelLayout->addWidget(ServerDisconnectButton);
   ServerEchoRequestButton = new QPushButton(QString("Отправить эхо-запрос"));
   ServerControlPanelLayout->addWidget(ServerEchoRequestButton);
@@ -111,9 +115,35 @@ void MasterGui::createServerTab() {
       new QPushButton(QString("Распечатать последний стикер для паллеты"));
   ServerControlPanelLayout->addWidget(PrintLastPalletStickerButton);
 
-  // Представление данных о боксе
+  // Создаем представления
+  createServerTabViews();
+
+  // Настройка пропорции между объектами на макете
+  ServerTabMainLayout->setStretch(0, 1);
+  ServerTabMainLayout->setStretch(1, 2);
+}
+
+void MasterGui::createServerTabViews() {
+  ModelViewLayout = new QVBoxLayout();
+  ServerTabMainLayout->addLayout(ModelViewLayout);
+
+  // Данные производственной линии
+  ProductionLineDataGroup = new QGroupBox("Данные производственной линии");
+  ModelViewLayout->addWidget(ProductionLineDataGroup);
+
+  ProductionLineDataLayout = new QVBoxLayout();
+  ProductionLineDataGroup->setLayout(ProductionLineDataLayout);
+
+  ProductionLineDataView = new QTableView();
+  ProductionLineDataLayout->addWidget(ProductionLineDataView);
+
+  // Дополнительный холст
+  ModelViewSublayout = new QHBoxLayout();
+  ModelViewLayout->addLayout(ModelViewSublayout);
+
+  // Данные бокса
   BoxDataGroup = new QGroupBox("Данные бокса");
-  ServerTabMainLayout->addWidget(BoxDataGroup);
+  ModelViewSublayout->addWidget(BoxDataGroup);
 
   BoxDataLayout = new QVBoxLayout();
   BoxDataGroup->setLayout(BoxDataLayout);
@@ -121,20 +151,15 @@ void MasterGui::createServerTab() {
   BoxDataView = new QTableView();
   BoxDataLayout->addWidget(BoxDataView);
 
-  // Представление данных о транспондере
+  // Данные транспондера
   TransponderDataGroup = new QGroupBox("Данные транспондера");
-  ServerTabMainLayout->addWidget(TransponderDataGroup);
+  ModelViewSublayout->addWidget(TransponderDataGroup);
 
   TransponderDataLayout = new QVBoxLayout();
   TransponderDataGroup->setLayout(TransponderDataLayout);
 
   TransponderDataView = new QTableView();
   TransponderDataLayout->addWidget(TransponderDataView);
-
-  // Настройка пропорции между объектами на макете
-  ServerTabMainLayout->setStretch(0, 1);
-  ServerTabMainLayout->setStretch(1, 1);
-  ServerTabMainLayout->setStretch(2, 1);
 }
 
 void MasterGui::createProgrammatorTab() {

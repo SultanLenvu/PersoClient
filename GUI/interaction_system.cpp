@@ -146,8 +146,8 @@ void InteractionSystem::createMessageTable() {
       "Получена ошибка синхронизации.";
   MessageTable[ReturnStatus::FileOpenError] =
       "Получена ошибка при открытии файла.";
-  MessageTable[ReturnStatus::InvalidFile] =
-      "Не удалось открыть некорректный файл.";
+  MessageTable[ReturnStatus::InvalidFirmwareFile] =
+      "Получен некорректный файл прошивки.";
 
   MessageTable[ReturnStatus::ServerConnectionError] =
       "Не удалось подключиться к серверу.";
@@ -185,6 +185,9 @@ void InteractionSystem::createMessageTable() {
   MessageTable[ReturnStatus::OrderInProcessMissed] =
       "Отсутствуют заказы в процессе сборки.";
 
+  MessageTable[ReturnStatus::BoxAlreadyRequested] =
+      "Бокс был получен ранее и находится в процессе сборки.";
+  MessageTable[ReturnStatus::BoxNotRequested] = "Бокс не был запрошен ранее.";
   MessageTable[ReturnStatus::FreeBoxMissed] =
       "Не найден свободный бокс для сборки.";
   MessageTable[ReturnStatus::BoxCompletelyAssembled] =
@@ -212,7 +215,8 @@ void InteractionSystem::createMessageTable() {
   MessageTable[ReturnStatus::ProductionLineCompleted] =
       "Производственная линия завершила свою работу.";
   MessageTable[ReturnStatus::ProductionLineNotInProcess] =
-      "Отствует заказ для сборки.";
+      "Производственная линия не находится в процессе сборки. Необходимо "
+      "запросить бокс.";
   MessageTable[ReturnStatus::ProductionLineRollbackLimit] =
       "Достигнут лимит отката для производственной линии.";
 

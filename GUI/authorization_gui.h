@@ -36,7 +36,7 @@ class AuthorizationGui : public AbstractGui {
   explicit AuthorizationGui(QWidget* parent);
   ~AuthorizationGui();
 
-  virtual void update(void) override;
+  virtual void updateModelViews(void) override;
   virtual GuiType type(void) override;
 
  private:

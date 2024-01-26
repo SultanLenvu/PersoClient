@@ -503,7 +503,6 @@ void PersoServerConnection::socketError_slot(
 }
 
 void PersoServerConnection::waitTimerTimeout_slot() {
-  Socket->abort();
   CurrentCommand->clear();
   sendLog("Время ожидания вышло. ");
 }

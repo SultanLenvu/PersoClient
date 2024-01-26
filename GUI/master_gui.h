@@ -44,6 +44,13 @@ class MasterGui : public AbstractGui {
   QPushButton* PrintPalletStickerButton;
   QPushButton* PrintLastPalletStickerButton;
 
+  QVBoxLayout* ModelViewLayout;
+  QHBoxLayout* ModelViewSublayout;
+
+  QGroupBox* ProductionLineDataGroup;
+  QVBoxLayout* ProductionLineDataLayout;
+  QTableView* ProductionLineDataView;
+
   QGroupBox* BoxDataGroup;
   QVBoxLayout* BoxDataLayout;
   QTableView* BoxDataView;
@@ -93,12 +100,14 @@ class MasterGui : public AbstractGui {
   explicit MasterGui(QWidget* parent);
   ~MasterGui();
 
-  virtual void update(void) override;
+  virtual void updateModelViews(void) override;
   virtual GuiType type(void) override;
 
  private:
   Q_DISABLE_COPY(MasterGui);
   void createServerTab(void);
+  void createServerTabViews(void);
+
   void createProgrammatorTab(void);
   void createStickerPrinterTab(void);
   void createLogWidgets(void);

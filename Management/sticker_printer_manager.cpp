@@ -1,6 +1,4 @@
 #include "sticker_printer_manager.h"
-#include "global_environment.h"
-#include "log_system.h"
 #include "te310_printer.h"
 
 StickerPrinterManager::StickerPrinterManager(const QString& name)
@@ -101,8 +99,8 @@ void StickerPrinterManager::loadSettings() {}
 void StickerPrinterManager::createStickerPrinter() {
   StickerPrinter =
       std::unique_ptr<AbstractStickerPrinter>(new TE310Printer("TSC TE310"));
-  connect(StickerPrinter.get(), &AbstractStickerPrinter::logging,
-          dynamic_cast<LogSystem*>(
-              GlobalEnvironment::instance()->getObject("LogSystem")),
-          &LogSystem::generate);
+
+  if (!StickerPrinter->init()) {
+    sendLog("Не удалось инициализировать принтер стикеров.");
+  }
 }

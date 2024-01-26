@@ -64,10 +64,12 @@ void ProductionGuiSubkernel::authorizationCompleted_slot() {
 void ProductionGuiSubkernel::displayTransponderData(
     const StringDictionary& data) {
   TransponderDataModel->setData(data);
+  emit updateModelViews();
 }
 
 void ProductionGuiSubkernel::displayBoxData(const StringDictionary& data) {
   BoxDataModel->setData(data);
+  emit updateModelViews();
 }
 
 void ProductionGuiSubkernel::connectAuthorizationGui() {
@@ -80,6 +82,7 @@ void ProductionGuiSubkernel::connectAuthorizationGui() {
 void ProductionGuiSubkernel::connectMasterGui() {
   MasterGui* gui = dynamic_cast<MasterGui*>(CurrentGui);
 
+  // Сигналы от GUI
   connect(gui->ServerConnectPushButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::connect_guiSlot);
   connect(gui->ServerDisconnectButton, &QPushButton::clicked, this,
@@ -121,6 +124,10 @@ void ProductionGuiSubkernel::connectMasterGui() {
   // Связывание моделей и представлений
   gui->TransponderDataView->setModel(TransponderDataModel.get());
   gui->BoxDataView->setModel(BoxDataModel.get());
+
+  // Сигналы от подядра
+  connect(this, &ProductionGuiSubkernel::updateModelViews, gui,
+          &MasterGui::updateModelViews);
 }
 
 void ProductionGuiSubkernel::connectProductionAssemblerGui() {
@@ -361,6 +368,7 @@ void ProductionGuiSubkernel::createModels() {
   tMatchTable->insert("transponder_pan", "PAN");
   tMatchTable->insert("box_id", "Идентификатор бокса");
   tMatchTable->insert("transponder_release_counter", "Количество выпусков");
+  tMatchTable->insert("issuer_name", "Заказчик");
 
   TransponderDataModel = std::unique_ptr<HashTableModel>(
       new HashTableModel("TransponderDataNodel"));

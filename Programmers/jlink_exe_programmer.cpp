@@ -16,7 +16,7 @@ ReturnStatus JLinkExeProgrammer::programMemory(QFile& firmware) {
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
     sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
-    return ReturnStatus::InvalidFile;
+    return ReturnStatus::InvalidFirmwareFile;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
@@ -53,7 +53,7 @@ ReturnStatus JLinkExeProgrammer::programMemoryWithUnlock(QFile& firmware) {
   // Проверка корректности присланной прошивки
   if (!checkFirmwareFile(firmware)) {
     sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
-    return ReturnStatus::InvalidFile;
+    return ReturnStatus::InvalidFirmwareFile;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
@@ -191,7 +191,7 @@ ReturnStatus JLinkExeProgrammer::programUserData(QFile& data) {
   // Проверка корректности присланной прошивки
   if (!checkDataFile(data)) {
     sendLog(QString("Получен некорректный файл с данными. Сброс. "));
-    return ReturnStatus::InvalidFile;
+    return ReturnStatus::InvalidFirmwareFile;
   }
 
   // Проверка на существование программы адаптера для программатора JLink
@@ -240,21 +240,21 @@ ReturnStatus JLinkExeProgrammer::readUcid(QString& ucid) {
   // Формируем сценарий команд
   JLinkScript->write(
       QByteArray(QString("mem %1, %2\n")
-                     .arg(UCID_START_ADDRESS, QString::number(UCID_SIZE, 16))
+                     .arg(UCID_MEMORY_ADDRESS, QString::number(UCID_SIZE, 16))
                      .toUtf8()));
 
   // Запускаем выполнение скрипта JLink
   executeJLinkScript();
 
   // Обрабатываем вывод JLink.exe
-  if (ProcessOutput.indexOf("Script processing ReturnStatus::NoError.") == -1) {
+  if (ProcessOutput.indexOf("Script processing completed.") == -1) {
     ucid.clear();
     return ReturnStatus::ProgrammatorError;
   }
 
   for (int32_t i = 0; i < ProcessOutput.size(); i++) {
     if (ProcessOutput.at(i).contains(
-            QString(UCID_START_ADDRESS).remove("0x"))) {
+            QString(UCID_MEMORY_ADDRESS).remove("0x"))) {
       ucid = ProcessOutput.at(i).mid(11, 50);
       ucid.remove(' ');
       break;

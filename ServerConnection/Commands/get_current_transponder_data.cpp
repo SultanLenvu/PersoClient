@@ -28,6 +28,16 @@ ReturnStatus GetCurrentTransponderData::processResponse(
     return ReturnStatus::ServerResponseDataBlockError;
   }
 
+  if (!Response.contains("return_status")) {
+    return ReturnStatus::ServerResponseSyntaxError;
+  }
+
+  ReturnStatus ret = processReturnStatus(Response["return_status"].toString());
+  if (ret != ReturnStatus::NoError) {
+    sendLog("Получена ошибка при выполнении команды на сервере.");
+    return ret;
+  }
+
   if (!checkSyntax()) {
     return ReturnStatus::ServerResponseSyntaxError;
   }
@@ -38,24 +48,18 @@ ReturnStatus GetCurrentTransponderData::processResponse(
   responseData["transponder_release_counter"] =
       Response["transponder_release_counter"].toString();
   responseData["box_id"] = Response["box_id"].toString();
-
-  ReturnStatus ret = processReturnStatus(Response["return_status"].toString());
-  if (ret != ReturnStatus::NoError) {
-    sendLog("Получена ошибка при выполнении команды на сервере.");
-    return ret;
-  }
+  responseData["issuer_name"] = Response["issuer_name"].toString();
 
   return ReturnStatus::NoError;
 }
 
 bool GetCurrentTransponderData::checkSyntax() {
   if ((Response.size() != ResponseSize) || (Response["command_name"] != Name) ||
-      !Response.contains("return_status") ||
       !Response.contains("transponder_sn") ||
-      !Response.contains("transponder_pan") || !Response.contains("box_id") ||
-      !Response.contains("pallet_id") || !Response.contains("order_id") ||
-      !Response.contains("issuer_name") ||
-      !Response.contains("transponder_model")) {
+      !Response.contains("transponder_pan") ||
+      !Response.contains("transponder_ucid") ||
+      !Response.contains("transponder_release_counter") ||
+      !Response.contains("box_id") || !Response.contains("issuer_name")) {
     return false;
   }
 

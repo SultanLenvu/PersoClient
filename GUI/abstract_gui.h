@@ -21,7 +21,7 @@ class AbstractGui : public QWidget {
   AbstractGui(QWidget* parent);
   virtual ~AbstractGui();
 
-  virtual void update(void) = 0;
+  virtual void updateModelViews(void) = 0;
   virtual GuiType type(void) = 0;
 
  private:

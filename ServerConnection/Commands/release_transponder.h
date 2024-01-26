@@ -24,6 +24,7 @@ class ReleaseTransponder : public AbstractClientCommand {
 
  private:
   Q_DISABLE_COPY_MOVE(ReleaseTransponder)
+  bool checkSyntax(void);
 
  signals:
 };

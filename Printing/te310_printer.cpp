@@ -53,8 +53,9 @@ ReturnStatus TE310Printer::printTransponderSticker(
   }
 
   // Проврека параметров
-  if (param.value("issuer_name").isEmpty() || param.value("sn").isEmpty() ||
-      param.value("pan").isEmpty()) {
+  if (param.value("issuer_name").isEmpty() ||
+      param.value("transponder_sn").isEmpty() ||
+      param.value("transponder_pan").isEmpty()) {
     sendLog(QString("Получены некорректные параметры. Сброс."));
     return ReturnStatus::ParameterError;
   }
@@ -91,9 +92,9 @@ ReturnStatus TE310Printer::printBoxSticker(const StringDictionary& param) {
     return ReturnStatus::StickerPrinterConnectionError;
   }
 
-  if (param.value("id").isEmpty() ||
+  if (param.value("box_id").isEmpty() ||
       param.value("transponder_model").isEmpty() ||
-      param.value("quantity").isEmpty() ||
+      param.value("box_assembled_units").isEmpty() ||
       param.value("first_transponder_sn").isEmpty() ||
       param.value("last_transponder_sn").isEmpty()) {
     sendLog(QString("Получены некорректные параметры. Сброс."));
@@ -130,7 +131,7 @@ ReturnStatus TE310Printer::printBoxSticker(const StringDictionary& param) {
   //                  .data());
   sendCommand("TEXT 50, 190, \"D.FNT\", 0, 2, 2, 1, \"QUANTITY:\"");
   sendCommand(QString("TEXT 600, 190, \"D.FNT\", 0, 2, 2, 1, \"%1\"")
-                  .arg(param.value("quantity"))
+                  .arg(param.value("box_assembled_units"))
                   .toUtf8()
                   .data());
   sendCommand("TEXT 50, 290, \"D.FNT\", 0, 2, 2, 1, \"SERIAL NO FROM:\"");
@@ -264,6 +265,8 @@ void TE310Printer::applySetting() {
   sendLog("Применение новых настроек.");
 
   loadSetting();
+
+  init();
 }
 
 void TE310Printer::loadSetting() {
@@ -369,16 +372,17 @@ void TE310Printer::printNkdSticker(const StringDictionary& param) {
   sendCommand("DIRECTION 1");
   sendCommand("CLS");
   sendCommand(QString("TEXT 162,30,\"D.FNT\",0,1,1,2,\"PAN: %1\"")
-                  .arg(param.value("pan"))
+                  .arg(param.value("transponder_pan"))
                   .toUtf8()
                   .data());
-  sendCommand(QString("QRCODE "
-                      "60,60,H,10,A,0,X204,J1,M2,\"%1\n\r%2\"")
-                  .arg(param.value("pan"), param.value("sn"))
-                  .toUtf8()
-                  .data());
+  sendCommand(
+      QString("QRCODE "
+              "60,60,H,10,A,0,X204,J1,M2,\"%1\n\r%2\"")
+          .arg(param.value("transponder_pan"), param.value("transponder_sn"))
+          .toUtf8()
+          .data());
   sendCommand(QString("TEXT 162,276,\"D.FNT\",0,1,1,2,\"SN: %1\"")
-                  .arg(param.value("sn"))
+                  .arg(param.value("transponder_sn"))
                   .toUtf8()
                   .data());
   sendCommand("PRINT 1");
