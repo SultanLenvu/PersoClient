@@ -142,7 +142,7 @@ void MasterGui::createServerTabViews() {
   ModelViewLayout->addLayout(ModelViewSublayout);
 
   // Данные бокса
-  BoxDataGroup = new QGroupBox("Данные бокса");
+  BoxDataGroup = new QGroupBox("Данные бокса, находящегося в процессе сборки");
   ModelViewSublayout->addWidget(BoxDataGroup);
 
   BoxDataLayout = new QVBoxLayout();
@@ -152,7 +152,8 @@ void MasterGui::createServerTabViews() {
   BoxDataLayout->addWidget(BoxDataView);
 
   // Данные транспондера
-  TransponderDataGroup = new QGroupBox("Данные транспондера");
+  TransponderDataGroup =
+      new QGroupBox("Данные последнего выпущенного транспондера");
   ModelViewSublayout->addWidget(TransponderDataGroup);
 
   TransponderDataLayout = new QVBoxLayout();

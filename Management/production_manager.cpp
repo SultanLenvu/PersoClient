@@ -118,12 +118,25 @@ void ProductionManager::requestBox() {
 
   ret = Server->getCurrentBoxData(BoxData);
   if (ret != ReturnStatus::NoError) {
+    BoxData.clear();
+    emit displayBoxData_signal(BoxData);
     emit executionFinished("requestBox", ret);
     sendLog("Не удалось получить данные текущего бокса. ");
     return;
   }
 
   emit displayBoxData_signal(BoxData);
+
+  ret = Server->getCurrentTransponderData(TransponderData);
+  if (ret != ReturnStatus::NoError) {
+    TransponderData.clear();
+    emit displayTransponderData_signal(TransponderData);
+    emit executionFinished("getCurrentTransponderData", ret);
+    sendLog("Не удалось получить данные текущего транспондера. ");
+    return;
+  }
+
+  emit displayTransponderData_signal(TransponderData);
 
   // Завершаем операцию
   sendLog("Бокс для сборки получен. ");
@@ -136,6 +149,8 @@ void ProductionManager::getCurrentBoxData() {
 
   ReturnStatus ret = Server->getCurrentBoxData(BoxData);
   if (ret != ReturnStatus::NoError) {
+    BoxData.clear();
+    emit displayBoxData_signal(BoxData);
     emit executionFinished("getCurrentBoxData", ret);
     sendLog("Не удалось получить данные текущего бокса. ");
     return;
@@ -248,14 +263,6 @@ void ProductionManager::releaseTransponder() {
   // Удаляем файл прошивки
   firmware.remove();
 
-  // Печатаем стикер
-  ret = StickerPrinter->printTransponderSticker(TransponderData);
-  if (ret != ReturnStatus::NoError) {
-    emit executionFinished("releaseTransponder", ret);
-    return;
-  }
-  sendLog(QString("Стикер распечатан."));
-
   // Подтверждаем выпуск транспондера
   param.insert("transponder_ucid", ucid);
   ret = Server->confirmTransponderRelease(param);
@@ -265,16 +272,37 @@ void ProductionManager::releaseTransponder() {
   }
   sendLog(QString("Выпуск транспондера подтвержден."));
 
-  // Запрашиваем данные подтвержденного транспондера
+  // Обновляем данные бокса
+  ret = Server->getCurrentBoxData(BoxData);
+  if (ret != ReturnStatus::NoError) {
+    BoxData.clear();
+    emit displayBoxData_signal(BoxData);
+    emit executionFinished("getCurrentBoxData", ret);
+    sendLog("Не удалось получить данные текущего бокса. ");
+    return;
+  }
+
+  emit displayBoxData_signal(BoxData);
+
+  // Запрашиваем данные выпущенного транспондера
   ret = Server->getCurrentTransponderData(TransponderData);
+  if (ret != ReturnStatus::NoError) {
+    TransponderData.clear();
+    emit displayTransponderData_signal(TransponderData);
+    emit executionFinished("releaseTransponder", ret);
+    return;
+  }
+  sendLog(QString("Данные выпускаемого транспондера получены."));
+
+  emit displayTransponderData_signal(TransponderData);
+
+  // Печатаем стикер
+  ret = StickerPrinter->printTransponderSticker(TransponderData);
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("releaseTransponder", ret);
     return;
   }
-  sendLog(QString("Данные подтвержденного транспондера получены."));
-
-  // Запрашиваем отображение данных транспондера
-  emit displayTransponderData_signal(TransponderData);
+  sendLog(QString("Стикер распечатан."));
 
   // Завершаем операцию
   sendLog("Транспондер успешно выпущен. ");
@@ -334,13 +362,6 @@ void ProductionManager::rereleaseTransponder(
   // Удаляем файл прошивки
   firmware.remove();
 
-  // Печатаем стикер
-  ret = StickerPrinter->printTransponderSticker(TransponderData);
-  if (ret != ReturnStatus::NoError) {
-    emit executionFinished("rereleaseTransponder", ret);
-    return;
-  }
-
   // Подтверждаем перевыпуск транспондера
   requestParam.insert("transponder_ucid", ucid);
   ret = Server->confirmTransponderRerelease(requestParam);
@@ -360,6 +381,13 @@ void ProductionManager::rereleaseTransponder(
   // Запрашиваем отображение данных транспондера
   emit displayTransponderData_signal(TransponderData);
 
+  // Печатаем стикер
+  ret = StickerPrinter->printTransponderSticker(TransponderData);
+  if (ret != ReturnStatus::NoError) {
+    emit executionFinished("rereleaseTransponder", ret);
+    return;
+  }
+
   // Завершаем операцию
   sendLog("Транспондер успешно выпущен. ");
   emit executionFinished("rereleaseTransponder", ret);
@@ -376,14 +404,27 @@ void ProductionManager::rollbackTransponder() {
     return;
   }
 
-  // Запрашиваем данные очередного транспондера
-  ret = Server->getCurrentTransponderData(TransponderData);
+  // Обновляем данные бокса
+  ret = Server->getCurrentBoxData(BoxData);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("releaseTransponder", ret);
+    BoxData.clear();
+    emit displayBoxData_signal(BoxData);
+    emit executionFinished("getCurrentBoxData", ret);
+    sendLog("Не удалось получить данные текущего бокса. ");
     return;
   }
 
-  // Запрашиваем отображение данных транспондера
+  emit displayBoxData_signal(BoxData);
+
+  ret = Server->getCurrentTransponderData(TransponderData);
+  if (ret != ReturnStatus::NoError) {
+    TransponderData.clear();
+    emit displayTransponderData_signal(TransponderData);
+    emit executionFinished("getCurrentTransponderData", ret);
+    sendLog("Не удалось получить данные текущего транспондера. ");
+    return;
+  }
+
   emit displayTransponderData_signal(TransponderData);
 
   // Завершаем операцию
@@ -398,6 +439,8 @@ void ProductionManager::getCurrentTransponderData() {
   ReturnStatus ret;
   ret = Server->getCurrentTransponderData(TransponderData);
   if (ret != ReturnStatus::NoError) {
+    TransponderData.clear();
+    emit displayTransponderData_signal(TransponderData);
     emit executionFinished("getCurrentTransponderData", ret);
     sendLog("Не удалось получить данные текущего транспондера. ");
     return;
@@ -418,6 +461,8 @@ void ProductionManager::getTransponderData(
   ReturnStatus ret;
   ret = Server->getTransponderData(*param.get(), TransponderData);
   if (ret != ReturnStatus::NoError) {
+    TransponderData.clear();
+    emit displayTransponderData_signal(TransponderData);
     emit executionFinished("getTransponderData", ret);
     sendLog("Не удалось получить данные транспондера. ");
     return;

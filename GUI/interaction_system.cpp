@@ -166,17 +166,13 @@ void InteractionSystem::createMessageTable() {
   MessageTable[ReturnStatus::ServerInternalError] =
       "Получена серверная ошибка.";
 
-  MessageTable[ReturnStatus::ClientCommandParamError] =
-      "Получена ошибка в параметре клиентской комаенды.";
-  MessageTable[ReturnStatus::ServerInternalError] =
-      "Получена серверная ошибка.";
-
   MessageTable[ReturnStatus::ProductionLineMissed] =
       "Производственная линия не найдена.";
   MessageTable[ReturnStatus::TranspoderMissed] = "Транспондер не найден.";
   MessageTable[ReturnStatus::BoxMissed] = "Бокс не найден.";
   MessageTable[ReturnStatus::PalletMissed] = "Паллета не найдена.";
   MessageTable[ReturnStatus::OrderMissed] = "Заказ не найден.";
+  MessageTable[ReturnStatus::IssuerMissed] = "Заказчик не найден.";
   MessageTable[ReturnStatus::MasterKeysMissed] =
       "Ключи безопасности не найдены.";
 
@@ -196,11 +192,14 @@ void InteractionSystem::createMessageTable() {
       "В боксе собраны не все транспондеры.";
 
   MessageTable[ReturnStatus::TransponderIncorrectRerelease] =
-      "Получена ошибка при перевыпуске транспондера.";
+      "Данный транспондер не был выпущен ранее. Перевыпуск невозможен.";
   MessageTable[ReturnStatus::IdenticalUcidError] =
-      "Получена ошибка идентификатора печатной платы.";
+      "Данная печатная плата уже была использована при сборке. Выпуск "
+      "транспондера невозможен.";
   MessageTable[ReturnStatus::CurrentOrderAssembled] =
       "Сборка текущего заказа успешно завершена.";
+  MessageTable[ReturnStatus::TransponderRollbackLimit] =
+      "В текущем боксе нет собранных транспондеров. Откат невозможен.";
 
   MessageTable[ReturnStatus::ProductionLineContextNotAuthorized] =
       "Контекст производственной линии не авторизирован.";
@@ -210,6 +209,8 @@ void InteractionSystem::createMessageTable() {
       "Не удалось запустить производственную линию.";
   MessageTable[ReturnStatus::ProductionLineAlreadyLaunched] =
       "Производственная линия уже запущена.";
+  MessageTable[ReturnStatus::ProductionLineAlreadyInProcess] =
+      "Производственная линия уже находится в процессе сборки бокса.";
   MessageTable[ReturnStatus::ProductionLineNotActive] =
       "Производственная линия не активирована.";
   MessageTable[ReturnStatus::ProductionLineCompleted] =
@@ -217,8 +218,6 @@ void InteractionSystem::createMessageTable() {
   MessageTable[ReturnStatus::ProductionLineNotInProcess] =
       "Производственная линия не находится в процессе сборки. Необходимо "
       "запросить бокс.";
-  MessageTable[ReturnStatus::ProductionLineRollbackLimit] =
-      "Достигнут лимит отката для производственной линии.";
 
   MessageTable[ReturnStatus::StickerPrinterInitError] =
       "Не удалось инициализировать принтер стикеров.";

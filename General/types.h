@@ -29,6 +29,7 @@ enum class ReturnStatus {
   BoxMissed,
   PalletMissed,
   OrderMissed,
+  IssuerMissed,
   MasterKeysMissed,
 
   OrderMultiplyAssembly,
@@ -43,15 +44,16 @@ enum class ReturnStatus {
   TransponderIncorrectRerelease,
   IdenticalUcidError,
   CurrentOrderAssembled,
+  TransponderRollbackLimit,
 
   ProductionLineContextNotAuthorized,
   ProductionLineNotLaunched,
   ProductionLineLaunchError,
   ProductionLineAlreadyLaunched,
+  ProductionLineAlreadyInProcess,
   ProductionLineNotActive,
   ProductionLineCompleted,
   ProductionLineNotInProcess,
-  ProductionLineRollbackLimit,
 
   StickerPrinterInitError,
   StickerPrinterConnectionError,

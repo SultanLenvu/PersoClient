@@ -86,6 +86,8 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[DatabaseTransactionError] = ReturnStatus::ServerInternalError;
   CrtMap[DatabaseQueryError] = ReturnStatus::ServerInternalError;
 
+  CrtMap[ProductionLineLaunchSystemInitError] =
+      ReturnStatus::ServerInternalError;
   CrtMap[FirmwareGeneratorInitError] = ReturnStatus::ServerInternalError;
   CrtMap[StickerPrinterInitError] = ReturnStatus::ServerInternalError;
 
@@ -95,6 +97,7 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[BoxMissed] = ReturnStatus::BoxMissed;
   CrtMap[PalletMissed] = ReturnStatus::PalletMissed;
   CrtMap[OrderMissed] = ReturnStatus::OrderMissed;
+  CrtMap[IssuerMissed] = ReturnStatus::IssuerMissed;
   CrtMap[MasterKeysMissed] = ReturnStatus::MasterKeysMissed;
 
   CrtMap[OrderMultiplyAssembly] = ReturnStatus::OrderMultiplyAssembly;
@@ -106,6 +109,7 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[BoxCompletelyAssembled] = ReturnStatus::BoxCompletelyAssembled;
   CrtMap[BoxNotCompletelyAssembled] = ReturnStatus::BoxNotCompletelyAssembled;
 
+  CrtMap[TransponderRepeatRelease] = ReturnStatus::ServerInternalError;
   CrtMap[TransponderNotReleasedEarlier] = ReturnStatus::ServerInternalError;
   CrtMap[TransponderNotAwaitingConfirmation] =
       ReturnStatus::ServerInternalError;
@@ -113,19 +117,20 @@ void AbstractClientCommand::createCrtMap() {
       ReturnStatus::TransponderIncorrectRerelease;
   CrtMap[IdenticalUcidError] = ReturnStatus::IdenticalUcidError;
   CrtMap[CurrentOrderAssembled] = ReturnStatus::CurrentOrderAssembled;
+  CrtMap[TransponderRollbackLimit] = ReturnStatus::TransponderRollbackLimit;
 
   CrtMap[ProductionLineContextNotAuthorized] =
       ReturnStatus::ProductionLineContextNotAuthorized;
+  CrtMap[ProductionLineNotActive] = ReturnStatus::ProductionLineNotActive;
   CrtMap[ProductionLineNotLaunched] = ReturnStatus::ProductionLineNotLaunched;
+  CrtMap[ProductionLineNotInProcess] = ReturnStatus::ProductionLineNotInProcess;
   CrtMap[ProductionLineLaunchError] = ReturnStatus::ProductionLineLaunchError;
   CrtMap[ProductionLineAlreadyLaunched] =
       ReturnStatus::ProductionLineAlreadyLaunched;
-  CrtMap[ProductionLineNotActive] = ReturnStatus::ProductionLineNotActive;
+  CrtMap[ProductionLineAlreadyInProcess] =
+      ReturnStatus::ProductionLineAlreadyInProcess;
   CrtMap[ProductionLineCompleted] = ReturnStatus::ProductionLineCompleted;
   CrtMap[ProductionLineShutdownError] = ReturnStatus::ServerInternalError;
-  CrtMap[ProductionLineNotInProcess] = ReturnStatus::ProductionLineNotInProcess;
-  CrtMap[ProductionLineRollbackLimit] =
-      ReturnStatus::ProductionLineRollbackLimit;
 
   CrtMap[FirmwareGenerationError] = ReturnStatus::ServerInternalError;
 
@@ -151,6 +156,8 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: DatabaseTransactionError";
   CrtLogMap[DatabaseQueryError] = "Server return status: DatabaseQueryError";
 
+  CrtLogMap[ProductionLineLaunchSystemInitError] =
+      "Server return status: ProductionLineLaunchSystemInitError";
   CrtLogMap[FirmwareGeneratorInitError] =
       "Server return status: FirmwareGeneratorInitError";
   CrtLogMap[StickerPrinterInitError] =
@@ -163,6 +170,7 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[BoxMissed] = "Server return status: BoxMissed";
   CrtLogMap[PalletMissed] = "Server return status: PalletMissed";
   CrtLogMap[OrderMissed] = "Server return status: OrderMissed";
+  CrtLogMap[IssuerMissed] = "Server return status: IssuerMissed";
   CrtLogMap[MasterKeysMissed] = "Server return status: MasterKeysMissed";
 
   CrtLogMap[OrderMultiplyAssembly] =
@@ -178,38 +186,38 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[BoxNotCompletelyAssembled] =
       "Server return status: BoxNotCompletelyAssembled";
 
+  CrtLogMap[TransponderRepeatRelease] =
+      "Server return status: TransponderRepeatReleases";
   CrtLogMap[TransponderNotReleasedEarlier] =
       "Server return status: TransponderNotReleasedEarlier";
   CrtLogMap[TransponderNotAwaitingConfirmation] =
       "Server return status: TransponderNotAwaitingConfirmation";
   CrtLogMap[TransponderIncorrectRerelease] =
       "Server return status: TransponderIncorrectRerelease";
-  CrtLogMap[IssuerMissed] = "Server return status: IssuerMissed";
   CrtLogMap[IdenticalUcidError] = "Server return status: IdenticalUcidError";
   CrtLogMap[CurrentOrderAssembled] =
       "Server return status: CurrentOrderAssembled";
+  CrtLogMap[TransponderRollbackLimit] =
+      "Server return status: TransponderRollbackLimit";
 
   CrtLogMap[ProductionLineContextNotAuthorized] =
       "Server return status: ProductionLineContextNotAuthorized";
+  CrtLogMap[ProductionLineNotActive] =
+      "Server return status: ProductionLineNotActive";
   CrtLogMap[ProductionLineNotLaunched] =
       "Server return status: ProductionLineNotLaunched";
+  CrtLogMap[ProductionLineNotInProcess] =
+      "Server return status: ProductionLineNotInProcess";
   CrtLogMap[ProductionLineLaunchError] =
       "Server return status: ProductionLineLaunchError";
   CrtLogMap[ProductionLineAlreadyLaunched] =
       "Server return status: ProductionLineAlreadyLaunched";
-  CrtLogMap[ProductionLineNotActive] =
-      "Server return status: ProductionLineNotActive";
-  CrtLogMap[ProductionLineNotInProcess] =
-      "Server return status: ProductionLineNotInProcess";
+  CrtLogMap[ProductionLineAlreadyInProcess] =
+      "Server return status: ProductionLineAlreadyInProcess";
   CrtLogMap[ProductionLineCompleted] =
       "Server return status: ProductionLineCompleted";
   CrtLogMap[ProductionLineShutdownError] =
       "Server return status: ProductionLineShutdownError";
-
-  CrtLogMap[ProductionLineNotInProcess] =
-      "Server return status: ProductionLineNotInProcess";
-  CrtLogMap[ProductionLineRollbackLimit] =
-      "Server return status: ProductionLineRollbackLimit";
 
   CrtLogMap[FirmwareGenerationError] =
       "Server return status: FirmwareGenerationError";
