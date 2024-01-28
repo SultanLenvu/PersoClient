@@ -8,17 +8,24 @@ class ProductionTesterGui : public AbstractGui {
   QVBoxLayout* ControlPanelLayout;
 
   QGroupBox* TransponderGroup;
-  QVBoxLayout* TransponderLayout;
+  QVBoxLayout* TransponderGroupLayout;
   QPushButton* RereleaseTransponderButton;
 
-  QGroupBox* PrintStickerGroup;
-  QVBoxLayout* PrintStickerLayout;
+  QGroupBox* PrinterStickerGroup;
+  QVBoxLayout* PrinterStickerLayout;
   QPushButton* PrintLastTransponderStickerButton;
   QPushButton* PrintCustomTransponderStickerButton;
   QPushButton* PrintBoxStickerButton;
   QPushButton* PrintPalletStickerButton;
 
   QSpacerItem* ControlPanelVS;
+
+  QVBoxLayout* ModelViewLayout;
+  QHBoxLayout* ModelViewSublayout;
+
+  QGroupBox* ProductionLineDataGroup;
+  QVBoxLayout* ProductionLineDataLayout;
+  QTableView* ProductionLineDataView;
 
   QGroupBox* TransponderDataGroup;
   QVBoxLayout* TransponderDataLayout;
@@ -33,6 +40,8 @@ class ProductionTesterGui : public AbstractGui {
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionTesterGui);
+
+  void createModelViews(void);
 };
 
 #endif  // PRODUCTION_TESTER_GUI_H

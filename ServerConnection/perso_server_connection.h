@@ -68,8 +68,8 @@ class PersoServerConnection : public AbstractServerConnection {
   virtual ReturnStatus connect() override;
   virtual void disconnect() override;
   virtual ReturnStatus echo() override;
-  virtual ReturnStatus logIn(const StringDictionary& param) override;
-  virtual ReturnStatus logOut() override;
+  virtual ReturnStatus launchProductionLine(const StringDictionary& param) override;
+  virtual ReturnStatus shutdownProductionLine() override;
 
   virtual ReturnStatus requestBox(void) override;
   virtual ReturnStatus getCurrentBoxData(StringDictionary& result) override;

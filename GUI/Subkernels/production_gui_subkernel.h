@@ -18,6 +18,7 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   AbstractGui* CurrentGui;
   std::shared_ptr<AbstractManager> Manager;
 
+  std::unique_ptr<HashTableModel> ProductionLineModel;
   std::unique_ptr<HashTableModel> BoxDataModel;
   std::unique_ptr<HashTableModel> TransponderDataModel;
 
@@ -33,7 +34,7 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   virtual void reset() override;
 
  public slots:
-  void authorizationCompleted_slot(void);
+  void logOnCompleted_slot(void);
   void displayTransponderData(const StringDictionary& data);
   void displayBoxData(const StringDictionary& data);
 
@@ -50,7 +51,7 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   void connect_guiSlot(void);
   void disconnect_guiSlot(void);
   void echoRequest_guiSlot(void);
-  void authorize_guiSlot(void);
+  void logOn_guiSlot(void);
 
   void requestBox_guiSlot(void);
   void getCurrentBoxData_guiSlot(void);
@@ -78,8 +79,10 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   // Сигналы для менеджера
   void connectToServer_signal(void);
   void disconnectFromServer_signal(void);
+  void launchProductionLine_signal(
+      const std::shared_ptr<StringDictionary> param);
+  void logOnServer_signal(const std::shared_ptr<StringDictionary> param);
   void echoServer_signal(void);
-  void authorize_signal(const std::shared_ptr<StringDictionary> param);
 
   void requestBox_signal(void);
   void getCurrentBoxData_signal(void);

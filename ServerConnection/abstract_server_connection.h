@@ -16,8 +16,8 @@ class AbstractServerConnection : public QObject {
 
   virtual ReturnStatus echo(void) = 0;
 
-  virtual ReturnStatus logIn(const StringDictionary& param) = 0;
-  virtual ReturnStatus logOut(void) = 0;
+  virtual ReturnStatus launchProductionLine(const StringDictionary& param) = 0;
+  virtual ReturnStatus shutdownProductionLine(void) = 0;
 
   virtual ReturnStatus requestBox(void) = 0;
   virtual ReturnStatus getCurrentBoxData(StringDictionary& result) = 0;
@@ -47,6 +47,8 @@ class AbstractServerConnection : public QObject {
  private:
   AbstractServerConnection();
   Q_DISABLE_COPY_MOVE(AbstractServerConnection)
+
+  void connectDepedencies(void);
 
  signals:
   void logging(const QString& log);

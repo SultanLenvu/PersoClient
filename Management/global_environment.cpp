@@ -1,4 +1,5 @@
 #include "global_environment.h"
+#include "QApplication"
 
 GlobalEnvironment::~GlobalEnvironment() {}
 

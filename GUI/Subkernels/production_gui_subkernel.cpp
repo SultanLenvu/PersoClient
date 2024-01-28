@@ -18,6 +18,8 @@ ProductionGuiSubkernel::~ProductionGuiSubkernel() {}
 
 void ProductionGuiSubkernel::connectGui(AbstractGui* gui) {
   CurrentGui = gui;
+  BoxDataModel->clear();
+  TransponderDataModel->clear();
 
   switch (CurrentGui->type()) {
     case AbstractGui::Authorization:
@@ -51,7 +53,7 @@ void ProductionGuiSubkernel::reset() {
   Manager.reset();
 }
 
-void ProductionGuiSubkernel::authorizationCompleted_slot() {
+void ProductionGuiSubkernel::logOnCompleted_slot() {
   if (Role == Assembler) {
     emit displayProductionAssemblerGui();
   }
@@ -76,7 +78,7 @@ void ProductionGuiSubkernel::connectAuthorizationGui() {
   AuthorizationGui* gui = dynamic_cast<AuthorizationGui*>(CurrentGui);
 
   connect(gui->AuthorizePushButton, &QPushButton::clicked, this,
-          &ProductionGuiSubkernel::authorize_guiSlot);
+          &ProductionGuiSubkernel::logOn_guiSlot);
 }
 
 void ProductionGuiSubkernel::connectMasterGui() {
@@ -90,7 +92,7 @@ void ProductionGuiSubkernel::connectMasterGui() {
   connect(gui->ServerEchoRequestButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::echoRequest_guiSlot);
   connect(gui->AuthorizePushButton, &QPushButton::clicked, this,
-          &ProductionGuiSubkernel::authorize_guiSlot);
+          &ProductionGuiSubkernel::logOn_guiSlot);
 
   connect(gui->RequestBoxButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::requestBox_guiSlot);
@@ -134,6 +136,14 @@ void ProductionGuiSubkernel::connectProductionAssemblerGui() {
   ProductionAssemblerGui* gui =
       dynamic_cast<ProductionAssemblerGui*>(CurrentGui);
 
+  // Сигналы от GUI
+  connect(gui->RequestBoxButton, &QPushButton::clicked, this,
+          &ProductionGuiSubkernel::requestBox_guiSlot);
+  connect(gui->RefundCurrentBoxButton, &QPushButton::clicked, this,
+          &ProductionGuiSubkernel::refundCurrentBox_guiSlot);
+  connect(gui->CompleteCurrentBoxButton, &QPushButton::clicked, this,
+          &ProductionGuiSubkernel::completeCurrentBox_guiSlot);
+
   connect(gui->ReleaseTransponderButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::releaseTransponder_guiSlot);
   connect(gui->RereleaseTransponderButton, &QPushButton::clicked, this,
@@ -145,13 +155,19 @@ void ProductionGuiSubkernel::connectProductionAssemblerGui() {
           &ProductionGuiSubkernel::printBoxSticker_guiSlot);
 
   // Связывание моделей и представлений
+  gui->ProductionLineDataView->setModel(ProductionLineModel.get());
   gui->TransponderDataView->setModel(TransponderDataModel.get());
   gui->BoxDataView->setModel(BoxDataModel.get());
+
+  // Сигналы от подядра
+  connect(this, &ProductionGuiSubkernel::updateModelViews, gui,
+          &ProductionAssemblerGui::updateModelViews);
 }
 
 void ProductionGuiSubkernel::connectProductionTesterGui() {
   ProductionTesterGui* gui = dynamic_cast<ProductionTesterGui*>(CurrentGui);
 
+  // Сигналы от GUI
   connect(gui->PrintBoxStickerButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::rereleaseTransponder_guiSlot);
   connect(gui->PrintPalletStickerButton, &QPushButton::clicked, this,
@@ -159,7 +175,10 @@ void ProductionGuiSubkernel::connectProductionTesterGui() {
 
   // Связывание моделей и представлений
   gui->TransponderDataView->setModel(TransponderDataModel.get());
-  //  gui->BoxDataView->setModel(BoxDataModel.get());
+
+  // Сигналы от подядра
+  connect(this, &ProductionGuiSubkernel::updateModelViews, gui,
+          &ProductionTesterGui::updateModelViews);
 }
 
 void ProductionGuiSubkernel::connectProductionManager() const {
@@ -170,10 +189,12 @@ void ProductionGuiSubkernel::connectProductionManager() const {
           &ProductionManager::connectToServer);
   connect(this, &ProductionGuiSubkernel::disconnectFromServer_signal, manager,
           &ProductionManager::disconnectFromServer);
+  connect(this, &ProductionGuiSubkernel::launchProductionLine_signal, manager,
+          &ProductionManager::launchProductionLine);
+  connect(this, &ProductionGuiSubkernel::logOnServer_signal, manager,
+          &ProductionManager::logOnServer);
   connect(this, &ProductionGuiSubkernel::echoServer_signal, manager,
           &ProductionManager::echoServer);
-  connect(this, &ProductionGuiSubkernel::authorize_signal, manager,
-          &ProductionManager::launchProductionLine);
 
   connect(this, &ProductionGuiSubkernel::requestBox_signal, manager,
           &ProductionManager::requestBox);
@@ -206,7 +227,7 @@ void ProductionGuiSubkernel::connectProductionManager() const {
 
   // Сигналы от менеджера
   connect(manager, &ProductionManager::authorizationCompleted, this,
-          &ProductionGuiSubkernel::authorizationCompleted_slot);
+          &ProductionGuiSubkernel::logOnCompleted_slot);
   connect(manager, &ProductionManager::displayTransponderData_signal, this,
           &ProductionGuiSubkernel::displayTransponderData);
   connect(manager, &ProductionManager::displayBoxData_signal, this,
@@ -231,7 +252,7 @@ void ProductionGuiSubkernel::echoRequest_guiSlot() {
   emit echoServer_signal();
 }
 
-void ProductionGuiSubkernel::authorize_guiSlot() {
+void ProductionGuiSubkernel::logOn_guiSlot() {
   std::shared_ptr<StringDictionary> param(new StringDictionary());
 
   if (CurrentGui->type() == AbstractGui::Authorization) {
@@ -239,21 +260,24 @@ void ProductionGuiSubkernel::authorize_guiSlot() {
     param->insert("login", gui->LoginLineEdit->text());
     param->insert("password", gui->PasswordLineEdit->text());
     param->insert("mode", gui->ModeChoice->currentText());
-  } else {
-    AuthorizationDialog dialog(CurrentGui);
-    if (dialog.exec() == QDialog::Rejected) {
-      return;
+
+    if (param->value("mode") == "Сборка") {
+      Role = Assembler;
+    } else if (param->value("mode") == "Тестирование") {
+      Role = Tester;
     }
-    dialog.getData(*param);
+
+    emit logOnServer_signal(param);
+    return;
   }
 
-  if (param->value("mode") == "Сборка") {
-    Role = Assembler;
-  } else if (param->value("mode") == "Тестирование") {
-    Role = Tester;
+  AuthorizationDialog dialog(CurrentGui);
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
   }
+  dialog.getData(*param);
 
-  emit authorize_signal(param);
+  emit
 }
 
 void ProductionGuiSubkernel::requestBox_guiSlot() {

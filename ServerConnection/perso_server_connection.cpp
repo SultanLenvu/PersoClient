@@ -84,7 +84,7 @@ ReturnStatus PersoServerConnection::echo() {
   return ret;
 }
 
-ReturnStatus PersoServerConnection::logIn(const StringDictionary& param) {
+ReturnStatus PersoServerConnection::launchProductionLine(const StringDictionary& param) {
   CurrentCommand = Commands.at(LogIn);
 
   StringDictionary result;
@@ -93,7 +93,7 @@ ReturnStatus PersoServerConnection::logIn(const StringDictionary& param) {
   return ret;
 }
 
-ReturnStatus PersoServerConnection::logOut() {
+ReturnStatus PersoServerConnection::shutdownProductionLine() {
   CurrentCommand = Commands.at(LogOut);
 
   StringDictionary param, result;

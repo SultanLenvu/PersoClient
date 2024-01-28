@@ -36,7 +36,9 @@ class ProductionManager : public AbstractManager {
   void connectToServer(void);
   void disconnectFromServer(void);
   void launchProductionLine(const std::shared_ptr<StringDictionary> param);
-  void resetServerConnection(void);
+  void shutdownProductionLine(void);
+  void logOnServer(const std::shared_ptr<StringDictionary> param);
+  void logOutServer(void);
   void echoServer(void);
 
   void requestBox(void);
@@ -63,6 +65,10 @@ class ProductionManager : public AbstractManager {
   void createProgrammer(void);
   void createServerConnection(void);
   void createStickerPrinter(void);
+
+  void initOperation(const QString& name);
+  void processOperationError(const QString& name, ReturnStatus ret);
+  void completeOperation(const QString& name);
 
  signals:
   void displayTransponderData_signal(const StringDictionary& data);

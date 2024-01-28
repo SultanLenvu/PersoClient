@@ -33,86 +33,99 @@ void ProductionManager::applySettings() {
 }
 
 void ProductionManager::connectToServer() {
-  emit executionStarted("connectToServer");
-  sendLog("Подключение серверу сервером. ");
+  initOperation("connectToServer");
 
   ReturnStatus ret;
   ret = Server->connect();
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("connectToServer", ret);
+    processOperationError("connectToServer", ret);
     return;
   }
 
-  // Завершаем операцию
-  sendLog("Соединение с сервером успешно инициализировано. ");
-  emit executionFinished("connectToServer", ret);
+  completeOperation("connectToServer");
 }
 
 void ProductionManager::disconnectFromServer() {
-  emit executionStarted("connectToServer");
-  sendLog("Отключение от сервера. ");
+  initOperation("connectToServer");
 
   Server->disconnect();
 
-  // Завершаем операцию
-  sendLog("Соединение с сервером отключено. ");
-  emit executionFinished("connectToServer", ReturnStatus::NoError);
+  completeOperation("connectToServer");
 }
 
 void ProductionManager::launchProductionLine(
     const std::shared_ptr<StringDictionary> param) {
-  emit executionStarted("launchProductionLine");
-  sendLog("Инициализация соединения с сервером. ");
+  initOperation("launchProductionLine");
 
   ReturnStatus ret;
-  ret = Server->logIn(*param);
+  ret = Server->launchProductionLine(*param);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("launchProductionLine", ret);
+    processOperationError("launchProductionLine", ret);
     return;
   }
 
-  // Завершаем операцию
-  sendLog("Соединение с сервером успешно инициализировано. ");
-  emit executionFinished("launchProductionLine", ret);
+  completeOperation("launchProductionLine");
 }
 
-void ProductionManager::resetServerConnection() {
-  emit executionStarted("resetServerConnection");
-  sendLog("Сброс соединения с сервером. ");
+void ProductionManager::shutdownProductionLine() {
+  initOperation("shutdownProductionLine");
 
+  Server->shutdownProductionLine();
+
+  completeOperation("shutdownProductionLine");
+}
+
+void ProductionManager::logOnServer(
+    const std::shared_ptr<StringDictionary> param) {
+  initOperation("logOnServer");
+
+  ReturnStatus ret;
+  ret = Server->connect();
+  if (ret != ReturnStatus::NoError) {
+    processOperationError("logOnServer", ret);
+    return;
+  }
+
+  ret = Server->launchProductionLine(*param);
+  if (ret != ReturnStatus::NoError) {
+    processOperationError("logOnServer", ret);
+    return;
+  }
+
+  emit authorizationCompleted();
+  completeOperation("logOnServer");
+}
+
+void ProductionManager::logOutServer() {
+  initOperation("logOutServer");
+
+  Server->shutdownProductionLine();
   Server->disconnect();
-  Server->logOut();
 
-  sendLog("Соединение с сервером успешно сброшено. ");
-  emit executionFinished("resetServerConnection", ReturnStatus::NoError);
+  completeOperation("logOutServer");
 }
 
 void ProductionManager::echoServer() {
-  emit executionStarted("echoServer");
-  sendLog("Выполнение эхо-запроса. ");
+  initOperation("echoServer");
 
   ReturnStatus ret;
   ret = Server->echo();
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("echoServer", ret);
+    processOperationError("echoServer", ret);
     return;
   }
 
-  // Завершаем операцию
-  sendLog("Эхо-запрос успешно выполнен. ");
-  emit executionFinished("echoServer", ret);
+  completeOperation("echoServer");
 }
 
 void ProductionManager::requestBox() {
-  emit executionStarted("requestBox");
-  sendLog("Запрос бокса. ");
+  initOperation("requestBox");
 
   ReturnStatus ret;
 
   ret = Server->requestBox();
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("requestBox", ret);
-    sendLog("Не удалось получить бокс для сборки. ");
+    processOperationError("requestBox", ret);
     return;
   }
 
@@ -120,8 +133,7 @@ void ProductionManager::requestBox() {
   if (ret != ReturnStatus::NoError) {
     BoxData.clear();
     emit displayBoxData_signal(BoxData);
-    emit executionFinished("requestBox", ret);
-    sendLog("Не удалось получить данные текущего бокса. ");
+    processOperationError("requestBox", ret);
     return;
   }
 
@@ -131,47 +143,39 @@ void ProductionManager::requestBox() {
   if (ret != ReturnStatus::NoError) {
     TransponderData.clear();
     emit displayTransponderData_signal(TransponderData);
-    emit executionFinished("getCurrentTransponderData", ret);
-    sendLog("Не удалось получить данные текущего транспондера. ");
+    processOperationError("requestBox", ret);
     return;
   }
 
   emit displayTransponderData_signal(TransponderData);
 
-  // Завершаем операцию
-  sendLog("Бокс для сборки получен. ");
-  emit executionFinished("requestBox", ret);
+  completeOperation("requestBox");
 }
 
 void ProductionManager::getCurrentBoxData() {
-  emit executionStarted("getCurrentBoxData");
-  sendLog("Запрос данных текущего бокса. ");
+  initOperation("getCurrentBoxData");
 
   ReturnStatus ret = Server->getCurrentBoxData(BoxData);
   if (ret != ReturnStatus::NoError) {
     BoxData.clear();
     emit displayBoxData_signal(BoxData);
-    emit executionFinished("getCurrentBoxData", ret);
+    processOperationError("getCurrentBoxData", ret);
     sendLog("Не удалось получить данные текущего бокса. ");
     return;
   }
 
   emit displayBoxData_signal(BoxData);
 
-  // Завершаем операцию
-  sendLog("Данные текущего бокса получены. ");
-  emit executionFinished("getCurrentBoxData", ret);
+  completeOperation("getCurrentBoxData");
 }
 
 void ProductionManager::refundCurrentBox() {
-  emit executionStarted("refundCurrentBox");
-  sendLog("Возврат текущего бокса. ");
+  initOperation("refundCurrentBox");
 
   ReturnStatus ret;
   ret = Server->refundCurrentBox();
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("refundCurrentBox", ret);
-    sendLog("Не удалось вернуть текущий бокс для сборки. ");
+    processOperationError("refundCurrentBox", ret);
     return;
   }
 
@@ -181,34 +185,27 @@ void ProductionManager::refundCurrentBox() {
   TransponderData.clear();
   emit displayTransponderData_signal(TransponderData);
 
-  // Завершаем операцию
-  sendLog("Текущий бокс успешно возвращен. ");
-  emit executionFinished("refundCurrentBox", ret);
+  completeOperation("refundCurrentBox");
 }
 
 void ProductionManager::completeCurrentBox() {
-  emit executionStarted("completeCurrentBox");
-  sendLog("Завершение сборки текущего бокса. ");
+  initOperation("completeCurrentBox");
 
   ReturnStatus ret;
   ret = Server->completeCurrentBox();
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("completeCurrentBox", ret);
-    sendLog("Не удалось завершить сборку текущего бокса. ");
+    processOperationError("completeCurrentBox", ret);
     return;
   }
 
   BoxData.clear();
   emit displayBoxData_signal(BoxData);
 
-  // Завершаем операцию
-  sendLog("Сборка текуего бокса успешно завершена. ");
-  emit executionFinished("completeCurrentBox", ret);
+  completeOperation("completeCurrentBox");
 }
 
 void ProductionManager::releaseTransponder() {
-  emit executionStarted("releaseTransponder");
-  sendLog("Выпуск транспондера. ");
+  initOperation("releaseTransponder");
 
   ReturnStatus ret;
   QString ucid;
@@ -219,7 +216,7 @@ void ProductionManager::releaseTransponder() {
   // Разблокируем память
   ret = Programmer->unlockMemory();
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("releaseTransponder", ret);
+    processOperationError("releaseTransponder", ret);
     return;
   }
   sendLog("Flash-память разблокирована.");
@@ -227,7 +224,7 @@ void ProductionManager::releaseTransponder() {
   // Считываем UCID
   ret = Programmer->readUcid(ucid);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("releaseTransponder", ret);
+    processOperationError("releaseTransponder", ret);
     return;
   }
   sendLog(QString("Считанный UCID: %1.").arg(ucid));
@@ -235,15 +232,14 @@ void ProductionManager::releaseTransponder() {
   // Выпускаем транспондер
   ret = Server->releaseTransponder(result);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("releaseTransponder", ret);
+    processOperationError("releaseTransponder", ret);
     return;
   }
   sendLog(QString("Транспондер выпущен."));
 
   // Сохраняем присланный файл прошивки
   if (!firmware.open(QIODevice::WriteOnly)) {
-    sendLog("Не удалось сохранить файл прошивки. ");
-    emit executionFinished("releaseTransponder", ReturnStatus::FileOpenError);
+    processOperationError("releaseTransponder", ReturnStatus::FileOpenError);
   }
 
   // Сохраняем прошивку в файл
@@ -255,7 +251,7 @@ void ProductionManager::releaseTransponder() {
   // Загружаем прошивку
   ret = Programmer->programMemory(firmware);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("releaseTransponder", ret);
+    processOperationError("releaseTransponder", ret);
     return;
   }
   sendLog(QString("Прошивка загружена в микроконтроллер."));
@@ -267,7 +263,7 @@ void ProductionManager::releaseTransponder() {
   param.insert("transponder_ucid", ucid);
   ret = Server->confirmTransponderRelease(param);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("releaseTransponder", ret);
+    processOperationError("releaseTransponder", ret);
     return;
   }
   sendLog(QString("Выпуск транспондера подтвержден."));
@@ -277,8 +273,7 @@ void ProductionManager::releaseTransponder() {
   if (ret != ReturnStatus::NoError) {
     BoxData.clear();
     emit displayBoxData_signal(BoxData);
-    emit executionFinished("getCurrentBoxData", ret);
-    sendLog("Не удалось получить данные текущего бокса. ");
+    processOperationError("getCurrentBoxData", ret);
     return;
   }
 
@@ -289,7 +284,7 @@ void ProductionManager::releaseTransponder() {
   if (ret != ReturnStatus::NoError) {
     TransponderData.clear();
     emit displayTransponderData_signal(TransponderData);
-    emit executionFinished("releaseTransponder", ret);
+    processOperationError("releaseTransponder", ret);
     return;
   }
   sendLog(QString("Данные выпускаемого транспондера получены."));
@@ -299,19 +294,17 @@ void ProductionManager::releaseTransponder() {
   // Печатаем стикер
   ret = StickerPrinter->printTransponderSticker(TransponderData);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("releaseTransponder", ret);
+    processOperationError("releaseTransponder", ret);
     return;
   }
   sendLog(QString("Стикер распечатан."));
 
-  // Завершаем операцию
-  sendLog("Транспондер успешно выпущен. ");
-  emit executionFinished("releaseTransponder", ret);
+  completeOperation("releaseTransponder");
 }
 
 void ProductionManager::rereleaseTransponder(
     const std::shared_ptr<StringDictionary> param) {
-  emit executionStarted("rereleaseTransponder");
+  initOperation("rereleaseTransponder");
   sendLog("Выпуск транспондера. ");
 
   ReturnStatus ret;
@@ -323,14 +316,14 @@ void ProductionManager::rereleaseTransponder(
   // Разблокируем память
   ret = Programmer->unlockMemory();
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("rereleaseTransponder", ret);
+    processOperationError("rereleaseTransponder", ret);
     return;
   }
 
   // Считываем UCID
   ret = Programmer->readUcid(ucid);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("rereleaseTransponder", ret);
+    processOperationError("rereleaseTransponder", ret);
     return;
   }
 
@@ -338,14 +331,14 @@ void ProductionManager::rereleaseTransponder(
   requestParam.insert("transponder_pan", param->value("transponder_pan"));
   ret = Server->rereleaseTransponder(requestParam, result);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("rereleaseTransponder", ret);
+    processOperationError("rereleaseTransponder", ret);
     return;
   }
 
   // Сохраняем присланный файл прошивки
   if (!firmware.open(QIODevice::WriteOnly)) {
     sendLog("Не удалось сохранить файл прошивки. ");
-    emit executionFinished("rereleaseTransponder", ReturnStatus::FileOpenError);
+    processOperationError("rereleaseTransponder", ReturnStatus::FileOpenError);
   }
 
   // Сохраняем прошивку в файл
@@ -355,7 +348,7 @@ void ProductionManager::rereleaseTransponder(
   // Загружаем прошивку
   ret = Programmer->programMemory(firmware);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("rereleaseTransponder", ret);
+    processOperationError("rereleaseTransponder", ret);
     return;
   }
 
@@ -366,7 +359,7 @@ void ProductionManager::rereleaseTransponder(
   requestParam.insert("transponder_ucid", ucid);
   ret = Server->confirmTransponderRerelease(requestParam);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("rereleaseTransponder", ret);
+    processOperationError("rereleaseTransponder", ret);
     return;
   }
 
@@ -374,7 +367,7 @@ void ProductionManager::rereleaseTransponder(
   requestParam.remove("transponder_ucid");
   ret = Server->getTransponderData(requestParam, TransponderData);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("releaseTransponder", ret);
+    processOperationError("releaseTransponder", ret);
     return;
   }
 
@@ -384,23 +377,21 @@ void ProductionManager::rereleaseTransponder(
   // Печатаем стикер
   ret = StickerPrinter->printTransponderSticker(TransponderData);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("rereleaseTransponder", ret);
+    processOperationError("rereleaseTransponder", ret);
     return;
   }
 
-  // Завершаем операцию
-  sendLog("Транспондер успешно выпущен. ");
-  emit executionFinished("rereleaseTransponder", ret);
+  completeOperation("rereleaseTransponder");
 }
 
 void ProductionManager::rollbackTransponder() {
-  emit executionStarted("rollbackTransponder");
+  initOperation("rollbackTransponder");
   sendLog("Откат производственной линии. ");
 
   ReturnStatus ret;
   ret = Server->rollbackTransponder();
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("rollbackTransponder", ret);
+    processOperationError("rollbackTransponder", ret);
     return;
   }
 
@@ -409,8 +400,7 @@ void ProductionManager::rollbackTransponder() {
   if (ret != ReturnStatus::NoError) {
     BoxData.clear();
     emit displayBoxData_signal(BoxData);
-    emit executionFinished("getCurrentBoxData", ret);
-    sendLog("Не удалось получить данные текущего бокса. ");
+    processOperationError("getCurrentBoxData", ret);
     return;
   }
 
@@ -420,125 +410,102 @@ void ProductionManager::rollbackTransponder() {
   if (ret != ReturnStatus::NoError) {
     TransponderData.clear();
     emit displayTransponderData_signal(TransponderData);
-    emit executionFinished("getCurrentTransponderData", ret);
-    sendLog("Не удалось получить данные текущего транспондера. ");
+    processOperationError("getCurrentTransponderData", ret);
     return;
   }
 
   emit displayTransponderData_signal(TransponderData);
 
-  // Завершаем операцию
-  sendLog("Откат производственной линии успешно завершен. ");
-  emit executionFinished("rollbackTransponder", ret);
+  completeOperation("rollbackTransponder");
 }
 
 void ProductionManager::getCurrentTransponderData() {
-  emit executionStarted("getCurrentTransponderData");
-  sendLog("Запрос данных текущего транспондера. ");
+  initOperation("getCurrentTransponderData");
 
   ReturnStatus ret;
   ret = Server->getCurrentTransponderData(TransponderData);
   if (ret != ReturnStatus::NoError) {
     TransponderData.clear();
     emit displayTransponderData_signal(TransponderData);
-    emit executionFinished("getCurrentTransponderData", ret);
-    sendLog("Не удалось получить данные текущего транспондера. ");
+    processOperationError("getCurrentTransponderData", ret);
     return;
   }
 
   emit displayTransponderData_signal(TransponderData);
 
-  // Завершаем операцию
-  sendLog("Данные текущего транспондера успешно получены. ");
-  emit executionFinished("getCurrentTransponderData", ret);
+  completeOperation("getCurrentTransponderData");
 }
 
 void ProductionManager::getTransponderData(
     const std::shared_ptr<StringDictionary> param) {
-  emit executionStarted("getTransponderData");
-  sendLog("Запрос данных транспондера. ");
+  initOperation("getTransponderData");
 
   ReturnStatus ret;
   ret = Server->getTransponderData(*param.get(), TransponderData);
   if (ret != ReturnStatus::NoError) {
     TransponderData.clear();
     emit displayTransponderData_signal(TransponderData);
-    emit executionFinished("getTransponderData", ret);
-    sendLog("Не удалось получить данные транспондера. ");
+    processOperationError("getTransponderData", ret);
     return;
   }
 
   emit displayTransponderData_signal(TransponderData);
 
-  // Завершаем операцию
-  sendLog("Данные транспондера успешно получены. ");
-  emit executionFinished("getTransponderData", ret);
+  completeOperation("getTransponderData");
 }
 
 void ProductionManager::printBoxSticker(
     const std::shared_ptr<StringDictionary> param) {
-  emit executionStarted("printBoxSticker");
-  sendLog("Печать стикера для бокса. ");
+  initOperation("printBoxSticker");
 
   ReturnStatus ret;
   ret = Server->printBoxSticker(*param);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("printBoxSticker", ret);
+    processOperationError("printBoxSticker", ret);
     return;
   }
 
-  // Завершаем операцию
-  sendLog("Стикер для бокса успешно распечатан. ");
-  emit executionFinished("printBoxSticker", ret);
+  completeOperation("printBoxSticker");
 }
 
 void ProductionManager::printLastBoxSticker() {
-  emit executionStarted("printLastBoxSticker");
-  sendLog("Печать последнего стикера для бокса. ");
+  initOperation("printLastBoxSticker");
 
   ReturnStatus ret;
   ret = Server->printLastBoxSticker();
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("printLastBoxSticker", ret);
+    processOperationError("printLastBoxSticker", ret);
     return;
   }
 
-  // Завершаем операцию
-  sendLog("Последний стикер для бокса успешно распечатан. ");
-  emit executionFinished("printLastBoxSticker", ret);
+  completeOperation("printLastBoxSticker");
 }
 
 void ProductionManager::printPalletSticker(
     const std::shared_ptr<StringDictionary> param) {
-  emit executionStarted("printPalletSticker");
-  sendLog("Печать стикера для паллеты. ");
+  initOperation("printPalletSticker");
 
   ReturnStatus ret;
   ret = Server->printPalletSticker(*param);
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("printPalletSticker", ret);
+    processOperationError("printPalletSticker", ret);
     return;
   }
 
-  // Завершаем операцию
-  sendLog("Стикер для паллеты успешно распечатан. ");
-  emit executionFinished("printPalletSticker", ret);
+  completeOperation("printPalletSticker");
 }
 
 void ProductionManager::printLastPalletSticker() {
-  emit executionStarted("printLastPalletSticker");
-  sendLog("Печать последнего стикера для паллеты. ");
+  initOperation("printLastPalletSticker");
 
   ReturnStatus ret;
   ret = Server->printLastPalletSticker();
   if (ret != ReturnStatus::NoError) {
-    emit executionFinished("printLastPalletSticker", ret);
+    processOperationError("printLastPalletSticker", ret);
     return;
   }
 
-  // Завершаем операцию
-  sendLog("Последний стикер для паллеты успешно распечатан. ");
-  emit executionFinished("printLastPalletSticker", ret);
+  completeOperation("printLastPalletSticker");
 }
 
 void ProductionManager::loadSettings() {}
@@ -568,4 +535,20 @@ void ProductionManager::createStickerPrinter() {
   if (!StickerPrinter->init()) {
     sendLog("Не удалось инициализировать принтер стикеров.");
   }
+}
+
+void ProductionManager::initOperation(const QString& name) {
+  sendLog(QString("Начало выполнения операции %1. ").arg(name));
+  emit executionStarted(name);
+}
+
+void ProductionManager::processOperationError(const QString& name,
+                                              ReturnStatus ret) {
+  sendLog(QString("Не удалось выполнить операцию %1. ").arg(name));
+  emit executionFinished(name, ret);
+}
+
+void ProductionManager::completeOperation(const QString& name) {
+  sendLog(QString("Операция %1 успешно выполнена. ").arg(name));
+  emit executionFinished(name, ReturnStatus::NoError);
 }

@@ -9,18 +9,34 @@ class ProductionAssemblerGui : public AbstractGui {
  public:
   QVBoxLayout* ControlPanelLayout;
 
+  QGroupBox* BoxGroup;
+  QVBoxLayout* BoxGroupLayout;
+  QPushButton* RequestBoxButton;
+  QPushButton* RefundCurrentBoxButton;
+  QPushButton* CompleteCurrentBoxButton;
+  QSpacerItem* ButtonVS1;
+
   QGroupBox* TransponderGroup;
-  QVBoxLayout* TransponderLayout;
+  QVBoxLayout* TransponderGroupLayout;
   QPushButton* ReleaseTransponderButton;
-  QSpacerItem* ButtonVerticalSpacer;
+  QSpacerItem* ButtonVS2;
   QPushButton* RollbackTransponderPushButton;
   QPushButton* RereleaseTransponderButton;
+  QSpacerItem* ButtonVS3;
 
-  QGroupBox* PrintStickerGroup;
-  QVBoxLayout* PrintStickerLayout;
+  QGroupBox* PrinterStickerGroup;
+  QVBoxLayout* PrinterStickerLayout;
   QPushButton* PrintLastTransponderStickerButton;
   QPushButton* PrintCustomTransponderStickerButton;
   QPushButton* PrintBoxStickerButton;
+
+  // Представления для моделей
+  QVBoxLayout* ModelViewLayout;
+  QHBoxLayout* ModelViewSublayout;
+
+  QGroupBox* ProductionLineDataGroup;
+  QVBoxLayout* ProductionLineDataLayout;
+  QTableView* ProductionLineDataView;
 
   QGroupBox* BoxDataGroup;
   QVBoxLayout* BoxDataLayout;
@@ -39,6 +55,11 @@ class ProductionAssemblerGui : public AbstractGui {
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionAssemblerGui);
+
+  void createBoxGroup(void);
+  void createTransponderGroup(void);
+  void createPrinterStickerGroup(void);
+  void createModelViews(void);
 };
 
 #endif  // PRODUCTION_ASSEMBLER_GUI_H

@@ -73,7 +73,7 @@ class MasterGui : public AbstractGui {
   QPushButton* EraseDeviceButton;
   QPushButton* ProgramDeviceUserDataButton;
   QPushButton* ReadDeviceUserDataButton;
-  QSpacerItem* ButtonVerticalSpacer;
+  QSpacerItem* ButtonVS1;
   QPushButton* unlockMemoryButton;
   QPushButton* lockMemoryButton;
   //============================================================

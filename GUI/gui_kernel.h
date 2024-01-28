@@ -11,6 +11,7 @@
 #include "abstract_gui.h"
 #include "abstract_gui_subkernel.h"
 #include "abstract_manager.h"
+#include "global_environment.h"
 #include "interaction_system.h"
 #include "log_system.h"
 
@@ -24,7 +25,7 @@ class GuiKernel : public QMainWindow {
   //==================================================
   QMenu* ServiceMenu;
   QAction* OpenMasterGuiAct;
-  QAction* OpenAuthorizationGuiAct;
+  QAction* LogOutServerAct;
   QAction* OpenSettingsDialogAct;
 
   QMenu* HelpMenu;
@@ -33,6 +34,8 @@ class GuiKernel : public QMainWindow {
 
   AbstractGui* CurrentGui;
   std::unordered_map<QString, std::shared_ptr<AbstractGuiSubkernel>> Subkernels;
+
+  GlobalEnvironment* GlobalEnv;
 
   std::unique_ptr<LogSystem> Logger;
   std::unique_ptr<InteractionSystem> Interactor;
@@ -51,8 +54,10 @@ class GuiKernel : public QMainWindow {
   void displayMasterGui_slot(void);
   void displayProductionAssemblerGui_slot(void);
   void displayProductionTesterGui_slot(void);
-  void displayAuthorizationGui_slot(void);
+  void logOutServerAct_slot(void);
   void displaySettingsDialog_slot(void);
+
+  void onServerDisconnected(void);
 
  private:
   Q_DISABLE_COPY_MOVE(GuiKernel);
@@ -84,6 +89,8 @@ class GuiKernel : public QMainWindow {
 
   void logging(const QString& log);
   void clearLogDisplay_signal(void);
+
+  void logOutServer_signal(void);
 };
 
 #endif  // GUI_KERNEL_H

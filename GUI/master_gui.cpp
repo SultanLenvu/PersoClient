@@ -189,9 +189,9 @@ void MasterGui::createProgrammatorTab() {
   ReadDeviceUserDataButton =
       new QPushButton(QString("Считать  пользовательские данные"));
   ProgrammatorControlPanelLayout->addWidget(ReadDeviceUserDataButton);
-  ButtonVerticalSpacer =
+  ButtonVS1 =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  ProgrammatorControlPanelLayout->addItem(ButtonVerticalSpacer);
+  ProgrammatorControlPanelLayout->addItem(ButtonVS1);
 
   unlockMemoryButton = new QPushButton(QString("Разблокировать память"));
   ProgrammatorControlPanelLayout->addWidget(unlockMemoryButton);
