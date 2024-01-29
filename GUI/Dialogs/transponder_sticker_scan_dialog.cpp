@@ -32,10 +32,10 @@ void TransponderStickerScanDialog::getData(StringDictionary& data) const {
   }
 
   if (input.size() == 2) {
-    data.insert("pan", input.at(0));
-    data.insert("sn", input.at(1));
+    data.insert("transponder_pan", input.at(0));
+    data.insert("transponder_sn", input.at(1));
   } else if (input.size() == 1) {
-    data.insert("pan", input.at(0));
+    data.insert("transponder_pan", input.at(0));
   }
 }
 

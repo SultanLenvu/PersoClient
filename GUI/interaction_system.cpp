@@ -138,8 +138,6 @@ void InteractionSystem::createTimers() {
 
 void InteractionSystem::createMessageTable() {
   MessageTable[ReturnStatus::NoError] = "Выполнено.";
-  MessageTable[ReturnStatus::DynamicLibraryMissing] =
-      "Не найдена динамическая библиотека.";
   MessageTable[ReturnStatus::ParameterError] = "Получена ошибка параметра.";
   MessageTable[ReturnStatus::SyntaxError] = "Получена синтаксическая ошибка.";
   MessageTable[ReturnStatus::ConsistencyViolation] =
@@ -219,6 +217,10 @@ void InteractionSystem::createMessageTable() {
       "Производственная линия не находится в процессе сборки. Необходимо "
       "запросить бокс.";
 
+  MessageTable[ReturnStatus::StickerPrinterDriverMissed] =
+      "Не найден драйвер для принтера стикеров.";
+  MessageTable[ReturnStatus::StickerPrinterLibraryMissing] =
+      "Не найдена динамическая библиотека для принтера стикеров.";
   MessageTable[ReturnStatus::StickerPrinterInitError] =
       "Не удалось инициализировать принтер стикеров.";
   MessageTable[ReturnStatus::StickerPrinterConnectionError] =

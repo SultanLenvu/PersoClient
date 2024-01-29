@@ -44,9 +44,14 @@ void SettingsDialog::create() {
   LogSystemMainLayout->addWidget(LogSystemExtendedEnableLabel, 1, 0, 1, 1);
   LogSystemExtendedEnableCheckBox = new QCheckBox();
   LogSystemExtendedEnableCheckBox->setCheckState(
-      Settings.value("log_system/Extended_enable").toBool() ? Qt::Checked
+      Settings.value("log_system/extended_enable").toBool() ? Qt::Checked
                                                             : Qt::Unchecked);
   LogSystemMainLayout->addWidget(LogSystemExtendedEnableCheckBox, 1, 1, 1, 1);
+  LogSystemMessageMaxSizeLabel = new QLabel("Максимальный размер сообщения");
+  LogSystemMainLayout->addWidget(LogSystemMessageMaxSizeLabel, 2, 0, 1, 1);
+  LogSystemMessageMaxSizeLineEdit =
+      new QLineEdit(Settings.value("log_system/message_max_size").toString());
+  LogSystemMainLayout->addWidget(LogSystemMessageMaxSizeLineEdit, 2, 1, 1, 1);
 
   // Сеть
   PersoServerGroupBox = new QGroupBox(QString("Сетевые настройки"));
@@ -129,13 +134,17 @@ void SettingsDialog::create() {
 bool SettingsDialog::check() const {
   QHostAddress IP = QHostAddress(PersoServerIpAddressLineEdit->text());
   uint32_t speed = ProgrammerSpeedLineEdit->text().toUInt();
+  int32_t msgMaxSize = LogSystemMessageMaxSizeLineEdit->text().toInt();
+
+  if (msgMaxSize == 0) {
+    return false;
+  }
 
   if (IP.isNull()) {
     return false;
   }
 
   int32_t port = PersoServerPortLineEdit->text().toInt();
-
   if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
     return false;
   }
@@ -162,6 +171,8 @@ void SettingsDialog::save() {
                     LogSystemGlobalEnableCheckBox->isChecked());
   Settings.setValue("log_system/extended_enable",
                     LogSystemExtendedEnableCheckBox->isChecked());
+  Settings.setValue("log_system/message_max_size",
+                    LogSystemMessageMaxSizeLineEdit->text().toInt());
 
   Settings.setValue("perso_server_connection/ip",
                     PersoServerIpAddressLineEdit->text());

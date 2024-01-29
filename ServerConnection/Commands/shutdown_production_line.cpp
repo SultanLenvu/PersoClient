@@ -1,28 +1,26 @@
-#include "log_in.h"
+#include "shutdown_production_line.h"
 
-LogIn::LogIn(const QString& name) : AbstractClientCommand(name) {}
+ShutdownProductionLine::ShutdownProductionLine(const QString& name) : AbstractClientCommand(name) {}
 
-LogIn::~LogIn() {}
+ShutdownProductionLine::~ShutdownProductionLine() {}
 
-const QString& LogIn::name() {
+const QString& ShutdownProductionLine::name() {
   return Name;
 }
 
-ReturnStatus LogIn::generate(const StringDictionary& param,
-                                    QByteArray& dataBlock) {
+ReturnStatus ShutdownProductionLine::generate(const StringDictionary& param,
+                              QByteArray& dataBlock) {
   // Заголовок команды
   Request["command_name"] = Name;
 
   // Тело команды
-  Request["login"] = param.value("login");
-  Request["password"] = param.value("password");
 
   generateDataBlock(dataBlock);
   return ReturnStatus::NoError;
 }
 
-ReturnStatus LogIn::processResponse(const QByteArray& dataBlock,
-                                           StringDictionary& responseData) {
+ReturnStatus ShutdownProductionLine::processResponse(const QByteArray& dataBlock,
+                                     StringDictionary& responseData) {
   if (!processDataBlock(dataBlock)) {
     sendLog("Получена ошибка при обработке полученного блока данных.");
     return ReturnStatus::ServerResponseDataBlockError;

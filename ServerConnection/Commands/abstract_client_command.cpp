@@ -4,6 +4,7 @@
 #include <QIODevice>
 #include <QJsonDocument>
 
+#include "definitions.h"
 #include "global_environment.h"
 #include "log_system.h"
 
@@ -48,6 +49,8 @@ void AbstractClientCommand::generateDataBlock(QByteArray& dataBlock) {
 
   sendLog(QString("Размер отправляемого блока данных: %1")
               .arg(QString::number(dataBlock.size())));
+  // Ограничиваем вывод в лог полученного блока данных, чтобы не было фризов при
+  // отрисовке
   sendLog(QString("Отправляемый блок данных: %1").arg(dataBlock));
 }
 
@@ -89,7 +92,6 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[ProductionLineLaunchSystemInitError] =
       ReturnStatus::ServerInternalError;
   CrtMap[FirmwareGeneratorInitError] = ReturnStatus::ServerInternalError;
-  CrtMap[StickerPrinterInitError] = ReturnStatus::ServerInternalError;
 
   CrtMap[RecordMissed] = ReturnStatus::ServerInternalError;
   CrtMap[ProductionLineMissed] = ReturnStatus::ProductionLineMissed;
@@ -134,6 +136,8 @@ void AbstractClientCommand::createCrtMap() {
 
   CrtMap[FirmwareGenerationError] = ReturnStatus::ServerInternalError;
 
+  CrtMap[StickerPrinterDriverMissed] = ReturnStatus::ServerInternalError;
+  CrtMap[StickerPrinterLibraryMissing] = ReturnStatus::ServerInternalError;
   CrtMap[StickerPrinterConnectionError] = ReturnStatus::ServerInternalError;
   CrtMap[BoxStickerPrintError] = ReturnStatus::ServerInternalError;
   CrtMap[PalletStickerPrintError] = ReturnStatus::ServerInternalError;
@@ -160,8 +164,6 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: ProductionLineLaunchSystemInitError";
   CrtLogMap[FirmwareGeneratorInitError] =
       "Server return status: FirmwareGeneratorInitError";
-  CrtLogMap[StickerPrinterInitError] =
-      "Server return status: StickerPrinterInitError";
 
   CrtLogMap[RecordMissed] = "Server return status: RecordMissed";
   CrtLogMap[ProductionLineMissed] =
@@ -222,6 +224,10 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[FirmwareGenerationError] =
       "Server return status: FirmwareGenerationError";
 
+  CrtLogMap[StickerPrinterDriverMissed] =
+      "Server return status: StickerPrinterDriverMissed";
+  CrtLogMap[StickerPrinterLibraryMissing] =
+      "Server return status: StickerPrinterLibraryMissing";
   CrtLogMap[StickerPrinterConnectionError] =
       "Server return status: StickerPrinterConnectionError";
   CrtLogMap[BoxStickerPrintError] =

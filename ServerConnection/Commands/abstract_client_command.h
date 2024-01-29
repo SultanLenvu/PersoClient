@@ -23,7 +23,6 @@ class AbstractClientCommand : public QObject {
 
     ProductionLineLaunchSystemInitError,
     FirmwareGeneratorInitError,
-    StickerPrinterInitError,
 
     RecordMissed,
     ProductionLineMissed,
@@ -63,6 +62,8 @@ class AbstractClientCommand : public QObject {
 
     FirmwareGenerationError,
 
+    StickerPrinterDriverMissed,
+    StickerPrinterLibraryMissing,
     StickerPrinterConnectionError,
     BoxStickerPrintError,
     PalletStickerPrintError,

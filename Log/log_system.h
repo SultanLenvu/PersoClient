@@ -19,6 +19,7 @@ class LogSystem : public QObject {
 
  private:
   bool LogEnable;
+  int32_t MessageMaxSize;
 
   std::vector<std::unique_ptr<LogBackend>> Backends;
 

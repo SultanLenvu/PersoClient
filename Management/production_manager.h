@@ -11,13 +11,14 @@
 class ProductionManager : public AbstractManager {
   Q_OBJECT
 
- private:
+ private:  
   std::unique_ptr<AbstractServerConnection> Server;
   std::unique_ptr<AbstractProgrammer> Programmer;
   std::unique_ptr<AbstractStickerPrinter> StickerPrinter;
 
   std::unique_ptr<QFile> Firmware;
 
+  StringDictionary ProductionLineData;
   StringDictionary BoxData;
   StringDictionary TransponderData;
 
@@ -37,6 +38,8 @@ class ProductionManager : public AbstractManager {
   void disconnectFromServer(void);
   void launchProductionLine(const std::shared_ptr<StringDictionary> param);
   void shutdownProductionLine(void);
+  void getProductionLineData(void);
+
   void logOnServer(const std::shared_ptr<StringDictionary> param);
   void logOutServer(void);
   void echoServer(void);
@@ -61,6 +64,7 @@ class ProductionManager : public AbstractManager {
   Q_DISABLE_COPY_MOVE(ProductionManager)
   void loadSettings(void);
   void sendLog(const QString& log);
+  ReturnStatus checkConfig(void);
 
   void createProgrammer(void);
   void createServerConnection(void);
@@ -71,6 +75,7 @@ class ProductionManager : public AbstractManager {
   void completeOperation(const QString& name);
 
  signals:
+  void displayProductionLineData_signal(const StringDictionary& data);
   void displayTransponderData_signal(const StringDictionary& data);
   void displayBoxData_signal(const StringDictionary& data);
   void authorizationCompleted(void);

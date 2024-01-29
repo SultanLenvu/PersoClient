@@ -1,18 +1,18 @@
-#ifndef LOGOUT_H
-#define LOGOUT_H
+#ifndef LOGIN_H
+#define LOGIN_H
 
 #include "abstract_client_command.h"
 #include "definitions.h"
 
-class LogOut : public AbstractClientCommand {
+class LaunchProductionLine : public AbstractClientCommand {
   Q_OBJECT
  private:
-  const QString Name = COMMAND_LOGOUT_NAME;
-  const size_t ResponseSize = COMMAND_LOGOUT_RESPONSE_SIZE;
+  const QString Name = COMMAND_LAUNCHPRODUCTIONLINE_NAME;
+  const size_t ResponseSize = COMMAND_LAUNCHPRODUCTIONLINE_RESPONSE_SIZE;
 
  public:
-  explicit LogOut(const QString& name);
-  ~LogOut();
+  explicit LaunchProductionLine(const QString& name);
+  ~LaunchProductionLine();
 
   // AbstractClientCommand interface
  public:
@@ -23,9 +23,9 @@ class LogOut : public AbstractClientCommand {
                                        StringDictionary& responseData) override;
 
  private:
-  Q_DISABLE_COPY_MOVE(LogOut)
+  Q_DISABLE_COPY_MOVE(LaunchProductionLine)
 
  signals:
 };
 
-#endif  // LOGOUT_H
+#endif  // LOGIN_H

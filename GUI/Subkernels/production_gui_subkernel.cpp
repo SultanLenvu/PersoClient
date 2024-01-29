@@ -63,15 +63,21 @@ void ProductionGuiSubkernel::logOnCompleted_slot() {
   }
 }
 
+void ProductionGuiSubkernel::displayProductionLineData(
+    const StringDictionary& data) {
+  ProductionLineModel->setData(data);
+  CurrentGui->updateModelViews();
+}
+
 void ProductionGuiSubkernel::displayTransponderData(
     const StringDictionary& data) {
   TransponderDataModel->setData(data);
-  emit updateModelViews();
+  CurrentGui->updateModelViews();
 }
 
 void ProductionGuiSubkernel::displayBoxData(const StringDictionary& data) {
   BoxDataModel->setData(data);
-  emit updateModelViews();
+  CurrentGui->updateModelViews();
 }
 
 void ProductionGuiSubkernel::connectAuthorizationGui() {
@@ -93,6 +99,8 @@ void ProductionGuiSubkernel::connectMasterGui() {
           &ProductionGuiSubkernel::echoRequest_guiSlot);
   connect(gui->AuthorizePushButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::logOn_guiSlot);
+  connect(gui->GetProductionLineDataButton, &QPushButton::clicked, this,
+          &ProductionGuiSubkernel::getProductionLineData_guiSlot);
 
   connect(gui->RequestBoxButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::requestBox_guiSlot);
@@ -124,12 +132,11 @@ void ProductionGuiSubkernel::connectMasterGui() {
           &ProductionGuiSubkernel::printLastPalletSticker_guiSlot);
 
   // Связывание моделей и представлений
+  gui->ProductionLineDataView->setModel(ProductionLineModel.get());
   gui->TransponderDataView->setModel(TransponderDataModel.get());
   gui->BoxDataView->setModel(BoxDataModel.get());
 
   // Сигналы от подядра
-  connect(this, &ProductionGuiSubkernel::updateModelViews, gui,
-          &MasterGui::updateModelViews);
 }
 
 void ProductionGuiSubkernel::connectProductionAssemblerGui() {
@@ -160,8 +167,6 @@ void ProductionGuiSubkernel::connectProductionAssemblerGui() {
   gui->BoxDataView->setModel(BoxDataModel.get());
 
   // Сигналы от подядра
-  connect(this, &ProductionGuiSubkernel::updateModelViews, gui,
-          &ProductionAssemblerGui::updateModelViews);
 }
 
 void ProductionGuiSubkernel::connectProductionTesterGui() {
@@ -174,11 +179,10 @@ void ProductionGuiSubkernel::connectProductionTesterGui() {
           &ProductionGuiSubkernel::printPalletSticker_guiSlot);
 
   // Связывание моделей и представлений
+  gui->TransponderDataView->setModel(ProductionLineModel.get());
   gui->TransponderDataView->setModel(TransponderDataModel.get());
 
   // Сигналы от подядра
-  connect(this, &ProductionGuiSubkernel::updateModelViews, gui,
-          &ProductionTesterGui::updateModelViews);
 }
 
 void ProductionGuiSubkernel::connectProductionManager() const {
@@ -189,12 +193,14 @@ void ProductionGuiSubkernel::connectProductionManager() const {
           &ProductionManager::connectToServer);
   connect(this, &ProductionGuiSubkernel::disconnectFromServer_signal, manager,
           &ProductionManager::disconnectFromServer);
+  connect(this, &ProductionGuiSubkernel::echoServer_signal, manager,
+          &ProductionManager::echoServer);
   connect(this, &ProductionGuiSubkernel::launchProductionLine_signal, manager,
           &ProductionManager::launchProductionLine);
   connect(this, &ProductionGuiSubkernel::logOnServer_signal, manager,
           &ProductionManager::logOnServer);
-  connect(this, &ProductionGuiSubkernel::echoServer_signal, manager,
-          &ProductionManager::echoServer);
+  connect(this, &ProductionGuiSubkernel::getProductionLineData_signal, manager,
+          &ProductionManager::getProductionLineData);
 
   connect(this, &ProductionGuiSubkernel::requestBox_signal, manager,
           &ProductionManager::requestBox);
@@ -228,6 +234,8 @@ void ProductionGuiSubkernel::connectProductionManager() const {
   // Сигналы от менеджера
   connect(manager, &ProductionManager::authorizationCompleted, this,
           &ProductionGuiSubkernel::logOnCompleted_slot);
+  connect(manager, &ProductionManager::displayProductionLineData_signal, this,
+          &ProductionGuiSubkernel::displayProductionLineData);
   connect(manager, &ProductionManager::displayTransponderData_signal, this,
           &ProductionGuiSubkernel::displayTransponderData);
   connect(manager, &ProductionManager::displayBoxData_signal, this,
@@ -277,7 +285,13 @@ void ProductionGuiSubkernel::logOn_guiSlot() {
   }
   dialog.getData(*param);
 
-  emit
+  emit launchProductionLine_signal(param);
+}
+
+void ProductionGuiSubkernel::getProductionLineData_guiSlot() {
+  emit clearLogDisplay_signal();
+
+  emit getProductionLineData_signal();
 }
 
 void ProductionGuiSubkernel::requestBox_guiSlot() {
@@ -386,6 +400,17 @@ void ProductionGuiSubkernel::printLastPalletSticker_guiSlot() {
 }
 
 void ProductionGuiSubkernel::createModels() {
+  std::shared_ptr<StringDictionary> plMatchTable(new StringDictionary());
+  plMatchTable->insert("production_line_id", "Идентификатор");
+  plMatchTable->insert("production_line_login", "Логин");
+  plMatchTable->insert("production_line_in_process", "В процессе сборки");
+  plMatchTable->insert("production_line_ns", "Сотрудник");
+  plMatchTable->insert("today_assembled_boxes", "Собрано боксов за сегодня");
+
+  ProductionLineModel = std::unique_ptr<HashTableModel>(
+      new HashTableModel("ProductionLineModel"));
+  ProductionLineModel->setMatchTable(plMatchTable);
+
   std::shared_ptr<StringDictionary> tMatchTable(new StringDictionary());
   tMatchTable->insert("transponder_sn", "Серийный номер");
   tMatchTable->insert("transponder_ucid", "UCID");

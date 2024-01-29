@@ -67,6 +67,9 @@ void MasterGui::createServerTab() {
   ServerControlPanelLayout->addWidget(ServerEchoRequestButton);
   AuthorizePushButton = new QPushButton(QString("Авторизироваться"));
   ServerControlPanelLayout->addWidget(AuthorizePushButton);
+  GetProductionLineDataButton =
+      new QPushButton(QString("Запросить данные производственной линии"));
+  ServerControlPanelLayout->addWidget(GetProductionLineDataButton);
   ServerControlPanelVS1 =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ServerControlPanelLayout->addItem(ServerControlPanelVS1);

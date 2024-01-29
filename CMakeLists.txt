@@ -83,14 +83,15 @@ add_executable(PersoClient WIN32
     ServerConnection/Commands/print_last_box_sticker.h ServerConnection/Commands/print_last_box_sticker.cpp
     ServerConnection/Commands/print_pallet_sticker.h ServerConnection/Commands/print_pallet_sticker.cpp
     ServerConnection/Commands/print_last_pallet_sticker.h ServerConnection/Commands/print_last_pallet_sticker.cpp
-    ServerConnection/Commands/log_in.h ServerConnection/Commands/log_in.cpp
-    ServerConnection/Commands/log_out.h ServerConnection/Commands/log_out.cpp
+    ServerConnection/Commands/launch_production_line.h ServerConnection/Commands/launch_production_line.cpp
+    ServerConnection/Commands/shutdown_production_line.h ServerConnection/Commands/shutdown_production_line.cpp
     ServerConnection/Commands/get_current_transponder_data.h ServerConnection/Commands/get_current_transponder_data.cpp
     ServerConnection/Commands/get_transponder_data.cpp ServerConnection/Commands/get_transponder_data.h
     ServerConnection/Commands/refund_current_box.cpp ServerConnection/Commands/refund_current_box.h
     ServerConnection/Commands/get_current_box_data.cpp ServerConnection/Commands/get_current_box_data.h
     ServerConnection/Commands/complete_current_box.h ServerConnection/Commands/complete_current_box.cpp
     ServerConnection/Commands/request_box.h ServerConnection/Commands/request_box.cpp
+    ServerConnection/Commands/get_production_line_data.h ServerConnection/Commands/get_production_line_data.cpp
 
     main.cpp
     )

@@ -13,11 +13,13 @@ class AbstractServerConnection : public QObject {
 
   virtual ReturnStatus connect(void) = 0;
   virtual void disconnect(void) = 0;
+  virtual bool isConnected(void) = 0;
 
   virtual ReturnStatus echo(void) = 0;
 
   virtual ReturnStatus launchProductionLine(const StringDictionary& param) = 0;
   virtual ReturnStatus shutdownProductionLine(void) = 0;
+  virtual ReturnStatus getProductionLineData(StringDictionary& result) = 0;
 
   virtual ReturnStatus requestBox(void) = 0;
   virtual ReturnStatus getCurrentBoxData(StringDictionary& result) = 0;

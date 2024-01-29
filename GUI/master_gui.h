@@ -24,6 +24,7 @@ class MasterGui : public AbstractGui {
   QPushButton* ServerDisconnectButton;
   QPushButton* ServerEchoRequestButton;
   QPushButton* AuthorizePushButton;
+  QPushButton* GetProductionLineDataButton;
   QSpacerItem* ServerControlPanelVS1;
 
   QPushButton* RequestBoxButton;

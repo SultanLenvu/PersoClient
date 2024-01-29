@@ -8,7 +8,7 @@ MasterPasswordInputDialog::MasterPasswordInputDialog(QWidget* parent)
   // Создаем диалоговое окно
   setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
               DesktopGeometry.width() * 0.15, DesktopGeometry.height() * 0.05);
-  setWindowTitle("Авторизация");
+  setWindowTitle("Мастер пароль");
 
   create();
 }

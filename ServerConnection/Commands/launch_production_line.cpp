@@ -1,26 +1,28 @@
-#include "log_out.h"
+#include "launch_production_line.h"
 
-LogOut::LogOut(const QString& name) : AbstractClientCommand(name) {}
+LaunchProductionLine::LaunchProductionLine(const QString& name) : AbstractClientCommand(name) {}
 
-LogOut::~LogOut() {}
+LaunchProductionLine::~LaunchProductionLine() {}
 
-const QString& LogOut::name() {
+const QString& LaunchProductionLine::name() {
   return Name;
 }
 
-ReturnStatus LogOut::generate(const StringDictionary& param,
-                              QByteArray& dataBlock) {
+ReturnStatus LaunchProductionLine::generate(const StringDictionary& param,
+                                    QByteArray& dataBlock) {
   // Заголовок команды
   Request["command_name"] = Name;
 
   // Тело команды
+  Request["login"] = param.value("login");
+  Request["password"] = param.value("password");
 
   generateDataBlock(dataBlock);
   return ReturnStatus::NoError;
 }
 
-ReturnStatus LogOut::processResponse(const QByteArray& dataBlock,
-                                     StringDictionary& responseData) {
+ReturnStatus LaunchProductionLine::processResponse(const QByteArray& dataBlock,
+                                           StringDictionary& responseData) {
   if (!processDataBlock(dataBlock)) {
     sendLog("Получена ошибка при обработке полученного блока данных.");
     return ReturnStatus::ServerResponseDataBlockError;

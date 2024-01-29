@@ -75,11 +75,34 @@ void ProductionManager::shutdownProductionLine() {
   completeOperation("shutdownProductionLine");
 }
 
+void ProductionManager::getProductionLineData() {
+  initOperation("getProductionLineData");
+
+  ReturnStatus ret;
+  ret = Server->getProductionLineData(ProductionLineData);
+  if (ret != ReturnStatus::NoError) {
+    ProductionLineData.clear();
+    emit displayProductionLineData_signal(ProductionLineData);
+    processOperationError("getProductionLineData", ret);
+    return;
+  }
+
+  emit displayProductionLineData_signal(ProductionLineData);
+
+  completeOperation("getProductionLineData");
+}
+
 void ProductionManager::logOnServer(
     const std::shared_ptr<StringDictionary> param) {
   initOperation("logOnServer");
 
   ReturnStatus ret;
+  ret = checkConfig();
+  if (ret != ReturnStatus::NoError) {
+    processOperationError("logOnServer", ret);
+    return;
+  }
+
   ret = Server->connect();
   if (ret != ReturnStatus::NoError) {
     processOperationError("logOnServer", ret);
@@ -92,6 +115,16 @@ void ProductionManager::logOnServer(
     return;
   }
 
+  ret = Server->getProductionLineData(ProductionLineData);
+  if (ret != ReturnStatus::NoError) {
+    ProductionLineData.clear();
+    emit displayBoxData_signal(ProductionLineData);
+    processOperationError("logOnServer", ret);
+    return;
+  }
+
+  emit displayProductionLineData_signal(ProductionLineData);
+
   emit authorizationCompleted();
   completeOperation("logOnServer");
 }
@@ -99,8 +132,10 @@ void ProductionManager::logOnServer(
 void ProductionManager::logOutServer() {
   initOperation("logOutServer");
 
-  Server->shutdownProductionLine();
-  Server->disconnect();
+  if (Server->isConnected()) {
+    Server->shutdownProductionLine();
+    Server->disconnect();
+  }
 
   completeOperation("logOutServer");
 }
@@ -149,6 +184,16 @@ void ProductionManager::requestBox() {
 
   emit displayTransponderData_signal(TransponderData);
 
+  ret = Server->getProductionLineData(ProductionLineData);
+  if (ret != ReturnStatus::NoError) {
+    ProductionLineData.clear();
+    emit displayBoxData_signal(ProductionLineData);
+    processOperationError("requestBox", ret);
+    return;
+  }
+
+  emit displayProductionLineData_signal(ProductionLineData);
+
   completeOperation("requestBox");
 }
 
@@ -184,6 +229,16 @@ void ProductionManager::refundCurrentBox() {
 
   TransponderData.clear();
   emit displayTransponderData_signal(TransponderData);
+
+  ret = Server->getProductionLineData(ProductionLineData);
+  if (ret != ReturnStatus::NoError) {
+    ProductionLineData.clear();
+    emit displayBoxData_signal(ProductionLineData);
+    processOperationError("logOnServer", ret);
+    return;
+  }
+
+  emit displayProductionLineData_signal(ProductionLineData);
 
   completeOperation("refundCurrentBox");
 }
@@ -441,7 +496,7 @@ void ProductionManager::getTransponderData(
   initOperation("getTransponderData");
 
   ReturnStatus ret;
-  ret = Server->getTransponderData(*param.get(), TransponderData);
+  ret = Server->getTransponderData(*param, TransponderData);
   if (ret != ReturnStatus::NoError) {
     TransponderData.clear();
     emit displayTransponderData_signal(TransponderData);
@@ -514,6 +569,19 @@ void ProductionManager::sendLog(const QString& log) {
   emit logging(objectName() + " - " + log);
 }
 
+ReturnStatus ProductionManager::checkConfig() {
+  sendLog("Проверка конфигурации.");
+
+  ReturnStatus ret = StickerPrinter->checkConfig();
+  if (ret != ReturnStatus::NoError) {
+    sendLog(
+        "Проверка конфигурации провалена. Принтер стикеров не готов к работе.");
+  }
+
+  sendLog("Проверка конфигурации успешно завершена.");
+  return ret;
+}
+
 void ProductionManager::createProgrammer() {
   Programmer = std::unique_ptr<AbstractProgrammer>(
       new JLinkExeProgrammer("JLinkExeProgrammer1"));
@@ -531,10 +599,6 @@ void ProductionManager::createServerConnection() {
 void ProductionManager::createStickerPrinter() {
   StickerPrinter =
       std::unique_ptr<AbstractStickerPrinter>(new TE310Printer("TSC TE310"));
-
-  if (!StickerPrinter->init()) {
-    sendLog("Не удалось инициализировать принтер стикеров.");
-  }
 }
 
 void ProductionManager::initOperation(const QString& name) {

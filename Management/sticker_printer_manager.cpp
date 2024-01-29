@@ -99,8 +99,4 @@ void StickerPrinterManager::loadSettings() {}
 void StickerPrinterManager::createStickerPrinter() {
   StickerPrinter =
       std::unique_ptr<AbstractStickerPrinter>(new TE310Printer("TSC TE310"));
-
-  if (!StickerPrinter->init()) {
-    sendLog("Не удалось инициализировать принтер стикеров.");
-  }
 }

@@ -50,8 +50,8 @@ GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
   createGuiSubkernels();
 
   // Создаем графический интерфейс для авторизации
-  createAuthorizationGui();
-  //  createMasterGui();
+  //  createAuthorizationGui();
+  createMasterGui();
 
   // Регистрируем типы
   registerMetaTypes();
@@ -101,9 +101,7 @@ void GuiKernel::displayProductionTesterGui_slot() {
 void GuiKernel::logOutServerAct_slot() {
   emit logOutServer_signal();
 
-  if (CurrentGui->type() != AbstractGui::Master) {
-    createAuthorizationGui();
-  }
+  createAuthorizationGui();
 }
 
 void GuiKernel::displaySettingsDialog_slot() {

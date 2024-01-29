@@ -7,7 +7,6 @@ using StringDictionary = QHash<QString, QString>;
 
 enum class ReturnStatus {
   NoError = 0,
-  DynamicLibraryMissing,
   ParameterError,
   SyntaxError,
   ConsistencyViolation,
@@ -55,6 +54,8 @@ enum class ReturnStatus {
   ProductionLineCompleted,
   ProductionLineNotInProcess,
 
+  StickerPrinterDriverMissed,
+  StickerPrinterLibraryMissing,
   StickerPrinterInitError,
   StickerPrinterConnectionError,
 

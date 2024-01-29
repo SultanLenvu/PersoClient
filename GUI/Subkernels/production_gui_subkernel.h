@@ -35,6 +35,7 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
 
  public slots:
   void logOnCompleted_slot(void);
+  void displayProductionLineData(const StringDictionary& data);
   void displayTransponderData(const StringDictionary& data);
   void displayBoxData(const StringDictionary& data);
 
@@ -52,6 +53,7 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   void disconnect_guiSlot(void);
   void echoRequest_guiSlot(void);
   void logOn_guiSlot(void);
+  void getProductionLineData_guiSlot(void);
 
   void requestBox_guiSlot(void);
   void getCurrentBoxData_guiSlot(void);
@@ -74,15 +76,15 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
  signals:
   void displayProductionAssemblerGui(void);
   void displayProductionTesterGui(void);
-  void updateModelViews(void);
 
   // Сигналы для менеджера
   void connectToServer_signal(void);
   void disconnectFromServer_signal(void);
+  void echoServer_signal(void);
   void launchProductionLine_signal(
       const std::shared_ptr<StringDictionary> param);
   void logOnServer_signal(const std::shared_ptr<StringDictionary> param);
-  void echoServer_signal(void);
+  void getProductionLineData_signal(void);
 
   void requestBox_signal(void);
   void getCurrentBoxData_signal(void);

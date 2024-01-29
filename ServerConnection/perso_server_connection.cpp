@@ -8,9 +8,9 @@
 #include "echo.h"
 #include "get_current_box_data.h"
 #include "get_current_transponder_data.h"
+#include "get_production_line_data.h"
 #include "get_transponder_data.h"
-#include "log_in.h"
-#include "log_out.h"
+#include "launch_production_line.h"
 #include "perso_server_connection.h"
 #include "print_box_sticker.h"
 #include "print_last_box_sticker.h"
@@ -21,6 +21,7 @@
 #include "request_box.h"
 #include "rerelease_transponder.h"
 #include "rollback_transponder.h"
+#include "shutdown_production_line.h"
 
 PersoServerConnection::PersoServerConnection(const QString& name)
     : AbstractServerConnection(name) {
@@ -65,13 +66,12 @@ ReturnStatus PersoServerConnection::connect() {
 }
 
 void PersoServerConnection::disconnect() {
-  if (!Socket->isOpen()) {
-    sendLog("Подключение не было установлено. ");
-    return;
-  }
-
   sendLog("Отключение от сервера персонализации. ");
   Socket->disconnectFromHost();
+}
+
+bool PersoServerConnection::isConnected() {
+  return Socket->isOpen();
 }
 
 ReturnStatus PersoServerConnection::echo() {
@@ -85,7 +85,7 @@ ReturnStatus PersoServerConnection::echo() {
 }
 
 ReturnStatus PersoServerConnection::launchProductionLine(const StringDictionary& param) {
-  CurrentCommand = Commands.at(LogIn);
+  CurrentCommand = Commands.at(LaunchProductionLine);
 
   StringDictionary result;
   ReturnStatus ret = processCurrentCommand(param, result);
@@ -94,10 +94,20 @@ ReturnStatus PersoServerConnection::launchProductionLine(const StringDictionary&
 }
 
 ReturnStatus PersoServerConnection::shutdownProductionLine() {
-  CurrentCommand = Commands.at(LogOut);
+  CurrentCommand = Commands.at(ShutdownProductionLine);
 
   StringDictionary param, result;
   ReturnStatus ret = processCurrentCommand(param, result);
+
+  return ret;
+}
+
+ReturnStatus PersoServerConnection::getProductionLineData(
+    StringDictionary& data) {
+  CurrentCommand = Commands.at(GetProductionLineData);
+
+  StringDictionary param;
+  ReturnStatus ret = processCurrentCommand(param, data);
 
   return ret;
 }
@@ -386,10 +396,12 @@ void PersoServerConnection::createSocket(void) {
 
 void PersoServerConnection::createCommands() {
   Commands[Echo] = std::shared_ptr<::AbstractClientCommand>(new ::Echo("Echo"));
-  Commands[LogIn] =
-      std::shared_ptr<::AbstractClientCommand>(new ::LogIn("LogIn"));
-  Commands[LogOut] =
-      std::shared_ptr<::AbstractClientCommand>(new ::LogOut("LogOut"));
+  Commands[LaunchProductionLine] =
+      std::shared_ptr<::AbstractClientCommand>(new ::LaunchProductionLine("LaunchProductionLine"));
+  Commands[ShutdownProductionLine] = std::shared_ptr<::AbstractClientCommand>(
+      new ::ShutdownProductionLine("ShutdownProductionLine"));
+  Commands[GetProductionLineData] = std::shared_ptr<::AbstractClientCommand>(
+      new ::GetProductionLineData("GetProductionLineData"));
 
   Commands[RequestBox] =
       std::shared_ptr<::AbstractClientCommand>(new ::RequestBox("RequestBox"));
@@ -440,6 +452,7 @@ void PersoServerConnection::socketConnected_slot() {
 
 void PersoServerConnection::socketDisconnected_slot() {
   sendLog("Соединение с сервером персонализации отключено. ");
+  emit disconnected();
 }
 
 void PersoServerConnection::socketReadyRead_slot() {
@@ -488,6 +501,8 @@ void PersoServerConnection::socketReadyRead_slot() {
 
   sendLog(QString("Размер полученного блока данных: %1. ")
               .arg(QString::number(ReceivedDataBlock.size())));
+  // Ограничиваем вывод в лог полученного блока данных, чтобы не было фризов при
+  // отрисовке
   sendLog(QString("Полученный блок данных: %1 ").arg(ReceivedDataBlock));
 
   // Останавливаем цикл ожидания

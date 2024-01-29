@@ -21,6 +21,8 @@ class SettingsDialog : public QDialog {
   QCheckBox* LogSystemGlobalEnableCheckBox;
   QLabel* LogSystemExtendedEnableLabel;
   QCheckBox* LogSystemExtendedEnableCheckBox;
+  QLabel* LogSystemMessageMaxSizeLabel;
+  QLineEdit* LogSystemMessageMaxSizeLineEdit;
 
   // Сеть
   QGroupBox* PersoServerGroupBox;

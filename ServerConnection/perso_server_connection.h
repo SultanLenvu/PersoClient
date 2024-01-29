@@ -19,8 +19,9 @@ class PersoServerConnection : public AbstractServerConnection {
  public:
   enum CommandId {
     Echo,
-    LogIn,
-    LogOut,
+    LaunchProductionLine,
+    ShutdownProductionLine,
+    GetProductionLineData,
 
     RequestBox,
     GetCurrentBoxData,
@@ -67,9 +68,12 @@ class PersoServerConnection : public AbstractServerConnection {
  public:
   virtual ReturnStatus connect() override;
   virtual void disconnect() override;
+  virtual bool isConnected(void) override;
   virtual ReturnStatus echo() override;
+
   virtual ReturnStatus launchProductionLine(const StringDictionary& param) override;
   virtual ReturnStatus shutdownProductionLine() override;
+  virtual ReturnStatus getProductionLineData(StringDictionary& data) override;
 
   virtual ReturnStatus requestBox(void) override;
   virtual ReturnStatus getCurrentBoxData(StringDictionary& result) override;
