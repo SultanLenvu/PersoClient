@@ -11,9 +11,9 @@ enum class ReturnStatus {
   SyntaxError,
   ConsistencyViolation,
   FileOpenError,
-  InvalidFirmwareFile,
 
   ServerConnectionError,
+  ServerConnectionMissed,
   ServerNotResponding,
   ServerDataTransmittingError,
   ServerResponseSyntaxError,
@@ -37,8 +37,11 @@ enum class ReturnStatus {
   BoxAlreadyRequested,
   BoxNotRequested,
   FreeBoxMissed,
+  BoxIsEmty,
   BoxCompletelyAssembled,
   BoxNotCompletelyAssembled,
+
+  PalletIsEmpty,
 
   TransponderIncorrectRerelease,
   IdenticalUcidError,
@@ -59,6 +62,8 @@ enum class ReturnStatus {
   StickerPrinterInitError,
   StickerPrinterConnectionError,
 
+  InvalidFirmwareFile,
+  ProgrammatorLibraryMissing,
   ProgrammatorError,
 };
 

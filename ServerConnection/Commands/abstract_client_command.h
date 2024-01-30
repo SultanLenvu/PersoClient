@@ -21,8 +21,8 @@ class AbstractClientCommand : public QObject {
     DatabaseTransactionError,
     DatabaseQueryError,
 
-    ProductionLineLaunchSystemInitError,
     FirmwareGeneratorInitError,
+    FirmwareGenerationError,
 
     RecordMissed,
     ProductionLineMissed,
@@ -39,8 +39,11 @@ class AbstractClientCommand : public QObject {
     BoxAlreadyRequested,
     BoxNotRequested,
     FreeBoxMissed,
+    BoxIsEmty,
     BoxCompletelyAssembled,
     BoxNotCompletelyAssembled,
+
+    PalletIsEmpty,
 
     TransponderRepeatRelease,
     TransponderNotReleasedEarlier,
@@ -50,6 +53,7 @@ class AbstractClientCommand : public QObject {
     CurrentOrderAssembled,
     TransponderRollbackLimit,
 
+    ProductionLineLaunchSystemInitError,
     ProductionLineContextNotAuthorized,
     ProductionLineNotActive,
     ProductionLineNotLaunched,
@@ -59,8 +63,6 @@ class AbstractClientCommand : public QObject {
     ProductionLineAlreadyInProcess,
     ProductionLineCompleted,
     ProductionLineShutdownError,
-
-    FirmwareGenerationError,
 
     StickerPrinterDriverMissed,
     StickerPrinterLibraryMissing,

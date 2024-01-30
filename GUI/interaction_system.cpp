@@ -149,6 +149,8 @@ void InteractionSystem::createMessageTable() {
 
   MessageTable[ReturnStatus::ServerConnectionError] =
       "Не удалось подключиться к серверу.";
+  MessageTable[ReturnStatus::ServerConnectionMissed] =
+      "Отсутствует подключение к серверу.";
   MessageTable[ReturnStatus::ServerNotResponding] = "Сервер не отвечает.";
   MessageTable[ReturnStatus::ServerDataTransmittingError] =
       "Получена ошибка при отправке данных.";
@@ -184,10 +186,13 @@ void InteractionSystem::createMessageTable() {
   MessageTable[ReturnStatus::BoxNotRequested] = "Бокс не был запрошен ранее.";
   MessageTable[ReturnStatus::FreeBoxMissed] =
       "Не найден свободный бокс для сборки.";
+  MessageTable[ReturnStatus::BoxIsEmty] = "В боксе отсутствуют транспондеры.";
   MessageTable[ReturnStatus::BoxCompletelyAssembled] =
       "Все транспондеры в боксе собраны.";
   MessageTable[ReturnStatus::BoxNotCompletelyAssembled] =
       "В боксе собраны не все транспондеры.";
+
+  MessageTable[ReturnStatus::PalletIsEmpty] = "В паллете отсутствуют боксы.";
 
   MessageTable[ReturnStatus::TransponderIncorrectRerelease] =
       "Данный транспондер не был выпущен ранее. Перевыпуск невозможен.";

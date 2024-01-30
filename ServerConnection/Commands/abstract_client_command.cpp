@@ -89,9 +89,8 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[DatabaseTransactionError] = ReturnStatus::ServerInternalError;
   CrtMap[DatabaseQueryError] = ReturnStatus::ServerInternalError;
 
-  CrtMap[ProductionLineLaunchSystemInitError] =
-      ReturnStatus::ServerInternalError;
   CrtMap[FirmwareGeneratorInitError] = ReturnStatus::ServerInternalError;
+  CrtMap[FirmwareGenerationError] = ReturnStatus::ServerInternalError;
 
   CrtMap[RecordMissed] = ReturnStatus::ServerInternalError;
   CrtMap[ProductionLineMissed] = ReturnStatus::ProductionLineMissed;
@@ -108,8 +107,11 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[BoxAlreadyRequested] = ReturnStatus::BoxAlreadyRequested;
   CrtMap[BoxNotRequested] = ReturnStatus::BoxNotRequested;
   CrtMap[FreeBoxMissed] = ReturnStatus::FreeBoxMissed;
+  CrtMap[BoxIsEmty] = ReturnStatus::BoxIsEmty;
   CrtMap[BoxCompletelyAssembled] = ReturnStatus::BoxCompletelyAssembled;
   CrtMap[BoxNotCompletelyAssembled] = ReturnStatus::BoxNotCompletelyAssembled;
+
+  CrtMap[PalletIsEmpty] = ReturnStatus::PalletIsEmpty;
 
   CrtMap[TransponderRepeatRelease] = ReturnStatus::ServerInternalError;
   CrtMap[TransponderNotReleasedEarlier] = ReturnStatus::ServerInternalError;
@@ -121,6 +123,8 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[CurrentOrderAssembled] = ReturnStatus::CurrentOrderAssembled;
   CrtMap[TransponderRollbackLimit] = ReturnStatus::TransponderRollbackLimit;
 
+  CrtMap[ProductionLineLaunchSystemInitError] =
+      ReturnStatus::ServerInternalError;
   CrtMap[ProductionLineContextNotAuthorized] =
       ReturnStatus::ProductionLineContextNotAuthorized;
   CrtMap[ProductionLineNotActive] = ReturnStatus::ProductionLineNotActive;
@@ -133,8 +137,6 @@ void AbstractClientCommand::createCrtMap() {
       ReturnStatus::ProductionLineAlreadyInProcess;
   CrtMap[ProductionLineCompleted] = ReturnStatus::ProductionLineCompleted;
   CrtMap[ProductionLineShutdownError] = ReturnStatus::ServerInternalError;
-
-  CrtMap[FirmwareGenerationError] = ReturnStatus::ServerInternalError;
 
   CrtMap[StickerPrinterDriverMissed] = ReturnStatus::ServerInternalError;
   CrtMap[StickerPrinterLibraryMissing] = ReturnStatus::ServerInternalError;
@@ -160,10 +162,10 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: DatabaseTransactionError";
   CrtLogMap[DatabaseQueryError] = "Server return status: DatabaseQueryError";
 
-  CrtLogMap[ProductionLineLaunchSystemInitError] =
-      "Server return status: ProductionLineLaunchSystemInitError";
   CrtLogMap[FirmwareGeneratorInitError] =
       "Server return status: FirmwareGeneratorInitError";
+  CrtLogMap[FirmwareGenerationError] =
+      "Server return status: FirmwareGenerationError";
 
   CrtLogMap[RecordMissed] = "Server return status: RecordMissed";
   CrtLogMap[ProductionLineMissed] =
@@ -183,10 +185,13 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[BoxAlreadyRequested] = "Server return status: BoxAlreadyRequested";
   CrtLogMap[BoxNotRequested] = "Server return status: BoxNotRequested";
   CrtLogMap[FreeBoxMissed] = "Server return status: FreeBoxMissed";
+  CrtLogMap[BoxIsEmty] = "Server return status: BoxIsEmty";
   CrtLogMap[BoxCompletelyAssembled] =
       "Server return status: BoxCompletelyAssembled";
   CrtLogMap[BoxNotCompletelyAssembled] =
       "Server return status: BoxNotCompletelyAssembled";
+
+  CrtLogMap[PalletIsEmpty] = "Server return status: PalletIsEmpty";
 
   CrtLogMap[TransponderRepeatRelease] =
       "Server return status: TransponderRepeatReleases";
@@ -202,6 +207,8 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[TransponderRollbackLimit] =
       "Server return status: TransponderRollbackLimit";
 
+  CrtLogMap[ProductionLineLaunchSystemInitError] =
+      "Server return status: ProductionLineLaunchSystemInitError";
   CrtLogMap[ProductionLineContextNotAuthorized] =
       "Server return status: ProductionLineContextNotAuthorized";
   CrtLogMap[ProductionLineNotActive] =
@@ -220,9 +227,6 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: ProductionLineCompleted";
   CrtLogMap[ProductionLineShutdownError] =
       "Server return status: ProductionLineShutdownError";
-
-  CrtLogMap[FirmwareGenerationError] =
-      "Server return status: FirmwareGenerationError";
 
   CrtLogMap[StickerPrinterDriverMissed] =
       "Server return status: StickerPrinterDriverMissed";

@@ -22,7 +22,7 @@ ReturnStatus JLinkExeProgrammer::programMemory(QFile& firmware) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
-    return ReturnStatus::DynamicLibraryMissing;
+    return ReturnStatus::ProgrammatorLibraryMissing;
   }
 
   // Логгирование
@@ -59,7 +59,7 @@ ReturnStatus JLinkExeProgrammer::programMemoryWithUnlock(QFile& firmware) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
-    return ReturnStatus::DynamicLibraryMissing;
+    return ReturnStatus::ProgrammatorLibraryMissing;
   }
 
   // Логгирование
@@ -106,7 +106,7 @@ ReturnStatus JLinkExeProgrammer::readMemory(void) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
-    return ReturnStatus::DynamicLibraryMissing;
+    return ReturnStatus::ProgrammatorLibraryMissing;
   }
 
   // Логгирование
@@ -134,7 +134,7 @@ ReturnStatus JLinkExeProgrammer::eraseMemory() {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
-    return ReturnStatus::DynamicLibraryMissing;
+    return ReturnStatus::ProgrammatorLibraryMissing;
   }
 
   // Логгирование
@@ -158,7 +158,7 @@ ReturnStatus JLinkExeProgrammer::readUserData(void) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
-    return ReturnStatus::DynamicLibraryMissing;
+    return ReturnStatus::ProgrammatorLibraryMissing;
   }
 
   // Логгирование
@@ -197,7 +197,7 @@ ReturnStatus JLinkExeProgrammer::programUserData(QFile& data) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
-    return ReturnStatus::DynamicLibraryMissing;
+    return ReturnStatus::ProgrammatorLibraryMissing;
   }
 
   // Формируем скрипт JLink
@@ -229,7 +229,7 @@ ReturnStatus JLinkExeProgrammer::readUcid(QString& ucid) {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
-    return ReturnStatus::DynamicLibraryMissing;
+    return ReturnStatus::ProgrammatorLibraryMissing;
   }
 
   // Логгирование
@@ -268,7 +268,7 @@ ReturnStatus JLinkExeProgrammer::unlockMemory() {
   // Проверка на существование программы адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
-    return ReturnStatus::DynamicLibraryMissing;
+    return ReturnStatus::ProgrammatorLibraryMissing;
   }
 
   // Логгирование
@@ -304,7 +304,7 @@ JLinkExeProgrammer::lockMemory() {  // Проверка на существов�
   // адаптера для программатора JLink
   if (JLinkProcess == nullptr) {
     sendLog(QString("Отсутсвует JLink.exe. Сброс."));
-    return ReturnStatus::DynamicLibraryMissing;
+    return ReturnStatus::ProgrammatorLibraryMissing;
   }
 
   // Логгирование
