@@ -343,7 +343,7 @@ bool MainWindowKernel::checkNewSettings()
   }
 
   QFileInfo info(gui->ProgrammerExeFilePathLineEdit->text());
-  if ((!info.exists()) || (!info.isExecutable())) {
+  if (!info.exists()) {
     return false;
   }
 
@@ -352,7 +352,7 @@ bool MainWindowKernel::checkNewSettings()
   }
 
   info.setFile(gui->StickerPrinterLibPathLineEdit->text());
-  if ((!info.exists()) || (info.suffix() != "dll")) {
+  if (!info.exists()) {
     return false;
   }
 

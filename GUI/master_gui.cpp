@@ -332,6 +332,6 @@ void MasterGUI::on_ProgrammerExeFilePathPushButton_slot()
 void MasterGUI::on_StickerPrinterLibPathPushButton_slot()
 {
   QString filePath =
-      QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.dll");
+      QFileDialog::getOpenFileName(this, "Выберите файл", "");
   StickerPrinterLibPathLineEdit->setText(filePath);
 }
