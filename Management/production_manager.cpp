@@ -64,6 +64,16 @@ void ProductionManager::launchProductionLine(
     return;
   }
 
+  ret = Server->getProductionLineData(ProductionLineData);
+  if (ret != ReturnStatus::NoError) {
+    ProductionLineData.clear();
+    emit displayBoxData_signal(ProductionLineData);
+    processOperationError("logOnServer", ret);
+    return;
+  }
+
+  emit displayProductionLineData_signal(ProductionLineData);
+
   completeOperation("launchProductionLine");
 }
 
@@ -71,6 +81,9 @@ void ProductionManager::shutdownProductionLine() {
   initOperation("shutdownProductionLine");
 
   Server->shutdownProductionLine();
+
+  ProductionLineData.clear();
+  emit displayBoxData_signal(ProductionLineData);
 
   completeOperation("shutdownProductionLine");
 }
@@ -174,16 +187,6 @@ void ProductionManager::requestBox() {
 
   emit displayBoxData_signal(BoxData);
 
-  ret = Server->getCurrentTransponderData(TransponderData);
-  if (ret != ReturnStatus::NoError) {
-    TransponderData.clear();
-    emit displayTransponderData_signal(TransponderData);
-    processOperationError("requestBox", ret);
-    return;
-  }
-
-  emit displayTransponderData_signal(TransponderData);
-
   ret = Server->getProductionLineData(ProductionLineData);
   if (ret != ReturnStatus::NoError) {
     ProductionLineData.clear();
@@ -193,6 +196,19 @@ void ProductionManager::requestBox() {
   }
 
   emit displayProductionLineData_signal(ProductionLineData);
+
+  // Если в боксе есть собранные транспондеры
+  if (BoxData.value("box_assembled_units").toInt() > 0) {
+    ret = Server->getCurrentTransponderData(TransponderData);
+    if (ret != ReturnStatus::NoError) {
+      TransponderData.clear();
+      emit displayTransponderData_signal(TransponderData);
+      processOperationError("requestBox", ret);
+      return;
+    }
+
+    emit displayTransponderData_signal(TransponderData);
+  }
 
   completeOperation("requestBox");
 }
@@ -255,6 +271,19 @@ void ProductionManager::completeCurrentBox() {
 
   BoxData.clear();
   emit displayBoxData_signal(BoxData);
+
+  TransponderData.clear();
+  emit displayTransponderData_signal(TransponderData);
+
+  ret = Server->getProductionLineData(ProductionLineData);
+  if (ret != ReturnStatus::NoError) {
+    ProductionLineData.clear();
+    emit displayBoxData_signal(ProductionLineData);
+    processOperationError("logOnServer", ret);
+    return;
+  }
+
+  emit displayProductionLineData_signal(ProductionLineData);
 
   completeOperation("completeCurrentBox");
 }
@@ -422,6 +451,8 @@ void ProductionManager::rereleaseTransponder(
   requestParam.remove("transponder_ucid");
   ret = Server->getTransponderData(requestParam, TransponderData);
   if (ret != ReturnStatus::NoError) {
+    TransponderData.clear();
+    emit displayTransponderData_signal(TransponderData);
     processOperationError("releaseTransponder", ret);
     return;
   }
@@ -455,21 +486,27 @@ void ProductionManager::rollbackTransponder() {
   if (ret != ReturnStatus::NoError) {
     BoxData.clear();
     emit displayBoxData_signal(BoxData);
-    processOperationError("getCurrentBoxData", ret);
+    processOperationError("rollbackTransponder", ret);
     return;
   }
 
   emit displayBoxData_signal(BoxData);
 
-  ret = Server->getCurrentTransponderData(TransponderData);
-  if (ret != ReturnStatus::NoError) {
+  // Если в боксе есть собранные транспондеры
+  if (BoxData.value("box_assembled_units").toInt() > 0) {
+    ret = Server->getCurrentTransponderData(TransponderData);
+    if (ret != ReturnStatus::NoError) {
+      TransponderData.clear();
+      emit displayTransponderData_signal(TransponderData);
+      processOperationError("rollbackTransponder", ret);
+      return;
+    }
+
+    emit displayTransponderData_signal(TransponderData);
+  } else {
     TransponderData.clear();
     emit displayTransponderData_signal(TransponderData);
-    processOperationError("getCurrentTransponderData", ret);
-    return;
   }
-
-  emit displayTransponderData_signal(TransponderData);
 
   completeOperation("rollbackTransponder");
 }
@@ -563,6 +600,17 @@ void ProductionManager::printLastPalletSticker() {
   completeOperation("printLastPalletSticker");
 }
 
+void ProductionManager::onServerDisconnected() {
+  ProductionLineData.clear();
+  emit displayProductionLineData_signal(ProductionLineData);
+
+  BoxData.clear();
+  emit displayBoxData_signal(BoxData);
+
+  TransponderData.clear();
+  emit displayTransponderData_signal(TransponderData);
+}
+
 void ProductionManager::loadSettings() {}
 
 void ProductionManager::sendLog(const QString& log) {
@@ -594,6 +642,9 @@ void ProductionManager::createProgrammer() {
 void ProductionManager::createServerConnection() {
   Server = std::unique_ptr<AbstractServerConnection>(
       new PersoServerConnection("PersoServerConnection"));
+
+  connect(Server.get(), &AbstractServerConnection::disconnected, this,
+          &ProductionManager::onServerDisconnected);
 }
 
 void ProductionManager::createStickerPrinter() {

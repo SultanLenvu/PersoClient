@@ -30,10 +30,9 @@ class ProductionManager : public AbstractManager {
  public:
   virtual void onInstanceThreadStarted(void) override;
   virtual Type type() const override;
-
- public slots:
   virtual void applySettings(void) override;
 
+ public:
   void connectToServer(void);
   void disconnectFromServer(void);
   void launchProductionLine(const std::shared_ptr<StringDictionary> param);
@@ -59,6 +58,8 @@ class ProductionManager : public AbstractManager {
   void printLastBoxSticker(void);
   void printPalletSticker(const std::shared_ptr<StringDictionary> param);
   void printLastPalletSticker(void);
+
+  void onServerDisconnected(void);
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionManager)
