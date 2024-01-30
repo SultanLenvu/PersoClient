@@ -68,5 +68,5 @@ add_custom_target(docs doxygen doxygen.conf
 )
 
 if (UNIX AND NOT APPLE)
-	install(CODE "execute_process(COMMAND desktop-file-install --dir=/usr/share/applications supplemental/persoclient.desktop WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}")
+    install(FILES supplemental/persoclient.desktop DESTINATION ${DESTDIR}/usr/share/applications)
 endif (UNIX AND NOT APPLE)
