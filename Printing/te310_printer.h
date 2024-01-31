@@ -28,9 +28,9 @@ class TE310Printer : public AbstractStickerPrinter {
   QString TscLibPath;
   std::unique_ptr<QLibrary> TscLib;
 
-  QHash<QString, QString> LastTransponderSticker;
-  QHash<QString, QString> LastBoxSticker;
-  QHash<QString, QString> LastPalletSticker;
+  static StringDictionary LastTransponderSticker;
+  static StringDictionary LastBoxSticker;
+  static StringDictionary LastPalletSticker;
 
   // Библиотечные функции
   TscAbout about;

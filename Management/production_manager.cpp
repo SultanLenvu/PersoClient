@@ -426,7 +426,8 @@ void ProductionManager::rereleaseTransponder(
   }
 
   // Сохраняем прошивку в файл
-  firmware.write(QByteArray::fromBase64(result.value("firmware").toUtf8()));
+  firmware.write(
+      QByteArray::fromBase64(result.value("transponder_firmware").toUtf8()));
   firmware.close();
 
   // Загружаем прошивку

@@ -452,7 +452,11 @@ void PersoServerConnection::socketConnected_slot() {
 
 void PersoServerConnection::socketDisconnected_slot() {
   sendLog("Соединение с сервером персонализации отключено. ");
-  emit disconnected();
+
+  // Если отключение произошло в результате ошибки
+  if (Socket->error() != QTcpSocket::UnknownSocketError) {
+    emit disconnected();
+  }
 }
 
 void PersoServerConnection::socketReadyRead_slot() {
