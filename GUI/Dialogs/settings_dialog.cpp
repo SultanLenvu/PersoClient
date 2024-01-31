@@ -150,7 +150,7 @@ bool SettingsDialog::check() const {
   }
 
   QFileInfo info(ProgrammerExeFilePathLineEdit->text());
-  if ((!info.exists()) || (!info.isExecutable())) {
+  if (!info.exists()) {
     return false;
   }
 
@@ -159,7 +159,7 @@ bool SettingsDialog::check() const {
   }
 
   info.setFile(StickerPrinterLibPathLineEdit->text());
-  if ((!info.exists()) || (info.suffix() != "dll")) {
+  if (!info.exists()) {
     return false;
   }
 
@@ -203,12 +203,12 @@ void SettingsDialog::accept() {
 
 void SettingsDialog::programmerExeFilePathPushButton_slot() {
   QString filePath =
-      QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.exe");
+      QFileDialog::getOpenFileName(this, "Выберите файл", "");
   ProgrammerExeFilePathLineEdit->setText(filePath);
 }
 
 void SettingsDialog::stickerPrinterLibPathPushButton_slot() {
   QString filePath =
-      QFileDialog::getOpenFileName(this, "Выберите файл", "", "*.dll *.so*");
+      QFileDialog::getOpenFileName(this, "Выберите файл", "");
   StickerPrinterLibPathLineEdit->setText(filePath);
 }

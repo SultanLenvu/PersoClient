@@ -1,0 +1,31 @@
+name: build PersoServer
+run-name: build PersoServer
+on:
+  push:
+    branch:
+      - 'main'
+
+jobs:
+  build:
+    runs-on: ubuntu-23.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Build and package PersoClient
+        run: |
+          cd ${{ gitea.workspace }}
+          mkdir build
+          cd build
+          cmake -G Ninja ..
+          ninja
+          mkdir -p persoclient_${{ gitea.ref_name }}-1_amd64
+          DESTDIR=persoclient_${{ gitea.ref_name }}-1_amd64 ninja install
+          mkdir persoclient_${{ gitea.ref_name }}-1_amd64/DEBIAN
+          sed -e "s/@VERSION@/${{ gitea.ref_name }}/g" < ../DEBIAN/control.in > persoclient_${{ gitea.ref_name }}-1_amd64/DEBIAN/control
+          cp ../DEBIAN/postinst persoclient_${{ gitea.ref_name }}-1_amd64/DEBIAN/
+          dpkg-deb --build --root-owner-group persoclient_${{ gitea.ref_name }}-1_amd64
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: persoclient_${{ gitea.ref_name }}-1_amd64.deb
+          path: build/persoclient_${{ gitea.ref_name }}-1_amd64.deb
