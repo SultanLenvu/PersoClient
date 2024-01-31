@@ -39,7 +39,7 @@ jobs:
       - name: Deploy and regenerate repository
         run: |
           rm -f /var/www/repo/pool/persoclient*.deb
-          cp persoclient_${{ gitea.ref_name }}_amd64.deb /var/www/repo/pool/internal
+          cp persoclient_${{ gitea.ref_name }}-1_amd64.deb /var/www/repo/pool/internal
           cd /var/www/repo/pool/internal
           apt-ftpcache packages pool/internal > dists/mantic/internal/binary-amd64/Packages
           echo "Archive: mantic" > dists/mantic/Release
