@@ -1,5 +1,5 @@
 Package: persoclient
-Version: 0.0.2
+Version: @VERSION@
 Architecture: amd64
 Maintainer: Power Syntez JSC Team <peter.shhh@yandex.ru>
 Description: Personalisation Software Client
