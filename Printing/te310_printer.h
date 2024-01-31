@@ -28,9 +28,9 @@ class TE310Printer : public AbstractStickerPrinter {
   QString TscLibPath;
   std::unique_ptr<QLibrary> TscLib;
 
-  static StringDictionary LastTransponderSticker;
-  static StringDictionary LastBoxSticker;
-  static StringDictionary LastPalletSticker;
+  StringDictionary LastTransponderSticker;
+  StringDictionary LastBoxSticker;
+  StringDictionary LastPalletSticker;
 
   // Библиотечные функции
   TscAbout about;
@@ -44,7 +44,7 @@ class TE310Printer : public AbstractStickerPrinter {
  public:
   explicit TE310Printer(const QString& name);
 #ifdef __linux__
-  explicit TE310Printer(QObject* parent, const QHostAddress& ip, int port);
+  explicit TE310Printer(const QString& name, const QHostAddress& ip, int port);
 #endif /* __linux__ */
 
   virtual ReturnStatus checkConfig(void) override;

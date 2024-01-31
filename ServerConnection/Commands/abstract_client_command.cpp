@@ -24,8 +24,8 @@ AbstractClientCommand::AbstractClientCommand(const QString& name)
 AbstractClientCommand::~AbstractClientCommand() {}
 
 void AbstractClientCommand::clear() {
-  //  Request = QJsonObject();
-  //  Response = QJsonObject();
+  Request = QJsonObject();
+  Response = QJsonObject();
 }
 
 AbstractClientCommand::AbstractClientCommand() {}
@@ -40,7 +40,7 @@ void AbstractClientCommand::generateDataBlock(QByteArray& dataBlock) {
   // Инициализируем блок данных и сериализатор
   dataBlock.clear();
   QDataStream serializator(&dataBlock, QIODevice::WriteOnly);
-  serializator.setVersion(QDataStream::Qt_6_5);
+  serializator.setVersion(QDataStream::Qt_6_4);
 
   // Формируем единый блок данных для отправки
   serializator << uint32_t(0) << requestDocument.toJson();

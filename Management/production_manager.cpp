@@ -649,8 +649,12 @@ void ProductionManager::createServerConnection() {
 }
 
 void ProductionManager::createStickerPrinter() {
+#ifdef __linux__
+  StickerPrinter = std::unique_ptr<AbstractStickerPrinter>(new TE310Printer("USB"));
+#else
   StickerPrinter =
       std::unique_ptr<AbstractStickerPrinter>(new TE310Printer("TSC TE310"));
+#endif /* __linux__ */
 }
 
 void ProductionManager::initOperation(const QString& name) {

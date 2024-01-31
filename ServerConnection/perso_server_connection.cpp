@@ -462,7 +462,7 @@ void PersoServerConnection::socketDisconnected_slot() {
 void PersoServerConnection::socketReadyRead_slot() {
   QDataStream deserializator(Socket.get());  // Дессериализатор
   deserializator.setVersion(
-      QDataStream::Qt_6_5);  // Настраиваем версию десериализатора
+      QDataStream::Qt_6_4);  // Настраиваем версию десериализатора
 
   // Если блок данных еще не начал формироваться
   if (ReceivedDataBlockSize == 0) {
