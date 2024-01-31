@@ -47,6 +47,18 @@ class SettingsDialog : public QDialog {
   QLabel* StickerPrinterLibPathLabel;
   QLineEdit* StickerPrinterLibPathLineEdit;
   QPushButton* StickerPrinterLibPathPushButton;
+  QLabel* StickerPrinterNameLabel;
+  QLineEdit* StickerPrinterNameLineEdit;
+
+  QLabel* StickerPrinterUseEthernetLabel;
+  QCheckBox* StickerPrinterUseEthernetCheck;
+
+  QWidget* StickerPrinterProxyWidget;
+  QGridLayout* StickerPrinterProxyWidgetLayout;
+  QLabel* StickerPrinterIpLabel;
+  QLineEdit* StickerPrinterIpLineEdit;
+  QLabel* StickerPrinterPortLabel;
+  QLineEdit* StickerPrinterPortLineEdit;
 
   QSpacerItem* VS1;
 
@@ -67,9 +79,12 @@ class SettingsDialog : public QDialog {
   bool check() const;
   void save(void);
 
+  void createStickerPrinterProxyWidget(void);
+
  private slots:
   void programmerExeFilePathPushButton_slot(void);
   void stickerPrinterLibPathPushButton_slot(void);
+  void stickerPrinterUseEthernetStateChanged_slot(int32_t state);
 
  signals:
   void applyNewSettings(void);

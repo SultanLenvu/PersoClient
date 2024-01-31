@@ -134,8 +134,6 @@ void GuiKernel::loadSettings() {
   QCoreApplication::setApplicationName(PROGRAM_NAME);
 
   QSettings::setDefaultFormat(QSettings::IniFormat);
-  QSettings::setPath(QSettings::IniFormat, QSettings::UserScope,
-                     QCoreApplication::applicationDirPath());
 }
 
 void GuiKernel::registerMetaTypes() {

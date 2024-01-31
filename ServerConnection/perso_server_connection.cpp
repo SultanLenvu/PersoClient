@@ -46,6 +46,11 @@ PersoServerConnection::~PersoServerConnection() {
 }
 
 ReturnStatus PersoServerConnection::connect() {
+  if (Socket->state() == QTcpSocket::ConnectedState) {
+    sendLog("Соединение с сервером персонализации уже установлено. ");
+    return ReturnStatus::NoError;
+  }
+
   sendLog("Подключение к серверу персонализации. ");
   // Подключаемся к серверу персонализации
   Socket->connectToHost(PersoServerAddress, PersoServerPort);
@@ -280,6 +285,7 @@ ReturnStatus PersoServerConnection::processCurrentCommand(
 
   // Очистка
   clearBuffer();
+  CurrentCommand->clear();
 
   QByteArray dataBlock;
   ReturnStatus ret = CurrentCommand->generate(param, dataBlock);
@@ -516,12 +522,11 @@ void PersoServerConnection::socketReadyRead_slot() {
 void PersoServerConnection::socketError_slot(
     QAbstractSocket::SocketError socketError) {
   Socket->abort();
-  CurrentCommand->clear();
   sendLog(QString("Ошибка сети: %1. %2.")
               .arg(QString::number(socketError), Socket->errorString()));
 }
 
 void PersoServerConnection::waitTimerTimeout_slot() {
-  CurrentCommand->clear();
+  //    Socket->abort();
   sendLog("Время ожидания вышло. ");
 }

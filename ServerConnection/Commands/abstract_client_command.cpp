@@ -4,7 +4,6 @@
 #include <QIODevice>
 #include <QJsonDocument>
 
-#include "definitions.h"
 #include "global_environment.h"
 #include "log_system.h"
 

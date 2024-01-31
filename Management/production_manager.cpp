@@ -1,3 +1,5 @@
+#include <QSettings>
+
 #include "production_manager.h"
 #include "definitions.h"
 #include "global_environment.h"
@@ -615,7 +617,7 @@ void ProductionManager::onServerDisconnected() {
 void ProductionManager::loadSettings() {}
 
 void ProductionManager::sendLog(const QString& log) {
-  emit logging(objectName() + " - " + log);
+  emit logging(QString("%1 - %2").arg(objectName(), log));
 }
 
 ReturnStatus ProductionManager::checkConfig() {
@@ -649,12 +651,8 @@ void ProductionManager::createServerConnection() {
 }
 
 void ProductionManager::createStickerPrinter() {
-#ifdef __linux__
-  StickerPrinter = std::unique_ptr<AbstractStickerPrinter>(new TE310Printer("USB"));
-#else
-  StickerPrinter =
-      std::unique_ptr<AbstractStickerPrinter>(new TE310Printer("TSC TE310"));
-#endif /* __linux__ */
+  StickerPrinter = std::unique_ptr<AbstractStickerPrinter>(
+      new TE310Printer("StickerPrinter1"));
 }
 
 void ProductionManager::initOperation(const QString& name) {

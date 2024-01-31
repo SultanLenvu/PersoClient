@@ -16,7 +16,7 @@ jobs:
           cd ${{ gitea.workspace }}
           mkdir build
           cd build
-          cmake -G Ninja ..
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -G Ninja ..
           ninja
           mkdir -p persoclient_${{ gitea.ref_name }}-1_amd64
           DESTDIR=persoclient_${{ gitea.ref_name }}-1_amd64 ninja install

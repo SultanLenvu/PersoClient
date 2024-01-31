@@ -113,6 +113,26 @@ void SettingsDialog::create() {
   connect(StickerPrinterLibPathPushButton, &QPushButton::clicked, this,
           &SettingsDialog::stickerPrinterLibPathPushButton_slot);
 
+  StickerPrinterNameLabel = new QLabel("Системное имя");
+  StickerPrinterMainLayout->addWidget(StickerPrinterNameLabel, 1, 0, 1, 1);
+  StickerPrinterNameLineEdit =
+      new QLineEdit(Settings.value("te310_printer/system_name").toString());
+  StickerPrinterMainLayout->addWidget(StickerPrinterNameLineEdit, 1, 1, 1, 1);
+
+  StickerPrinterUseEthernetLabel =
+      new QLabel("Использовать Ethernet-подключение");
+  StickerPrinterMainLayout->addWidget(StickerPrinterUseEthernetLabel, 2, 0, 1,
+                                      1);
+  StickerPrinterUseEthernetCheck = new QCheckBox();
+  StickerPrinterUseEthernetCheck->setChecked(
+      Settings.value("te310_printer/use_ethernet").toBool());
+  StickerPrinterMainLayout->addWidget(StickerPrinterUseEthernetCheck, 2, 1, 1,
+                                      1);
+  connect(StickerPrinterUseEthernetCheck, &QCheckBox::stateChanged, this,
+          &SettingsDialog::stickerPrinterUseEthernetStateChanged_slot);
+
+  createStickerPrinterProxyWidget();
+
   // Сжимаем позиционирование
   VS1 = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
   MainLayout->addItem(VS1);
@@ -163,6 +183,17 @@ bool SettingsDialog::check() const {
     return false;
   }
 
+  if (StickerPrinterUseEthernetCheck->isChecked()) {
+    IP = QHostAddress(PersoServerIpAddressLineEdit->text());
+    if (IP.isNull()) {
+      return false;
+    }
+
+    port = StickerPrinterPortLineEdit->text().toInt();
+    if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
+      return false;
+    }
+  }
   return true;
 }
 
@@ -186,6 +217,40 @@ void SettingsDialog::save() {
 
   Settings.setValue("te310_printer/library_path",
                     StickerPrinterLibPathLineEdit->text());
+  Settings.setValue("te310_printer/system_name",
+                    StickerPrinterNameLineEdit->text());
+  Settings.setValue("te310_printer/use_ethernet",
+                    StickerPrinterUseEthernetCheck->isChecked());
+  Settings.setValue("te310_printer/ip_address",
+                    StickerPrinterIpLineEdit->text());
+  Settings.setValue("te310_printer/port", StickerPrinterPortLineEdit->text());
+}
+
+void SettingsDialog::createStickerPrinterProxyWidget() {
+  StickerPrinterProxyWidget = new QWidget();
+  StickerPrinterMainLayout->addWidget(StickerPrinterProxyWidget, 3, 0, 1, 2);
+
+  StickerPrinterProxyWidgetLayout = new QGridLayout();
+  StickerPrinterProxyWidget->setLayout(StickerPrinterProxyWidgetLayout);
+
+  StickerPrinterIpLabel = new QLabel("IP адрес");
+  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterIpLabel, 0, 0, 1, 1);
+  StickerPrinterIpLineEdit =
+      new QLineEdit(Settings.value("te310_printer/ip_address").toString());
+  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterIpLineEdit, 0, 1, 1,
+                                             1);
+
+  StickerPrinterPortLabel = new QLabel("Порт");
+  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterPortLabel, 1, 0, 1,
+                                             1);
+  StickerPrinterPortLineEdit =
+      new QLineEdit(Settings.value("te310_printer/port").toString());
+  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterPortLineEdit, 1, 1,
+                                             1, 1);
+
+  if (!Settings.value("te310_printer/use_ethernet").toBool()) {
+    StickerPrinterProxyWidget->hide();
+  }
 }
 
 void SettingsDialog::accept() {
@@ -211,4 +276,12 @@ void SettingsDialog::stickerPrinterLibPathPushButton_slot() {
   QString filePath =
       QFileDialog::getOpenFileName(this, "Выберите файл", "");
   StickerPrinterLibPathLineEdit->setText(filePath);
+}
+
+void SettingsDialog::stickerPrinterUseEthernetStateChanged_slot(int32_t state) {
+  if (state == Qt::Checked) {
+    StickerPrinterProxyWidget->show();
+  } else {
+    StickerPrinterProxyWidget->hide();
+  }
 }
