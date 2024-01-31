@@ -1,0 +1,53 @@
+name: build, package and put PersoClient to the repository
+run-name: build, package and put PersoClient to the repository
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-23.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+      - name: Build and package PersoClient
+        run: |
+          cd ${{ gitea.workspace }}
+          mkdir build
+          cd build
+          cmake -G Ninja ..
+          ninja
+          mkdir -p persoclient_${{ gitea.ref_name }}-1_amd64
+          DESTDIR=persoclient_${{ gitea.ref_name }}-1_amd64 ninja install
+          mkdir persoclient_${{ gitea.ref_name }}-1_amd64/DEBIAN
+          sed -e "s/@VERSION@/${{ gitea.ref_name }}/g" < ../DEBIAN/control.in > persoclient_${{ gitea.ref_name }}-1_amd64/DEBIAN/control
+          cp ../DEBIAN/postinst persoclient_${{ gitea.ref_name }}-1_amd64/DEBIAN/
+          dpkg-deb --build --root-owner-group persoclient_${{ gitea.ref_name }}-1_amd64
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: persoclient_${{ gitea.ref_name }}-1_amd64.deb
+          path: build/persoclient_${{ gitea.ref_name }}-1_amd64.deb
+  deploy:
+    runs-on: ubuntu-23.04
+    steps:
+      - name: Fetch package artifact
+        uses: https://github.com/actions/download-artifact@v3
+        with:
+          name: persoclient_${{ gitea.ref_name }}-1_amd64.deb
+      - name: Deploy and regenerate repository
+        run: |
+          rm -f /var/www/repo/pool/persoclient*.deb
+          cp persoclient_${{ gitea.ref_name }}_amd64.deb /var/www/repo/pool/internal
+          cd /var/www/repo/pool/internal
+          apt-ftpcache packages pool/internal > dists/mantic/internal/binary-amd64/Packages
+          echo "Archive: mantic" > dists/mantic/Release
+          echo "Suite: mantic" >> dists/mantic/Release
+          echo "Components: internal" >> dists/mantic/Release
+          echo "Architectures: amd64" >> dists/mantic/Release
+          apt-ftpcache release dists/mantic >> dists/mantic/Release
+      - name: trigger Ansible playbook to make clients upgrade
+        run: |
+          cd $HOME/ansible-upgrade
+          ansible-playbook -i inventory.ini playbook.yaml -u root
