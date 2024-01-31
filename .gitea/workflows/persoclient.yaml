@@ -38,15 +38,15 @@ jobs:
           name: persoclient_${{ gitea.ref_name }}-1_amd64.deb
       - name: Deploy and regenerate repository
         run: |
-          rm -f /var/www/repo/pool/persoclient*.deb
+          rm -f /var/www/repo/pool/internal/persoclient*.deb
           cp persoclient_${{ gitea.ref_name }}-1_amd64.deb /var/www/repo/pool/internal
           cd /var/www/repo/
-          apt-ftpcache packages pool/internal > dists/mantic/internal/binary-amd64/Packages
+          apt-ftparchive packages pool/internal > dists/mantic/internal/binary-amd64/Packages
           echo "Archive: mantic" > dists/mantic/Release
           echo "Suite: mantic" >> dists/mantic/Release
           echo "Components: internal" >> dists/mantic/Release
           echo "Architectures: amd64" >> dists/mantic/Release
-          apt-ftpcache release dists/mantic >> dists/mantic/Release
+          apt-ftparchive release dists/mantic >> dists/mantic/Release
       - name: trigger Ansible playbook to make clients upgrade
         run: |
           cd $HOME/ansible-upgrade
