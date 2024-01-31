@@ -3,6 +3,6 @@ Type=Application
 Version=0.0.1
 Name=PersoClient
 Comment=Personalization Client
-Exec=persoclient
+Exec=PersoClient
 Terminal=false
 Categories=Development;
