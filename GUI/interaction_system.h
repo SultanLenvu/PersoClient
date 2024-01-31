@@ -1,4 +1,4 @@
-#ifndef INTERACTION_SYSTEM_H
+﻿#ifndef INTERACTION_SYSTEM_H
 #define INTERACTION_SYSTEM_H
 
 #include <QElapsedTimer>
@@ -8,150 +8,55 @@
 #include <QObject>
 #include <QProgressBar>
 #include <QProgressDialog>
+#include <QTimer>
 
-#include "authorization_dialog.h"
-#include "custom_transponder_sticker_dialog.h"
-#include "master_password_input_dialog.h"
-#include "transponder_sticker_scan_dialog.h"
+#include "types.h"
 
-/*!
- * Interaction system singleton. Show dialogs, messages, etc
- */
-class InteractionSystem : public QWidget
-{
+class InteractionSystem : public QObject {
   Q_OBJECT
 
  private:
-  //! Is logging enabled
-  bool LogEnable;
-  //! Shows operation progress
-  QProgressDialog* ProgressDialog;
-  //! ProgressDialog fill percentage
-  uint32_t CurrentOperationStep;
+  std::unique_ptr<QProgressDialog> ProgressDialog;
 
-  //! Maximal duration timer
-  QTimer* ODTimer;
-  //! Quant timer
-  QTimer* ODQTimer;
-  //! Timer to measure elapsed time
-  QElapsedTimer* ODMeter;
+  std::unique_ptr<QTimer> ODTimer;
+  std::unique_ptr<QTimer> ODQTimer;
+  std::unique_ptr<QElapsedTimer> ODMeter;
+
+  std::unordered_map<ReturnStatus, QString> MessageTable;
 
  public:
-  /*!
-   * Get instance of this class.
-   */
-  static InteractionSystem* instance(void);
+  explicit InteractionSystem(const QString& name);
+  ~InteractionSystem();
 
  public slots:
-  /*!
-   * Show information message box
-   * \param[in] data message to show
-   */
-  void generateMessage(const QString& data);
-  /*!
-   * Show error message box
-   * \param[in] text message to show
-   */
+  void generateMessage(const QString& text);
   void generateErrorMessage(const QString& text);
 
-  /*!
-   * Create progress dialog with createProgressDialog,
-   * read quant duration, start ODQTimer with that duration,
-   * and start ODTimer and ODMeter
-   */
-  void startOperationProgressDialog(const QString& operationName);
-  /*!
-   * Close progress dialog window and record operation time
-   */
-  void finishOperationProgressDialog(const QString& operationName);
+  void processOperationStart(const QString& opName);
+  void processOperationFinish(const QString& opName, ReturnStatus ret);
 
-  /*!
-   * Ask user for password to the master interface
-   * \param[out] pass where to store entered password
-   * \return true if data was saved, false if user canceled the operation
-   */
-  bool getMasterPassword(QString& pass);
-  /*!
-   * Ask user for authorization data
-   * \param[out] data where to store authorization data
-   * \return true if data was saved, false if user canceled the operation
-   */
-  bool getAuthorizationData(QHash<QString, QString>* data);
-  /*!
-   * Ask user for sticker data via TransponderStickerScanDialog
-   * \param[out] data where to store sticker data
-   * \return true if data was saved, false if user canceled the operation
-   */
-  bool getTransponderStickerData(QHash<QString, QString>* data);
-  /*!
-   * Ask user for custom sticker data via CustomStickerScanDialog
-   * \param[out] data where to store sticker data
-   * \return true if data was saved, false if user canceled the operation
-   */
-  bool getCustomTransponderStickerData(QHash<QString, QString>* data);
-
-  /*!
-   * Load settings using loadSettings method
-   */
   void applySettings(void);
 
  private:
-  /*!
-   * Construct object, set object name, load settings and
-   * initialize timers
-   * \param[in] window Parent window
-   */
-  explicit InteractionSystem(QWidget* window);
-  //! \cond
-  Q_DISABLE_COPY(InteractionSystem)
-  //! \endcond
-  /*!
-   * Load settings from QSettings, namely:
-   * - user_interaction_system/log_enable: whether logging is enabled
-   */
-  void loadSettings(void);
-  /*!
-   * Send log line to the logger if logging is enabled
-   * \param[in] log new log line
-   */
+  InteractionSystem();
+  Q_DISABLE_COPY_MOVE(InteractionSystem)
   void sendLog(const QString& log);
+  void loadSettings(void);
 
-  /*!
-   * Construct QPRogressDialog and store it in ProgressDialog
-   */
   void createProgressDialog(void);
-  /*!
-   * Destroy ProgressDialog
-   */
   void destroyProgressDialog(void);
-  /*!
-   * Construct timers:
-   * - ODTimer to track timeouts
-   * - ODMeter to measure operation execution time
-   * - ODQTimer to tick on quants
-   */
   void createTimers(void);
+  void createMessageTable(void);
+
+  void processReturnStatus(ReturnStatus ret);
 
  private slots:
-  /*!
-   * Timeout, stop the operation
-   */
-  void on_ODTimerTimeout_slot(void);
-  /*!
-   * Quantum timer ticked, show some progress on progress dialog
-   */
-  void on_ODQTimerTimeout_slot(void);
+  void odTimerTimeout_slot(void);
+  void odqTimerTimeout_slot(void);
 
  signals:
-  /*!
-   * Emitted to send a log line to the logger
-   * \param[in] log the new log line
-   */
-  void logging(const QString& log);
-  /*!
-   * Emitted to cancel any ongoing operations
-   */
   void abortCurrentOperation(void);
+  void logging(const QString& log);
 };
 
 #endif  // INTERACTION_SYSTEM_H

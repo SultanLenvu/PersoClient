@@ -1,64 +1,67 @@
-#include "log_system.h"
+#include <QSettings>
 
-LogSystem::LogSystem(QObject* parent) : QObject(parent)
-{
-  setObjectName("LogSystem");
+#include "file_log_backend.h"
+#include "global_environment.h"
+#include "log_system.h"
+#include "widget_log_backend.h"
+
+LogSystem::LogSystem(const QString& name) : QObject(nullptr) {
+  setObjectName(name);
   loadSettings();
 
-  WidgetLogger = new WidgetLogBackend(this);
-  Backends << WidgetLogger;
+  Backends.push_back(
+      std::unique_ptr<LogBackend>(new WidgetLogBackend("WidgetLogBackend")));
+  Backends.push_back(
+      std::unique_ptr<LogBackend>(new FileLogBackend("FileLogBackend")));
 
-  FileLogger = new FileLogBackend(this);
-  Backends << FileLogger;
+  GlobalEnvironment::instance()->registerObject(this);
 }
 
 LogSystem::~LogSystem() {}
 
-WidgetLogBackend* LogSystem::getWidgetLogger()
-{
-  return WidgetLogger;
-}
-
-LogSystem* LogSystem::instance()
-{
-  static LogSystem Logger(nullptr);
-  return &Logger;
-}
-
-void LogSystem::clear()
-{
-  for (QList<LogBackend*>::iterator it = Backends.begin(); it != Backends.end();
-       it++) {
+void LogSystem::clear() {
+  for (auto it = Backends.begin(); it != Backends.end(); it++) {
     (*it)->clear();
   }
 }
 
-void LogSystem::generate(const QString& log)
-{
-  QTime time = QDateTime::currentDateTime().time();
-  QString LogData = time.toString("hh:mm:ss.zzz - ") + log;
-  for (QList<LogBackend*>::const_iterator it = Backends.constBegin();
-       it != Backends.constEnd(); it++) {
+void LogSystem::generate(const QString& log) {
+  if (!LogEnable) {
+    return;
+  }
+
+  QString logMsg = log;
+  if (log.size() > MessageMaxSize) {
+    logMsg.truncate(MessageMaxSize);
+  }
+
+  QString LogData = QString("%1 - %2").arg(
+      QDateTime::currentDateTime().time().toString("hh:mm:ss.zzz"), logMsg);
+
+  for (auto it = Backends.begin(); it != Backends.end(); it++) {
     (*it)->writeLogLine(LogData);
   }
 }
 
-void LogSystem::applySettings()
-{
-  generate("LogSystem - Применение новых настроек. ");
+void LogSystem::applySettings() {
+  generate(objectName() + " - Применение новых настроек.");
   loadSettings();
 
-  for (QList<LogBackend*>::const_iterator it = Backends.constBegin();
-       it != Backends.constEnd(); it++) {
+  for (auto it = Backends.begin(); it != Backends.end(); it++) {
     (*it)->applySettings();
   }
 }
+
 
 /*
  * Приватные методы
  */
 
-void LogSystem::loadSettings()
-{
+LogSystem::LogSystem() {}
+
+void LogSystem::loadSettings() {
   QSettings settings;
+
+  LogEnable = settings.value("log_system/global_enable").toBool();
+  MessageMaxSize = settings.value("log_system/message_max_size").toInt();
 }

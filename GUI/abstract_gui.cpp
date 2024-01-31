@@ -1,19 +1,10 @@
 #include "abstract_gui.h"
 
-AbstractGUI::AbstractGUI(QWidget* parent, GuiType type) : QWidget(parent)
-{
-  Type = type;
-
+AbstractGui::AbstractGui(QWidget* parent) : QWidget(parent) {
   MainLayout = new QHBoxLayout();
   setLayout(MainLayout);
 }
 
-AbstractGUI::~AbstractGUI()
-{
+AbstractGui::~AbstractGui() {
   //  qDebug() << "Deleted.";
-}
-
-AbstractGUI::GuiType AbstractGUI::type()
-{
-  return Type;
 }

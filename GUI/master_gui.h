@@ -1,16 +1,10 @@
-#ifndef MASTERGUI_H
-#define MASTERGUI_H
+#ifndef MASTER_GUI_H
+#define MASTER_GUI_H
 
-#include "General/definitions.h"
 #include "abstract_gui.h"
 
-/*!
- * Master GUI mode
- */
-class MasterGUI : public AbstractGUI
-{
+class MasterGui : public AbstractGui {
  public:
-  //! \cond
   QTabWidget* Tabs;
 
   // Виджеты для отображения логов
@@ -26,15 +20,41 @@ class MasterGUI : public AbstractGUI
   QGroupBox* ServerControlPanel;
   QVBoxLayout* ServerControlPanelLayout;
 
-  QPushButton* PersoServerConnectPushButton;
-  QPushButton* PersoServerDisconnectButton;
-  QPushButton* PersoServerEchoRequestButton;
-  QSpacerItem* ButtonVerticalSpacer1;
+  QPushButton* ServerConnectPushButton;
+  QPushButton* ServerDisconnectButton;
+  QPushButton* ServerEchoRequestButton;
+  QPushButton* AuthorizePushButton;
+  QPushButton* GetProductionLineDataButton;
+  QSpacerItem* ServerControlPanelVS1;
 
-  QPushButton* MasterAuthorizePushButton;
-  QPushButton* LoadTransponderFirmwareButton;
-  QPushButton* ReloadTransponderFirmwareButton;
-  QPushButton* RollbackProductionLinePushButton;
+  QPushButton* RequestBoxButton;
+  QPushButton* GetCurrentBoxDataButton;
+  QPushButton* RefundCurrentBoxButton;
+  QPushButton* CompleteCurrentBoxButton;
+  QSpacerItem* ServerControlPanelVS2;
+
+  QPushButton* ReleaseTransponderButton;
+  QPushButton* RereleaseTransponderButton;
+  QPushButton* RollbackTransponderPushButton;
+  QPushButton* GetCurrentTransponderDataButton;
+  QPushButton* GetTransponderDataButton;
+  QSpacerItem* ServerControlPanelVS3;
+
+  QPushButton* PrintBoxStickerButton;
+  QPushButton* PrintLastBoxStickerButton;
+  QPushButton* PrintPalletStickerButton;
+  QPushButton* PrintLastPalletStickerButton;
+
+  QVBoxLayout* ModelViewLayout;
+  QHBoxLayout* ModelViewSublayout;
+
+  QGroupBox* ProductionLineDataGroup;
+  QVBoxLayout* ProductionLineDataLayout;
+  QTableView* ProductionLineDataView;
+
+  QGroupBox* BoxDataGroup;
+  QVBoxLayout* BoxDataLayout;
+  QTableView* BoxDataView;
 
   QGroupBox* TransponderDataGroup;
   QVBoxLayout* TransponderDataLayout;
@@ -54,9 +74,9 @@ class MasterGUI : public AbstractGUI
   QPushButton* EraseDeviceButton;
   QPushButton* ProgramDeviceUserDataButton;
   QPushButton* ReadDeviceUserDataButton;
-  QSpacerItem* ButtonVerticalSpacer;
-  QPushButton* UnlockDeviceButton;
-  QPushButton* LockDeviceButton;
+  QSpacerItem* ButtonVS1;
+  QPushButton* unlockMemoryButton;
+  QPushButton* lockMemoryButton;
   //============================================================
 
   /* Интерфейс для взаимодействия с принтером */
@@ -77,111 +97,27 @@ class MasterGUI : public AbstractGUI
   QPlainTextEdit* StickerPrinterCommandSriptTextEdit;
   //============================================================
 
-  /* Настройки клиента */
-  //============================================================
-  QWidget* SettingsTab;
-  QHBoxLayout* SettingsMainLayout;
-  QVBoxLayout* SettingsMainSubLayout;
-  QPushButton* ApplySettingsPushButton;
-
-  // Настойки логгирования
-  QGroupBox* LogSystemSettingsGroupBox;
-  QGridLayout* LogSystemSettingsMainLayout;
-  QLabel* LogSystemGlobalEnableLabel;
-  QCheckBox* LogSystemGlobalEnableCheckBox;
-  QLabel* LogSystemExtendedEnableLabel;
-  QCheckBox* LogSystemExtendedEnableCheckBox;
-
-  // Сеть
-  QGroupBox* PersoSettingsGroupBox;
-  QGridLayout* PersoSettingsMainLayout;
-  QLabel* PersoServerIpAddressLabel;
-  QLineEdit* PersoServerIpAddressLineEdit;
-  QLabel* PersoServerPortLabel;
-  QLineEdit* PersoServerPortLineEdit;
-
-  // Программатор
-  QGroupBox* ProgrammerSettingsGroupBox;
-  QGridLayout* ProgrammerSettingsMainLayout;
-  QLabel* ProgrammerExeFilePathLabel;
-  QLineEdit* ProgrammerExeFilePathLineEdit;
-  QPushButton* ProgrammerExeFilePathPushButton;
-  QLabel* ProgrammerSpeedLabel;
-  QLineEdit* ProgrammerSpeedLineEdit;
-
-  // Принтер
-  QGroupBox* StickerPrinterSettingsGroupBox;
-  QGridLayout* StickerPrinterSettingsMainLayout;
-  QLabel* StickerPrinterLibPathLabel;
-  QLineEdit* StickerPrinterLibPathLineEdit;
-  QPushButton* StickerPrinterLibPathPushButton;
-
-  QSpacerItem* SettingsVS1;
-  QSpacerItem* SettingsHS1;
-  //! \endcond
-
  public:
-  /*!
-   * Default constructor. Initialize
-   * \param[in] parent QObject parent
-   */
-  explicit MasterGUI(QWidget* parent);
-  /*!
-   * Default destructor
-   */
-  ~MasterGUI();
+  explicit MasterGui(QWidget* parent);
+  ~MasterGui();
 
-  /*!
-   * Resize TransponderInfoView to match amount of columns
-   */
-  virtual void update(void) override;
-
- public slots:
-  /*!
-   * Show logs on the screen in GeneralLogs view
-   * \param[in] log new log line
-   */
-  void displayLogData(const QString& log);
-  /*!
-   * Clear GeneralLogs view
-   */
-  void clearLogDataDisplay(void);
+  virtual void updateModelViews(void) override;
+  virtual GuiType type(void) override;
 
  private:
-  //! \cond
-  Q_DISABLE_COPY(MasterGUI);
-  //! \endcond
-  /*!
-   * Create 'Server' tab widgets
-   * \todo Qt Designer?
-   */
+  Q_DISABLE_COPY(MasterGui);
   void createServerTab(void);
-  /*!
-   * Create 'Programmator' tab widgets
-   */
+  void createServerTabViews(void);
+
   void createProgrammatorTab(void);
-  /*!
-   * Create 'Sticker printer' tab widgets
-   */
   void createStickerPrinterTab(void);
-  /*!
-   * Create 'Settings' tab widgets
-   */
-  void createSettingsTab(void);
-  /*!
-   * Create logging-related widgets
-   */
   void createLogWidgets(void);
 
+  void connectDepedencies(void);
+
  private slots:
-  /*!
-   * Show file picker for JLink
-   */
-  void on_ProgrammerExeFilePathPushButton_slot(void);
-  /*!
-   * Show file picker for TSC library
-   */
-  void on_StickerPrinterLibPathPushButton_slot(void);
+  void displayLog(const QString& log);
+  void clearLogDisplay(void);
 };
 
-#endif  // MASTERGUI_H
+#endif  // MASTER_GUI_H

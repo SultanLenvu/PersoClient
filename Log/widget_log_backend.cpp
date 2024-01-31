@@ -1,15 +1,16 @@
 #include "widget_log_backend.h"
+#include "global_environment.h"
 
-WidgetLogBackend::WidgetLogBackend(QObject* parent) : LogBackend(parent)
-{
-  setObjectName("WidgetLogBackend");
+WidgetLogBackend::WidgetLogBackend(const QString& name) : LogBackend(name) {
   loadSettings();
+
+  GlobalEnvironment::instance()->registerObject(this);
 }
 
 WidgetLogBackend::~WidgetLogBackend() {}
 
-void WidgetLogBackend::writeLogLine(const QString& str)
-{
+void WidgetLogBackend::writeLogLine(const QString& str) {
+  //  if (LogEnable)
   emit displayLog_signal(str);
 }
 
@@ -23,4 +24,8 @@ void WidgetLogBackend::applySettings()
   loadSettings();
 }
 
-void WidgetLogBackend::loadSettings() {}
+void WidgetLogBackend::loadSettings() {
+  QSettings settings;
+
+  LogEnable = settings.value("log_system/display_enable").toBool();
+}

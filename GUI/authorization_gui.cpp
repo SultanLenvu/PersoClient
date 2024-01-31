@@ -1,20 +1,20 @@
 #include "authorization_gui.h"
 
-AuthorizationGUI::AuthorizationGUI(QWidget* parent)
-    : AbstractGUI(parent, Authorization)
-{
+AuthorizationGui::AuthorizationGui(QWidget* parent) : AbstractGui(parent) {
   create();
 }
 
-AuthorizationGUI::~AuthorizationGUI()
-{
+AuthorizationGui::~AuthorizationGui() {
   //  qDebug() << "Deleted.";
 }
 
-void AuthorizationGUI::update() {}
+void AuthorizationGui::updateModelViews() {}
 
-void AuthorizationGUI::create()
-{
+AbstractGui::GuiType AuthorizationGui::type() {
+  return Authorization;
+}
+
+void AuthorizationGui::create() {
   GeneralLayout = new QVBoxLayout();
   MainLayout->addLayout(GeneralLayout);
 
@@ -24,11 +24,9 @@ void AuthorizationGUI::create()
   ModeChoiceLabel = new QLabel("Режим работы");
   ModeChoiceLayout->addWidget(ModeChoiceLabel);
   ModeChoice = new QComboBox();
-  ModeChoice->addItem("Производство");
+  ModeChoice->addItem("Сборка");
   ModeChoice->addItem("Тестирование");
   GeneralLayout->addWidget(ModeChoice);
-  connect(ModeChoice, &QComboBox::currentTextChanged, this,
-          &AuthorizationGUI::on_ModeChoiceCurrentTextChanged_slot);
   ModeChoice->setCurrentIndex(0);
 
   createAuthorizationGroup();
@@ -41,8 +39,7 @@ void AuthorizationGUI::create()
   GeneralLayout->addItem(ControlPanelVS);
 }
 
-void AuthorizationGUI::createAuthorizationGroup()
-{
+void AuthorizationGui::createAuthorizationGroup() {
   AuthorizationGroup = new QGroupBox("Авторизация");
   AuthorizationGroup->setAlignment(Qt::AlignCenter);
   GeneralLayout->insertWidget(GeneralLayout->indexOf(ControlPanelVS) - 1,
@@ -68,17 +65,4 @@ void AuthorizationGUI::createAuthorizationGroup()
   PasswordLineEdit = new QLineEdit();
   PasswordLineEdit->setEchoMode(QLineEdit::Password);
   PasswordLayout->addWidget(PasswordLineEdit);
-}
-
-void AuthorizationGUI::on_ModeChoiceCurrentTextChanged_slot(const QString& text)
-{
-  if (text == "Тестирование") {
-    GeneralLayout->removeWidget(AuthorizationGroup);
-    delete AuthorizationGroup;
-  } else {
-    createAuthorizationGroup();
-  }
-
-  adjustSize();
-  emit visibilityChanged();
 }
