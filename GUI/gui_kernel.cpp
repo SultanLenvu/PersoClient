@@ -50,8 +50,8 @@ GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
   createGuiSubkernels();
 
   // Создаем графический интерфейс для авторизации
-  createAuthorizationGui();
-  //  createMasterGui();
+  //  createAuthorizationGui();
+  createMasterGui();
 
   // Регистрируем типы
   registerMetaTypes();

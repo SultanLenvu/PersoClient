@@ -39,7 +39,8 @@
 
 /* Определения программатора */
 //===============================================================
-#define FIRMWARE_TEMP_FILE_NAME "data.bin"
+#define FIRMWARE_TEMP_FILE_NAME \
+  "data.bin"  // Расширение критически важно, оно обязательно должно быть .bin
 #define FIRMWARE_SIZE 131072
 
 #define JLINK_COMMAND_SCRIPT_DEFAULT_NAME "JLinkScript.jlink"
