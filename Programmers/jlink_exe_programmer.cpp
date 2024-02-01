@@ -179,11 +179,14 @@ ReturnStatus JLinkExeProgrammer::programUserData(QFile& data) {
 ReturnStatus JLinkExeProgrammer::readUcid(QString& ucid) {
   sendLog(QString("Считывание UCID микроконтроллера."));
 
+  QString ucidFileName;
+  ucidFileName = QString("%1/ucid").arg(QDir::tempPath());
+
   // Формируем скрипт JLink
   initScript();
   // Формируем сценарий команд
-  JLinkScript->write(QByteArray(QString("savebin %1/ucid %2, %3\n")
-                                    .arg(QDir::tempPath(), UCID_MEMORY_ADDRESS,
+  JLinkScript->write(QByteArray(QString("savebin %1, %2, %3\n")
+                                    .arg(ucidFileName, UCID_MEMORY_ADDRESS,
                                          QString::number(UCID_SIZE, 16))
                                     .toUtf8()));
 
@@ -194,7 +197,7 @@ ReturnStatus JLinkExeProgrammer::readUcid(QString& ucid) {
   }
 
   QByteArray ucidByteArray;
-  QFile ucidFile("ucid");
+  QFile ucidFile(ucidFileName);
   if (!ucidFile.open(QIODevice::ReadOnly)) {
     sendLog("Не удалось открыть файл содержащий UCID.");
     return ReturnStatus::FileOpenError;
