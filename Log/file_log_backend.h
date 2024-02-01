@@ -16,11 +16,11 @@ class FileLogBackend : public LogBackend
 {
   Q_OBJECT
  private:
-  bool LogEnable;
-  int32_t LogFileMaxNumber;
-  QString CurrentLogDir;
-  QFile CurrentLogFile;
-  QTextStream LogTextStream;
+  bool Enable;
+  int32_t FileMaxNumber;
+  QDir CurrentDir;
+  QFile CurrentFile;
+  QTextStream FileStream;
 
  public:
   explicit FileLogBackend(const QString& name);

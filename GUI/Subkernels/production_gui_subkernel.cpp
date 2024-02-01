@@ -173,13 +173,15 @@ void ProductionGuiSubkernel::connectProductionTesterGui() {
   ProductionTesterGui* gui = dynamic_cast<ProductionTesterGui*>(CurrentGui);
 
   // Сигналы от GUI
-  connect(gui->PrintBoxStickerButton, &QPushButton::clicked, this,
+  connect(gui->RereleaseTransponderButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::rereleaseTransponder_guiSlot);
+  connect(gui->PrintBoxStickerButton, &QPushButton::clicked, this,
+          &ProductionGuiSubkernel::printBoxSticker_guiSlot);
   connect(gui->PrintPalletStickerButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::printPalletSticker_guiSlot);
 
   // Связывание моделей и представлений
-  gui->TransponderDataView->setModel(ProductionLineModel.get());
+  gui->ProductionLineDataView->setModel(ProductionLineModel.get());
   gui->TransponderDataView->setModel(TransponderDataModel.get());
 
   // Сигналы от подядра

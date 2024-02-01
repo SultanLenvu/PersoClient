@@ -50,8 +50,8 @@ GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
   createGuiSubkernels();
 
   // Создаем графический интерфейс для авторизации
-  //  createAuthorizationGui();
-  createMasterGui();
+  createAuthorizationGui();
+  //  createMasterGui();
 
   // Регистрируем типы
   registerMetaTypes();
@@ -191,6 +191,13 @@ void GuiKernel::createManagersInstance() {
   }
 
   ManagersThread->start();
+
+  connect(static_cast<ProductionManager*>(Managers["ProductionManager"].get()),
+          &ProductionManager::printTransponderSticker_signal,
+          static_cast<StickerPrinterManager*>(
+              Managers["StickerPrinterManager"].get()),
+          &StickerPrinterManager::printTransponderSticker_sync,
+          Qt::DirectConnection);
 }
 
 void GuiKernel::createAuthorizationGui() {
@@ -238,7 +245,7 @@ void GuiKernel::createProductionAssemblerGui() {
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
-              DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
+              DesktopGeometry.width() * 0.8, DesktopGeometry.height() * 0.8);
   setLayoutDirection(Qt::LeftToRight);
 
   CurrentGui = new ProductionAssemblerGui(this);

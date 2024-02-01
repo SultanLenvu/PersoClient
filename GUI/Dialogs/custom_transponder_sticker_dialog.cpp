@@ -7,15 +7,12 @@ CustomTransponderStickerScanDialog::CustomTransponderStickerScanDialog(
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
 
-  // Создаем диалоговое окно
-  setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
-              DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1);
-  setWindowTitle("Данные стикера");
-
   create();
   createMatchTable();
 
   Regex.setPattern("^[0-9]+$");
+
+  setWindowTitle("Данные стикера");
 }
 
 CustomTransponderStickerScanDialog::~CustomTransponderStickerScanDialog() {}

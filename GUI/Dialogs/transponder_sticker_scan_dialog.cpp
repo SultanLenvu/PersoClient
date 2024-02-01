@@ -6,13 +6,11 @@ TransponderStickerScanDialog::TransponderStickerScanDialog(QWidget* parent)
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
 
-  // Создаем диалоговое окно
-  setGeometry(DesktopGeometry.width() * 0.3, DesktopGeometry.height() * 0.35,
-              DesktopGeometry.width() * 0.2, DesktopGeometry.height() * 0.15);
   setWindowTitle("Сканирование стикера");
-  setFixedSize(size());
 
   create();
+  adjustSize();
+  setFixedSize(size());
 
   Regex.setPattern("^[0-9]+$");
 }

@@ -4,56 +4,97 @@
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
   setObjectName("SettingsDialog");
 
-  // Считываем размеры дисплея
-  DesktopGeometry = QApplication::primaryScreen()->size();
-
-  // Создаем диалоговое окно
-  setGeometry(DesktopGeometry.width() * 0.45, DesktopGeometry.height() * 0.45,
-              DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1);
-  setWindowTitle("Настройки");
-
+  // Создаем виджеты
   create();
+  adjustSize();
 
-  //  adjustSize();
-  //  setFixedHeight(size().height());
+  // Задаем заголовок
+  setWindowTitle("Настройки");
 }
 
 SettingsDialog::~SettingsDialog() {}
 
+void SettingsDialog::accept() {
+  if (!check()) {
+    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.",
+                          QMessageBox::Ok);
+    return;
+  }
+
+  save();
+  QMessageBox::information(this, "Оповещение", "Новые настройки применены.",
+                           QMessageBox::Ok);
+  emit applyNewSettings();
+}
+
 void SettingsDialog::create() {
   // Главный макет меню настроек
   MainLayout = new QVBoxLayout();
+  MainLayout->setSizeConstraint(QLayout::SetFixedSize);
+  MainLayout->setAlignment(Qt::AlignTop);
   setLayout(MainLayout);
 
   // Система логгирования
+  createLogSystem();
+
+  // Сеть
+  createPersoServer();
+
+  // Настройки программатора
+  createProgrammator();
+
+  // Настройки принтера
+  createStickerPrinter();
+
+  // Кнопки
+  createButtons();
+
+  // Сжимаем позиционирование
+  //  VS1 = new QSpacerItem(0, 0, QSizePolicy::MinimumExpanding,
+  //                        QSizePolicy::MinimumExpanding);
+  //  MainLayout->addItem(VS1);
+}
+
+
+void SettingsDialog::createLogSystem() {
   LogSystemGroupBox = new QGroupBox(QString("Система логгирования"));
   MainLayout->addWidget(LogSystemGroupBox);
 
   LogSystemMainLayout = new QGridLayout();
   LogSystemGroupBox->setLayout(LogSystemMainLayout);
 
-  LogSystemGlobalEnableLabel = new QLabel("Глобальное логгирование вкл/выкл");
-  LogSystemMainLayout->addWidget(LogSystemGlobalEnableLabel, 0, 0, 1, 1);
+  LogSystemGlobalEnableLabel = new QLabel("Активно");
+  LogSystemMainLayout->addWidget(LogSystemGlobalEnableLabel, 0, 0, 1, 3);
   LogSystemGlobalEnableCheckBox = new QCheckBox();
   LogSystemGlobalEnableCheckBox->setCheckState(
       Settings.value("log_system/global_enable").toBool() ? Qt::Checked
                                                           : Qt::Unchecked);
-  LogSystemMainLayout->addWidget(LogSystemGlobalEnableCheckBox, 0, 1, 1, 1);
-  LogSystemExtendedEnableLabel =
-      new QLabel("Расширенное логгирование вкл/выкл");
-  LogSystemMainLayout->addWidget(LogSystemExtendedEnableLabel, 1, 0, 1, 1);
-  LogSystemExtendedEnableCheckBox = new QCheckBox();
-  LogSystemExtendedEnableCheckBox->setCheckState(
-      Settings.value("log_system/extended_enable").toBool() ? Qt::Checked
-                                                            : Qt::Unchecked);
-  LogSystemMainLayout->addWidget(LogSystemExtendedEnableCheckBox, 1, 1, 1, 1);
+  LogSystemMainLayout->addWidget(LogSystemGlobalEnableCheckBox, 0, 1, 1, 3);
+
   LogSystemMessageMaxSizeLabel = new QLabel("Максимальный размер сообщения");
-  LogSystemMainLayout->addWidget(LogSystemMessageMaxSizeLabel, 2, 0, 1, 1);
+  LogSystemMainLayout->addWidget(LogSystemMessageMaxSizeLabel, 1, 0, 1, 3);
   LogSystemMessageMaxSizeLineEdit =
       new QLineEdit(Settings.value("log_system/message_max_size").toString());
-  LogSystemMainLayout->addWidget(LogSystemMessageMaxSizeLineEdit, 2, 1, 1, 1);
+  LogSystemMainLayout->addWidget(LogSystemMessageMaxSizeLineEdit, 1, 1, 1, 3);
 
-  // Сеть
+  LogSystemFileDirLabel = new QLabel("Директория для лог-файлов");
+  LogSystemMainLayout->addWidget(LogSystemFileDirLabel, 2, 0, 1, 1);
+  LogSystemFileDirLineEdit =
+      new QLineEdit(Settings.value("log_system/file_directory").toString());
+  LogSystemMainLayout->addWidget(LogSystemFileDirLineEdit, 2, 1, 1, 1);
+  LogSystemFileDirPushButton = new QPushButton("Обзор");
+  LogSystemMainLayout->addWidget(LogSystemFileDirPushButton, 2, 2, 1, 1);
+  connect(LogSystemFileDirPushButton, &QPushButton::clicked, this,
+          &SettingsDialog::logSystemFileDirPushButton_slot);
+
+  LogSystemFileMaxNumberLabel = new QLabel("Максимум лог-файлов");
+  LogSystemMainLayout->addWidget(LogSystemFileMaxNumberLabel, 3, 0, 1, 1);
+  LogSystemFileMaxNumberLineEdit =
+      new QLineEdit(Settings.value("log_system/file_max_number").toString());
+  LogSystemMainLayout->addWidget(LogSystemFileMaxNumberLineEdit, 3, 1, 1, 2);
+}
+
+void SettingsDialog::createPersoServer() {
   PersoServerGroupBox = new QGroupBox(QString("Сетевые настройки"));
   MainLayout->addWidget(PersoServerGroupBox);
 
@@ -71,8 +112,9 @@ void SettingsDialog::create() {
   PersoServerPortLineEdit =
       new QLineEdit(Settings.value("perso_server_connection/port").toString());
   PersoServerMainLayout->addWidget(PersoServerPortLineEdit, 1, 1, 1, 1);
+}
 
-  // Настройки программатора
+void SettingsDialog::createProgrammator() {
   ProgrammerGroupBox = new QGroupBox(QString("Программатор"));
   MainLayout->addWidget(ProgrammerGroupBox);
 
@@ -93,8 +135,9 @@ void SettingsDialog::create() {
   ProgrammerSpeedLineEdit =
       new QLineEdit(Settings.value("jlink_exe_programmer/speed").toString());
   ProgrammerMainLayout->addWidget(ProgrammerSpeedLineEdit, 1, 1, 1, 2);
+}
 
-  // Настройки принтера
+void SettingsDialog::createStickerPrinter() {
   StickerPrinterGroupBox = new QGroupBox(QString("Стикер-принтер"));
   MainLayout->addWidget(StickerPrinterGroupBox);
 
@@ -117,7 +160,7 @@ void SettingsDialog::create() {
   StickerPrinterMainLayout->addWidget(StickerPrinterNameLabel, 1, 0, 1, 1);
   StickerPrinterNameLineEdit =
       new QLineEdit(Settings.value("te310_printer/system_name").toString());
-  StickerPrinterMainLayout->addWidget(StickerPrinterNameLineEdit, 1, 1, 1, 1);
+  StickerPrinterMainLayout->addWidget(StickerPrinterNameLineEdit, 1, 1, 1, 2);
 
   StickerPrinterUseEthernetLabel =
       new QLabel("Использовать Ethernet-подключение");
@@ -126,18 +169,44 @@ void SettingsDialog::create() {
   StickerPrinterUseEthernetCheck = new QCheckBox();
   StickerPrinterUseEthernetCheck->setChecked(
       Settings.value("te310_printer/use_ethernet").toBool());
-  StickerPrinterMainLayout->addWidget(StickerPrinterUseEthernetCheck, 2, 1, 1,
+  StickerPrinterMainLayout->addWidget(StickerPrinterUseEthernetCheck, 2, 1, 2,
                                       1);
   connect(StickerPrinterUseEthernetCheck, &QCheckBox::stateChanged, this,
           &SettingsDialog::stickerPrinterUseEthernetStateChanged_slot);
 
   createStickerPrinterProxyWidget();
+}
 
-  // Сжимаем позиционирование
-  VS1 = new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-  MainLayout->addItem(VS1);
+void SettingsDialog::createStickerPrinterProxyWidget() {
+  StickerPrinterProxyWidget = new QWidget();
+  StickerPrinterMainLayout->addWidget(StickerPrinterProxyWidget, 3, 0, 1, 2);
 
-  // Кнопки
+  StickerPrinterProxyWidgetLayout = new QGridLayout();
+  StickerPrinterProxyWidget->setLayout(StickerPrinterProxyWidgetLayout);
+  StickerPrinterMainLayout->setSizeConstraint(QLayout::SetMinimumSize);
+  StickerPrinterMainLayout->setAlignment(Qt::AlignTop);
+
+  StickerPrinterIpLabel = new QLabel("IP адрес");
+  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterIpLabel, 0, 0, 1, 1);
+  StickerPrinterIpLineEdit =
+      new QLineEdit(Settings.value("te310_printer/ip_address").toString());
+  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterIpLineEdit, 0, 1, 1,
+                                             1);
+
+  StickerPrinterPortLabel = new QLabel("Порт");
+  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterPortLabel, 1, 0, 1,
+                                             1);
+  StickerPrinterPortLineEdit =
+      new QLineEdit(Settings.value("te310_printer/port").toString());
+  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterPortLineEdit, 1, 1,
+                                             1, 1);
+
+  if (!Settings.value("te310_printer/use_ethernet").toBool()) {
+    StickerPrinterProxyWidget->hide();
+  }
+}
+
+void SettingsDialog::createButtons() {
   ButtonLayout = new QHBoxLayout();
   MainLayout->addLayout(ButtonLayout);
 
@@ -152,24 +221,30 @@ void SettingsDialog::create() {
 }
 
 bool SettingsDialog::check() const {
-  QHostAddress IP = QHostAddress(PersoServerIpAddressLineEdit->text());
-  uint32_t speed = ProgrammerSpeedLineEdit->text().toUInt();
   int32_t msgMaxSize = LogSystemMessageMaxSizeLineEdit->text().toInt();
+  QFileInfo info(LogSystemFileDirLineEdit->text());
+  int32_t fileMaxNumber = LogSystemFileMaxNumberLineEdit->text().toInt();
 
-  if (msgMaxSize == 0) {
+  if (msgMaxSize == 0 || fileMaxNumber == 0) {
     return false;
   }
 
+  if (!info.isDir() || !info.isWritable() || !info.isReadable()) {
+    return false;
+  }
+
+  QHostAddress IP = QHostAddress(PersoServerIpAddressLineEdit->text());
+  int32_t port = PersoServerPortLineEdit->text().toInt();
   if (IP.isNull()) {
     return false;
   }
 
-  int32_t port = PersoServerPortLineEdit->text().toInt();
   if ((port > IP_PORT_MAX_VALUE) || (port < IP_PORT_MIN_VALUE)) {
     return false;
   }
 
-  QFileInfo info(ProgrammerExeFilePathLineEdit->text());
+  uint32_t speed = ProgrammerSpeedLineEdit->text().toUInt();
+  info.setFile(ProgrammerExeFilePathLineEdit->text());
   if (!info.exists()) {
     return false;
   }
@@ -200,10 +275,12 @@ bool SettingsDialog::check() const {
 void SettingsDialog::save() {
   Settings.setValue("log_system/global_enable",
                     LogSystemGlobalEnableCheckBox->isChecked());
-  Settings.setValue("log_system/extended_enable",
-                    LogSystemExtendedEnableCheckBox->isChecked());
   Settings.setValue("log_system/message_max_size",
                     LogSystemMessageMaxSizeLineEdit->text().toInt());
+  Settings.setValue("log_system/file_directory",
+                    LogSystemFileDirLineEdit->text());
+  Settings.setValue("log_system/file_max_number",
+                    LogSystemFileMaxNumberLineEdit->text());
 
   Settings.setValue("perso_server_connection/ip",
                     PersoServerIpAddressLineEdit->text());
@@ -226,62 +303,30 @@ void SettingsDialog::save() {
   Settings.setValue("te310_printer/port", StickerPrinterPortLineEdit->text());
 }
 
-void SettingsDialog::createStickerPrinterProxyWidget() {
-  StickerPrinterProxyWidget = new QWidget();
-  StickerPrinterMainLayout->addWidget(StickerPrinterProxyWidget, 3, 0, 1, 2);
-
-  StickerPrinterProxyWidgetLayout = new QGridLayout();
-  StickerPrinterProxyWidget->setLayout(StickerPrinterProxyWidgetLayout);
-
-  StickerPrinterIpLabel = new QLabel("IP адрес");
-  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterIpLabel, 0, 0, 1, 1);
-  StickerPrinterIpLineEdit =
-      new QLineEdit(Settings.value("te310_printer/ip_address").toString());
-  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterIpLineEdit, 0, 1, 1,
-                                             1);
-
-  StickerPrinterPortLabel = new QLabel("Порт");
-  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterPortLabel, 1, 0, 1,
-                                             1);
-  StickerPrinterPortLineEdit =
-      new QLineEdit(Settings.value("te310_printer/port").toString());
-  StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterPortLineEdit, 1, 1,
-                                             1, 1);
-
-  if (!Settings.value("te310_printer/use_ethernet").toBool()) {
-    StickerPrinterProxyWidget->hide();
-  }
-}
-
-void SettingsDialog::accept() {
-  if (!check()) {
-    QMessageBox::critical(this, "Ошибка", "Некорректный ввод данных.",
-                          QMessageBox::Ok);
-    return;
-  }
-
-  save();
-  QMessageBox::information(this, "Оповещение", "Новые настройки применены.",
-                           QMessageBox::Ok);
-  emit applyNewSettings();
+void SettingsDialog::logSystemFileDirPushButton_slot() {
+  QString filePath =
+      QFileDialog::getExistingDirectory(this, "Выберите директорию", "");
+  LogSystemFileDirLineEdit->setText(filePath);
 }
 
 void SettingsDialog::programmerExeFilePathPushButton_slot() {
-  QString filePath =
-      QFileDialog::getOpenFileName(this, "Выберите файл", "");
+  QString filePath = QFileDialog::getOpenFileName(this, "Выберите файл", "");
   ProgrammerExeFilePathLineEdit->setText(filePath);
 }
 
 void SettingsDialog::stickerPrinterLibPathPushButton_slot() {
-  QString filePath =
-      QFileDialog::getOpenFileName(this, "Выберите файл", "");
+  QString filePath = QFileDialog::getOpenFileName(this, "Выберите файл", "");
   StickerPrinterLibPathLineEdit->setText(filePath);
 }
 
 void SettingsDialog::stickerPrinterUseEthernetStateChanged_slot(int32_t state) {
   if (state == Qt::Checked) {
     StickerPrinterProxyWidget->show();
+    StickerPrinterMainLayout->addWidget(StickerPrinterProxyWidget, 3, 0, 1, 2);
   } else {
     StickerPrinterProxyWidget->hide();
+    StickerPrinterMainLayout->removeWidget(StickerPrinterProxyWidget);
   }
+
+  resize(minimumSizeHint());
 }

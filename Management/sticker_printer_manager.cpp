@@ -23,7 +23,7 @@ void StickerPrinterManager::applySettings() {
   StickerPrinter->applySetting();
 }
 
-void StickerPrinterManager::printTransponderSticker(
+void StickerPrinterManager::printTransponderSticker_async(
     std::shared_ptr<StringDictionary> param) {
   emit executionStarted("printTransponderSticker");
   sendLog("Печать стикера для транспондера. ");
@@ -40,7 +40,7 @@ void StickerPrinterManager::printTransponderSticker(
   emit executionFinished("printTransponderSticker", ret);
 }
 
-void StickerPrinterManager::printLastTransponderSticker() {
+void StickerPrinterManager::printLastTransponderSticker_async() {
   emit executionStarted("printLastTransponderSticker");
   sendLog("Печать последнего стикера для транспондера. ");
 
@@ -56,7 +56,7 @@ void StickerPrinterManager::printLastTransponderSticker() {
   emit executionFinished("printLastTransponderSticker", ret);
 }
 
-void StickerPrinterManager::printCustomTransponderSticker(
+void StickerPrinterManager::printCustomTransponderSticker_async(
     std::shared_ptr<StringDictionary> param) {
   emit executionStarted("printCustomTransponderSticker");
   sendLog("Печать произвольного стикера для транспондера. ");
@@ -73,7 +73,7 @@ void StickerPrinterManager::printCustomTransponderSticker(
   emit executionFinished("printCustomTransponderSticker", ret);
 }
 
-void StickerPrinterManager::executeCommandScript(
+void StickerPrinterManager::executeCommandScript_async(
     std::shared_ptr<QStringList> script) {
   emit executionStarted("executeCommandScript");
   sendLog("Выполнение командного скрипта для принтера. ");
@@ -90,8 +90,30 @@ void StickerPrinterManager::executeCommandScript(
   emit executionFinished("executeCommandScript", ret);
 }
 
+void StickerPrinterManager::printTransponderSticker_sync(
+    const StringDictionary& param,
+    ReturnStatus& ret) {
+  ret = StickerPrinter->printTransponderSticker(param);
+}
+
+void StickerPrinterManager::printLastTransponderSticker_sync(
+    ReturnStatus& ret) {
+  ret = StickerPrinter->printLastTransponderSticker();
+}
+
+void StickerPrinterManager::printCustomTransponderSticker_sync(
+    const StringDictionary& param,
+    ReturnStatus& ret) {
+  ret = StickerPrinter->printTransponderSticker(param);
+}
+
+void StickerPrinterManager::executeCommandScript_sync(const QStringList& script,
+                                                      ReturnStatus& ret) {
+  ret = StickerPrinter->exec(script);
+}
+
 void StickerPrinterManager::sendLog(const QString& log) {
-  emit logging(objectName() + " - " + log);
+  emit logging(QString("%1 - %2").arg(objectName(), log));
 }
 
 void StickerPrinterManager::loadSettings() {}

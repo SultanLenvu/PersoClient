@@ -19,6 +19,7 @@ class AbstractProgrammer : public QObject {
   virtual ~AbstractProgrammer();
 
  public:
+  virtual ReturnStatus checkConfig(void) = 0;
   virtual ProgrammerType type() const = 0;
   virtual ReturnStatus programMemory(QFile& firmware) = 0;
   virtual ReturnStatus programMemoryWithUnlock(QFile& firmware) = 0;

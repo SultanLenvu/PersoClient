@@ -21,10 +21,18 @@ class StickerPrinterManager : public AbstractManager {
  public slots:
   virtual void applySettings(void) override;
 
-  void printTransponderSticker(std::shared_ptr<StringDictionary> param);
-  void printLastTransponderSticker(void);
-  void printCustomTransponderSticker(std::shared_ptr<StringDictionary> param);
-  void executeCommandScript(std::shared_ptr<QStringList> script);
+  void printTransponderSticker_async(std::shared_ptr<StringDictionary> param);
+  void printLastTransponderSticker_async(void);
+  void printCustomTransponderSticker_async(
+      std::shared_ptr<StringDictionary> param);
+  void executeCommandScript_async(std::shared_ptr<QStringList> script);
+
+  void printTransponderSticker_sync(const StringDictionary& param,
+                                    ReturnStatus& ret);
+  void printLastTransponderSticker_sync(ReturnStatus& ret);
+  void printCustomTransponderSticker_sync(const StringDictionary& param,
+                                          ReturnStatus& ret);
+  void executeCommandScript_sync(const QStringList& script, ReturnStatus& ret);
 
  private:
   Q_DISABLE_COPY_MOVE(StickerPrinterManager)

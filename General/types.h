@@ -57,6 +57,7 @@ enum class ReturnStatus {
   ProductionLineCompleted,
   ProductionLineNotInProcess,
 
+  StickerPrintingFailed,
   StickerPrinterDriverMissed,
   StickerPrinterLibraryMissing,
   StickerPrinterInitError,
@@ -64,7 +65,10 @@ enum class ReturnStatus {
 
   InvalidFirmwareFile,
   ProgrammatorLibraryMissing,
+  ProgrammatorExeFileInvalid,
   ProgrammatorError,
+
+  Unknown
 };
 
 #endif  // TYPES_H

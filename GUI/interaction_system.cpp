@@ -225,6 +225,8 @@ void InteractionSystem::createMessageTable() {
       "Производственная линия не находится в процессе сборки. Необходимо "
       "запросить бокс.";
 
+  MessageTable[ReturnStatus::StickerPrintingFailed] =
+      "Не удалось распечататать стикер.";
   MessageTable[ReturnStatus::StickerPrinterDriverMissed] =
       "Не найден драйвер для принтера стикеров.";
   MessageTable[ReturnStatus::StickerPrinterLibraryMissing] =
@@ -234,8 +236,16 @@ void InteractionSystem::createMessageTable() {
   MessageTable[ReturnStatus::StickerPrinterConnectionError] =
       "Не удалось подключиться к принтеру стикеров.";
 
+  MessageTable[ReturnStatus::InvalidFirmwareFile] =
+      "Получен некорректный файл прошивки.";
+  MessageTable[ReturnStatus::ProgrammatorLibraryMissing] =
+      "Не найдена библиотека программатора.";
+  MessageTable[ReturnStatus::ProgrammatorExeFileInvalid] =
+      "Получен некорректный исполняемый файл для работы с программатором.";
   MessageTable[ReturnStatus::ProgrammatorError] =
       "Получена ошибка программатора.";
+
+  MessageTable[ReturnStatus::Unknown] = "Получена неизвестная ошибка.";
 }
 
 void InteractionSystem::processReturnStatus(ReturnStatus ret) {

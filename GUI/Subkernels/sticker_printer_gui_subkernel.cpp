@@ -82,12 +82,12 @@ void StickerPrinterGuiSubkernel::connectStickerPrinterManager() const {
       dynamic_cast<StickerPrinterManager*>(Manager.get());
 
   connect(this, &StickerPrinterGuiSubkernel::printLastTransponderSticker_signal,
-          manager, &StickerPrinterManager::printLastTransponderSticker);
+          manager, &StickerPrinterManager::printLastTransponderSticker_async);
   connect(this,
           &StickerPrinterGuiSubkernel::printCustomTransponderSticker_signal,
-          manager, &StickerPrinterManager::printCustomTransponderSticker);
+          manager, &StickerPrinterManager::printCustomTransponderSticker_async);
   connect(this, &StickerPrinterGuiSubkernel::executeCommandScript_signal,
-          manager, &StickerPrinterManager::executeCommandScript);
+          manager, &StickerPrinterManager::executeCommandScript_async);
 }
 
 void StickerPrinterGuiSubkernel::printLastTransponderSticker_guiSlot() {

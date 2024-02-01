@@ -14,17 +14,20 @@ class SettingsDialog : public QDialog {
 
   QVBoxLayout* MainLayout;
 
-  // Настойки логгирования
+ private:  // Настойки логгирования
   QGroupBox* LogSystemGroupBox;
   QGridLayout* LogSystemMainLayout;
   QLabel* LogSystemGlobalEnableLabel;
   QCheckBox* LogSystemGlobalEnableCheckBox;
-  QLabel* LogSystemExtendedEnableLabel;
-  QCheckBox* LogSystemExtendedEnableCheckBox;
   QLabel* LogSystemMessageMaxSizeLabel;
   QLineEdit* LogSystemMessageMaxSizeLineEdit;
+  QLabel* LogSystemFileDirLabel;
+  QLineEdit* LogSystemFileDirLineEdit;
+  QPushButton* LogSystemFileDirPushButton;
+  QLabel* LogSystemFileMaxNumberLabel;
+  QLineEdit* LogSystemFileMaxNumberLineEdit;
 
-  // Сеть
+ private:  // Сеть
   QGroupBox* PersoServerGroupBox;
   QGridLayout* PersoServerMainLayout;
   QLabel* PersoServerIpAddressLabel;
@@ -32,7 +35,7 @@ class SettingsDialog : public QDialog {
   QLabel* PersoServerPortLabel;
   QLineEdit* PersoServerPortLineEdit;
 
-  // Программатор
+ private:  // Программатор
   QGroupBox* ProgrammerGroupBox;
   QGridLayout* ProgrammerMainLayout;
   QLabel* ProgrammerExeFilePathLabel;
@@ -41,7 +44,7 @@ class SettingsDialog : public QDialog {
   QLabel* ProgrammerSpeedLabel;
   QLineEdit* ProgrammerSpeedLineEdit;
 
-  // Принтер
+ private:  // Принтер
   QGroupBox* StickerPrinterGroupBox;
   QGridLayout* StickerPrinterMainLayout;
   QLabel* StickerPrinterLibPathLabel;
@@ -49,7 +52,6 @@ class SettingsDialog : public QDialog {
   QPushButton* StickerPrinterLibPathPushButton;
   QLabel* StickerPrinterNameLabel;
   QLineEdit* StickerPrinterNameLineEdit;
-
   QLabel* StickerPrinterUseEthernetLabel;
   QCheckBox* StickerPrinterUseEthernetCheck;
 
@@ -60,9 +62,10 @@ class SettingsDialog : public QDialog {
   QLabel* StickerPrinterPortLabel;
   QLineEdit* StickerPrinterPortLineEdit;
 
+ private:
   QSpacerItem* VS1;
 
-  // Кнопки
+ private:  // Кнопки
   QHBoxLayout* ButtonLayout;
   QPushButton* ApplyPushButton;
   QPushButton* RejectPushButton;
@@ -71,17 +74,25 @@ class SettingsDialog : public QDialog {
   explicit SettingsDialog(QWidget* parent);
   ~SettingsDialog();
 
+ public:  // QDialog interface
   virtual void accept(void) override;
 
  private:
   Q_DISABLE_COPY_MOVE(SettingsDialog)
   void create(void);
+
+  void createLogSystem(void);
+  void createPersoServer(void);
+  void createProgrammator(void);
+  void createStickerPrinter(void);
+  void createStickerPrinterProxyWidget(void);
+  void createButtons(void);
+
   bool check() const;
   void save(void);
 
-  void createStickerPrinterProxyWidget(void);
-
  private slots:
+  void logSystemFileDirPushButton_slot(void);
   void programmerExeFilePathPushButton_slot(void);
   void stickerPrinterLibPathPushButton_slot(void);
   void stickerPrinterUseEthernetStateChanged_slot(int32_t state);

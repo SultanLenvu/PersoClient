@@ -5,12 +5,9 @@ AuthorizationDialog::AuthorizationDialog(QWidget* parent)
   // Считываем размеры дисплея
   DesktopGeometry = QApplication::primaryScreen()->size();
 
-  // Создаем диалоговое окно
+  // Создаем виджеты
   create();
 
-  //  setGeometry(DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5,
-  //              DesktopGeometry.width() * 0.1, DesktopGeometry.height() *
-  //              0.1);
   setWindowTitle("Авторизация");
   adjustSize();
   setFixedSize(size());

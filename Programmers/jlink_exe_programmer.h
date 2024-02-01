@@ -12,6 +12,7 @@ class JLinkExeProgrammer : public AbstractProgrammer {
   Q_OBJECT
  private:
   uint32_t Speed;
+  QString JLinkPath;
   std::unique_ptr<QProcess> JLinkProcess;
 
   std::unique_ptr<QFile> JLinkScript;
@@ -24,6 +25,7 @@ class JLinkExeProgrammer : public AbstractProgrammer {
   ~JLinkExeProgrammer();
 
  public:
+  virtual ReturnStatus checkConfig(void) override;
   virtual ProgrammerType type() const override;
   virtual ReturnStatus programMemory(QFile& firmware) override;
   virtual ReturnStatus programMemoryWithUnlock(QFile& firmware) override;
@@ -44,6 +46,8 @@ class JLinkExeProgrammer : public AbstractProgrammer {
   Q_DISABLE_COPY(JLinkExeProgrammer);
   void sendLog(const QString& log);
   void loadSettings(void);
+
+  void createJLinkProcess(void);
 
   void executeJLinkScript(void);
   void initScript(void);

@@ -6,7 +6,6 @@
 #include "jlink_exe_programmer.h"
 #include "log_system.h"
 #include "perso_server_connection.h"
-#include "te310_printer.h"
 
 ProductionManager::ProductionManager(const QString& name)
     : AbstractManager{name} {
@@ -18,7 +17,6 @@ ProductionManager::~ProductionManager() {}
 void ProductionManager::onInstanceThreadStarted() {
   createProgrammer();
   createServerConnection();
-  createStickerPrinter();
 }
 
 AbstractManager::Type ProductionManager::type() const {
@@ -31,7 +29,6 @@ void ProductionManager::applySettings() {
 
   Server->applySettings();
   Programmer->applySettings();
-  StickerPrinter->applySetting();
 }
 
 void ProductionManager::connectToServer() {
@@ -378,7 +375,8 @@ void ProductionManager::releaseTransponder() {
   emit displayTransponderData_signal(TransponderData);
 
   // Печатаем стикер
-  ret = StickerPrinter->printTransponderSticker(TransponderData);
+  ret = ReturnStatus::StickerPrinterConnectionError;
+  emit printTransponderSticker_signal(TransponderData, ret);
   if (ret != ReturnStatus::NoError) {
     processOperationError("releaseTransponder", ret);
     return;
@@ -464,7 +462,7 @@ void ProductionManager::rereleaseTransponder(
   emit displayTransponderData_signal(TransponderData);
 
   // Печатаем стикер
-  ret = StickerPrinter->printTransponderSticker(TransponderData);
+  emit printTransponderSticker_signal(TransponderData, ret);
   if (ret != ReturnStatus::NoError) {
     processOperationError("rereleaseTransponder", ret);
     return;
@@ -623,10 +621,9 @@ void ProductionManager::sendLog(const QString& log) {
 ReturnStatus ProductionManager::checkConfig() {
   sendLog("Проверка конфигурации.");
 
-  ReturnStatus ret = StickerPrinter->checkConfig();
+  ReturnStatus ret = Programmer->checkConfig();
   if (ret != ReturnStatus::NoError) {
-    sendLog(
-        "Проверка конфигурации провалена. Принтер стикеров не готов к работе.");
+    sendLog("Проверка конфигурации провалена. Программатор не готов к работе.");
   }
 
   sendLog("Проверка конфигурации успешно завершена.");
@@ -648,11 +645,6 @@ void ProductionManager::createServerConnection() {
 
   connect(Server.get(), &AbstractServerConnection::disconnected, this,
           &ProductionManager::onServerDisconnected);
-}
-
-void ProductionManager::createStickerPrinter() {
-  StickerPrinter = std::unique_ptr<AbstractStickerPrinter>(
-      new TE310Printer("StickerPrinter1"));
 }
 
 void ProductionManager::initOperation(const QString& name) {

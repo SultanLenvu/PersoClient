@@ -4,9 +4,25 @@
 JLinkExeProgrammer::JLinkExeProgrammer(const QString& name)
     : AbstractProgrammer(name) {
   loadSettings();
+  createJLinkProcess();
 }
 
 JLinkExeProgrammer::~JLinkExeProgrammer() {}
+
+ReturnStatus JLinkExeProgrammer::checkConfig() {
+  sendLog("Проверка конфигурации.");
+
+  QFileInfo info(JLinkPath);
+  if (!info.isExecutable()) {
+    //    sendLog(
+    //        "Получен некорректный исполняемый файл для работы с
+    //        программатором.");
+    //    return ReturnStatus::ProgrammatorExeFileInvalid;
+  }
+
+  sendLog("Проверка конфигурации успешно завершена.");
+  return ReturnStatus::NoError;
+}
 
 AbstractProgrammer::ProgrammerType JLinkExeProgrammer::type() const {
   return JLinkExe;
@@ -340,6 +356,7 @@ void JLinkExeProgrammer::applySettings()
 {
   sendLog("Применение новых настроек. ");
   loadSettings();
+  createJLinkProcess();
 }
 
 void JLinkExeProgrammer::sendLog(const QString& log) {
@@ -354,11 +371,13 @@ void JLinkExeProgrammer::loadSettings()
 {
   QSettings settings;
 
-  JLinkProcess = std::unique_ptr<QProcess>(new QProcess());
-  JLinkProcess->setProgram(
-      settings.value("jlink_exe_programmer/exe_file_path").toString());
-
+  JLinkPath = settings.value("jlink_exe_programmer/exe_file_path").toString();
   Speed = settings.value("jlink_exe_programmer/speed").toUInt();
+}
+
+void JLinkExeProgrammer::createJLinkProcess() {
+  JLinkProcess = std::unique_ptr<QProcess>(new QProcess());
+  JLinkProcess->setProgram(JLinkPath);
 }
 
 void JLinkExeProgrammer::executeJLinkScript()

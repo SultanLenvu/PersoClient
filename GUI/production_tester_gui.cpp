@@ -55,6 +55,9 @@ ProductionTesterGui::ProductionTesterGui(QWidget* parent)
 ProductionTesterGui::~ProductionTesterGui() {}
 
 void ProductionTesterGui::updateModelViews() {
+  ProductionLineDataView->resizeColumnsToContents();
+  ProductionLineDataView->update();
+
   TransponderDataView->resizeColumnsToContents();
   TransponderDataView->update();
 }

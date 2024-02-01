@@ -6,7 +6,6 @@
 #include "abstract_manager.h"
 #include "abstract_programmer.h"
 #include "abstract_server_connection.h"
-#include "abstract_sticker_printer.h"
 
 class ProductionManager : public AbstractManager {
   Q_OBJECT
@@ -14,7 +13,6 @@ class ProductionManager : public AbstractManager {
  private:  
   std::unique_ptr<AbstractServerConnection> Server;
   std::unique_ptr<AbstractProgrammer> Programmer;
-  std::unique_ptr<AbstractStickerPrinter> StickerPrinter;
 
   std::unique_ptr<QFile> Firmware;
 
@@ -69,7 +67,6 @@ class ProductionManager : public AbstractManager {
 
   void createProgrammer(void);
   void createServerConnection(void);
-  void createStickerPrinter(void);
 
   void initOperation(const QString& name);
   void processOperationError(const QString& name, ReturnStatus ret);
@@ -80,6 +77,9 @@ class ProductionManager : public AbstractManager {
   void displayTransponderData_signal(const StringDictionary& data);
   void displayBoxData_signal(const StringDictionary& data);
   void authorizationCompleted(void);
+
+  void printTransponderSticker_signal(const StringDictionary& data,
+                                      ReturnStatus& ret);
 };
 
 #endif  // ProductionManager_H
