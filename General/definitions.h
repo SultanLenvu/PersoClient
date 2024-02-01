@@ -39,7 +39,7 @@
 
 /* Определения программатора */
 //===============================================================
-#define FIRMWARE_TEMP_FILE_NAME "data.bin"
+#define FIRMWARE_TEMP_FILE_NAME "data"
 #define FIRMWARE_SIZE 131072
 
 #define JLINK_COMMAND_SCRIPT_DEFAULT_NAME "JLinkScript.jlink"

@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QTemporaryDir>
 
 #include "jlink_exe_programmer.h"
 #include "definitions.h"
@@ -181,11 +182,10 @@ ReturnStatus JLinkExeProgrammer::readUcid(QString& ucid) {
   // Формируем скрипт JLink
   initScript();
   // Формируем сценарий команд
-  JLinkScript->write(
-      QByteArray(QString("savebin %1/ucid %2, %3\n")
-                     .arg(QApplication::applicationDirPath(),
-                          UCID_MEMORY_ADDRESS, QString::number(UCID_SIZE, 16))
-                     .toUtf8()));
+  JLinkScript->write(QByteArray(QString("savebin %1/ucid %2, %3\n")
+                                    .arg(QDir::tempPath(), UCID_MEMORY_ADDRESS,
+                                         QString::number(UCID_SIZE, 16))
+                                    .toUtf8()));
 
   // Запускаем выполнение скрипта JLink
 

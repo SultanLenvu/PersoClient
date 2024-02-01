@@ -292,7 +292,8 @@ void ProductionManager::releaseTransponder() {
 
   ReturnStatus ret;
   QString ucid;
-  QFile firmware(FIRMWARE_TEMP_FILE_NAME);
+  QFile firmware(
+      QString("%1/%2").arg(QDir::tempPath(), FIRMWARE_TEMP_FILE_NAME));
   StringDictionary result;
   StringDictionary param;
 
@@ -393,7 +394,8 @@ void ProductionManager::rereleaseTransponder(
 
   ReturnStatus ret;
   QString ucid;
-  QFile firmware(FIRMWARE_TEMP_FILE_NAME, this);
+  QFile firmware(
+      QString("%1/%2").arg(QDir::tempPath(), FIRMWARE_TEMP_FILE_NAME));
   StringDictionary result;
   StringDictionary requestParam;
 
