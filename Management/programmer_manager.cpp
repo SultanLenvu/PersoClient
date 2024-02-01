@@ -116,8 +116,8 @@ void ProgrammerManager::readUcid() {
   sendLog("Считывание UCID. ");
 
   ReturnStatus ret;
-  std::shared_ptr<QString> ucid;
-  ret = Programmer->readUcid(*ucid);
+  QString ucid;
+  ret = Programmer->readUcid(ucid);
   if (ret != ReturnStatus::NoError) {
     emit executionFinished("readUcid", ret);
     return;
@@ -125,7 +125,7 @@ void ProgrammerManager::readUcid() {
 
   // Завершаем операцию
   sendLog("UCID успешно считан. ");
-  emit displayUcid_signal(ucid);
+  //  emit displayUcid_signal(ucid);
   emit executionFinished("readUcid", ret);
 }
 

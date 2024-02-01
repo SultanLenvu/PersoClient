@@ -242,7 +242,7 @@ void InteractionSystem::createMessageTable() {
       "Не найдена библиотека программатора.";
   MessageTable[ReturnStatus::ProgrammatorExeFileInvalid] =
       "Получен некорректный исполняемый файл для работы с программатором.";
-  MessageTable[ReturnStatus::ProgrammatorError] =
+  MessageTable[ReturnStatus::ProgrammatorCommandScriptError] =
       "Получена ошибка программатора.";
 
   MessageTable[ReturnStatus::Unknown] = "Получена неизвестная ошибка.";

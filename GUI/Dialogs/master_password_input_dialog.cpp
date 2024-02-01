@@ -9,7 +9,7 @@ MasterPasswordInputDialog::MasterPasswordInputDialog(QWidget* parent)
   adjustSize();
   setFixedSize(size());
 
-  setWindowTitle("Мастер пароль");
+  setWindowTitle("Мастер доступ");
 }
 
 MasterPasswordInputDialog::~MasterPasswordInputDialog() {}
@@ -46,7 +46,7 @@ void MasterPasswordInputDialog::create()
   ButtonLayout->addWidget(CancelButton);
   connect(CancelButton, &QPushButton::clicked, this, &QDialog::reject);
 
-  MainLayoutVS =
-      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-  MainLayout->addItem(MainLayoutVS);
+  //  MainLayoutVS =
+  //      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  //  MainLayout->addItem(MainLayoutVS);
 }

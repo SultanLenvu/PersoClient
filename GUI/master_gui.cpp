@@ -3,6 +3,27 @@
 #include "widget_log_backend.h"
 
 MasterGui::MasterGui(QWidget* parent) : AbstractGui(parent) {
+  create();
+}
+
+MasterGui::~MasterGui() {}
+
+void MasterGui::updateModelViews() {
+  ProductionLineDataView->resizeColumnsToContents();
+  ProductionLineDataView->update();
+
+  TransponderDataView->resizeColumnsToContents();
+  TransponderDataView->update();
+
+  BoxDataView->resizeColumnsToContents();
+  BoxDataView->update();
+}
+
+AbstractGui::GuiType MasterGui::type() {
+  return Master;
+}
+
+void MasterGui::create() {
   // Вкладки с всеми интерфейсами
   Tabs = new QTabWidget();
   MainLayout->addWidget(Tabs);
@@ -25,23 +46,6 @@ MasterGui::MasterGui(QWidget* parent) : AbstractGui(parent) {
   // Настройка пропорции между объектами на макете
   MainLayout->setStretch(0, 5);
   MainLayout->setStretch(1, 2);
-}
-
-MasterGui::~MasterGui() {}
-
-void MasterGui::updateModelViews() {
-  ProductionLineDataView->resizeColumnsToContents();
-  ProductionLineDataView->update();
-
-  TransponderDataView->resizeColumnsToContents();
-  TransponderDataView->update();
-
-  BoxDataView->resizeColumnsToContents();
-  BoxDataView->update();
-}
-
-AbstractGui::GuiType MasterGui::type() {
-  return Master;
 }
 
 void MasterGui::createServerTab() {
@@ -192,6 +196,9 @@ void MasterGui::createProgrammatorTab() {
   ReadDeviceUserDataButton =
       new QPushButton(QString("Считать  пользовательские данные"));
   ProgrammatorControlPanelLayout->addWidget(ReadDeviceUserDataButton);
+  ReadDeviceUcidButton = new QPushButton(QString("Считать  UCID"));
+  ProgrammatorControlPanelLayout->addWidget(ReadDeviceUcidButton);
+
   ButtonVS1 =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ProgrammatorControlPanelLayout->addItem(ButtonVS1);

@@ -66,7 +66,7 @@ enum class ReturnStatus {
   InvalidFirmwareFile,
   ProgrammatorLibraryMissing,
   ProgrammatorExeFileInvalid,
-  ProgrammatorError,
+  ProgrammatorCommandScriptError,
 
   Unknown
 };

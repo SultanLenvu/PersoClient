@@ -74,6 +74,7 @@ class MasterGui : public AbstractGui {
   QPushButton* EraseDeviceButton;
   QPushButton* ProgramDeviceUserDataButton;
   QPushButton* ReadDeviceUserDataButton;
+  QPushButton* ReadDeviceUcidButton;
   QSpacerItem* ButtonVS1;
   QPushButton* unlockMemoryButton;
   QPushButton* lockMemoryButton;
@@ -106,6 +107,7 @@ class MasterGui : public AbstractGui {
 
  private:
   Q_DISABLE_COPY(MasterGui);
+  void create(void);
   void createServerTab(void);
   void createServerTabViews(void);
 

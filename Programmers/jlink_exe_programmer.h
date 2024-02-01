@@ -18,7 +18,6 @@ class JLinkExeProgrammer : public AbstractProgrammer {
   std::unique_ptr<QFile> JLinkScript;
 
   QStringList ProcessArguments;
-  QStringList ProcessOutput;
 
  public:
   explicit JLinkExeProgrammer(const QString& name);
@@ -49,7 +48,8 @@ class JLinkExeProgrammer : public AbstractProgrammer {
 
   void createJLinkProcess(void);
 
-  void executeJLinkScript(void);
+  bool executeJLinkScript(void);
+  bool executeJLinkScript(QString& output);
   void initScript(void);
 };
 

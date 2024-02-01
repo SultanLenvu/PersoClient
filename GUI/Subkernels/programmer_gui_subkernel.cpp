@@ -61,6 +61,8 @@ void ProgrammerGuiSubkernel::connectMasterGui() {
           &ProgrammerGuiSubkernel::readUserData_guiSlot);
   connect(gui->ProgramDeviceUserDataButton, &QPushButton::clicked, this,
           &ProgrammerGuiSubkernel::programUserData_guiSlot);
+  connect(gui->ReadDeviceUcidButton, &QPushButton::clicked, this,
+          &ProgrammerGuiSubkernel::readUcid_guiSlot);
 
   connect(gui->unlockMemoryButton, &QPushButton::clicked, this,
           &ProgrammerGuiSubkernel::unlockMemory_guiSlot);
@@ -130,6 +132,8 @@ void ProgrammerGuiSubkernel::readUserData_guiSlot() {
 }
 
 void ProgrammerGuiSubkernel::readUcid_guiSlot() {
+  emit readUcid_signal();
+
   emit clearLogDisplay_signal();
 }
 
