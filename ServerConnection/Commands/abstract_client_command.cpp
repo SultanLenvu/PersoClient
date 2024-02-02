@@ -102,15 +102,18 @@ void AbstractClientCommand::createCrtMap() {
 
   CrtMap[OrderMultiplyAssembly] = ReturnStatus::OrderMultiplyAssembly;
   CrtMap[OrderInProcessMissed] = ReturnStatus::OrderInProcessMissed;
+  CrtMap[OrderCompletelyAssembled] = ReturnStatus::OrderCompletelyAssembled;
 
   CrtMap[BoxAlreadyRequested] = ReturnStatus::BoxAlreadyRequested;
   CrtMap[BoxNotRequested] = ReturnStatus::BoxNotRequested;
   CrtMap[FreeBoxMissed] = ReturnStatus::FreeBoxMissed;
   CrtMap[BoxIsEmty] = ReturnStatus::BoxIsEmty;
+  CrtMap[BoxOverflow] = ReturnStatus::BoxOverflow;
   CrtMap[BoxCompletelyAssembled] = ReturnStatus::BoxCompletelyAssembled;
   CrtMap[BoxNotCompletelyAssembled] = ReturnStatus::BoxNotCompletelyAssembled;
 
   CrtMap[PalletIsEmpty] = ReturnStatus::PalletIsEmpty;
+  CrtMap[PalletOverflow] = ReturnStatus::PalletOverflow;
 
   CrtMap[TransponderRepeatRelease] = ReturnStatus::ServerInternalError;
   CrtMap[TransponderNotReleasedEarlier] = ReturnStatus::ServerInternalError;
@@ -118,8 +121,8 @@ void AbstractClientCommand::createCrtMap() {
       ReturnStatus::ServerInternalError;
   CrtMap[TransponderIncorrectRerelease] =
       ReturnStatus::TransponderIncorrectRerelease;
-  CrtMap[IdenticalUcidError] = ReturnStatus::IdenticalUcidError;
-  CrtMap[CurrentOrderAssembled] = ReturnStatus::CurrentOrderAssembled;
+  CrtMap[TransponderIdenticalUcidError] =
+      ReturnStatus::TransponderIdenticalUcidError;
   CrtMap[TransponderRollbackLimit] = ReturnStatus::TransponderRollbackLimit;
 
   CrtMap[ProductionLineLaunchSystemInitError] =
@@ -180,17 +183,21 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: OrderMultiplyAssembly";
   CrtLogMap[OrderInProcessMissed] =
       "Server return status: OrderAssemblyMissingы";
+  CrtLogMap[OrderCompletelyAssembled] =
+      "Server return status: OrderCompletelyAssembled";
 
   CrtLogMap[BoxAlreadyRequested] = "Server return status: BoxAlreadyRequested";
   CrtLogMap[BoxNotRequested] = "Server return status: BoxNotRequested";
   CrtLogMap[FreeBoxMissed] = "Server return status: FreeBoxMissed";
   CrtLogMap[BoxIsEmty] = "Server return status: BoxIsEmty";
+  CrtLogMap[BoxOverflow] = "Server return status: BoxOverflow";
   CrtLogMap[BoxCompletelyAssembled] =
       "Server return status: BoxCompletelyAssembled";
   CrtLogMap[BoxNotCompletelyAssembled] =
       "Server return status: BoxNotCompletelyAssembled";
 
   CrtLogMap[PalletIsEmpty] = "Server return status: PalletIsEmpty";
+  CrtLogMap[PalletOverflow] = "Server return status: PalletOverflow";
 
   CrtLogMap[TransponderRepeatRelease] =
       "Server return status: TransponderRepeatReleases";
@@ -200,9 +207,8 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: TransponderNotAwaitingConfirmation";
   CrtLogMap[TransponderIncorrectRerelease] =
       "Server return status: TransponderIncorrectRerelease";
-  CrtLogMap[IdenticalUcidError] = "Server return status: IdenticalUcidError";
-  CrtLogMap[CurrentOrderAssembled] =
-      "Server return status: CurrentOrderAssembled";
+  CrtLogMap[TransponderIdenticalUcidError] =
+      "Server return status: TransponderIdenticalUcidError";
   CrtLogMap[TransponderRollbackLimit] =
       "Server return status: TransponderRollbackLimit";
 

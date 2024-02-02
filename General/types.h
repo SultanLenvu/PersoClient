@@ -38,14 +38,16 @@ enum class ReturnStatus {
   BoxNotRequested,
   FreeBoxMissed,
   BoxIsEmty,
+  BoxOverflow,
   BoxCompletelyAssembled,
   BoxNotCompletelyAssembled,
 
   PalletIsEmpty,
+  PalletOverflow,
 
   TransponderIncorrectRerelease,
-  IdenticalUcidError,
-  CurrentOrderAssembled,
+  TransponderIdenticalUcidError,
+  OrderCompletelyAssembled,
   TransponderRollbackLimit,
 
   ProductionLineContextNotAuthorized,

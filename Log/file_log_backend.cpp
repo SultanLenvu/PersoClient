@@ -1,4 +1,5 @@
 #include <QMessageBox>
+#include <QStandardPaths>
 
 #include "file_log_backend.h"
 
@@ -12,9 +13,11 @@ FileLogBackend::~FileLogBackend() {
 }
 
 void FileLogBackend::writeLogLine(const QString& str) {
-  //  if (Enable) {
+  if (!Enable) {
+    return;
+  }
+
   FileStream << str << "\n";
-  //}
   FileStream.flush();
 }
 
@@ -29,7 +32,6 @@ void FileLogBackend::applySettings() {
 void FileLogBackend::loadSettings() {
   QSettings settings;
 
-  CurrentDir = QApplication::applicationDirPath() + "/logs";
   Enable = settings.value("log_system/file_log_enable").toBool();
   FileMaxNumber = settings.value("log_system/file_max_number").toInt();
   CurrentDir = settings.value("log_system/file_directory").toString();

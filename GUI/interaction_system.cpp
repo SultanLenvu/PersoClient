@@ -101,7 +101,10 @@ void InteractionSystem::sendLog(const QString& log) {
 
 void InteractionSystem::createProgressDialog() {
   ProgressDialog = std::unique_ptr<QProgressDialog>(
-      new QProgressDialog("Выполнение операции...", "Закрыть", 0, 100));
+      new QProgressDialog("Ожидайте", "", 0, 100));
+  ProgressDialog->setWindowTitle("Выполнение...");
+  ProgressDialog->setLabel(nullptr);
+  ProgressDialog->setCancelButton(nullptr);
   ProgressDialog->setWindowModality(Qt::ApplicationModal);
   ProgressDialog->setAutoClose(false);
   ProgressDialog->setValue(0);
@@ -183,6 +186,8 @@ void InteractionSystem::createMessageTable() {
       "Несколько заказов одновременно находятся в процессе сборки.";
   MessageTable[ReturnStatus::OrderInProcessMissed] =
       "Отсутствуют заказы в процессе сборки.";
+  MessageTable[ReturnStatus::OrderCompletelyAssembled] =
+      "Сборка текущего заказа завершена.";
 
   MessageTable[ReturnStatus::BoxAlreadyRequested] =
       "Бокс был получен ранее и находится в процессе сборки.";
@@ -190,20 +195,20 @@ void InteractionSystem::createMessageTable() {
   MessageTable[ReturnStatus::FreeBoxMissed] =
       "Не найден свободный бокс для сборки.";
   MessageTable[ReturnStatus::BoxIsEmty] = "В боксе отсутствуют транспондеры.";
+  MessageTable[ReturnStatus::BoxOverflow] = "Бокс переполнен.";
   MessageTable[ReturnStatus::BoxCompletelyAssembled] =
       "Все транспондеры в боксе собраны.";
   MessageTable[ReturnStatus::BoxNotCompletelyAssembled] =
       "В боксе собраны не все транспондеры.";
 
   MessageTable[ReturnStatus::PalletIsEmpty] = "В паллете отсутствуют боксы.";
+  MessageTable[ReturnStatus::PalletOverflow] = "Паллета переполнена.";
 
   MessageTable[ReturnStatus::TransponderIncorrectRerelease] =
       "Данный транспондер не был выпущен ранее. Перевыпуск невозможен.";
-  MessageTable[ReturnStatus::IdenticalUcidError] =
-      "Данная печатная плата уже была использована при сборке. Выпуск "
-      "транспондера невозможен.";
-  MessageTable[ReturnStatus::CurrentOrderAssembled] =
-      "Сборка текущего заказа успешно завершена.";
+  MessageTable[ReturnStatus::TransponderIdenticalUcidError] =
+      "Данная печатная плата уже была использована при сборке. Используйте "
+      "другую плату.";
   MessageTable[ReturnStatus::TransponderRollbackLimit] =
       "В текущем боксе нет собранных транспондеров. Откат невозможен.";
 
@@ -264,13 +269,10 @@ void InteractionSystem::odTimerTimeout_slot() {
 }
 
 void InteractionSystem::odqTimerTimeout_slot() {
-  //  if (!ProgressDialog) {
-  //    return;
-  //  }
+  assert(ProgressDialog);
 
   uint32_t cv = ProgressDialog->value();
-  //  sendLog(QString("quant %1").arg(QString::number(cv)));
-  if (cv < 100) {
+  if (cv < 99) {
     ProgressDialog->setValue(++cv);
   }
 }

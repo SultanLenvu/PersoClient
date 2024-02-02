@@ -408,6 +408,8 @@ void ProductionGuiSubkernel::createModels() {
   plMatchTable->insert("production_line_in_process", "В процессе сборки");
   plMatchTable->insert("production_line_ns", "Сотрудник");
   plMatchTable->insert("today_assembled_boxes", "Собрано боксов за сегодня");
+  plMatchTable->insert("transponder_id", "Идентификатор транспондера");
+  plMatchTable->insert("box_id", "Идентификатор бокса");
 
   ProductionLineModel = std::unique_ptr<HashTableModel>(
       new HashTableModel("ProductionLineModel"));

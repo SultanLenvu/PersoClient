@@ -35,22 +35,24 @@ class AbstractClientCommand : public QObject {
 
     OrderMultiplyAssembly,
     OrderInProcessMissed,
+    OrderCompletelyAssembled,
 
     BoxAlreadyRequested,
     BoxNotRequested,
     FreeBoxMissed,
     BoxIsEmty,
+    BoxOverflow,
     BoxCompletelyAssembled,
     BoxNotCompletelyAssembled,
 
     PalletIsEmpty,
+    PalletOverflow,
 
     TransponderRepeatRelease,
     TransponderNotReleasedEarlier,
     TransponderNotAwaitingConfirmation,
     TransponderIncorrectRerelease,
-    IdenticalUcidError,
-    CurrentOrderAssembled,
+    TransponderIdenticalUcidError,
     TransponderRollbackLimit,
 
     ProductionLineLaunchSystemInitError,

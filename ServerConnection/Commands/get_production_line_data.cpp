@@ -50,6 +50,8 @@ ReturnStatus GetProductionLineData::processResponse(
       Response["production_line_in_process"].toString();
   responseData["today_assembled_boxes"] =
       Response["today_assembled_boxes"].toString();
+  responseData["transponder_id"] = Response["transponder_id"].toString();
+  responseData["box_id"] = Response["box_id"].toString();
 
   return ReturnStatus::NoError;
 }
