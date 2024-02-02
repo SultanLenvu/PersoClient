@@ -1,5 +1,5 @@
-name: build PersoServer
-run-name: build PersoServer
+name: build PersoClient
+run-name: build PersoClient
 on:
   push:
     branches:
@@ -13,19 +13,15 @@ jobs:
         uses: actions/checkout@v3
       - name: Build and package PersoClient
         run: |
+          GITREF=$(git describe --abbrev)
           cd ${{ gitea.workspace }}
           mkdir build
           cd build
           cmake -G Ninja ..
           ninja
-          mkdir -p persoclient_${{ gitea.ref_name }}-1_amd64
-          DESTDIR=persoclient_${{ gitea.ref_name }}-1_amd64 ninja install
-          mkdir persoclient_${{ gitea.ref_name }}-1_amd64/DEBIAN
-          sed -e "s/@VERSION@/${{ gitea.ref_name }}/g" < ../DEBIAN/control.in > persoclient_${{ gitea.ref_name }}-1_amd64/DEBIAN/control
-          cp ../DEBIAN/postinst persoclient_${{ gitea.ref_name }}-1_amd64/DEBIAN/
-          dpkg-deb --build --root-owner-group persoclient_${{ gitea.ref_name }}-1_amd64
-      - name: Upload package artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: persoclient_${{ gitea.ref_name }}-1_amd64.deb
-          path: build/persoclient_${{ gitea.ref_name }}-1_amd64.deb
+          mkdir -p persoclient_$GITREF-1_amd64
+          DESTDIR=persoclient_$GITREF-1_amd64 ninja install
+          mkdir persoclient_$GITREF-1_amd64/DEBIAN
+          sed -e "s/@VERSION@/$GITREF/g" < ../DEBIAN/control.in > persoclient_${{ gitea.ref_name }}-1_amd64/DEBIAN/control
+          cp ../DEBIAN/postinst persoclient_$GITREF-1_amd64/DEBIAN/
+          dpkg-deb --build --root-owner-group persoclient_$GIREF-1_amd64
