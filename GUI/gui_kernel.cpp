@@ -262,7 +262,7 @@ void GuiKernel::createProductionTesterGui() {
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
-              DesktopGeometry.width() * 0.5, DesktopGeometry.height() * 0.5);
+              DesktopGeometry.width() * 0.8, DesktopGeometry.height() * 0.8);
   setLayoutDirection(Qt::LeftToRight);
 
   CurrentGui = new ProductionTesterGui(this);
