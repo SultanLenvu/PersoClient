@@ -241,14 +241,17 @@ void TE310Printer::applySetting() {
 void TE310Printer::loadSetting() {
   QSettings settings;
 
-  TscLibPath = settings.value("te310_printer/library_path").toString();
-  SystemName = settings.value("te310_printer/system_name").toString();
+  TscLibPath =
+      settings.value(QString("%1/library_path").arg(objectName())).toString();
+  SystemName =
+      settings.value(QString("%1/system_name").arg(objectName())).toString();
 
-  UseEthernet = settings.value("te310_printer/use_ethernet").toBool();
+  UseEthernet =
+      settings.value(QString("%1/use_ethernet").arg(objectName())).toBool();
   if (UseEthernet) {
-    IPAddress =
-        QHostAddress(settings.value("te310_printer/ip_address").toString());
-    Port = settings.value("te310_printer/port").toInt();
+    IPAddress = QHostAddress(
+        settings.value(QString("%1/ip_address").arg(objectName())).toString());
+    Port = settings.value(QString("%1/port").arg(objectName())).toInt();
   }
 }
 
