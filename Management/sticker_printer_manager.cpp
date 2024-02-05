@@ -120,5 +120,5 @@ void StickerPrinterManager::loadSettings() {}
 
 void StickerPrinterManager::createStickerPrinter() {
   StickerPrinter = std::unique_ptr<AbstractStickerPrinter>(
-      new TE310Printer("StickerPrinter2"));
+      new TE310Printer("sticker_printer"));
 }
