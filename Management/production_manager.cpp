@@ -268,12 +268,6 @@ void ProductionManager::completeCurrentBox() {
     return;
   }
 
-  BoxData.clear();
-  emit displayBoxData_signal(BoxData);
-
-  TransponderData.clear();
-  emit displayTransponderData_signal(TransponderData);
-
   ret = Server->getProductionLineData(ProductionLineData);
   if (ret != ReturnStatus::NoError) {
     ProductionLineData.clear();
@@ -283,6 +277,16 @@ void ProductionManager::completeCurrentBox() {
   }
 
   emit displayProductionLineData_signal(ProductionLineData);
+
+  ret = Server->getCurrentBoxData(BoxData);
+  if (ret != ReturnStatus::NoError) {
+    BoxData.clear();
+    emit displayBoxData_signal(BoxData);
+    processOperationError("requestBox", ret);
+    return;
+  }
+
+  emit displayBoxData_signal(BoxData);
 
   completeOperation("completeCurrentBox");
 }
