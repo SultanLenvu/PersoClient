@@ -49,4 +49,4 @@ jobs:
       - name: trigger Ansible playbook to make clients upgrade
         run: |
           cd $HOME/ansible-upgrade
-          ansible-playbook -i inventory.ini playbook.yaml -u root
+          ansible-playbook -i inventory.ini playbook.yaml -u root -e "config_file=${{ gitea.workspace }}/supplemental/PersoClient.ini"
