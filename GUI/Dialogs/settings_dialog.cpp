@@ -147,7 +147,7 @@ void SettingsDialog::createStickerPrinter() {
   StickerPrinterLibPathLabel = new QLabel("Путь к библиотеке");
   StickerPrinterMainLayout->addWidget(StickerPrinterLibPathLabel, 0, 0, 1, 1);
   StickerPrinterLibPathLineEdit =
-      new QLineEdit(Settings.value("te310_printer/library_path").toString());
+      new QLineEdit(Settings.value("sticker_printer/library_path").toString());
   StickerPrinterMainLayout->addWidget(StickerPrinterLibPathLineEdit, 0, 1, 1,
                                       1);
   StickerPrinterLibPathPushButton = new QPushButton("Обзор");
@@ -159,7 +159,7 @@ void SettingsDialog::createStickerPrinter() {
   StickerPrinterNameLabel = new QLabel("Системное имя");
   StickerPrinterMainLayout->addWidget(StickerPrinterNameLabel, 1, 0, 1, 1);
   StickerPrinterNameLineEdit =
-      new QLineEdit(Settings.value("te310_printer/system_name").toString());
+      new QLineEdit(Settings.value("sticker_printer/system_name").toString());
   StickerPrinterMainLayout->addWidget(StickerPrinterNameLineEdit, 1, 1, 1, 2);
 
   StickerPrinterUseEthernetLabel =
@@ -168,7 +168,7 @@ void SettingsDialog::createStickerPrinter() {
                                       1);
   StickerPrinterUseEthernetCheck = new QCheckBox();
   StickerPrinterUseEthernetCheck->setChecked(
-      Settings.value("te310_printer/use_ethernet").toBool());
+      Settings.value("sticker_printer/use_ethernet").toBool());
   StickerPrinterMainLayout->addWidget(StickerPrinterUseEthernetCheck, 2, 1, 2,
                                       1);
   connect(StickerPrinterUseEthernetCheck, &QCheckBox::stateChanged, this,
@@ -189,7 +189,7 @@ void SettingsDialog::createStickerPrinterProxyWidget() {
   StickerPrinterIpLabel = new QLabel("IP адрес");
   StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterIpLabel, 0, 0, 1, 1);
   StickerPrinterIpLineEdit =
-      new QLineEdit(Settings.value("te310_printer/ip_address").toString());
+      new QLineEdit(Settings.value("sticker_printer/ip_address").toString());
   StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterIpLineEdit, 0, 1, 1,
                                              1);
 
@@ -197,11 +197,11 @@ void SettingsDialog::createStickerPrinterProxyWidget() {
   StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterPortLabel, 1, 0, 1,
                                              1);
   StickerPrinterPortLineEdit =
-      new QLineEdit(Settings.value("te310_printer/port").toString());
+      new QLineEdit(Settings.value("sticker_printer/port").toString());
   StickerPrinterProxyWidgetLayout->addWidget(StickerPrinterPortLineEdit, 1, 1,
                                              1, 1);
 
-  if (!Settings.value("te310_printer/use_ethernet").toBool()) {
+  if (!Settings.value("sticker_printer/use_ethernet").toBool()) {
     StickerPrinterProxyWidget->hide();
   }
 }
@@ -292,15 +292,15 @@ void SettingsDialog::save() {
   Settings.setValue("jlink_exe_programmer/speed",
                     ProgrammerSpeedLineEdit->text());
 
-  Settings.setValue("te310_printer/library_path",
+  Settings.setValue("sticker_printer/library_path",
                     StickerPrinterLibPathLineEdit->text());
-  Settings.setValue("te310_printer/system_name",
+  Settings.setValue("sticker_printer/system_name",
                     StickerPrinterNameLineEdit->text());
-  Settings.setValue("te310_printer/use_ethernet",
+  Settings.setValue("sticker_printer/use_ethernet",
                     StickerPrinterUseEthernetCheck->isChecked());
-  Settings.setValue("te310_printer/ip_address",
+  Settings.setValue("sticker_printer/ip_address",
                     StickerPrinterIpLineEdit->text());
-  Settings.setValue("te310_printer/port", StickerPrinterPortLineEdit->text());
+  Settings.setValue("sticker_printer/port", StickerPrinterPortLineEdit->text());
 }
 
 void SettingsDialog::logSystemFileDirPushButton_slot() {
