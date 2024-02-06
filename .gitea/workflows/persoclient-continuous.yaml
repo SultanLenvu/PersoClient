@@ -13,8 +13,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Build and package PersoClient
         run: |
-          GITREF=$(git describe --abbrev)
           cd ${{ gitea.workspace }}
+          GITREF=$(git describe --abbrev)
           mkdir build
           cd build
           cmake -G Ninja ..
