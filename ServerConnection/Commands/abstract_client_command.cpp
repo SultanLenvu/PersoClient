@@ -143,8 +143,9 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[StickerPrinterDriverMissed] = ReturnStatus::ServerInternalError;
   CrtMap[StickerPrinterLibraryMissing] = ReturnStatus::ServerInternalError;
   CrtMap[StickerPrinterConnectionError] = ReturnStatus::ServerInternalError;
-  CrtMap[BoxStickerPrintError] = ReturnStatus::ServerInternalError;
-  CrtMap[PalletStickerPrintError] = ReturnStatus::ServerInternalError;
+  CrtMap[StickerPrintError] = ReturnStatus::ServerInternalError;
+  CrtMap[LastStickerMissed] = ReturnStatus::ServerInternalError;
+
   CrtMap[Unknown] = ReturnStatus::ServerInternalError;
 }
 
@@ -239,9 +240,8 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: StickerPrinterLibraryMissing";
   CrtLogMap[StickerPrinterConnectionError] =
       "Server return status: StickerPrinterConnectionError";
-  CrtLogMap[BoxStickerPrintError] =
-      "Server return status: BoxStickerPrintError";
-  CrtLogMap[PalletStickerPrintError] =
-      "Server return status: PalletStickerPrintError";
+  CrtLogMap[StickerPrintError] = "Server return status: StickerPrintError";
+  CrtLogMap[LastStickerMissed] = "Server return status: LastStickerMissed";
+
   CrtLogMap[Unknown] = "Server return status: Unknown";
 }

@@ -240,6 +240,10 @@ void InteractionSystem::createMessageTable() {
       "Не удалось инициализировать принтер стикеров.";
   MessageTable[ReturnStatus::StickerPrinterConnectionError] =
       "Не удалось подключиться к принтеру стикеров.";
+  MessageTable[ReturnStatus::StickerPrintError] =
+      "Не удалось распечатать стикер.";
+  MessageTable[ReturnStatus::LastStickerMissed] =
+      "Ранее не было распечатано ни одного стикера. Повтор печати невозможен.";
 
   MessageTable[ReturnStatus::InvalidFirmwareFile] =
       "Получен некорректный файл прошивки.";

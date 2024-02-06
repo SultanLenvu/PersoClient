@@ -11,14 +11,18 @@ class ProductionTesterGui : public AbstractGui {
   QVBoxLayout* TransponderGroupLayout;
   QPushButton* RereleaseTransponderButton;
 
+  QSpacerItem* ControlPanelVS;
+
   QGroupBox* PrinterStickerGroup;
   QVBoxLayout* PrinterStickerLayout;
   QPushButton* PrintLastTransponderStickerButton;
   QPushButton* PrintCustomTransponderStickerButton;
+  QSpacerItem* ControlPanelVS1;
+  QPushButton* PrintLastBoxStickerButton;
   QPushButton* PrintBoxStickerButton;
+  QSpacerItem* ControlPanelVS2;
+  QPushButton* PrintLastPalletStickerButton;
   QPushButton* PrintPalletStickerButton;
-
-  QSpacerItem* ControlPanelVS;
 
   QVBoxLayout* ModelViewLayout;
   QHBoxLayout* ModelViewSublayout;
@@ -41,6 +45,9 @@ class ProductionTesterGui : public AbstractGui {
  private:
   Q_DISABLE_COPY_MOVE(ProductionTesterGui);
 
+  void create(void);
+  void createTransponderGroup(void);
+  void createPrinterStickerGroup(void);
   void createModelViews(void);
 };
 

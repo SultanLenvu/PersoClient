@@ -69,8 +69,9 @@ class AbstractClientCommand : public QObject {
     StickerPrinterDriverMissed,
     StickerPrinterLibraryMissing,
     StickerPrinterConnectionError,
-    BoxStickerPrintError,
-    PalletStickerPrintError,
+    StickerPrintError,
+    LastStickerMissed,
+
     Unknown,
   };
 

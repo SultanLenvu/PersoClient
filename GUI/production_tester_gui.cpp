@@ -2,9 +2,36 @@
 
 ProductionTesterGui::ProductionTesterGui(QWidget* parent)
     : AbstractGui(parent) {
+  create();
+}
+
+ProductionTesterGui::~ProductionTesterGui() {}
+
+void ProductionTesterGui::updateModelViews() {
+  ProductionLineDataView->resizeColumnsToContents();
+  ProductionLineDataView->update();
+
+  TransponderDataView->resizeColumnsToContents();
+  TransponderDataView->update();
+}
+
+AbstractGui::GuiType ProductionTesterGui::type() {
+  return ProductionTester;
+}
+
+void ProductionTesterGui::create() {
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
 
+  createTransponderGroup();
+  createPrinterStickerGroup();
+  createModelViews();
+
+  MainLayout->setStretch(0, 1);
+  MainLayout->setStretch(1, 3);
+}
+
+void ProductionTesterGui::createTransponderGroup() {
   TransponderGroup = new QGroupBox("Сборка");
   ControlPanelLayout->addWidget(TransponderGroup);
 
@@ -19,7 +46,9 @@ ProductionTesterGui::ProductionTesterGui(QWidget* parent)
   ControlPanelVS =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
   ControlPanelLayout->addItem(ControlPanelVS);
+}
 
+void ProductionTesterGui::createPrinterStickerGroup() {
   PrinterStickerGroup = new QGroupBox("Печать");
   ControlPanelLayout->addWidget(PrinterStickerGroup);
 
@@ -36,34 +65,33 @@ ProductionTesterGui::ProductionTesterGui(QWidget* parent)
   PrintCustomTransponderStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
   PrinterStickerLayout->addWidget(PrintCustomTransponderStickerButton);
 
+  ControlPanelVS1 =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  PrinterStickerLayout->addItem(ControlPanelVS1);
+
+  PrintLastBoxStickerButton =
+      new QPushButton(QString("Распечатать последний стикер для бокса"));
+  PrintLastBoxStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
+  PrinterStickerLayout->addWidget(PrintLastBoxStickerButton);
+
   PrintBoxStickerButton =
       new QPushButton(QString("Распечатать стикер для бокса"));
   PrintBoxStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
   PrinterStickerLayout->addWidget(PrintBoxStickerButton);
 
+  ControlPanelVS2 =
+      new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+  PrinterStickerLayout->addItem(ControlPanelVS2);
+
+  PrintLastPalletStickerButton =
+      new QPushButton(QString("Распечатать последний стикер для паллеты"));
+  PrintLastPalletStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
+  PrinterStickerLayout->addWidget(PrintLastPalletStickerButton);
+
   PrintPalletStickerButton =
       new QPushButton(QString("Распечатать стикер для паллеты"));
   PrintPalletStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
   PrinterStickerLayout->addWidget(PrintPalletStickerButton);
-
-  createModelViews();
-
-  MainLayout->setStretch(0, 1);
-  MainLayout->setStretch(1, 3);
-}
-
-ProductionTesterGui::~ProductionTesterGui() {}
-
-void ProductionTesterGui::updateModelViews() {
-  ProductionLineDataView->resizeColumnsToContents();
-  ProductionLineDataView->update();
-
-  TransponderDataView->resizeColumnsToContents();
-  TransponderDataView->update();
-}
-
-AbstractGui::GuiType ProductionTesterGui::type() {
-  return ProductionTester;
 }
 
 void ProductionTesterGui::createModelViews() {

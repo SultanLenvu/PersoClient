@@ -175,8 +175,14 @@ void ProductionGuiSubkernel::connectProductionTesterGui() {
   // Сигналы от GUI
   connect(gui->RereleaseTransponderButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::rereleaseTransponder_guiSlot);
+
+  connect(gui->PrintLastBoxStickerButton, &QPushButton::clicked, this,
+          &ProductionGuiSubkernel::printLastBoxSticker_guiSlot);
   connect(gui->PrintBoxStickerButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::printBoxSticker_guiSlot);
+
+  connect(gui->PrintLastPalletStickerButton, &QPushButton::clicked, this,
+          &ProductionGuiSubkernel::printLastPalletSticker_guiSlot);
   connect(gui->PrintPalletStickerButton, &QPushButton::clicked, this,
           &ProductionGuiSubkernel::printPalletSticker_guiSlot);
 
