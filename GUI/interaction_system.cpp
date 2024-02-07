@@ -200,8 +200,6 @@ void InteractionSystem::createMessageTable() {
       "Все транспондеры в боксе собраны.";
   MessageTable[ReturnStatus::BoxNotCompletelyAssembled] =
       "В боксе собраны не все транспондеры.";
-  MessageTable[ReturnStatus::BoxAlreadyCompleted] =
-      "Сборка текущего бокса была завершена ранее. Запросите новый бокс.";
 
   MessageTable[ReturnStatus::PalletIsEmpty] = "В паллете отсутствуют боксы.";
   MessageTable[ReturnStatus::PalletOverflow] = "Паллета переполнена.";
