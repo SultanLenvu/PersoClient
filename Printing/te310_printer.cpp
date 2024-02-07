@@ -70,7 +70,7 @@ ReturnStatus TE310Printer::printTransponderSticker(
 }
 
 ReturnStatus TE310Printer::printLastTransponderSticker() {
-  if (LastPalletSticker.isEmpty()) {
+  if (LastTransponderSticker.isEmpty()) {
     sendLog(
         "Ранее не было распечатано ни одного стикера на транспондер. Повтор "
         "печати невозможен.");

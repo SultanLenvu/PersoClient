@@ -44,7 +44,6 @@ class AbstractClientCommand : public QObject {
     BoxOverflow,
     BoxCompletelyAssembled,
     BoxNotCompletelyAssembled,
-    BoxAlreadyCompleted,
 
     PalletIsEmpty,
     PalletOverflow,

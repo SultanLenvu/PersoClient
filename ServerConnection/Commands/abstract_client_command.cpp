@@ -111,7 +111,6 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[BoxOverflow] = ReturnStatus::BoxOverflow;
   CrtMap[BoxCompletelyAssembled] = ReturnStatus::BoxCompletelyAssembled;
   CrtMap[BoxNotCompletelyAssembled] = ReturnStatus::BoxNotCompletelyAssembled;
-  CrtMap[BoxAlreadyCompleted] = ReturnStatus::BoxAlreadyCompleted;
 
   CrtMap[PalletIsEmpty] = ReturnStatus::PalletIsEmpty;
   CrtMap[PalletOverflow] = ReturnStatus::PalletOverflow;
@@ -197,7 +196,6 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: BoxCompletelyAssembled";
   CrtLogMap[BoxNotCompletelyAssembled] =
       "Server return status: BoxNotCompletelyAssembled";
-  CrtLogMap[BoxAlreadyCompleted] = "Server return status: BoxAlreadyCompleted";
 
   CrtLogMap[PalletIsEmpty] = "Server return status: PalletIsEmpty";
   CrtLogMap[PalletOverflow] = "Server return status: PalletOverflow";

@@ -239,12 +239,6 @@ void ProductionManager::refundCurrentBox() {
     return;
   }
 
-  BoxData.clear();
-  emit displayBoxData_signal(BoxData);
-
-  TransponderData.clear();
-  emit displayTransponderData_signal(TransponderData);
-
   ret = Server->getProductionLineData(ProductionLineData);
   if (ret != ReturnStatus::NoError) {
     ProductionLineData.clear();
@@ -252,8 +246,13 @@ void ProductionManager::refundCurrentBox() {
     processOperationError("logOnServer", ret);
     return;
   }
-
   emit displayProductionLineData_signal(ProductionLineData);
+
+  BoxData.clear();
+  emit displayBoxData_signal(BoxData);
+
+  TransponderData.clear();
+  emit displayTransponderData_signal(TransponderData);
 
   completeOperation("refundCurrentBox");
 }
@@ -278,15 +277,11 @@ void ProductionManager::completeCurrentBox() {
 
   emit displayProductionLineData_signal(ProductionLineData);
 
-  ret = Server->getCurrentBoxData(BoxData);
-  if (ret != ReturnStatus::NoError) {
-    BoxData.clear();
-    emit displayBoxData_signal(BoxData);
-    processOperationError("requestBox", ret);
-    return;
-  }
-
+  BoxData.clear();
   emit displayBoxData_signal(BoxData);
+
+  TransponderData.clear();
+  emit displayTransponderData_signal(TransponderData);
 
   completeOperation("completeCurrentBox");
 }
