@@ -24,6 +24,8 @@ class AbstractClientCommand : public QObject {
     FirmwareGeneratorInitError,
     FirmwareGenerationError,
 
+    ProductionContextNotValid,
+
     RecordMissed,
     ProductionLineMissed,
     TranspoderMissed,
@@ -38,7 +40,6 @@ class AbstractClientCommand : public QObject {
     OrderCompletelyAssembled,
 
     BoxAlreadyRequested,
-    BoxNotRequested,
     FreeBoxMissed,
     BoxIsEmty,
     BoxOverflow,

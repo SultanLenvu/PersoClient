@@ -172,6 +172,9 @@ void InteractionSystem::createMessageTable() {
   MessageTable[ReturnStatus::ServerInternalError] =
       "Получена серверная ошибка.";
 
+  MessageTable[ReturnStatus::ProductionContextNotValid] =
+      "Производство не запущено.";
+
   MessageTable[ReturnStatus::ProductionLineMissed] =
       "Производственная линия не найдена.";
   MessageTable[ReturnStatus::TranspoderMissed] = "Транспондер не найден.";
@@ -191,7 +194,6 @@ void InteractionSystem::createMessageTable() {
 
   MessageTable[ReturnStatus::BoxAlreadyRequested] =
       "Бокс был получен ранее и находится в процессе сборки.";
-  MessageTable[ReturnStatus::BoxNotRequested] = "Бокс не был запрошен ранее.";
   MessageTable[ReturnStatus::FreeBoxMissed] =
       "Не найден свободный бокс для сборки.";
   MessageTable[ReturnStatus::BoxIsEmty] = "В боксе отсутствуют транспондеры.";

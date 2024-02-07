@@ -23,6 +23,8 @@ enum class ReturnStatus {
   ClientCommandParamError,
   ServerInternalError,
 
+  ProductionContextNotValid,
+
   ProductionLineMissed,
   TranspoderMissed,
   BoxMissed,
@@ -35,7 +37,6 @@ enum class ReturnStatus {
   OrderInProcessMissed,
 
   BoxAlreadyRequested,
-  BoxNotRequested,
   FreeBoxMissed,
   BoxIsEmty,
   BoxOverflow,

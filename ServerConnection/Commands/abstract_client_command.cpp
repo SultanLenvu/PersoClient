@@ -91,6 +91,8 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[FirmwareGeneratorInitError] = ReturnStatus::ServerInternalError;
   CrtMap[FirmwareGenerationError] = ReturnStatus::ServerInternalError;
 
+  CrtMap[ProductionContextNotValid] = ReturnStatus::ProductionContextNotValid;
+
   CrtMap[RecordMissed] = ReturnStatus::ServerInternalError;
   CrtMap[ProductionLineMissed] = ReturnStatus::ProductionLineMissed;
   CrtMap[TranspoderMissed] = ReturnStatus::TranspoderMissed;
@@ -105,7 +107,6 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[OrderCompletelyAssembled] = ReturnStatus::OrderCompletelyAssembled;
 
   CrtMap[BoxAlreadyRequested] = ReturnStatus::BoxAlreadyRequested;
-  CrtMap[BoxNotRequested] = ReturnStatus::BoxNotRequested;
   CrtMap[FreeBoxMissed] = ReturnStatus::FreeBoxMissed;
   CrtMap[BoxIsEmty] = ReturnStatus::BoxIsEmty;
   CrtMap[BoxOverflow] = ReturnStatus::BoxOverflow;
@@ -170,6 +171,9 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[FirmwareGenerationError] =
       "Server return status: FirmwareGenerationError";
 
+  CrtLogMap[ProductionContextNotValid] =
+      "Server return status: ProductionContextNotValid";
+
   CrtLogMap[RecordMissed] = "Server return status: RecordMissed";
   CrtLogMap[ProductionLineMissed] =
       "Server return status: ProductionLineMissed";
@@ -188,7 +192,6 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: OrderCompletelyAssembled";
 
   CrtLogMap[BoxAlreadyRequested] = "Server return status: BoxAlreadyRequested";
-  CrtLogMap[BoxNotRequested] = "Server return status: BoxNotRequested";
   CrtLogMap[FreeBoxMissed] = "Server return status: FreeBoxMissed";
   CrtLogMap[BoxIsEmty] = "Server return status: BoxIsEmty";
   CrtLogMap[BoxOverflow] = "Server return status: BoxOverflow";
