@@ -18,6 +18,7 @@ jobs:
           cd build
           cmake -G Ninja ..
           ninja
+          ninja manual
           mkdir -p persoclient_1.0.0-1_amd64
           DESTDIR=persoclient_1.0.0-1_amd64 ninja install
           mkdir persoclient_1.0.0-1_amd64/DEBIAN
