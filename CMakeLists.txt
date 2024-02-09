@@ -120,7 +120,7 @@ add_custom_target(docs doxygen doxygen.conf
 )
 
 add_custom_target(manual pandoc -s --pdf-engine=xelatex manual.md -V "mainfont:PT Sans" -V "lang:ru" -V papersize:a4 -V "geometry:margin=0.5in" -V "mainfontoptions:Scale=1.5" -o manual.pdf
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR/Doc/manual
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Doc/manual
 )
 
 if (UNIX AND NOT APPLE)
