@@ -60,3 +60,6 @@ PersoClient
 docs
 # Build directory
 build
+
+# manual
+Doc/manual/manual.pdf
