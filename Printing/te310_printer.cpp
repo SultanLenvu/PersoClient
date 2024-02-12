@@ -344,11 +344,11 @@ void TE310Printer::printZsdSticker(const StringDictionary& param) {
   sendCommand("DIRECTION 1");
   sendCommand("CLS");
   sendCommand(QString("TEXT 180,12,\"D.FNT\",0,1,1,2,\"SN: %1\"")
-                  .arg(param.value("sn"))
+                  .arg(param.value("transponder_sn"))
                   .toUtf8()
                   .data());
   sendCommand(QString("BARCODE 18,36,\"128\",144,2,0,2,2,\"%1\"")
-                  .arg(param.value("pan"))
+                  .arg(param.value("transponder_pan"))
                   .toUtf8()
                   .data());
   sendCommand("PRINT 1");
