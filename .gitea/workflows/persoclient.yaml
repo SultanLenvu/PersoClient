@@ -55,4 +55,4 @@ jobs:
           CONFIG_FILE=$(realpath supplemental/PersoClient.ini)
           MANUAL_FILE=$(realpath Doc/manual/manual.pdf)
           cd $HOME/ansible-upgrade
-          ansible-playbook -i inventory.ini playbook.yaml -u root -e "config_file=$CONFIG_FILE,manual_file=$MANUAL_FILE"
+          ansible-playbook -i inventory.ini playbook.yaml -u root -e "config_file=$CONFIG_FILE" -e "manual_file=$MANUAL_FILE"
