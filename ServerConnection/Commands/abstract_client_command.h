@@ -28,7 +28,7 @@ class AbstractClientCommand : public QObject {
 
     RecordMissed,
     ProductionLineMissed,
-    TranspoderMissed,
+    TransponderMissed,
     BoxMissed,
     PalletMissed,
     OrderMissed,
@@ -70,7 +70,7 @@ class AbstractClientCommand : public QObject {
     StickerPrinterDriverMissed,
     StickerPrinterLibraryMissing,
     StickerPrinterConnectionError,
-    StickerPrintError,
+    StickerPrintingError,
     LastStickerMissed,
 
     Unknown,

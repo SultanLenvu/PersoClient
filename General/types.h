@@ -26,7 +26,7 @@ enum class ReturnStatus {
   ProductionContextNotValid,
 
   ProductionLineMissed,
-  TranspoderMissed,
+  TransponderMissed,
   BoxMissed,
   PalletMissed,
   OrderMissed,

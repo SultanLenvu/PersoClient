@@ -177,7 +177,7 @@ void InteractionSystem::createMessageTable() {
 
   MessageTable[ReturnStatus::ProductionLineMissed] =
       "Производственная линия не найдена.";
-  MessageTable[ReturnStatus::TranspoderMissed] = "Транспондер не найден.";
+  MessageTable[ReturnStatus::TransponderMissed] = "Транспондер не найден.";
   MessageTable[ReturnStatus::BoxMissed] = "Бокс не найден.";
   MessageTable[ReturnStatus::PalletMissed] = "Паллета не найдена.";
   MessageTable[ReturnStatus::OrderMissed] = "Заказ не найден.";

@@ -95,7 +95,7 @@ void AbstractClientCommand::createCrtMap() {
 
   CrtMap[RecordMissed] = ReturnStatus::ServerInternalError;
   CrtMap[ProductionLineMissed] = ReturnStatus::ProductionLineMissed;
-  CrtMap[TranspoderMissed] = ReturnStatus::TranspoderMissed;
+  CrtMap[TransponderMissed] = ReturnStatus::TransponderMissed;
   CrtMap[BoxMissed] = ReturnStatus::BoxMissed;
   CrtMap[PalletMissed] = ReturnStatus::PalletMissed;
   CrtMap[OrderMissed] = ReturnStatus::OrderMissed;
@@ -144,7 +144,7 @@ void AbstractClientCommand::createCrtMap() {
   CrtMap[StickerPrinterDriverMissed] = ReturnStatus::ServerInternalError;
   CrtMap[StickerPrinterLibraryMissing] = ReturnStatus::ServerInternalError;
   CrtMap[StickerPrinterConnectionError] = ReturnStatus::ServerInternalError;
-  CrtMap[StickerPrintError] = ReturnStatus::ServerInternalError;
+  CrtMap[StickerPrintingError] = ReturnStatus::ServerInternalError;
   CrtMap[LastStickerMissed] = ReturnStatus::ServerInternalError;
 
   CrtMap[Unknown] = ReturnStatus::ServerInternalError;
@@ -177,7 +177,7 @@ void AbstractClientCommand::createCrtLogMap() {
   CrtLogMap[RecordMissed] = "Server return status: RecordMissed";
   CrtLogMap[ProductionLineMissed] =
       "Server return status: ProductionLineMissed";
-  CrtLogMap[TranspoderMissed] = "Server return status: TranspoderMissed";
+  CrtLogMap[TransponderMissed] = "Server return status: TranspoderMissed";
   CrtLogMap[BoxMissed] = "Server return status: BoxMissed";
   CrtLogMap[PalletMissed] = "Server return status: PalletMissed";
   CrtLogMap[OrderMissed] = "Server return status: OrderMissed";
