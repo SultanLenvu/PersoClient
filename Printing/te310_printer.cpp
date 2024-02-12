@@ -47,7 +47,7 @@ ReturnStatus TE310Printer::printTransponderSticker(
   }
 
   if ((param.value("issuer_name") != "Новое качество дорог") &&
-      (param.value("issuer_name") == "Магистраль северной столицы")) {
+      (param.value("issuer_name") != "Магистраль северной столицы")) {
     sendLog("Получено неизвестное название компании-эмитента. Сброс.");
     return ReturnStatus::ParameterError;
   }
