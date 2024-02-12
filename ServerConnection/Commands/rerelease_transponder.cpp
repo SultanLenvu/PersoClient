@@ -33,14 +33,9 @@ ReturnStatus RereleaseTransponder::processResponse(
     return ReturnStatus::ServerResponseDataBlockError;
   }
 
-  if ((Response.size() != ResponseSize) || (Response["command_name"] != Name) ||
-      (!Response.contains("return_status")) ||
-      (!Response.contains("transponder_firmware"))) {
+  if (!Response.contains("return_status")) {
     return ReturnStatus::ServerResponseSyntaxError;
   }
-
-  responseData["transponder_firmware"] =
-      Response["transponder_firmware"].toString();
 
   ReturnStatus ret = processReturnStatus(Response["return_status"].toString());
   if (ret != ReturnStatus::NoError) {
@@ -48,5 +43,21 @@ ReturnStatus RereleaseTransponder::processResponse(
     return ret;
   }
 
+  if (!checkSyntax()) {
+    return ReturnStatus::ServerResponseSyntaxError;
+  }
+
+  responseData["transponder_firmware"] =
+      Response["transponder_firmware"].toString();
+
   return ReturnStatus::NoError;
+}
+
+bool RereleaseTransponder::checkSyntax() {
+  if ((Response.size() != ResponseSize) || (Response["command_name"] != Name) ||
+      !Response.contains("transponder_firmware")) {
+    return false;
+  }
+
+  return true;
 }

@@ -25,6 +25,7 @@ class RereleaseTransponder : public AbstractClientCommand {
 
  private:
   Q_DISABLE_COPY_MOVE(RereleaseTransponder)
+  bool checkSyntax(void);
 
  signals:
 };
