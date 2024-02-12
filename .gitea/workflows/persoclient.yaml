@@ -42,7 +42,7 @@ jobs:
           name: persoclient_${{ gitea.ref_name }}-artifacts
       - name: Deploy and regenerate repository
         run: |
-          cp persoclient_${{ gitea.ref_name }}-1_amd64.deb /var/www/repo/pool/internal
+          cp build/persoclient_${{ gitea.ref_name }}-1_amd64.deb /var/www/repo/pool/internal
           cd /var/www/repo/
           apt-ftparchive packages pool/internal > dists/mantic/internal/binary-amd64/Packages
           echo "Archive: mantic" > dists/mantic/Release
@@ -52,7 +52,7 @@ jobs:
           apt-ftparchive release dists/mantic >> dists/mantic/Release
       - name: trigger Ansible playbook to make clients upgrade
         run: |
-          CONFIG_FILE=$(realpath PersoClient.ini)
-          MANUAL_FILE=$(realpath manual.pdf)
+          CONFIG_FILE=$(realpath supplemental/PersoClient.ini)
+          MANUAL_FILE=$(realpath Doc/manual/manual.pdf)
           cd $HOME/ansible-upgrade
-          ansible-playbook -i inventory.ini playbook.yaml -u root -e "config_file=$CONFIG_FILE,manual_file=$MANUAL_FILE"
+          ansible-playbook -i inventory.ini playbook.yaml -u root -e "config_file=$CONFIG_FILE" -e "manual_file=$MANUAL_FILE"
