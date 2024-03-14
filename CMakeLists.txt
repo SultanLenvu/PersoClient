@@ -17,23 +17,56 @@ find_package(Qt${QT_VERSION_MAJOR} OPTIONAL_COMPONENTS Widgets)
 
 #========================================== SOURCE DIRECTORIES ===========================================#
 include_directories(Management/)
+include_directories(Management/Managers)
+include_directories(Management/ManagersManagers)
 include_directories(GUI/)
 include_directories(GUI/Dialogs)
 include_directories(GUI/Subkernels)
-include_directories(General/)
-include_directories(Log/)
+
+include_directories(Service/)
+include_directories(Service/Functors)
+include_directories(Service/General)
+include_directories(Service/Log)
+include_directories(Service/ObjectTypes)
+
 include_directories(Programmers/)
-include_directories(Printing/)
+include_directories(StickerPrinter/)
+
 include_directories(ServerConnection/)
 include_directories(ServerConnection/Commands/)
 #======================================================================================================#
 
 add_executable(PersoClient WIN32
-    Management/global_environment.cpp Management/global_environment.h
-    Management/abstract_manager.h Management/abstract_manager.cpp
-    Management/production_manager.h Management/production_manager.cpp
-    Management/programmer_manager.h Management/programmer_manager.cpp
-    Management/sticker_printer_manager.h Management/sticker_printer_manager.cpp
+    Service/abstract_service_object_space.h Service/abstract_service_object_space.cpp
+    Service/service_object_space.h Service/service_object_space.cpp
+    Service/asynchronous_object_space.h Service/asynchronous_object_space.cpp
+    Service/configuration_manager.h Service/configuration_manager.cpp
+
+    Service/General/definitions.h
+    Service/General/hash_table_model.cpp Service/General/hash_table_model.h
+    Service/General/types.h
+    Service/General/global_environment.cpp Service/General/global_environment.h
+    Service/General/named_object_factory.h Service/General/named_object_factory.cpp
+
+    Service/Functors/abstract_string_checker.h Service/Functors/abstract_string_checker.cpp
+    Service/Functors/ucid_checker.h Service/Functors/ucid_checker.cpp
+    Service/Functors/numeric_string_checker.h Service/Functors/numeric_string_checker.cpp
+
+    Service/ObjectTypes/named_object.cpp Service/ObjectTypes/named_object.h
+    Service/ObjectTypes/configurable_object.h Service/ObjectTypes/configurable_object.cpp
+    Service/ObjectTypes/settings_apply_bundle.h Service/ObjectTypes/settings_apply_bundle.cpp
+    Service/ObjectTypes/loggable_object.h Service/ObjectTypes/loggable_object.cpp
+    Service/ObjectTypes/log_system_bundle.h Service/ObjectTypes/log_system_bundle.cpp
+
+    Service/Log/file_log_backend.cpp Service/Log/file_log_backend.h
+    Service/Log/abstract_log_backend.cpp Service/Log/abstract_log_backend.h
+    Service/Log/log_system.cpp Service/Log/log_system.h
+    Service/Log/widget_log_backend.cpp Service/Log/widget_log_backend.h
+
+    Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
+    Management/Managers/production_manager.h Management/Managers/production_manager.cpp
+    Management/Managers/programmer_manager.h Management/Managers/programmer_manager.cpp
+    Management/Managers/sticker_printer_manager.h Management/Managers/sticker_printer_manager.cpp
 
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
@@ -55,20 +88,11 @@ add_executable(PersoClient WIN32
     GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
     GUI/Dialogs/settings_dialog.cpp GUI/Dialogs/settings_dialog.h
 
-    General/definitions.h
-    General/hash_table_model.cpp General/hash_table_model.h
-    General/types.h
-
-    Log/file_log_backend.cpp Log/file_log_backend.h
-    Log/log_backend.cpp Log/log_backend.h
-    Log/log_system.cpp Log/log_system.h
-    Log/widget_log_backend.cpp Log/widget_log_backend.h
-
     Programmers/abstract_programmer.cpp Programmers/abstract_programmer.h
     Programmers/jlink_exe_programmer.cpp Programmers/jlink_exe_programmer.h
 
-    Printing/abstract_sticker_printer.cpp Printing/abstract_sticker_printer.h
-    Printing/te310_printer.cpp Printing/te310_printer.h
+    StickerPrinter/abstract_sticker_printer.cpp StickerPrinter/abstract_sticker_printer.h
+    StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
     ServerConnection/abstract_server_connection.h ServerConnection/abstract_server_connection.cpp

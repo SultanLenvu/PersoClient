@@ -1,24 +1,20 @@
 #include "hash_table_model.h"
 
-HashTableModel::HashTableModel(const QString& name)
-    : QAbstractTableModel(nullptr) {
-  setObjectName(name);
-}
+HashTableModel::HashTableModel() : QAbstractTableModel(nullptr) {}
 
 HashTableModel::~HashTableModel() {}
 
-void HashTableModel::setData(const StringDictionary& table) {
+void HashTableModel::setData(std::shared_ptr<StringDictionary> data) {
   beginResetModel();
 
-  // Очищаем старые данные
-  Values.clear();
-  Headers.clear();
+  Data = data;
 
-  // Устанавливаем новые данные
-  for (auto itb = table.constBegin(), ite = table.constEnd(); itb != ite;
+  // Настраиваем конвертер
+  Converter.clear();
+  uint32_t i = 0;
+  for (auto itb = data->constBegin(), ite = data->constEnd(); itb != ite;
        ++itb) {
-    Values.append(itb.value());
-    Headers.append(MatchTable->value(itb.key()));
+    Converter[i++] = itb.key();
   }
 
   endResetModel();
@@ -31,18 +27,22 @@ void HashTableModel::setMatchTable(std::shared_ptr<StringDictionary> match) {
 void HashTableModel::clear() {
   beginResetModel();
 
-  Values.clear();
-  Headers.clear();
+  Converter.clear();
+  Data.reset();
 
   endResetModel();
 }
 
 bool HashTableModel::isEmpty() const {
-  return Values.isEmpty();
+  if (!Data) {
+    return true;
+  }
+
+  return false;
 }
 
 int HashTableModel::columnCount(const QModelIndex& parent) const {
-  if (Values.isEmpty()) {
+  if (!Data) {
     return 0;
   }
 
@@ -50,7 +50,11 @@ int HashTableModel::columnCount(const QModelIndex& parent) const {
 }
 
 int HashTableModel::rowCount(const QModelIndex& parent) const {
-  return Values.size();
+  if (!Data) {
+    return 0;
+  }
+
+  return Data->size();
 }
 
 QVariant HashTableModel::data(const QModelIndex& index, int role) const {
@@ -58,20 +62,21 @@ QVariant HashTableModel::data(const QModelIndex& index, int role) const {
     return QVariant();
   }
 
-  if (index.row() > (Values.size())) {
+  if (index.row() >= Data->size()) {
     return QVariant();
   }
 
-  if (role == Qt::DisplayRole) {
-    return Values.at(index.row());
-  } else
+  if (role != Qt::DisplayRole) {
     return QVariant();
+  }
+
+  return Data->value(Converter.at(index.row()));
 }
 
 QVariant HashTableModel::headerData(int section,
                                 Qt::Orientation orientation,
                                 int role) const {
-  if (section > (Values.size())) {
+  if (section >= Converter.size()) {
     return QVariant();
   }
 
@@ -83,8 +88,12 @@ QVariant HashTableModel::headerData(int section,
   }
 
   if (orientation == Qt::Vertical) {
-    return Headers.at(section);
-  } else {
     return QVariant();
   }
+
+  if (MatchTable) {
+    return MatchTable->value(Converter.at(section));
+  }
+
+  return Converter.at(section);
 }
