@@ -19,9 +19,11 @@ find_package(Qt${QT_VERSION_MAJOR} OPTIONAL_COMPONENTS Widgets)
 include_directories(Management/)
 include_directories(Management/Managers)
 include_directories(Management/ManagersManagers)
+
 include_directories(GUI/)
 include_directories(GUI/Dialogs)
 include_directories(GUI/Subkernels)
+include_directories(GUI/Reactions)
 
 include_directories(Service/)
 include_directories(Service/Functors)
@@ -70,7 +72,6 @@ add_executable(PersoClient WIN32
 
     GUI/abstract_gui.cpp GUI/abstract_gui.h
     GUI/authorization_gui.cpp GUI/authorization_gui.h
-    GUI/interaction_system.cpp GUI/interaction_system.h
     GUI/gui_kernel.cpp GUI/gui_kernel.h
     GUI/master_gui.cpp GUI/master_gui.h
     GUI/production_assembler_gui.cpp GUI/production_assembler_gui.h
@@ -87,6 +88,13 @@ add_executable(PersoClient WIN32
     GUI/Dialogs/transponder_sticker_scan_dialog.cpp GUI/Dialogs/transponder_sticker_scan_dialog.h
     GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
     GUI/Dialogs/settings_dialog.cpp GUI/Dialogs/settings_dialog.h
+
+    GUI/Reactions/abstract_progress_indicator.h GUI/Reactions/abstract_progress_indicator.cpp
+    GUI/Reactions/progress_indicator.cpp GUI/Reactions/progress_indicator.h
+    GUI/Reactions/abstract_return_status_handler.h GUI/Reactions/abstract_return_status_handler.cpp
+    GUI/Reactions/return_status_handler.h GUI/Reactions/return_status_handler.cpp
+    GUI/Reactions/progress_indicator_bundle.h GUI/Reactions/progress_indicator_bundle.cpp
+    GUI/Reactions/return_status_handler_bundle.h GUI/Reactions/return_status_handler_bundle.cpp
 
     Programmers/abstract_programmer.cpp Programmers/abstract_programmer.h
     Programmers/jlink_exe_programmer.cpp Programmers/jlink_exe_programmer.h
