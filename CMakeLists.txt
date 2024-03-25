@@ -18,7 +18,7 @@ find_package(Qt${QT_VERSION_MAJOR} OPTIONAL_COMPONENTS Widgets)
 #========================================== SOURCE DIRECTORIES ===========================================#
 include_directories(Management/)
 include_directories(Management/Managers)
-include_directories(Management/ManagersManagers)
+include_directories(Management/AsyncWrappers)
 
 include_directories(GUI/)
 include_directories(GUI/Dialogs)
@@ -56,7 +56,6 @@ add_executable(PersoClient WIN32
 
     Service/ObjectTypes/named_object.cpp Service/ObjectTypes/named_object.h
     Service/ObjectTypes/configurable_object.h Service/ObjectTypes/configurable_object.cpp
-    Service/ObjectTypes/settings_apply_bundle.h Service/ObjectTypes/settings_apply_bundle.cpp
     Service/ObjectTypes/loggable_object.h Service/ObjectTypes/loggable_object.cpp
     Service/ObjectTypes/log_system_bundle.h Service/ObjectTypes/log_system_bundle.cpp
 
@@ -65,17 +64,20 @@ add_executable(PersoClient WIN32
     Service/Log/log_system.cpp Service/Log/log_system.h
     Service/Log/widget_log_backend.cpp Service/Log/widget_log_backend.h
 
+    Management/AsyncWrappers/i_async_wrapper.h Management/AsyncWrappers/i_async_wrapper.cpp
+
     Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
     Management/Managers/production_manager.h Management/Managers/production_manager.cpp
     Management/Managers/programmer_manager.h Management/Managers/programmer_manager.cpp
     Management/Managers/sticker_printer_manager.h Management/Managers/sticker_printer_manager.cpp
 
-    GUI/abstract_gui.cpp GUI/abstract_gui.h
-    GUI/authorization_gui.cpp GUI/authorization_gui.h
     GUI/gui_kernel.cpp GUI/gui_kernel.h
-    GUI/master_gui.cpp GUI/master_gui.h
-    GUI/production_assembler_gui.cpp GUI/production_assembler_gui.h
-    GUI/production_tester_gui.cpp GUI/production_tester_gui.h
+
+    GUI/Widgets/abstract_gui.cpp GUI/Widgets/abstract_gui.h
+    GUI/Widgets/authorization_gui.cpp GUI/Widgets/authorization_gui.h
+    GUI/Widgets/master_gui.cpp GUI/Widgets/master_gui.h
+    GUI/Widgets/production_assembler_gui.cpp GUI/Widgets/production_assembler_gui.h
+    GUI/Widgets/production_tester_gui.cpp GUI/Widgets/production_tester_gui.h
 
     GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
     GUI/Subkernels/production_gui_subkernel.h GUI/Subkernels/production_gui_subkernel.cpp
@@ -89,12 +91,10 @@ add_executable(PersoClient WIN32
     GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
     GUI/Dialogs/settings_dialog.cpp GUI/Dialogs/settings_dialog.h
 
-    GUI/Reactions/abstract_progress_indicator.h GUI/Reactions/abstract_progress_indicator.cpp
+    GUI/Reactions/i_progress_indicator.h GUI/Reactions/i_progress_indicator.cpp
     GUI/Reactions/progress_indicator.cpp GUI/Reactions/progress_indicator.h
-    GUI/Reactions/abstract_return_status_handler.h GUI/Reactions/abstract_return_status_handler.cpp
-    GUI/Reactions/return_status_handler.h GUI/Reactions/return_status_handler.cpp
-    GUI/Reactions/progress_indicator_bundle.h GUI/Reactions/progress_indicator_bundle.cpp
-    GUI/Reactions/return_status_handler_bundle.h GUI/Reactions/return_status_handler_bundle.cpp
+    GUI/Reactions/i_status_indicator.h GUI/Reactions/i_status_indicator.cpp
+    GUI/Reactions/status_indicator.h GUI/Reactions/status_indicator.cpp
 
     Programmers/abstract_programmer.cpp Programmers/abstract_programmer.h
     Programmers/jlink_exe_programmer.cpp Programmers/jlink_exe_programmer.h

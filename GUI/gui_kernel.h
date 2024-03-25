@@ -10,10 +10,10 @@
 
 #include "abstract_gui.h"
 #include "abstract_gui_subkernel.h"
-#include "abstract_manager.h"
-#include "global_environment.h"
-#include "interaction_system.h"
-#include "log_system.h"
+#include "asynchronous_object_space.h"
+#include "progress_indicator.h"
+#include "service_object_space.h"
+#include "status_indicator.h"
 
 class GuiKernel : public QMainWindow {
   Q_OBJECT
@@ -33,20 +33,17 @@ class GuiKernel : public QMainWindow {
   //==================================================
 
   AbstractGui* CurrentGui;
-  std::unordered_map<QString, std::shared_ptr<AbstractGuiSubkernel>> Subkernels;
+  std::vector<AbstractGuiSubkernel> Subkernels;
 
-  GlobalEnvironment* GlobalEnv;
+  std::unique_ptr<ProgressIndicator> PIndicator;
+  std::unique_ptr<StatusIndicator> SIndicator;
 
-  std::unique_ptr<LogSystem> Logger;
-  std::unique_ptr<InteractionSystem> Interactor;
-  std::unique_ptr<QThread> ServiceThread;
-
-  std::unordered_map<QString, std::shared_ptr<AbstractManager>> Managers;
-  std::unique_ptr<QThread> ManagersThread;
+  std::unique_ptr<ServiceObjectSpace> Service;
+  std::unique_ptr<AsynchronousObjectSpace> Async;
 
  public:
   explicit GuiKernel(QWidget* parent = nullptr);
-  ~GuiKernel();
+  ~GuiKernel() = default;
 
  public slots:
   void applySettings(void);
@@ -61,22 +58,16 @@ class GuiKernel : public QMainWindow {
 
  private:
   Q_DISABLE_COPY_MOVE(GuiKernel);
-  void sendLog(const QString& log);
-  void loadSettings(void);
-  void registerMetaTypes(void);
 
   void createTopMenuActions(void);
   void createTopMenu(void);
 
   void createLoggerInstance(void);
-  void createInteractorInstance(void);
+  void createReactions(void);
 
   void createManagersInstance(void);
 
   void createGuiSubkernels(void);
-  void createProductionGuiSubkernel(void);
-  void createProgrammerGuiSubkernel(void);
-  void createStickerPrinterGuiSubkernel(void);
 
   void createAuthorizationGui(void);
   void createMasterGui(void);
@@ -85,11 +76,6 @@ class GuiKernel : public QMainWindow {
   void connectGui(void);
 
  signals:
-  void applySettings_signal(void);
-
-  void logging(const QString& log);
-  void clearLogDisplay_signal(void);
-
   void logOutServer_signal(void);
 };
 

@@ -5,7 +5,6 @@
 
 #include "authorization_gui.h"
 #include "definitions.h"
-#include "global_environment.h"
 #include "gui_kernel.h"
 #include "master_gui.h"
 #include "master_password_input_dialog.h"
@@ -14,15 +13,11 @@
 #include "production_manager.h"
 #include "production_tester_gui.h"
 #include "programmer_gui_subkernel.h"
-#include "programmer_manager.h"
 #include "settings_dialog.h"
 #include "sticker_printer_gui_subkernel.h"
-#include "sticker_printer_manager.h"
 
-GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
-  setObjectName("GuiKernel");
-  CurrentGui = nullptr;
-  loadSettings();
+GuiKernel::GuiKernel(QWidget* parent)
+    : QMainWindow(parent), CurrentGui(nullptr) {
   DesktopGeometry = QApplication::primaryScreen()->size();
 
   /* !!!
@@ -30,46 +25,13 @@ GuiKernel::GuiKernel(QWidget* parent) : QMainWindow(parent) {
    * !!!
    */
 
-  // Глобальная среда для соединения объектов
-  GlobalEnv = GlobalEnvironment::instance();
-  GlobalEnv->registerObject(this);
-
-  // Создаем действия для верхнего меню
-  createTopMenuActions();
-
-  // Создаем логгер
-  createLoggerInstance();
-
-  // Система для взаимодействия с пользователем
-  createInteractorInstance();
-
-  // Менеджер для взаимодействия с программатором
-  createManagersInstance();
-
-  // Создаем подядра для обработки пользовательских сигналов
-  createGuiSubkernels();
+  Service = std::make_unique<ServiceObjectSpace>();
+  createReactions();
+  Async = std::make_unique<AsyncObjectSpace>();
 
   // Создаем графический интерфейс для авторизации
   createAuthorizationGui();
   //  createMasterGui();
-
-  // Регистрируем типы
-  registerMetaTypes();
-
-  GlobalEnvironment::instance()->registerObject(this);
-}
-
-GuiKernel::~GuiKernel() {
-  ManagersThread->exit();
-  ManagersThread->wait();
-
-  ServiceThread->exit();
-  ServiceThread->wait();
-}
-
-void GuiKernel::applySettings() {
-  sendLog("Применение новых настроек. ");
-  emit applySettings_signal();
 }
 
 void GuiKernel::displayMasterGui_slot() {
@@ -124,41 +86,7 @@ void GuiKernel::onServerDisconnected() {
   }
 }
 
-void GuiKernel::sendLog(const QString& log) {
-  emit logging(objectName() + " - " + log);
-}
-
-void GuiKernel::loadSettings() {
-  QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
-  QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
-  QCoreApplication::setApplicationName(PROGRAM_NAME);
-
-  QSettings::setDefaultFormat(QSettings::IniFormat);
-}
-
-void GuiKernel::registerMetaTypes() {
-  qRegisterMetaType<std::shared_ptr<StringDictionary>>(
-      "std::shared_ptr<StringDictionary>");
-  qRegisterMetaType<std::shared_ptr<QStringList>>(
-      "std::shared_ptr<QStringList>");
-  qRegisterMetaType<std::shared_ptr<QString>>("std::shared_ptr<QString>");
-}
-
-void GuiKernel::createLoggerInstance() {
-  Logger = std::unique_ptr<LogSystem>(new LogSystem("LogSystem"));
-  connect(this, &GuiKernel::logging, Logger.get(), &LogSystem::generate);
-  connect(this, &GuiKernel::clearLogDisplay_signal, Logger.get(),
-          &LogSystem::clear);
-  connect(this, &GuiKernel::applySettings_signal, Logger.get(),
-          &LogSystem::applySettings);
-
-  ServiceThread = std::unique_ptr<QThread>(new QThread());
-
-  Logger->moveToThread(ServiceThread.get());
-  ServiceThread->start();
-}
-
-void GuiKernel::createInteractorInstance() {
+void GuiKernel::createReactions() {
   Interactor = std::unique_ptr<InteractionSystem>(
       new InteractionSystem("InteractionSystem"));
   connect(this, &GuiKernel::applySettings_signal, Interactor.get(),
@@ -328,40 +256,8 @@ void GuiKernel::createTopMenu() {
 }
 
 void GuiKernel::createGuiSubkernels() {
-  createProductionGuiSubkernel();
-  createProgrammerGuiSubkernel();
-  createStickerPrinterGuiSubkernel();
-}
-
-void GuiKernel::createProductionGuiSubkernel() {
-  std::shared_ptr<ProductionGuiSubkernel> subkernel(
-      new ProductionGuiSubkernel("ProductionGuiSubkernel"));
-
-  connect(subkernel.get(),
-          &ProductionGuiSubkernel::displayProductionAssemblerGui, this,
-          &GuiKernel::displayProductionAssemblerGui_slot);
-  connect(subkernel.get(), &ProductionGuiSubkernel::displayProductionTesterGui,
-          this, &GuiKernel::displayProductionTesterGui_slot);
-
-  subkernel->connectManager(Managers["ProductionManager"]);
-
-  Subkernels["ProductionGuiSubkernel"] = subkernel;
-}
-
-void GuiKernel::createProgrammerGuiSubkernel() {
-  std::shared_ptr<ProgrammerGuiSubkernel> subkernel(
-      new ProgrammerGuiSubkernel("ProgrammerGuiSubkernel"));
-
-  subkernel->connectManager(Managers["ProgrammerManager"]);
-
-  Subkernels["ProgrammerGuiSubkernel"] = subkernel;
-}
-
-void GuiKernel::createStickerPrinterGuiSubkernel() {
-  std::shared_ptr<StickerPrinterGuiSubkernel> subkernel(
+  Subkernels.emplace_back(new ProductionGuiSubkernel("ProductionGuiSubkernel"));
+  Subkernels.emplace_back(new ProgrammerGuiSubkernel("ProgrammerGuiSubkernel"));
+  Subkernels.emplace_back(
       new StickerPrinterGuiSubkernel("StickerPrinterGuiSubkernel"));
-
-  subkernel->connectManager(Managers["StickerPrinterManager"]);
-
-  Subkernels["StickerPrinterGuiSubkernel"] = subkernel;
 }
