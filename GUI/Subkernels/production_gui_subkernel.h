@@ -3,52 +3,31 @@
 
 #include "abstract_gui_subkernel.h"
 #include "hash_table_model.h"
+#include "production_assembler_gui.h"
 
 class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   Q_OBJECT
+  friend ProductionAssemblerGui;
 
  private:
-  enum UserRole {
-    Tester,
-    Assembler,
-  };
-
- private:
-  UserRole Role;
-  AbstractGui* CurrentGui;
-  std::shared_ptr<AbstractManager> Manager;
-
-  std::unique_ptr<HashTableModel> ProductionLineModel;
-  std::unique_ptr<HashTableModel> BoxDataModel;
-  std::unique_ptr<HashTableModel> TransponderDataModel;
+  HashTableModel ProductionLineModel;
+  HashTableModel BoxDataModel;
+  HashTableModel TransponderDataModel;
 
  public:
   explicit ProductionGuiSubkernel(const QString& name);
-  ~ProductionGuiSubkernel();
-
-  // AbstractGuiSubkernel interface
- public:
-  virtual void connectGui(AbstractGui* gui) override;
-  virtual void connectManager(
-      std::shared_ptr<AbstractManager> manager) override;
-  virtual void reset() override;
+  ~ProductionGuiSubkernel() = default;
 
  public slots:
-  void logOnCompleted_slot(void);
   void displayProductionLineData(const StringDictionary& data);
   void displayTransponderData(const StringDictionary& data);
   void displayBoxData(const StringDictionary& data);
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionGuiSubkernel);
+  void connectDependecies(void);
 
-  void connectAuthorizationGui(void);
-  void connectMasterGui(void);
-  void connectProductionAssemblerGui(void);
-  void connectProductionTesterGui(void);
-
-  void connectProductionManager(void) const;
-
+ private slots:  // Слоты для сигналов от виджетов
   void connect_guiSlot(void);
   void disconnect_guiSlot(void);
   void echoRequest_guiSlot(void);
@@ -77,7 +56,7 @@ class ProductionGuiSubkernel : public AbstractGuiSubkernel {
   void displayProductionAssemblerGui(void);
   void displayProductionTesterGui(void);
 
-  // Сигналы для менеджера
+ signals:  // Сигналы для менеджера
   void connectToServer_signal(void);
   void disconnectFromServer_signal(void);
   void echoServer_signal(void);

@@ -1,9 +1,9 @@
 #ifndef AUTHORIZATIONGUI_H
 #define AUTHORIZATIONGUI_H
 
-#include "abstract_gui.h"
+#include <QtWidgets>
 
-class AuthorizationGui : public AbstractGui {
+class AuthorizationGui : public QWidget {
   Q_OBJECT
 
  private:
@@ -11,6 +11,7 @@ class AuthorizationGui : public AbstractGui {
   QRect DesktopGeometry;
 
  public:
+  QHBoxLayout* MainLayout;
   QVBoxLayout* GeneralLayout;
 
   QHBoxLayout* ModeChoiceLayout;
@@ -34,13 +35,16 @@ class AuthorizationGui : public AbstractGui {
 
  public:
   explicit AuthorizationGui(QWidget* parent);
-  ~AuthorizationGui();
+  ~AuthorizationGui() = default;
 
-  virtual void updateModelViews(void) override;
-  virtual GuiType type(void) override;
+ private slots:
+  void logOn_guiSlot(void);
 
  private:
   Q_DISABLE_COPY(AuthorizationGui);
+  void connectDependecies(void);
+
+ private:
   void create(void);
   void createAuthorizationGroup(void);
 };

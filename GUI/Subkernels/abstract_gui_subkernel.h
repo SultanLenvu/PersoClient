@@ -3,21 +3,15 @@
 
 #include <QObject>
 
-#include "abstract_gui.h"
-#include "abstract_manager.h"
+#include "named_object.h"
 
-class AbstractGuiSubkernel : public QObject {
+class AbstractGuiSubkernel : public NamedObject {
   Q_OBJECT
  public:
   explicit AbstractGuiSubkernel(const QString& name);
-  virtual ~AbstractGuiSubkernel();
-
-  virtual void connectGui(AbstractGui* gui) = 0;
-  virtual void connectManager(std::shared_ptr<AbstractManager> manager) = 0;
-  virtual void reset(void) = 0;
+  virtual ~AbstractGuiSubkernel() = default;
 
  private:
-  AbstractGuiSubkernel();
   Q_DISABLE_COPY_MOVE(AbstractGuiSubkernel);
 
  signals:

@@ -2,11 +2,12 @@
 #define PRODUCTION_ASSEMBLER_GUI_H
 
 #include <QTableView>
+#include <QtWidgets>
 
-#include "abstract_gui.h"
-
-class ProductionAssemblerGui : public AbstractGui {
+class ProductionAssemblerGui : public QWidget {
  public:
+  QHBoxLayout* MainLayout;
+
   QVBoxLayout* ControlPanelLayout;
 
   QGroupBox* BoxGroup;
@@ -48,14 +49,13 @@ class ProductionAssemblerGui : public AbstractGui {
 
  public:
   explicit ProductionAssemblerGui(QWidget* parent);
-  ~ProductionAssemblerGui();
-
-  virtual void updateModelViews(void) override;
-  virtual GuiType type(void) override;
+  ~ProductionAssemblerGui() = default;
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionAssemblerGui);
+  void connectDependecies(void);
 
+ private:
   void createBoxGroup(void);
   void createTransponderGroup(void);
   void createPrinterStickerGroup(void);

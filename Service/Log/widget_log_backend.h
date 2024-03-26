@@ -16,13 +16,12 @@ class WidgetLogBackend final : public NamedObject,
 
  public:
   explicit WidgetLogBackend(const QString& name);
-  ~WidgetLogBackend();
+  ~WidgetLogBackend() = default;
 
   // AbstractLogBackend interface
  public:
   virtual void writeMessage(const QString& str) override;
 
-  // Own
  public:
   void clear();
 

@@ -24,6 +24,7 @@ include_directories(GUI/)
 include_directories(GUI/Dialogs)
 include_directories(GUI/Subkernels)
 include_directories(GUI/Reactions)
+include_directories(GUI/Widgets)
 
 include_directories(Service/)
 include_directories(Service/Functors)
@@ -73,7 +74,6 @@ add_executable(PersoClient WIN32
 
     GUI/gui_kernel.cpp GUI/gui_kernel.h
 
-    GUI/Widgets/abstract_gui.cpp GUI/Widgets/abstract_gui.h
     GUI/Widgets/authorization_gui.cpp GUI/Widgets/authorization_gui.h
     GUI/Widgets/master_gui.cpp GUI/Widgets/master_gui.h
     GUI/Widgets/production_assembler_gui.cpp GUI/Widgets/production_assembler_gui.h
@@ -126,6 +126,7 @@ add_executable(PersoClient WIN32
     ServerConnection/Commands/get_production_line_data.h ServerConnection/Commands/get_production_line_data.cpp
 
     main.cpp
+    GUI/Subkernels/AuthorizationGuiSubkernel.h GUI/Subkernels/AuthorizationGuiSubkernel.cpp
     )
 
 target_link_libraries(PersoClient PRIVATE

@@ -1,7 +1,9 @@
 #include "production_assembler_gui.h"
+#include "global_environment.h"
+#include "production_gui_subkernel.h"
 
 ProductionAssemblerGui::ProductionAssemblerGui(QWidget* parent)
-    : AbstractGui(parent) {
+    : QWidget(parent) {
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
 
@@ -14,21 +16,32 @@ ProductionAssemblerGui::ProductionAssemblerGui(QWidget* parent)
   MainLayout->setStretch(1, 3);
 }
 
-ProductionAssemblerGui::~ProductionAssemblerGui() {}
+void ProductionAssemblerGui::connectDependecies() {
+  ProductionGuiSubkernel* pgs =
+      GlobalEnvironment::instance()->getObject<ProductionGuiSubkernel>(
+          "ProductionGuiSubkernel");
 
-void ProductionAssemblerGui::updateModelViews(void) {
-  ProductionLineDataView->resizeColumnsToContents();
-  ProductionLineDataView->update();
+  connect(RequestBoxButton, &QPushButton::clicked, pgs,
+          &ProductionGuiSubkernel::requestBox_guiSlot);
+  connect(RefundCurrentBoxButton, &QPushButton::clicked, pgs,
+          &ProductionGuiSubkernel::refundCurrentBox_guiSlot);
+  connect(CompleteCurrentBoxButton, &QPushButton::clicked, pgs,
+          &ProductionGuiSubkernel::completeCurrentBox_guiSlot);
 
-  BoxDataView->resizeColumnsToContents();
-  BoxDataView->update();
+  connect(ReleaseTransponderButton, &QPushButton::clicked, pgs,
+          &ProductionGuiSubkernel::releaseTransponder_guiSlot);
+  connect(RereleaseTransponderButton, &QPushButton::clicked, pgs,
+          &ProductionGuiSubkernel::rereleaseTransponder_guiSlot);
+  connect(RollbackTransponderPushButton, &QPushButton::clicked, pgs,
+          &ProductionGuiSubkernel::rollbackTransponder_guiSlot);
 
-  TransponderDataView->resizeColumnsToContents();
-  TransponderDataView->update();
-}
+  connect(PrintBoxStickerButton, &QPushButton::clicked, pgs,
+          &ProductionGuiSubkernel::printBoxSticker_guiSlot);
 
-AbstractGui::GuiType ProductionAssemblerGui::type() {
-  return ProductionAssembler;
+  // Связывание моделей и представлений
+  ProductionLineDataView->setModel(&pgs->ProductionLineModel);
+  TransponderDataView->setModel(&pgs->TransponderDataModel);
+  BoxDataView->setModel(&pgs->BoxDataModel);
 }
 
 void ProductionAssemblerGui::createBoxGroup() {

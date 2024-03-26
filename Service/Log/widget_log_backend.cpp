@@ -7,8 +7,6 @@ WidgetLogBackend::WidgetLogBackend(const QString& name)
   doLoadSettings();
 }
 
-WidgetLogBackend::~WidgetLogBackend() {}
-
 void WidgetLogBackend::writeMessage(const QString& str) {
   if (Enable) {
     emit displayLog_signal(str);

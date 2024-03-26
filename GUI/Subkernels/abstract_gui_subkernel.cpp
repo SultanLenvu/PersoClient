@@ -1,17 +1,11 @@
 #include "abstract_gui_subkernel.h"
 #include "global_environment.h"
-#include "log_system.h"
+#include "widget_log_backend.h"
 
 AbstractGuiSubkernel::AbstractGuiSubkernel(const QString& name)
-    : QObject{nullptr} {
-  setObjectName(name);
-
+    : NamedObject{name} {
   connect(this, &AbstractGuiSubkernel::clearLogDisplay_signal,
-          dynamic_cast<LogSystem*>(
-              GlobalEnvironment::instance()->getObject("LogSystem")),
-          &LogSystem::clear);
+          dynamic_cast<WidgetLogBackend*>(
+              GlobalEnvironment::instance()->getObject("WidgetLogBackend")),
+          &WidgetLogBackend::clear);
 }
-
-AbstractGuiSubkernel::~AbstractGuiSubkernel() {}
-
-AbstractGuiSubkernel::AbstractGuiSubkernel() {}

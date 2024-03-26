@@ -1,17 +1,21 @@
 #include "authorization_gui.h"
+#include "authorization_gui_subkernel.h"
+#include "global_environment.h"
 
-AuthorizationGui::AuthorizationGui(QWidget* parent) : AbstractGui(parent) {
+AuthorizationGui::AuthorizationGui(QWidget* parent) : QWidget(parent) {
   create();
+  connectDependecies();
 }
 
-AuthorizationGui::~AuthorizationGui() {
-  //  qDebug() << "Deleted.";
-}
+void AuthorizationGui::logOn_guiSlot() {}
 
-void AuthorizationGui::updateModelViews() {}
+void AuthorizationGui::connectDependecies() {
+  AuthorizationGuiSubkernel* ags =
+      GlobalEnvironment::instance()->getObject<AuthorizationGuiSubkernel>(
+          "AuthorizationGuiSubkernel");
 
-AbstractGui::GuiType AuthorizationGui::type() {
-  return Authorization;
+  connect(AuthorizePushButton, &QPushButton::clicked, ags,
+          &AuthorizationGuiSubkernel::logOn_guiSlot);
 }
 
 void AuthorizationGui::create() {

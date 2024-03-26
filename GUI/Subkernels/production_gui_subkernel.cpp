@@ -1,6 +1,7 @@
 #include "production_gui_subkernel.h"
 #include "authorization_dialog.h"
 #include "authorization_gui.h"
+#include "global_environment.h"
 #include "master_gui.h"
 #include "production_assembler_gui.h"
 #include "production_manager.h"
@@ -9,82 +10,76 @@
 
 ProductionGuiSubkernel::ProductionGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel{name} {
-  Role = Assembler;
-
   createModels();
-}
-
-ProductionGuiSubkernel::~ProductionGuiSubkernel() {}
-
-void ProductionGuiSubkernel::connectGui(AbstractGui* gui) {
-  CurrentGui = gui;
-  BoxDataModel->clear();
-  TransponderDataModel->clear();
-
-  switch (CurrentGui->type()) {
-    case AbstractGui::Authorization:
-      connectAuthorizationGui();
-      break;
-    case AbstractGui::Master:
-      connectMasterGui();
-      break;
-    case AbstractGui::ProductionAssembler:
-      connectProductionAssemblerGui();
-      break;
-    case AbstractGui::ProductionTester:
-      connectProductionTesterGui();
-      break;
-    default:
-      break;
-  }
-}
-
-void ProductionGuiSubkernel::connectManager(
-    std::shared_ptr<AbstractManager> manager) {
-  if (manager->type() != AbstractManager::Production) {
-    return;
-  }
-
-  Manager = manager;
-  connectProductionManager();
-}
-
-void ProductionGuiSubkernel::reset() {
-  Manager.reset();
-}
-
-void ProductionGuiSubkernel::logOnCompleted_slot() {
-  if (Role == Assembler) {
-    emit displayProductionAssemblerGui();
-  }
-
-  if (Role == Tester) {
-    emit displayProductionTesterGui();
-  }
 }
 
 void ProductionGuiSubkernel::displayProductionLineData(
     const StringDictionary& data) {
-  ProductionLineModel->setData(data);
-  CurrentGui->updateModelViews();
+  ProductionLineModel.setData(data);
 }
 
 void ProductionGuiSubkernel::displayTransponderData(
     const StringDictionary& data) {
-  TransponderDataModel->setData(data);
-  CurrentGui->updateModelViews();
+  TransponderDataModel.setData(data);
 }
 
 void ProductionGuiSubkernel::displayBoxData(const StringDictionary& data) {
-  BoxDataModel->setData(data);
-  CurrentGui->updateModelViews();
+  BoxDataModel.setData(data);
 }
 
-void ProductionGuiSubkernel::connectAuthorizationGui() {
-  AuthorizationGui* gui = dynamic_cast<AuthorizationGui*>(CurrentGui);
+void ProductionGuiSubkernel::connectDependecies() {
+  ProductionManager* manager = dynamic_cast<ProductionManager*>(Manager.get());
 
-  connect(gui->AuthorizePushButton, &QPushButton::clicked, this,
-          &ProductionGuiSubkernel::logOn_guiSlot);
+  // Сигналы от подядра
+  connect(this, &ProductionGuiSubkernel::connectToServer_signal, manager,
+          &ProductionManager::connectToServer);
+  connect(this, &ProductionGuiSubkernel::disconnectFromServer_signal, manager,
+          &ProductionManager::disconnectFromServer);
+  connect(this, &ProductionGuiSubkernel::echoServer_signal, manager,
+          &ProductionManager::echoServer);
+  connect(this, &ProductionGuiSubkernel::launchProductionLine_signal, manager,
+          &ProductionManager::launchProductionLine);
+  connect(this, &ProductionGuiSubkernel::logOnServer_signal, manager,
+          &ProductionManager::logOnServer);
+  connect(this, &ProductionGuiSubkernel::getProductionLineData_signal, manager,
+          &ProductionManager::getProductionLineData);
+
+  connect(this, &ProductionGuiSubkernel::requestBox_signal, manager,
+          &ProductionManager::requestBox);
+  connect(this, &ProductionGuiSubkernel::getCurrentBoxData_signal, manager,
+          &ProductionManager::getCurrentBoxData);
+  connect(this, &ProductionGuiSubkernel::refundCurrentBox_signal, manager,
+          &ProductionManager::refundCurrentBox);
+  connect(this, &ProductionGuiSubkernel::completeCurrentBox_signal, manager,
+          &ProductionManager::completeCurrentBox);
+
+  connect(this, &ProductionGuiSubkernel::releaseTransponder_signal, manager,
+          &ProductionManager::releaseTransponder);
+  connect(this, &ProductionGuiSubkernel::rereleaseTransponder_signal, manager,
+          &ProductionManager::rereleaseTransponder);
+  connect(this, &ProductionGuiSubkernel::rollbackTransponder_signal, manager,
+          &ProductionManager::rollbackTransponder);
+  connect(this, &ProductionGuiSubkernel::getCurrentTransponderData_signal,
+          manager, &ProductionManager::getCurrentTransponderData);
+  connect(this, &ProductionGuiSubkernel::getTransponderData_signal, manager,
+          &ProductionManager::getTransponderData);
+
+  connect(this, &ProductionGuiSubkernel::printBoxSticker_signal, manager,
+          &ProductionManager::printBoxSticker);
+  connect(this, &ProductionGuiSubkernel::printLastBoxSticker_signal, manager,
+          &ProductionManager::printLastBoxSticker);
+  connect(this, &ProductionGuiSubkernel::printPalletSticker_signal, manager,
+          &ProductionManager::printPalletSticker);
+  connect(this, &ProductionGuiSubkernel::printLastPalletSticker_signal, manager,
+          &ProductionManager::printLastPalletSticker);
+
+  // Сигналы от менеджера
+  connect(manager, &ProductionManager::displayProductionLineData_signal, this,
+          &ProductionGuiSubkernel::displayProductionLineData);
+  connect(manager, &ProductionManager::displayTransponderData_signal, this,
+          &ProductionGuiSubkernel::displayTransponderData);
+  connect(manager, &ProductionManager::displayBoxData_signal, this,
+          &ProductionGuiSubkernel::displayBoxData);
 }
 
 void ProductionGuiSubkernel::connectMasterGui() {
@@ -139,36 +134,6 @@ void ProductionGuiSubkernel::connectMasterGui() {
   // Сигналы от подядра
 }
 
-void ProductionGuiSubkernel::connectProductionAssemblerGui() {
-  ProductionAssemblerGui* gui =
-      dynamic_cast<ProductionAssemblerGui*>(CurrentGui);
-
-  // Сигналы от GUI
-  connect(gui->RequestBoxButton, &QPushButton::clicked, this,
-          &ProductionGuiSubkernel::requestBox_guiSlot);
-  connect(gui->RefundCurrentBoxButton, &QPushButton::clicked, this,
-          &ProductionGuiSubkernel::refundCurrentBox_guiSlot);
-  connect(gui->CompleteCurrentBoxButton, &QPushButton::clicked, this,
-          &ProductionGuiSubkernel::completeCurrentBox_guiSlot);
-
-  connect(gui->ReleaseTransponderButton, &QPushButton::clicked, this,
-          &ProductionGuiSubkernel::releaseTransponder_guiSlot);
-  connect(gui->RereleaseTransponderButton, &QPushButton::clicked, this,
-          &ProductionGuiSubkernel::rereleaseTransponder_guiSlot);
-  connect(gui->RollbackTransponderPushButton, &QPushButton::clicked, this,
-          &ProductionGuiSubkernel::rollbackTransponder_guiSlot);
-
-  connect(gui->PrintBoxStickerButton, &QPushButton::clicked, this,
-          &ProductionGuiSubkernel::printBoxSticker_guiSlot);
-
-  // Связывание моделей и представлений
-  gui->ProductionLineDataView->setModel(ProductionLineModel.get());
-  gui->TransponderDataView->setModel(TransponderDataModel.get());
-  gui->BoxDataView->setModel(BoxDataModel.get());
-
-  // Сигналы от подядра
-}
-
 void ProductionGuiSubkernel::connectProductionTesterGui() {
   ProductionTesterGui* gui = dynamic_cast<ProductionTesterGui*>(CurrentGui);
 
@@ -194,60 +159,7 @@ void ProductionGuiSubkernel::connectProductionTesterGui() {
 }
 
 void ProductionGuiSubkernel::connectProductionManager() const {
-  ProductionManager* manager = dynamic_cast<ProductionManager*>(Manager.get());
-
-  // Сигналы от подядра
-  connect(this, &ProductionGuiSubkernel::connectToServer_signal, manager,
-          &ProductionManager::connectToServer);
-  connect(this, &ProductionGuiSubkernel::disconnectFromServer_signal, manager,
-          &ProductionManager::disconnectFromServer);
-  connect(this, &ProductionGuiSubkernel::echoServer_signal, manager,
-          &ProductionManager::echoServer);
-  connect(this, &ProductionGuiSubkernel::launchProductionLine_signal, manager,
-          &ProductionManager::launchProductionLine);
-  connect(this, &ProductionGuiSubkernel::logOnServer_signal, manager,
-          &ProductionManager::logOnServer);
-  connect(this, &ProductionGuiSubkernel::getProductionLineData_signal, manager,
-          &ProductionManager::getProductionLineData);
-
-  connect(this, &ProductionGuiSubkernel::requestBox_signal, manager,
-          &ProductionManager::requestBox);
-  connect(this, &ProductionGuiSubkernel::getCurrentBoxData_signal, manager,
-          &ProductionManager::getCurrentBoxData);
-  connect(this, &ProductionGuiSubkernel::refundCurrentBox_signal, manager,
-          &ProductionManager::refundCurrentBox);
-  connect(this, &ProductionGuiSubkernel::completeCurrentBox_signal, manager,
-          &ProductionManager::completeCurrentBox);
-
-  connect(this, &ProductionGuiSubkernel::releaseTransponder_signal, manager,
-          &ProductionManager::releaseTransponder);
-  connect(this, &ProductionGuiSubkernel::rereleaseTransponder_signal, manager,
-          &ProductionManager::rereleaseTransponder);
-  connect(this, &ProductionGuiSubkernel::rollbackTransponder_signal, manager,
-          &ProductionManager::rollbackTransponder);
-  connect(this, &ProductionGuiSubkernel::getCurrentTransponderData_signal,
-          manager, &ProductionManager::getCurrentTransponderData);
-  connect(this, &ProductionGuiSubkernel::getTransponderData_signal, manager,
-          &ProductionManager::getTransponderData);
-
-  connect(this, &ProductionGuiSubkernel::printBoxSticker_signal, manager,
-          &ProductionManager::printBoxSticker);
-  connect(this, &ProductionGuiSubkernel::printLastBoxSticker_signal, manager,
-          &ProductionManager::printLastBoxSticker);
-  connect(this, &ProductionGuiSubkernel::printPalletSticker_signal, manager,
-          &ProductionManager::printPalletSticker);
-  connect(this, &ProductionGuiSubkernel::printLastPalletSticker_signal, manager,
-          &ProductionManager::printLastPalletSticker);
-
-  // Сигналы от менеджера
-  connect(manager, &ProductionManager::authorizationCompleted, this,
-          &ProductionGuiSubkernel::logOnCompleted_slot);
-  connect(manager, &ProductionManager::displayProductionLineData_signal, this,
-          &ProductionGuiSubkernel::displayProductionLineData);
-  connect(manager, &ProductionManager::displayTransponderData_signal, this,
-          &ProductionGuiSubkernel::displayTransponderData);
-  connect(manager, &ProductionManager::displayBoxData_signal, this,
-          &ProductionGuiSubkernel::displayBoxData);
+  
 }
 
 void ProductionGuiSubkernel::connect_guiSlot() {
