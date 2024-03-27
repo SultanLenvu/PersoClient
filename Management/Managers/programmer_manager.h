@@ -2,13 +2,13 @@
 #define PROGRAMMERMANAGER_H
 
 #include "abstract_manager.h"
-#include "abstract_programmer.h"
+#include "i_programmer.h"
 
 class ProgrammerManager : public AbstractManager {
   Q_OBJECT
 
  private:
-  std::unique_ptr<AbstractProgrammer> Programmer;
+  std::unique_ptr<IProgrammer> Programmer;
 
  public:
   explicit ProgrammerManager(const QString& name);

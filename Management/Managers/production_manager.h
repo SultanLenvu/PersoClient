@@ -4,7 +4,7 @@
 #include <QFile>
 
 #include "abstract_manager.h"
-#include "abstract_programmer.h"
+#include "i_programmer.h"
 #include "abstract_server_connection.h"
 
 class ProductionManager : public AbstractManager {
@@ -12,7 +12,7 @@ class ProductionManager : public AbstractManager {
 
  private:  
   std::unique_ptr<AbstractServerConnection> Server;
-  std::unique_ptr<AbstractProgrammer> Programmer;
+  std::unique_ptr<IProgrammer> Programmer;
 
   std::unique_ptr<QFile> Firmware;
 

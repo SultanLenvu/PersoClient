@@ -3,12 +3,16 @@
 
 #include <QDir>
 #include <QProcess>
-#include <QSettings>
-#include <QThread>
 
-#include "abstract_programmer.h"
+#include "configurable_object.h"
+#include "i_programmer.h"
+#include "loggable_object.h"
+#include "named_object.h"
 
-class JLinkExeProgrammer : public AbstractProgrammer {
+class JLinkExeProgrammer : public NamedObject,
+                           public IProgrammer,
+                           public LoggableObject,
+                           public ConfigurableObject {
   Q_OBJECT
  private:
   uint32_t Speed;
@@ -21,31 +25,30 @@ class JLinkExeProgrammer : public AbstractProgrammer {
 
  public:
   explicit JLinkExeProgrammer(const QString& name);
-  ~JLinkExeProgrammer();
+  ~JLinkExeProgrammer() = default;
 
- public:
+ public:  // IProgrammer interface
   virtual ReturnStatus checkConfig(void) override;
-  virtual ProgrammerType type() const override;
-  virtual ReturnStatus programMemory(QFile& firmware) override;
-  virtual ReturnStatus programMemoryWithUnlock(QFile& firmware) override;
+  virtual ReturnStatus programMemory(TransponderFirmware& firmware) override;
+  virtual ReturnStatus programMemoryWithUnlock(
+      TransponderFirmware& firmware) override;
   virtual ReturnStatus readMemory(void) override;
   virtual ReturnStatus eraseMemory(void) override;
 
   virtual ReturnStatus readUserData(void) override;
-  virtual ReturnStatus programUserData(QFile& data) override;
+  virtual ReturnStatus programUserData(TransponderUserData& data) override;
 
   virtual ReturnStatus readUcid(QString& ucid) override;
 
   virtual ReturnStatus unlockMemory(void) override;
   virtual ReturnStatus lockMemory(void) override;
 
-  virtual void applySettings() override;
+ private:
+  Q_DISABLE_COPY_MOVE(JLinkExeProgrammer);
+  virtual void loadSettings(void) override;
+  void doLoadSettings(void);
 
  private:
-  Q_DISABLE_COPY(JLinkExeProgrammer);
-  void sendLog(const QString& log);
-  void loadSettings(void);
-
   void createJLinkProcess(void);
 
   bool executeJLinkScript(void);

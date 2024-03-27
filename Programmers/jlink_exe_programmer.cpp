@@ -5,12 +5,10 @@
 #include "definitions.h"
 
 JLinkExeProgrammer::JLinkExeProgrammer(const QString& name)
-    : AbstractProgrammer(name) {
-  loadSettings();
+    : NamedObject(name), LoggableObject(name) {
+  doLoadSettings();
   createJLinkProcess();
 }
-
-JLinkExeProgrammer::~JLinkExeProgrammer() {}
 
 ReturnStatus JLinkExeProgrammer::checkConfig() {
   sendLog("Проверка конфигурации.");
@@ -25,27 +23,25 @@ ReturnStatus JLinkExeProgrammer::checkConfig() {
   return ReturnStatus::NoError;
 }
 
-AbstractProgrammer::ProgrammerType JLinkExeProgrammer::type() const {
-  return JLinkExe;
-}
-
-ReturnStatus JLinkExeProgrammer::programMemory(QFile& firmware) {
+ReturnStatus JLinkExeProgrammer::programMemory(TransponderFirmware& firmware) {
   sendLog(QString("Загрузка прошивки."));
 
   // Проверка корректности присланной прошивки
-  if (!checkFirmwareFile(firmware)) {
+  if (!firmware.valid()) {
     sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
     return ReturnStatus::InvalidFirmwareFile;
   }
+
+  QString fileName(TRANSPONDER_FIRMWARE_FILE_NAME);
+  firmware.writeToFile(fileName);
 
   // Формируем скрипт JLink
   initScript();
   // Очищаем FLash
   JLinkScript->write(QByteArray("Erase\n"));
   // Загружаем прошивку
-  QString temp =
-      QString("LoadFile ") + firmware.fileName() + QString(", 0x08000000\n");
-  JLinkScript->write(temp.toUtf8());
+  JLinkScript->write(
+      QString("LoadFile %1, 0x08000000\n").arg(fileName).toUtf8());
 
   // Запускаем выполнение скрипта JLink
   if (!executeJLinkScript()) {
@@ -55,8 +51,18 @@ ReturnStatus JLinkExeProgrammer::programMemory(QFile& firmware) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus JLinkExeProgrammer::programMemoryWithUnlock(QFile& firmware) {
+ReturnStatus JLinkExeProgrammer::programMemoryWithUnlock(
+    TransponderFirmware& firmware) {
   sendLog(QString("Разблокировка памяти и загрузка прошивки."));
+
+  // Проверка корректности присланной прошивки
+  if (!firmware.valid()) {
+    sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
+    return ReturnStatus::InvalidFirmwareFile;
+  }
+
+  QString fileName(TRANSPONDER_FIRMWARE_FILE_NAME);
+  firmware.writeToFile(fileName);
 
   // Формируем скрипт JLink
   initScript();
@@ -77,9 +83,8 @@ ReturnStatus JLinkExeProgrammer::programMemoryWithUnlock(QFile& firmware) {
   JLinkScript->write(QByteArray("erase\n"));
 
   // Загружаем прошивку
-  QString temp =
-      QString("LoadFile ") + firmware.fileName() + QString(", 0x08000000\n");
-  JLinkScript->write(temp.toUtf8());
+  JLinkScript->write(
+      QString("LoadFile %1, 0x08000000\n").arg(fileName).toUtf8());
 
   // Запускаем выполнение скрипта JLink
   executeJLinkScript();
@@ -133,10 +138,10 @@ ReturnStatus JLinkExeProgrammer::readUserData(void) {
   // Формируем скрипт JLink
   initScript();
   // Считываем часть flash-памяти, в которой хранятся пользовательские данные
-  QString temp = QString("savebin saved_user_data.bin,") +
-                 QString(USER_DATA_FLASH_START_ADDRESS) + QString(", ") +
-                 QString::number(USER_DATA_FLASH_SIZE, 16) + QString("\n");
-  JLinkScript->write(temp.toUtf8());
+  JLinkScript->write(QString("savebin saved_user_data.bin, %1, %2\n")
+                         .arg(TRANSPONDER_USER_DATA_START_ADDRESS,
+                              QString::number(TRANSPONDER_USER_DATA_SIZE))
+                         .toUtf8());
 
   // Запускаем выполнение скрипта JLink
   if (!executeJLinkScript()) {
@@ -146,27 +151,30 @@ ReturnStatus JLinkExeProgrammer::readUserData(void) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus JLinkExeProgrammer::programUserData(QFile& data) {
+ReturnStatus JLinkExeProgrammer::programUserData(TransponderUserData& data) {
   sendLog(QString("Запись пользовательских данных."));
 
-  // Проверка корректности присланной прошивки
-  if (!checkDataFile(data)) {
-    sendLog(QString("Получен некорректный файл с данными. Сброс. "));
+  // Проверка корректности
+  if (!data.valid()) {
+    sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
     return ReturnStatus::InvalidFirmwareFile;
   }
+
+  QString fileName("user_data.bin");
+  data.writeToFile(fileName);
 
   // Формируем скрипт JLink
   initScript();
 
   // Очищаем старые пользовательские данные
-  QString temp = QString("Erase ") + QString(USER_DATA_FLASH_START_ADDRESS) +
-                 QString(", ") + QString(USER_DATA_FLASH_END_ADDRESS) +
-                 QString("\n");
-  JLinkScript->write(temp.toUtf8());
+  JLinkScript->write(QString("Erase %1, %2\n")
+                         .arg(TRANSPONDER_USER_DATA_START_ADDRESS,
+                              TRANSPONDER_USER_DATA_END_ADDRESS)
+                         .toUtf8());
   // Загружаем новые пользовательских данных
-  temp = QString("LoadFile ") + data.fileName() + QString(", ") +
-         QString(USER_DATA_FLASH_START_ADDRESS) + QString("\n");
-  JLinkScript->write(temp.toUtf8());
+  JLinkScript->write(QString("LoadFile %1, %2\n")
+                         .arg(fileName, TRANSPONDER_USER_DATA_START_ADDRESS)
+                         .toUtf8());
 
   // Запускаем выполнение скрипта JLink
   if (!executeJLinkScript()) {
@@ -262,21 +270,17 @@ JLinkExeProgrammer::lockMemory() {  // Проверка на существов�
   return ReturnStatus::NoError;
 }
 
-void JLinkExeProgrammer::applySettings() {
-  sendLog("Применение новых настроек. ");
-  loadSettings();
-  createJLinkProcess();
-}
-
-void JLinkExeProgrammer::sendLog(const QString& log) {
-  emit logging(QString("%1 - %2").arg(objectName(), log));
-}
-
 /*
  * Приватные методы
  */
 
 void JLinkExeProgrammer::loadSettings() {
+  sendLog("Применение новых настроек.");
+  doLoadSettings();
+  createJLinkProcess();
+}
+
+void JLinkExeProgrammer::doLoadSettings() {
   QSettings settings;
 
   JLinkPath = settings.value("jlink_exe_programmer/exe_file_path").toString();

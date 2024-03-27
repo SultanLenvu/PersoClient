@@ -168,9 +168,9 @@ void ProgrammerManager::sendLog(const QString& log) {
 void ProgrammerManager::loadSettings() {}
 
 void ProgrammerManager::createProgrammer() {
-  Programmer = std::unique_ptr<AbstractProgrammer>(
+  Programmer = std::unique_ptr<IProgrammer>(
       new JLinkExeProgrammer("JLinkExeProgrammer2"));
-  connect(Programmer.get(), &AbstractProgrammer::logging,
+  connect(Programmer.get(), &IProgrammer::logging,
           dynamic_cast<LogSystem*>(
               GlobalEnvironment::instance()->getObject("LogSystem")),
           &LogSystem::generate);

@@ -292,7 +292,7 @@ void ProductionManager::releaseTransponder() {
   ReturnStatus ret;
   QString ucid;
   QFile firmware(
-      QString("%1/%2").arg(QDir::tempPath(), FIRMWARE_TEMP_FILE_NAME));
+      QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME));
   StringDictionary result;
   StringDictionary param;
 
@@ -394,7 +394,7 @@ void ProductionManager::rereleaseTransponder(
   ReturnStatus ret;
   QString ucid;
   QFile firmware(
-      QString("%1/%2").arg(QDir::tempPath(), FIRMWARE_TEMP_FILE_NAME));
+      QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME));
   StringDictionary result;
   StringDictionary requestParam;
 
@@ -632,9 +632,9 @@ ReturnStatus ProductionManager::checkConfig() {
 }
 
 void ProductionManager::createProgrammer() {
-  Programmer = std::unique_ptr<AbstractProgrammer>(
+  Programmer = std::unique_ptr<IProgrammer>(
       new JLinkExeProgrammer("JLinkExeProgrammer1"));
-  connect(Programmer.get(), &AbstractProgrammer::logging,
+  connect(Programmer.get(), &IProgrammer::logging,
           dynamic_cast<LogSystem*>(
               GlobalEnvironment::instance()->getObject("LogSystem")),
           &LogSystem::generate);

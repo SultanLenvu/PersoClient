@@ -3,10 +3,17 @@
 
 #include <QHostAddress>
 #include <QHostInfo>
+#include <QLibrary>
 
-#include "abstract_sticker_printer.h"
+#include "i_sticker_printer.h"
+#include "configurable_object.h"
+#include "loggable_object.h"
+#include "named_object.h"
 
-class TE310Printer : public AbstractStickerPrinter {
+class TE310Printer final : public NamedObject,
+                           public IStickerPrinter,
+                           public ConfigurableObject,
+                           public LoggableObject {
   Q_OBJECT
 
  private:
@@ -40,9 +47,11 @@ class TE310Printer : public AbstractStickerPrinter {
 
  public:
   explicit TE310Printer(const QString& name);
+  ~TE310Printer() = default;
 
+  // IStickerPrinter interface
+ public slots:
   virtual ReturnStatus checkConfig(void) override;
-  virtual StickerPrinterType type(void) override;
 
   virtual ReturnStatus printTransponderSticker(
       const StringDictionary& param) override;
@@ -57,19 +66,18 @@ class TE310Printer : public AbstractStickerPrinter {
 
   virtual ReturnStatus exec(const QStringList& commandScript) override;
 
-  virtual void applySetting(void) override;
-
  private:
   Q_DISABLE_COPY_MOVE(TE310Printer);
-  void loadSetting(void);
-  void sendLog(const QString& log);
 
+ private:
+  virtual void loadSettings(void) override;
+  void doLoadSettings(void);
   void loadTscLib(void);
 
+ private:
   bool initConnection(void);
-
   void printNkdSticker(const StringDictionary& param);
-  void printZsdSticker(const StringDictionary& param);
+  void printMssSticker(const StringDictionary& param);
 };
 
 #endif  // TE310PRINTER_H

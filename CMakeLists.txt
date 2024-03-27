@@ -70,7 +70,11 @@ add_executable(PersoClient WIN32
     Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
     Management/Managers/production_manager.h Management/Managers/production_manager.cpp
     Management/Managers/programmer_manager.h Management/Managers/programmer_manager.cpp
-    Management/Managers/sticker_printer_manager.h Management/Managers/sticker_printer_manager.cpp
+    Management/AsyncWrappers/programmer_async_wrapper.cpp Management/AsyncWrappers/programmer_async_wrapper.h
+    Management/AsyncWrappers/progressable_async_wrapper.cpp Management/AsyncWrappers/progressable_async_wrapper.h
+    Management/AsyncWrappers/server_connection_async_wrapper.cpp Management/AsyncWrappers/server_connection_async_wrapper.h
+    Management/AsyncWrappers/sticker_printer_async_wrapper.cpp Management/AsyncWrappers/sticker_printer_async_wrapper.h
+    Management/AsyncWrappers/production_line_manager_async_wrapper.cpp Management/AsyncWrappers/production_line_manager_async_wrapper.h
 
     GUI/gui_kernel.cpp GUI/gui_kernel.h
 
@@ -83,6 +87,9 @@ add_executable(PersoClient WIN32
     GUI/Subkernels/production_gui_subkernel.h GUI/Subkernels/production_gui_subkernel.cpp
     GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
     GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
+    GUI/Subkernels/assembly_unit_gui_subkernel.cpp GUI/Subkernels/assembly_unit_gui_subkernel.h
+    GUI/Subkernels/server_connection_gui_subkernel.cpp GUI/Subkernels/server_connection_gui_subkernel.h
+    GUI/Subkernels/authorization_gui_subkernel.h GUI/Subkernels/authorization_gui_subkernel.cpp
 
     GUI/Dialogs/authorization_dialog.cpp GUI/Dialogs/authorization_dialog.h
     GUI/Dialogs/master_password_input_dialog.cpp GUI/Dialogs/master_password_input_dialog.h
@@ -96,14 +103,16 @@ add_executable(PersoClient WIN32
     GUI/Reactions/i_status_indicator.h GUI/Reactions/i_status_indicator.cpp
     GUI/Reactions/status_indicator.h GUI/Reactions/status_indicator.cpp
 
-    Programmers/abstract_programmer.cpp Programmers/abstract_programmer.h
+    Programmers/i_programmer.cpp Programmers/i_programmer.h
     Programmers/jlink_exe_programmer.cpp Programmers/jlink_exe_programmer.h
+    Programmers/transponder_firmware.h Programmers/transponder_firmware.cpp
+    Programmers/transponder_user_data.h Programmers/transponder_user_data.cpp
 
-    StickerPrinter/abstract_sticker_printer.cpp StickerPrinter/abstract_sticker_printer.h
+    StickerPrinter/i_sticker_printer.cpp StickerPrinter/i_sticker_printer.h
     StickerPrinter/te310_printer.cpp StickerPrinter/te310_printer.h
 
     ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
-    ServerConnection/abstract_server_connection.h ServerConnection/abstract_server_connection.cpp
+    ServerConnection/i_server_connection.h ServerConnection/i_server_connection.cpp
     ServerConnection/Commands/abstract_client_command.h ServerConnection/Commands/abstract_client_command.cpp
     ServerConnection/Commands/echo.h ServerConnection/Commands/echo.cpp
     ServerConnection/Commands/release_transponder.h ServerConnection/Commands/release_transponder.cpp
@@ -126,7 +135,6 @@ add_executable(PersoClient WIN32
     ServerConnection/Commands/get_production_line_data.h ServerConnection/Commands/get_production_line_data.cpp
 
     main.cpp
-    GUI/Subkernels/AuthorizationGuiSubkernel.h GUI/Subkernels/AuthorizationGuiSubkernel.cpp
     )
 
 target_link_libraries(PersoClient PRIVATE

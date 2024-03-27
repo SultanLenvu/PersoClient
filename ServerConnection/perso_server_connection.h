@@ -12,9 +12,15 @@
 #include <QTimer>
 
 #include "abstract_client_command.h"
-#include "abstract_server_connection.h"
+#include "i_server_connection.h"
+#include "configurable_object.h"
+#include "loggable_object.h"
+#include "named_object.h"
 
-class PersoServerConnection : public AbstractServerConnection {
+class PersoServerConnection final : public NamedObject,
+                                    public IServerConnection,
+                                    public LoggableObject,
+                                    public ConfigurableObject {
   Q_OBJECT
  public:
   enum CommandId {
@@ -64,7 +70,7 @@ class PersoServerConnection : public AbstractServerConnection {
   explicit PersoServerConnection(const QString& name);
   ~PersoServerConnection();
 
-  // AbstractServerConnection interface
+  // IServerConnection interface
  public:
   virtual ReturnStatus connect() override;
   virtual void disconnect() override;
@@ -73,23 +79,23 @@ class PersoServerConnection : public AbstractServerConnection {
 
   virtual ReturnStatus launchProductionLine(const StringDictionary& param) override;
   virtual ReturnStatus shutdownProductionLine() override;
-  virtual ReturnStatus getProductionLineData(StringDictionary& data) override;
+  virtual ReturnStatus getProductionLineData(StringDictionary data) override;
 
   virtual ReturnStatus requestBox(void) override;
-  virtual ReturnStatus getCurrentBoxData(StringDictionary& result) override;
+  virtual ReturnStatus getCurrentBoxData(StringDictionary result) override;
   virtual ReturnStatus completeCurrentBox(void) override;
   virtual ReturnStatus refundCurrentBox(void) override;
 
   virtual ReturnStatus getCurrentTransponderData(
-      StringDictionary& result) override;
+      StringDictionary result) override;
   virtual ReturnStatus getTransponderData(const StringDictionary& param,
-                                          StringDictionary& result) override;
+                                          StringDictionary result) override;
 
-  virtual ReturnStatus releaseTransponder(StringDictionary& result) override;
+  virtual ReturnStatus releaseTransponder(StringDictionary result) override;
   virtual ReturnStatus confirmTransponderRelease(
       const StringDictionary& param) override;
   virtual ReturnStatus rereleaseTransponder(const StringDictionary& param,
-                                            StringDictionary& result) override;
+                                            StringDictionary result) override;
   virtual ReturnStatus confirmTransponderRerelease(
       const StringDictionary& param) override;
   virtual ReturnStatus rollbackTransponder(void) override;
@@ -100,15 +106,17 @@ class PersoServerConnection : public AbstractServerConnection {
       const StringDictionary& param) override;
   virtual ReturnStatus printLastPalletSticker(void) override;
 
-  virtual void applySettings(void) override;
-
  private:
   Q_DISABLE_COPY_MOVE(PersoServerConnection)
-  void loadSettings(void);
-  void sendLog(const QString& log);
+  void connectDependencies(void);
 
+ private:
+  virtual void loadSettings(void) override;
+  void doLoadSettings(void);
+
+ private:
   ReturnStatus processCurrentCommand(const StringDictionary& param,
-                                     StringDictionary& result);
+                                     StringDictionary result);
   ReturnStatus transmitDataBlock(const QByteArray& dataBlock);
   bool waitResponse(void);
 
@@ -129,6 +137,7 @@ class PersoServerConnection : public AbstractServerConnection {
   void waitTimerTimeout_slot(void);
 
  signals:
+  void disconnected(void);
   void stopResponseWaiting(void);
 };
 
