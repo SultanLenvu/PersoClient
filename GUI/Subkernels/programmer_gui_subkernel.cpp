@@ -89,7 +89,7 @@ void ProgrammerGuiSubkernel::connectProgrammerManager() const {
   connect(this, &ProgrammerGuiSubkernel::readUserData_signal, manager,
           &ProgrammerManager::readUserData);
   connect(this, &ProgrammerGuiSubkernel::readUcid_signal, manager,
-          &ProgrammerManager::readUcid);
+          &ProgrammerManager::readTransponderUcid);
 
   connect(this, &ProgrammerGuiSubkernel::unlockMemory_signal, manager,
           &ProgrammerManager::unlockMemory);

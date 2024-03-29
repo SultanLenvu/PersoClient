@@ -1,15 +1,12 @@
 #include "production_line_manager_async_wrapper.h"
 
-ProductionLineManagerAsyncWrapper::ProductionLineManagerAsyncWrapper(
+AsyncProductionUnitManager::AsyncProductionUnitManager(
     const QString& name,
     std::shared_ptr<ISqlDatabase> database)
     : ProgressableAsyncWrapper{name},
       Manager(new ProductionLineManager("ProductionLineManager", database)) {}
 
-ProductionLineManagerAsyncWrapper::~ProductionLineManagerAsyncWrapper() {}
-
-void ProductionLineManagerAsyncWrapper::create(
-    const StringDictionary& param) {
+void AsyncProductionUnitManager::create(const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("create");
 
@@ -22,8 +19,7 @@ void ProductionLineManagerAsyncWrapper::create(
   completeOperation("create");
 }
 
-void ProductionLineManagerAsyncWrapper::activate(
-    const StringDictionary& param) {
+void AsyncProductionUnitManager::activate(const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("activate");
 
@@ -36,7 +32,7 @@ void ProductionLineManagerAsyncWrapper::activate(
   completeOperation("activate");
 }
 
-void ProductionLineManagerAsyncWrapper::activateAll() {
+void AsyncProductionUnitManager::activateAll() {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("activateAll");
 
@@ -49,8 +45,7 @@ void ProductionLineManagerAsyncWrapper::activateAll() {
   completeOperation("activateAll");
 }
 
-void ProductionLineManagerAsyncWrapper::deactivate(
-    const StringDictionary& param) {
+void AsyncProductionUnitManager::deactivate(const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("deactivate");
 
@@ -63,7 +58,7 @@ void ProductionLineManagerAsyncWrapper::deactivate(
   completeOperation("deactivate");
 }
 
-void ProductionLineManagerAsyncWrapper::deactivateAll() {
+void AsyncProductionUnitManager::deactivateAll() {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("deactivateAll");
 
@@ -76,8 +71,7 @@ void ProductionLineManagerAsyncWrapper::deactivateAll() {
   completeOperation("deactivateAll");
 }
 
-void ProductionLineManagerAsyncWrapper::edit(
-    const StringDictionary& param) {
+void AsyncProductionUnitManager::edit(const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("edit");
 
@@ -90,8 +84,7 @@ void ProductionLineManagerAsyncWrapper::edit(
   completeOperation("edit");
 }
 
-void ProductionLineManagerAsyncWrapper::remove(
-    const StringDictionary& param) {
+void AsyncProductionUnitManager::remove(const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
   initOperation("remove");
 

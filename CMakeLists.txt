@@ -65,16 +65,17 @@ add_executable(PersoClient WIN32
     Service/Log/log_system.cpp Service/Log/log_system.h
     Service/Log/widget_log_backend.cpp Service/Log/widget_log_backend.h
 
-    Management/AsyncWrappers/i_async_wrapper.h Management/AsyncWrappers/i_async_wrapper.cpp
-
     Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
     Management/Managers/production_manager.h Management/Managers/production_manager.cpp
-    Management/Managers/programmer_manager.h Management/Managers/programmer_manager.cpp
+    Management/Managers/authorization_manager.h Management/Managers/authorization_manager.cpp
+
+    Management/AsyncWrappers/i_async_wrapper.h Management/AsyncWrappers/i_async_wrapper.cpp
     Management/AsyncWrappers/programmer_async_wrapper.cpp Management/AsyncWrappers/programmer_async_wrapper.h
     Management/AsyncWrappers/progressable_async_wrapper.cpp Management/AsyncWrappers/progressable_async_wrapper.h
     Management/AsyncWrappers/server_connection_async_wrapper.cpp Management/AsyncWrappers/server_connection_async_wrapper.h
     Management/AsyncWrappers/sticker_printer_async_wrapper.cpp Management/AsyncWrappers/sticker_printer_async_wrapper.h
     Management/AsyncWrappers/production_line_manager_async_wrapper.cpp Management/AsyncWrappers/production_line_manager_async_wrapper.h
+    Management/AsyncWrappers/async_wrapper.h Management/AsyncWrappers/async_wrapper.cpp
 
     GUI/gui_kernel.cpp GUI/gui_kernel.h
 

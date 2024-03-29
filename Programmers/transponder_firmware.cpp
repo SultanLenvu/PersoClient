@@ -3,6 +3,10 @@
 #include <QFileInfo>
 #include "definitions.h"
 
+TransponderFirmware::TransponderFirmware() {
+  Data.reserve(TRANSPONDER_FIRMWARE_SIZE);
+}
+
 bool TransponderFirmware::setData(QByteArray& data) {
   if (data.size() != TRANSPONDER_FIRMWARE_SIZE) {
     return false;
@@ -15,10 +19,6 @@ bool TransponderFirmware::setData(QByteArray& data) {
 
 size_t TransponderFirmware::size() const {
   return Data.size();
-}
-
-bool TransponderFirmware::valid() const {
-  return Data.size() == TRANSPONDER_FIRMWARE_SIZE;
 }
 
 bool TransponderFirmware::writeToFile(const QString& fileName) const {
@@ -48,7 +48,6 @@ bool TransponderFirmware::readFromFile(const QString& fileName) {
     return false;
   }
 
-  Data.reserve(TRANSPONDER_FIRMWARE_SIZE);
   Data = file.readAll();
 
   return true;

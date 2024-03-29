@@ -1,21 +1,19 @@
 #ifndef PRODUCTIONLINEASYNCWRAPPER_H
 #define PRODUCTIONLINEASYNCWRAPPER_H
 
-#include "i_async_wrapper.h"
 #include "production_line_manager.h"
 #include "progressable_async_wrapper.h"
 
-class ProductionLineManagerAsyncWrapper final
-    : public ProgressableAsyncWrapper {
+class AsyncProductionUnitManager final : public ProgressableAsyncWrapper {
   Q_OBJECT
  private:
   std::unique_ptr<ProductionLineManager> Manager;
 
  public:
-  Q_INVOKABLE explicit ProductionLineManagerAsyncWrapper(
+  Q_INVOKABLE explicit AsyncProductionUnitManager(
       const QString& name,
       std::shared_ptr<ISqlDatabase> database);
-  ~ProductionLineManagerAsyncWrapper();
+  ~AsyncProductionUnitManager() = default;
 
   // Own
  public slots:
@@ -31,7 +29,7 @@ class ProductionLineManagerAsyncWrapper final
   void remove(const StringDictionary& param);
 
  private:
-  Q_DISABLE_COPY_MOVE(ProductionLineManagerAsyncWrapper)
+  Q_DISABLE_COPY_MOVE(AsyncProductionUnitManager)
 };
 
 #endif // PRODUCTIONLINEASYNCWRAPPER_H

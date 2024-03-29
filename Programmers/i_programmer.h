@@ -18,16 +18,16 @@ class IProgrammer {
  public:
   virtual ReturnStatus checkConfig(void) = 0;
 
-  virtual ReturnStatus programMemory(TransponderFirmware& firmware) = 0;
+  virtual ReturnStatus programMemory(const TransponderFirmware& firmware) = 0;
   virtual ReturnStatus programMemoryWithUnlock(
-      TransponderFirmware& firmware) = 0;
-  virtual ReturnStatus readMemory(void) = 0;
+      const TransponderFirmware& firmware) = 0;
+  virtual ReturnStatus readMemory(TransponderFirmware& data) = 0;
   virtual ReturnStatus eraseMemory(void) = 0;
 
-  virtual ReturnStatus programUserData(TransponderUserData& data) = 0;
-  virtual ReturnStatus readUserData(void) = 0;
+  virtual ReturnStatus programUserData(const TransponderUserData& data) = 0;
+  virtual ReturnStatus readUserData(TransponderUserData& data) = 0;
 
-  virtual ReturnStatus readUcid(QString& ucid) = 0;
+  virtual ReturnStatus readTransponderUcid(QString& ucid) = 0;
 
   virtual ReturnStatus unlockMemory(void) = 0;
   virtual ReturnStatus lockMemory(void) = 0;

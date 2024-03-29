@@ -9,12 +9,11 @@ class TransponderFirmware {
   QByteArray Data;
 
  public:
-  explicit TransponderFirmware() = default;
+  explicit TransponderFirmware();
   ~TransponderFirmware() = default;
 
  public:
   size_t size(void) const;
-  bool valid(void) const;
   bool writeToFile(const QString& fileName) const;
 
  public:

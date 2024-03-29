@@ -277,15 +277,6 @@ void ServerConnectionAsyncWrapper::printLastPalletSticker() {
   completeOperation("printLastPalletSticker");
 }
 
-ReturnStatus ServerConnectionAsyncWrapper::checkConfig() {
-  sendLog("Проверка конфигурации.");
-
-  ReturnStatus ret = ReturnStatus::NoError;
-
-  sendLog("Проверка конфигурации успешно завершена.");
-  return ret;
-}
-
 void ServerConnectionAsyncWrapper::connectDependecies() {
   AssemblyUnitGuiSubkernel* augs =
       GlobalEnvironment::instance()->getObject<AssemblyUnitGuiSubkernel>(

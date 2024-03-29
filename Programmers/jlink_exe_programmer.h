@@ -29,16 +29,18 @@ class JLinkExeProgrammer : public NamedObject,
 
  public:  // IProgrammer interface
   virtual ReturnStatus checkConfig(void) override;
-  virtual ReturnStatus programMemory(TransponderFirmware& firmware) override;
+  virtual ReturnStatus programMemory(
+      const TransponderFirmware& firmware) override;
   virtual ReturnStatus programMemoryWithUnlock(
-      TransponderFirmware& firmware) override;
-  virtual ReturnStatus readMemory(void) override;
+      const TransponderFirmware& firmware) override;
+  virtual ReturnStatus readMemory(TransponderFirmware& data) override;
   virtual ReturnStatus eraseMemory(void) override;
 
-  virtual ReturnStatus readUserData(void) override;
-  virtual ReturnStatus programUserData(TransponderUserData& data) override;
+  virtual ReturnStatus readUserData(TransponderUserData& data) override;
+  virtual ReturnStatus programUserData(
+      const TransponderUserData& data) override;
 
-  virtual ReturnStatus readUcid(QString& ucid) override;
+  virtual ReturnStatus readTransponderUcid(QString& ucid) override;
 
   virtual ReturnStatus unlockMemory(void) override;
   virtual ReturnStatus lockMemory(void) override;

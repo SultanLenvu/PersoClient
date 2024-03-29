@@ -1,18 +1,24 @@
-#ifndef ProductionManager_H
-#define ProductionManager_H
+#ifndef PRODUCTIONUNITMANAGER_H
+#define PRODUCTIONUNITMANAGER_H
 
 #include <QFile>
 
 #include "abstract_manager.h"
 #include "i_programmer.h"
-#include "abstract_server_connection.h"
+#include "i_server_connection.h"
+#include "i_sticker_printer.h"
+#include "loggable_object.h"
+#include "named_object.h"
 
-class ProductionManager : public AbstractManager {
+class ProductionManager : public NamedObject,
+                          public AbstractManager,
+                          public LoggableObject {
   Q_OBJECT
 
- private:  
-  std::unique_ptr<AbstractServerConnection> Server;
-  std::unique_ptr<IProgrammer> Programmer;
+ private:
+  std::shared_ptr<IServerConnection> Server;
+  std::shared_ptr<IProgrammer> Programmer;
+  std::shared_ptr<IStickerPrinter> StickerPrinter;
 
   std::unique_ptr<QFile> Firmware;
 
@@ -21,65 +27,28 @@ class ProductionManager : public AbstractManager {
   StringDictionary TransponderData;
 
  public:
-  explicit ProductionManager(const QString& name);
-  ~ProductionManager();
-
-  // AbstractManager interface
- public:
-  virtual void onInstanceThreadStarted(void) override;
-  virtual Type type() const override;
-  virtual void applySettings(void) override;
+  explicit ProductionManager(const QString& name,
+                             std::shared_ptr<IServerConnection> server,
+                             std::shared_ptr<IStickerPrinter> stickerPrinter,
+                             std::shared_ptr<IProgrammer> programmer);
+  ~ProductionManager() = default;
 
  public:
-  void connectToServer(void);
-  void disconnectFromServer(void);
-  void launchProductionLine(const std::shared_ptr<StringDictionary> param);
-  void shutdownProductionLine(void);
-  void getProductionLineData(void);
+  StringDictionary& productionLineData(void);
+  StringDictionary& boxData(void);
+  StringDictionary& transponderData(void);
 
-  void logOnServer(const std::shared_ptr<StringDictionary> param);
-  void logOutServer(void);
-  void echoServer(void);
+ public:
+  ReturnStatus requestBox(void);
+  ReturnStatus refundCurrentBox(void);
+  ReturnStatus completeCurrentBox(void);
 
-  void requestBox(void);
-  void getCurrentBoxData(void);
-  void refundCurrentBox(void);
-  void completeCurrentBox(void);
-
-  void releaseTransponder(void);
-  void rereleaseTransponder(const std::shared_ptr<StringDictionary> param);
-  void rollbackTransponder(void);
-  void getCurrentTransponderData(void);
-  void getTransponderData(const std::shared_ptr<StringDictionary> param);
-
-  void printBoxSticker(const std::shared_ptr<StringDictionary> param);
-  void printLastBoxSticker(void);
-  void printPalletSticker(const std::shared_ptr<StringDictionary> param);
-  void printLastPalletSticker(void);
-
-  void onServerDisconnected(void);
+  ReturnStatus releaseTransponder(void);
+  ReturnStatus rereleaseTransponder(const StringDictionary& param);
+  ReturnStatus rollbackTransponder(void);
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionManager)
-  void loadSettings(void);
-  void sendLog(const QString& log);
-  ReturnStatus checkConfig(void);
-
-  void createProgrammer(void);
-  void createServerConnection(void);
-
-  void initOperation(const QString& name);
-  void processOperationError(const QString& name, ReturnStatus ret);
-  void completeOperation(const QString& name);
-
- signals:
-  void displayProductionLineData_signal(const StringDictionary& data);
-  void displayTransponderData_signal(const StringDictionary& data);
-  void displayBoxData_signal(const StringDictionary& data);
-  void authorizationCompleted(void);
-
-  void printTransponderSticker_signal(const StringDictionary& data,
-                                      ReturnStatus& ret);
 };
 
-#endif  // ProductionManager_H
+#endif  // PRODUCTIONUNITMANAGER_H

@@ -15,7 +15,7 @@ class ServerConnectionAsyncWrapper : public ProgressableAsyncWrapper {
   Q_INVOKABLE explicit ServerConnectionAsyncWrapper(const QString& name);
   ~ServerConnectionAsyncWrapper() = default;
 
- public:
+ public slots:
   void connect(void);
   void disconnect(void);
 
@@ -46,7 +46,6 @@ class ServerConnectionAsyncWrapper : public ProgressableAsyncWrapper {
 
  private:
   Q_DISABLE_COPY_MOVE(ServerConnectionAsyncWrapper)
-  ReturnStatus checkConfig(void);
   void connectDependecies(void);
 
  signals:

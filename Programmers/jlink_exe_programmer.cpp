@@ -184,7 +184,7 @@ ReturnStatus JLinkExeProgrammer::programUserData(TransponderUserData& data) {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus JLinkExeProgrammer::readUcid(QString& ucid) {
+ReturnStatus JLinkExeProgrammer::readTransponderUcid(QString& ucid) {
   sendLog(QString("Считывание UCID микроконтроллера."));
 
   QString ucidFileName;
