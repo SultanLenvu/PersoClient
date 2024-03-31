@@ -5,20 +5,6 @@ ProductionTesterGui::ProductionTesterGui(QWidget* parent)
   create();
 }
 
-ProductionTesterGui::~ProductionTesterGui() {}
-
-void ProductionTesterGui::updateModelViews() {
-  ProductionLineDataView->resizeColumnsToContents();
-  ProductionLineDataView->update();
-
-  TransponderDataView->resizeColumnsToContents();
-  TransponderDataView->update();
-}
-
-AbstractGui::GuiType ProductionTesterGui::type() {
-  return ProductionTester;
-}
-
 void ProductionTesterGui::create() {
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);

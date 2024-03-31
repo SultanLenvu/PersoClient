@@ -1,5 +1,5 @@
-#include "assembly_unit_gui_subkernel.h"
-#include "assembly_unit_manager_async_wrapper.h"
+#include "production_manager_subkernel.h"
+#include "async_production_manager.h"
 #include "authorization_dialog.h"
 #include "global_environment.h"
 
@@ -18,12 +18,12 @@ void AssemblyUnitGuiSubkernel::logOn() {
   }
   dialog.getData(param);
 
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit logOn_signal(param);
 }
 
 void AssemblyUnitGuiSubkernel::logOut() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit logOut_signal();
 }
 
@@ -98,12 +98,12 @@ void AssemblyUnitGuiSubkernel::createModels() {
 }
 
 void AssemblyUnitGuiSubkernel::connectDependecies() {
-  AssemblyUnitManagerAsyncWrapper* psm =
-      GlobalEnvironment::instance()->getObject<AssemblyUnitManagerAsyncWrapper>(
-          "AssemblyUnitManagerAsyncWrapper");
+  ProductionManagerAsyncWrapper* psm =
+      GlobalEnvironment::instance()->getObject<ProductionManagerAsyncWrapper>(
+          "ProductionManagerAsyncWrapper");
 
   QObject::connect(this, &AssemblyUnitGuiSubkernel::logOn_signal, psm,
-                   &AssemblyUnitManagerAsyncWrapper::logOn);
+                   &ProductionManagerAsyncWrapper::logOn);
   QObject::connect(this, &AssemblyUnitGuiSubkernel::logOut_signal, psm,
-                   &AssemblyUnitManagerAsyncWrapper::logOut);
+                   &ProductionManagerAsyncWrapper::logOut);
 }

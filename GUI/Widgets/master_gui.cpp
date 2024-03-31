@@ -6,23 +6,6 @@ MasterGui::MasterGui(QWidget* parent) : AbstractGui(parent) {
   create();
 }
 
-MasterGui::~MasterGui() {}
-
-void MasterGui::updateModelViews() {
-  ProductionLineDataView->resizeColumnsToContents();
-  ProductionLineDataView->update();
-
-  TransponderDataView->resizeColumnsToContents();
-  TransponderDataView->update();
-
-  BoxDataView->resizeColumnsToContents();
-  BoxDataView->update();
-}
-
-AbstractGui::GuiType MasterGui::type() {
-  return Master;
-}
-
 void MasterGui::create() {
   // Вкладки с всеми интерфейсами
   Tabs = new QTabWidget();

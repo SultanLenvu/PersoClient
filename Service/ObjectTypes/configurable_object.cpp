@@ -11,8 +11,9 @@ ConfigurableObject::ConfigurableObject() {
 SettingsApplyBundle::SettingsApplyBundle(ConfigurableObject* object) {
   Object = object;
 
-  ConfigurationManager* cum = static_cast<ConfigurationManager*>(
-      GlobalEnvironment::instance()->getObject("ConfigurationManager"));
+  ConfigurationManager* cum =
+      GlobalEnvironment::instance()->getObject<ConfigurationManager>(
+          "ConfigurationManager");
 
   connect(cum, &ConfigurationManager::applySettings_signal, this,
           &SettingsApplyBundle::apply);

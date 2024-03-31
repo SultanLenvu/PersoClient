@@ -5,8 +5,8 @@
 
 class AbstractManager {
  public:
-  explicit AbstractManager();
-  virtual ~AbstractManager();
+  explicit AbstractManager() = default;
+  virtual ~AbstractManager() = default;
 
  private:
   Q_DISABLE_COPY_MOVE(AbstractManager);

@@ -79,23 +79,23 @@ class PersoServerConnection final : public NamedObject,
 
   virtual ReturnStatus launchProductionLine(const StringDictionary& param) override;
   virtual ReturnStatus shutdownProductionLine() override;
-  virtual ReturnStatus getProductionLineData(StringDictionary data) override;
+  virtual ReturnStatus getProductionLineData(StringDictionary& data) override;
 
   virtual ReturnStatus requestBox(void) override;
-  virtual ReturnStatus getCurrentBoxData(StringDictionary result) override;
+  virtual ReturnStatus getCurrentBoxData(StringDictionary& result) override;
   virtual ReturnStatus completeCurrentBox(void) override;
   virtual ReturnStatus refundCurrentBox(void) override;
 
   virtual ReturnStatus getCurrentTransponderData(
-      StringDictionary result) override;
+      StringDictionary& result) override;
   virtual ReturnStatus getTransponderData(const StringDictionary& param,
-                                          StringDictionary result) override;
+                                          StringDictionary& result) override;
 
-  virtual ReturnStatus releaseTransponder(StringDictionary result) override;
+  virtual ReturnStatus releaseTransponder(StringDictionary& result) override;
   virtual ReturnStatus confirmTransponderRelease(
       const StringDictionary& param) override;
   virtual ReturnStatus rereleaseTransponder(const StringDictionary& param,
-                                            StringDictionary result) override;
+                                            StringDictionary& result) override;
   virtual ReturnStatus confirmTransponderRerelease(
       const StringDictionary& param) override;
   virtual ReturnStatus rollbackTransponder(void) override;

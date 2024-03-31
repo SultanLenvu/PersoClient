@@ -6,8 +6,6 @@
 #include <QObject>
 #include <QString>
 
-#include "transponder_firmware.h"
-#include "transponder_user_data.h"
 #include "types.h"
 
 class IProgrammer {
@@ -18,14 +16,13 @@ class IProgrammer {
  public:
   virtual ReturnStatus checkConfig(void) = 0;
 
-  virtual ReturnStatus programMemory(const TransponderFirmware& firmware) = 0;
-  virtual ReturnStatus programMemoryWithUnlock(
-      const TransponderFirmware& firmware) = 0;
-  virtual ReturnStatus readMemory(TransponderFirmware& data) = 0;
+  virtual ReturnStatus programMemory(const QByteArray& data) = 0;
+  virtual ReturnStatus programMemoryWithUnlock(const QByteArray& data) = 0;
+  virtual ReturnStatus readMemory(QByteArray& data) = 0;
   virtual ReturnStatus eraseMemory(void) = 0;
 
-  virtual ReturnStatus programUserData(const TransponderUserData& data) = 0;
-  virtual ReturnStatus readUserData(TransponderUserData& data) = 0;
+  virtual ReturnStatus programUserData(const QByteArray& data) = 0;
+  virtual ReturnStatus readUserData(QByteArray& data) = 0;
 
   virtual ReturnStatus readTransponderUcid(QString& ucid) = 0;
 

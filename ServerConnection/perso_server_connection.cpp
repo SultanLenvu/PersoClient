@@ -106,7 +106,7 @@ ReturnStatus PersoServerConnection::shutdownProductionLine() {
 }
 
 ReturnStatus PersoServerConnection::getProductionLineData(
-    StringDictionary data) {
+    StringDictionary& data) {
   CurrentCommand = Commands.at(GetProductionLineData);
 
   StringDictionary param;
@@ -125,7 +125,7 @@ ReturnStatus PersoServerConnection::requestBox() {
 }
 
 ReturnStatus PersoServerConnection::getCurrentBoxData(
-    StringDictionary result) {
+    StringDictionary& result) {
   CurrentCommand = Commands.at(GetCurrentBoxData);
 
   StringDictionary param;
@@ -163,7 +163,7 @@ ReturnStatus PersoServerConnection::getCurrentTransponderData(
 
 ReturnStatus PersoServerConnection::getTransponderData(
     const StringDictionary& param,
-    StringDictionary result) {
+    StringDictionary& result) {
   CurrentCommand = Commands.at(GetTransponderData);
 
   ReturnStatus ret = processCurrentCommand(param, result);
@@ -172,7 +172,7 @@ ReturnStatus PersoServerConnection::getTransponderData(
 }
 
 ReturnStatus PersoServerConnection::releaseTransponder(
-    StringDictionary result) {
+    StringDictionary& result) {
   CurrentCommand = Commands.at(ReleaseTransponder);
 
   StringDictionary param;
@@ -193,7 +193,7 @@ ReturnStatus PersoServerConnection::confirmTransponderRelease(
 
 ReturnStatus PersoServerConnection::rereleaseTransponder(
     const StringDictionary& param,
-    StringDictionary result) {
+    StringDictionary& result) {
   CurrentCommand = Commands.at(RereleaseTransponder);
 
   ReturnStatus ret = processCurrentCommand(param, result);

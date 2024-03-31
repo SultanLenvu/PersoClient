@@ -20,8 +20,6 @@ class ProductionManager : public NamedObject,
   std::shared_ptr<IProgrammer> Programmer;
   std::shared_ptr<IStickerPrinter> StickerPrinter;
 
-  std::unique_ptr<QFile> Firmware;
-
   StringDictionary ProductionLineData;
   StringDictionary BoxData;
   StringDictionary TransponderData;
@@ -39,6 +37,9 @@ class ProductionManager : public NamedObject,
   StringDictionary& transponderData(void);
 
  public:
+  ReturnStatus logOn(const StringDictionary& param);
+  ReturnStatus logOut(void);
+
   ReturnStatus requestBox(void);
   ReturnStatus refundCurrentBox(void);
   ReturnStatus completeCurrentBox(void);

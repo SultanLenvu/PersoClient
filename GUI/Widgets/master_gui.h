@@ -1,9 +1,9 @@
 #ifndef MASTER_GUI_H
 #define MASTER_GUI_H
 
-#include "abstract_gui.h"
+#include <QtWidgets>
 
-class MasterGui : public AbstractGui {
+class MasterGui final : public QWidget {
  public:
   QTabWidget* Tabs;
 
@@ -100,13 +100,10 @@ class MasterGui : public AbstractGui {
 
  public:
   explicit MasterGui(QWidget* parent);
-  ~MasterGui();
-
-  virtual void updateModelViews(void) override;
-  virtual GuiType type(void) override;
+  ~MasterGui() = default;
 
  private:
-  Q_DISABLE_COPY(MasterGui);
+  Q_DISABLE_COPY_MOVE(MasterGui);
   void create(void);
   void createServerTab(void);
   void createServerTabViews(void);

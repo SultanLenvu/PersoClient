@@ -1,4 +1,6 @@
 #include <QApplication>
+#include <QFile>
+#include <QSettings>
 #include <QTemporaryDir>
 
 #include "jlink_exe_programmer.h"
@@ -23,17 +25,25 @@ ReturnStatus JLinkExeProgrammer::checkConfig() {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus JLinkExeProgrammer::programMemory(TransponderFirmware& firmware) {
+ReturnStatus JLinkExeProgrammer::programMemory(const QByteArray& data) {
   sendLog(QString("Загрузка прошивки."));
 
-  // Проверка корректности присланной прошивки
-  if (!firmware.valid()) {
-    sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
-    return ReturnStatus::InvalidFirmwareFile;
+  QString fileName =
+      QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME);
+  QFile tempFile(fileName);
+  if (tempFile.open(QIODevice::WriteOnly)) {
+    sendLog(
+        "Не удалось открыть временный файл с данными для загрузки в память.");
+    return ReturnStatus::FileOpenError;
   }
+  qint64 bytesWritten = tempFile.write(data);
+  tempFile.close();
 
-  QString fileName(TRANSPONDER_FIRMWARE_FILE_NAME);
-  firmware.writeToFile(fileName);
+  if (bytesWritten != data.size()) {
+    sendLog(
+        "Не удалось сохранить данные в временный файл для загрузки в память.");
+    return ReturnStatus::FileWriteError;
+  }
 
   // Формируем скрипт JLink
   initScript();
@@ -44,7 +54,14 @@ ReturnStatus JLinkExeProgrammer::programMemory(TransponderFirmware& firmware) {
       QString("LoadFile %1, 0x08000000\n").arg(fileName).toUtf8());
 
   // Запускаем выполнение скрипта JLink
-  if (!executeJLinkScript()) {
+  bool ok = executeJLinkScript();
+
+  if (!tempFile.remove()) {
+    sendLog(
+        "Не удалось удалить временный файл с данными для загрузки в память.");
+  }
+
+  if (!ok) {
     return ReturnStatus::ProgrammatorCommandScriptError;
   }
 
@@ -52,17 +69,25 @@ ReturnStatus JLinkExeProgrammer::programMemory(TransponderFirmware& firmware) {
 }
 
 ReturnStatus JLinkExeProgrammer::programMemoryWithUnlock(
-    TransponderFirmware& firmware) {
+    const QByteArray& data) {
   sendLog(QString("Разблокировка памяти и загрузка прошивки."));
 
-  // Проверка корректности присланной прошивки
-  if (!firmware.valid()) {
-    sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
-    return ReturnStatus::InvalidFirmwareFile;
+  QString fileName =
+      QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME);
+  QFile tempFile(fileName);
+  if (tempFile.open(QIODevice::WriteOnly)) {
+    sendLog(
+        "Не удалось открыть временный файл с данными для загрузки в память.");
+    return ReturnStatus::FileOpenError;
   }
+  qint64 bytesWritten = tempFile.write(data);
+  tempFile.close();
 
-  QString fileName(TRANSPONDER_FIRMWARE_FILE_NAME);
-  firmware.writeToFile(fileName);
+  if (bytesWritten != data.size()) {
+    sendLog(
+        "Не удалось сохранить данные в временный файл для загрузки в память.");
+    return ReturnStatus::FileWriteError;
+  }
 
   // Формируем скрипт JLink
   initScript();
@@ -87,18 +112,25 @@ ReturnStatus JLinkExeProgrammer::programMemoryWithUnlock(
       QString("LoadFile %1, 0x08000000\n").arg(fileName).toUtf8());
 
   // Запускаем выполнение скрипта JLink
-  executeJLinkScript();
+  bool ok = executeJLinkScript();
 
-  // Запускаем выполнение скрипта JLink
-  if (!executeJLinkScript()) {
+  if (!tempFile.remove()) {
+    sendLog(
+        "Не удалось удалить временный файл с данными для загрузки в память.");
+  }
+
+  if (!ok) {
     return ReturnStatus::ProgrammatorCommandScriptError;
   }
 
   return ReturnStatus::NoError;
 }
 
-ReturnStatus JLinkExeProgrammer::readMemory(void) {
+ReturnStatus JLinkExeProgrammer::readMemory(QByteArray& data) {
   sendLog(QString("Считывание прошивки."));
+
+  QString fileName =
+      QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME);
 
   // Формируем скрипт JLink
   initScript();
@@ -112,6 +144,20 @@ ReturnStatus JLinkExeProgrammer::readMemory(void) {
   // Запускаем выполнение скрипта JLink
   if (!executeJLinkScript()) {
     return ReturnStatus::ProgrammatorCommandScriptError;
+  }
+
+  // Считываем данные из файла
+  QFile tempFile(fileName);
+  if (!tempFile.open(QIODevice::ReadOnly)) {
+    sendLog("Не удалось открыть временный файл.");
+    return ReturnStatus::FileOpenError;
+  }
+
+  data.reserve(tempFile.size());
+  data = tempFile.readAll();
+  if (!tempFile.remove()) {
+    sendLog(
+        "Не удалось удалить временный файл с данными, считанными из памяти.");
   }
 
   return ReturnStatus::NoError;
@@ -132,14 +178,17 @@ ReturnStatus JLinkExeProgrammer::eraseMemory() {
   return ReturnStatus::NoError;
 }
 
-ReturnStatus JLinkExeProgrammer::readUserData(void) {
+ReturnStatus JLinkExeProgrammer::readUserData(QByteArray& data) {
   sendLog(QString("Чтение пользовательских данных."));
+
+  QString fileName =
+      QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME);
 
   // Формируем скрипт JLink
   initScript();
   // Считываем часть flash-памяти, в которой хранятся пользовательские данные
-  JLinkScript->write(QString("savebin saved_user_data.bin, %1, %2\n")
-                         .arg(TRANSPONDER_USER_DATA_START_ADDRESS,
+  JLinkScript->write(QString("savebin %1, %2, %3\n")
+                         .arg(fileName, TRANSPONDER_USER_DATA_START_ADDRESS,
                               QString::number(TRANSPONDER_USER_DATA_SIZE))
                          .toUtf8());
 
@@ -148,20 +197,42 @@ ReturnStatus JLinkExeProgrammer::readUserData(void) {
     return ReturnStatus::ProgrammatorCommandScriptError;
   }
 
+  // Считываем данные из файла
+  QFile tempFile(fileName);
+  if (!tempFile.open(QIODevice::ReadOnly)) {
+    sendLog("Не удалось открыть временный файл.");
+    return ReturnStatus::FileOpenError;
+  }
+
+  data.reserve(tempFile.size());
+  data = tempFile.readAll();
+  if (!tempFile.remove()) {
+    sendLog(
+        "Не удалось удалить временный файл с данными, считанными из памяти.");
+  }
+
   return ReturnStatus::NoError;
 }
 
-ReturnStatus JLinkExeProgrammer::programUserData(TransponderUserData& data) {
+ReturnStatus JLinkExeProgrammer::programUserData(const QByteArray& data) {
   sendLog(QString("Запись пользовательских данных."));
 
-  // Проверка корректности
-  if (!data.valid()) {
-    sendLog(QString("Получен некорректный файл прошивки. Сброс. "));
-    return ReturnStatus::InvalidFirmwareFile;
+  QString fileName =
+      QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME);
+  QFile tempFile(fileName);
+  if (tempFile.open(QIODevice::WriteOnly)) {
+    sendLog(
+        "Не удалось открыть временный файл с данными для загрузки в память.");
+    return ReturnStatus::FileOpenError;
   }
+  qint64 bytesWritten = tempFile.write(data);
+  tempFile.close();
 
-  QString fileName("user_data.bin");
-  data.writeToFile(fileName);
+  if (bytesWritten != data.size()) {
+    sendLog(
+        "Не удалось сохранить данные в временный файл для загрузки в память.");
+    return ReturnStatus::FileWriteError;
+  }
 
   // Формируем скрипт JLink
   initScript();
@@ -177,7 +248,14 @@ ReturnStatus JLinkExeProgrammer::programUserData(TransponderUserData& data) {
                          .toUtf8());
 
   // Запускаем выполнение скрипта JLink
-  if (!executeJLinkScript()) {
+  bool ok = executeJLinkScript();
+
+  if (!tempFile.remove()) {
+    sendLog(
+        "Не удалось удалить временный файл с данными для загрузки в память.");
+  }
+
+  if (!ok) {
     return ReturnStatus::ProgrammatorCommandScriptError;
   }
 

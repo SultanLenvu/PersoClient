@@ -4,7 +4,7 @@
 #include <QTableView>
 #include <QtWidgets>
 
-class ProductionAssemblerGui : public QWidget {
+class ProductionAssemblerGui final : public QWidget {
  public:
   QHBoxLayout* MainLayout;
 

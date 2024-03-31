@@ -1,5 +1,5 @@
 #include "server_connection_async_wrapper.h"
-#include "assembly_unit_gui_subkernel.h"
+#include "production_manager_subkernel.h"
 #include "global_environment.h"
 #include "perso_server_connection.h"
 

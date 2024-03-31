@@ -3,47 +3,10 @@
 #include "master_gui.h"
 #include "production_assembler_gui.h"
 #include "production_tester_gui.h"
-#include "sticker_printer_manager.h"
+#include "sticker_printer_async_wrapper.h"
 
 StickerPrinterGuiSubkernel::StickerPrinterGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel{name} {}
-
-StickerPrinterGuiSubkernel::~StickerPrinterGuiSubkernel() {}
-
-void StickerPrinterGuiSubkernel::connectGui(AbstractGui* gui) {
-  CurrentGui = gui;
-
-  switch (CurrentGui->type()) {
-    case AbstractGui::Authorization:
-      connectAuthorizationGui();
-      break;
-    case AbstractGui::Master:
-      connectMasterGui();
-      break;
-    case AbstractGui::ProductionAssembler:
-      connectProductionAssemblerGui();
-      break;
-    case AbstractGui::ProductionTester:
-      connectProductionTesterGui();
-      break;
-    default:
-      break;
-  }
-}
-
-void StickerPrinterGuiSubkernel::connectManager(
-    std::shared_ptr<AbstractManager> manager) {
-  if (manager->type() != AbstractManager::StickerPrinter) {
-    return;
-  }
-
-  Manager = manager;
-  connectStickerPrinterManager();
-}
-
-void StickerPrinterGuiSubkernel::reset() {
-  Manager.reset();
-}
 
 void StickerPrinterGuiSubkernel::connectAuthorizationGui() {}
 

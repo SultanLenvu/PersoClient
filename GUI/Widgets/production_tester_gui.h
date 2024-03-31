@@ -1,9 +1,9 @@
 #ifndef PRODUCTION_TESTER_GUI_H
 #define PRODUCTION_TESTER_GUI_H
 
-#include "abstract_gui.h"
+#include <QtWidgets>
 
-class ProductionTesterGui : public AbstractGui {
+class ProductionTesterGui final : public QWidget {
  public:
   QVBoxLayout* ControlPanelLayout;
 
@@ -37,10 +37,7 @@ class ProductionTesterGui : public AbstractGui {
 
  public:
   explicit ProductionTesterGui(QWidget* parent);
-  ~ProductionTesterGui();
-
-  virtual void updateModelViews(void) override;
-  virtual GuiType type(void) override;
+  ~ProductionTesterGui() = default;
 
  private:
   Q_DISABLE_COPY_MOVE(ProductionTesterGui);

@@ -11,6 +11,7 @@ enum class ReturnStatus {
   SyntaxError,
   ConsistencyViolation,
   FileOpenError,
+  FileWriteError,
 
   ServerConnectionError,
   ServerConnectionMissed,

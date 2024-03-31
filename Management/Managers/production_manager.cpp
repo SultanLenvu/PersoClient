@@ -25,6 +25,36 @@ StringDictionary& ProductionManager::transponderData() {
   return TransponderData;
 }
 
+ReturnStatus ProductionManager::logOn(const StringDictionary& param) {
+  ReturnStatus ret = ReturnStatus::NoError;
+
+  ret = Server->connect();
+  if (ret != ReturnStatus::NoError) {
+    return ret;
+  }
+
+  ret = Server->launchProductionLine(param);
+  if (ret != ReturnStatus::NoError) {
+    return ret;
+  }
+
+  ret = Server->getProductionLineData(ProductionLineData);
+  if (ret != ReturnStatus::NoError) {
+    return ret;
+  }
+
+  return ReturnStatus::NoError;
+}
+
+ReturnStatus ProductionManager::logOut() {
+  if (Server->isConnected()) {
+    Server->shutdownProductionLine();
+    Server->disconnect();
+  }
+
+  return ReturnStatus::NoError;
+}
+
 ReturnStatus ProductionManager::requestBox() {
   ReturnStatus ret = ReturnStatus::NoError;
 
@@ -89,8 +119,7 @@ ReturnStatus ProductionManager::completeCurrentBox() {
 ReturnStatus ProductionManager::releaseTransponder() {
   ReturnStatus ret = ReturnStatus::NoError;
   QString ucid;
-  QFile firmware(
-      QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME));
+  QByteArray firmware;
   StringDictionary result;
   StringDictionary param;
 
@@ -115,15 +144,13 @@ ReturnStatus ProductionManager::releaseTransponder() {
   }
   sendLog(QString("Транспондер выпущен."));
 
-  // Сохраняем присланный файл прошивки
-  if (!firmware.open(QIODevice::WriteOnly)) {
-    return ReturnStatus::FileOpenError;
+  firmware =
+      QByteArray::fromBase64(result.value("transponder_firmware").toUtf8());
+  // Проверка корректности присланной прошивки
+  if (firmware.size() != TRANSPONDER_FIRMWARE_SIZE) {
+    sendLog(QString("Получен некорректный файл прошивки. "));
+    return ReturnStatus::InvalidFirmwareFile;
   }
-
-  // Сохраняем прошивку в файл
-  firmware.write(
-      QByteArray::fromBase64(result.value("transponder_firmware").toUtf8()));
-  firmware.close();
   sendLog(QString("Прошивка транспондера получена."));
 
   // Загружаем прошивку
@@ -132,9 +159,6 @@ ReturnStatus ProductionManager::releaseTransponder() {
     return ret;
   }
   sendLog(QString("Прошивка загружена в микроконтроллер."));
-
-  // Удаляем файл прошивки
-  firmware.remove();
 
   // Подтверждаем выпуск транспондера
   param.insert("transponder_ucid", ucid);
@@ -171,10 +195,9 @@ ReturnStatus ProductionManager::rereleaseTransponder(
     const StringDictionary& param) {
   sendLog("Выпуск транспондера. ");
 
-  ReturnStatus ret;
+  ReturnStatus ret = ReturnStatus::NoError;
   QString ucid;
-  QFile firmware(
-      QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME));
+  QByteArray firmware;
   StringDictionary result;
   StringDictionary requestParam;
 
@@ -197,25 +220,20 @@ ReturnStatus ProductionManager::rereleaseTransponder(
     return ret;
   }
 
-  // Сохраняем присланный файл прошивки
-  if (!firmware.open(QIODevice::WriteOnly)) {
-    sendLog("Не удалось сохранить файл прошивки. ");
-    return ReturnStatus::FileOpenError;
+  firmware =
+      QByteArray::fromBase64(result.value("transponder_firmware").toUtf8());
+  // Проверка корректности присланной прошивки
+  if (firmware.size() != TRANSPONDER_FIRMWARE_SIZE) {
+    sendLog(QString("Получен некорректный файл прошивки. "));
+    return ReturnStatus::InvalidFirmwareFile;
   }
-
-  // Сохраняем прошивку в файл
-  firmware.write(
-      QByteArray::fromBase64(result.value("transponder_firmware").toUtf8()));
-  firmware.close();
+  sendLog(QString("Прошивка транспондера получена."));
 
   // Загружаем прошивку
   ret = Programmer->programMemory(firmware);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
-
-  // Удаляем файл прошивки
-  firmware.remove();
 
   // Подтверждаем перевыпуск транспондера
   requestParam.insert("transponder_ucid", ucid);
@@ -263,4 +281,6 @@ ReturnStatus ProductionManager::rollbackTransponder() {
       return ret;
     }
   }
+
+  return ReturnStatus::NoError;
 }
