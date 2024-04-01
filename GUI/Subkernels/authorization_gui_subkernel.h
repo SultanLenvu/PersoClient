@@ -9,10 +9,10 @@ class AuthorizationGuiSubkernel : public AbstractGuiSubkernel {
   explicit AuthorizationGuiSubkernel(const QString& name);
   ~AuthorizationGuiSubkernel() = default;
 
- private slots:
-  void logOn_guiSlot(void);
+ public slots:
+  void logOn(void);
 
- private slots:
+ public slots:
   void logOnCompleted_slot(void);
 
  private:

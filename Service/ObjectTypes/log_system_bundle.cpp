@@ -3,8 +3,8 @@
 #include "log_system.h"
 
 LogSystemBundle::LogSystemBundle() : QObject{nullptr} {
-  LogSystem* ls = static_cast<LogSystem*>(
-      GlobalEnvironment::instance()->getObject("LogSystem"));
+  LogSystem* ls =
+      GlobalEnvironment::instance()->getObject<LogSystem>("LogSystem");
 
   connect(this, &LogSystemBundle::logging, ls, &LogSystem::generate);
 }

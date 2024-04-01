@@ -8,7 +8,7 @@
 class AsynchronousObjectSpace final {
  private:
   QThread Thread;
-  std::vector<std::unique_ptr<IAsyncWrapper>> Managers;
+  std::vector<std::unique_ptr<IAsyncWrapper>> Wrappers;
 
  public:
   explicit AsynchronousObjectSpace();

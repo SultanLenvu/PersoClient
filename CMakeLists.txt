@@ -68,27 +68,28 @@ add_executable(PersoClient WIN32
     Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
     Management/Managers/production_manager.h Management/Managers/production_manager.cpp
 
-
     Management/AsyncWrappers/i_async_wrapper.h Management/AsyncWrappers/i_async_wrapper.cpp
-    Management/AsyncWrappers/programmer_async_wrapper.cpp Management/AsyncWrappers/programmer_async_wrapper.h
+    Management/AsyncWrappers/async_programmer.cpp Management/AsyncWrappers/async_programmer.h
     Management/AsyncWrappers/progressable_async_wrapper.cpp Management/AsyncWrappers/progressable_async_wrapper.h
-    Management/AsyncWrappers/server_connection_async_wrapper.cpp Management/AsyncWrappers/server_connection_async_wrapper.h
-    Management/AsyncWrappers/sticker_printer_async_wrapper.cpp Management/AsyncWrappers/sticker_printer_async_wrapper.h
+    Management/AsyncWrappers/async_server_connection.cpp Management/AsyncWrappers/async_server_connection.h
+    Management/AsyncWrappers/async_sticker_printer.cpp Management/AsyncWrappers/async_sticker_printer.h
     Management/AsyncWrappers/async_production_manager.cpp Management/AsyncWrappers/async_production_manager.h
     Management/AsyncWrappers/async_wrapper.h Management/AsyncWrappers/async_wrapper.cpp
 
     GUI/gui_kernel.cpp GUI/gui_kernel.h
 
-    GUI/Widgets/authorization_gui.cpp GUI/Widgets/authorization_gui.h
-    GUI/Widgets/master_gui.cpp GUI/Widgets/master_gui.h
-    GUI/Widgets/production_assembler_gui.cpp GUI/Widgets/production_assembler_gui.h
-    GUI/Widgets/production_tester_gui.cpp GUI/Widgets/production_tester_gui.h
+    GUI/Widgets/authorization_user_interface.cpp GUI/Widgets/authorization_user_interface.h
+    GUI/Widgets/master_user_interface.cpp GUI/Widgets/master_user_interface.h
+    GUI/Widgets/assembler_unit_user_interface.cpp GUI/Widgets/assembler_unit_user_interface.h
+    GUI/Widgets/tester_unit_user_interface.cpp GUI/Widgets/tester_unit_user_interface.h
+    GUI/Widgets/server_user_interface.cpp GUI/Widgets/server_user_interface.h
+    GUI/Widgets/abstract_user_interface.cpp GUI/Widgets/abstract_user_interface.h
 
     GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
-    GUI/Subkernels/production_gui_subkernel.h GUI/Subkernels/production_gui_subkernel.cpp
+
     GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
     GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
-    GUI/Subkernels/production_manager_subkernel.cpp GUI/Subkernels/production_manager_subkernel.h
+    GUI/Subkernels/production_manager_gui_subkernel.cpp GUI/Subkernels/production_manager_gui_subkernel.h
     GUI/Subkernels/server_connection_gui_subkernel.cpp GUI/Subkernels/server_connection_gui_subkernel.h
     GUI/Subkernels/authorization_gui_subkernel.h GUI/Subkernels/authorization_gui_subkernel.cpp
 

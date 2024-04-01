@@ -1,8 +1,7 @@
-#include "production_assembler_gui.h"
-#include "global_environment.h"
-#include "production_gui_subkernel.h"
+#include "assembler_unit_user_interface.h"
+#include "production_manager_gui_subkernel.h"
 
-ProductionAssemblerGui::ProductionAssemblerGui(QWidget* parent)
+AssemblerUnitUserInterface::AssemblerUnitUserInterface(QWidget* parent)
     : QWidget(parent) {
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
@@ -16,27 +15,27 @@ ProductionAssemblerGui::ProductionAssemblerGui(QWidget* parent)
   MainLayout->setStretch(1, 3);
 }
 
-void ProductionAssemblerGui::connectDependecies() {
-  ProductionGuiSubkernel* pgs =
-      GlobalEnvironment::instance()->getObject<ProductionGuiSubkernel>(
-          "ProductionGuiSubkernel");
+void AssemblerUnitUserInterface::connectDependecies() {
+  ProductionManagerGuiSubkernel* pgs =
+      GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
+          "ProductionManagerGuiSubkernel");
 
   connect(RequestBoxButton, &QPushButton::clicked, pgs,
-          &ProductionGuiSubkernel::requestBox_guiSlot);
+          &ProductionManagerGuiSubkernel::requestBox);
   connect(RefundCurrentBoxButton, &QPushButton::clicked, pgs,
-          &ProductionGuiSubkernel::refundCurrentBox_guiSlot);
+          &ProductionManagerGuiSubkernel::refundCurrentBox);
   connect(CompleteCurrentBoxButton, &QPushButton::clicked, pgs,
-          &ProductionGuiSubkernel::completeCurrentBox_guiSlot);
+          &ProductionManagerGuiSubkernel::completeCurrentBox);
 
   connect(ReleaseTransponderButton, &QPushButton::clicked, pgs,
-          &ProductionGuiSubkernel::releaseTransponder_guiSlot);
+          &ProductionManagerGuiSubkernel::releaseTransponder);
   connect(RereleaseTransponderButton, &QPushButton::clicked, pgs,
-          &ProductionGuiSubkernel::rereleaseTransponder_guiSlot);
+          &ProductionManagerGuiSubkernel::rereleaseTransponder);
   connect(RollbackTransponderPushButton, &QPushButton::clicked, pgs,
-          &ProductionGuiSubkernel::rollbackTransponder_guiSlot);
+          &ProductionManagerGuiSubkernel::rollbackTransponder);
 
   connect(PrintBoxStickerButton, &QPushButton::clicked, pgs,
-          &ProductionGuiSubkernel::printBoxSticker_guiSlot);
+          &ProductionManagerGuiSubkernel::printBoxSticker);
 
   // Связывание моделей и представлений
   ProductionLineDataView->setModel(&pgs->ProductionLineModel);
@@ -44,7 +43,7 @@ void ProductionAssemblerGui::connectDependecies() {
   BoxDataView->setModel(&pgs->BoxDataModel);
 }
 
-void ProductionAssemblerGui::createBoxGroup() {
+void AssemblerUnitUserInterface::createBoxGroup() {
   BoxGroup = new QGroupBox("Бокс");
   ControlPanelLayout->addWidget(BoxGroup);
 
@@ -68,7 +67,7 @@ void ProductionAssemblerGui::createBoxGroup() {
   ControlPanelLayout->addItem(ButtonVS1);
 }
 
-void ProductionAssemblerGui::createTransponderGroup() {
+void AssemblerUnitUserInterface::createTransponderGroup() {
   TransponderGroup = new QGroupBox("Транспондер");
   ControlPanelLayout->addWidget(TransponderGroup);
 
@@ -96,7 +95,7 @@ void ProductionAssemblerGui::createTransponderGroup() {
   ControlPanelLayout->addItem(ButtonVS3);
 }
 
-void ProductionAssemblerGui::createPrinterStickerGroup() {
+void AssemblerUnitUserInterface::createPrinterStickerGroup() {
   PrinterStickerGroup = new QGroupBox("Принтер стикеров");
   ControlPanelLayout->addWidget(PrinterStickerGroup);
 
@@ -119,7 +118,7 @@ void ProductionAssemblerGui::createPrinterStickerGroup() {
   PrinterStickerLayout->addWidget(PrintBoxStickerButton);
 }
 
-void ProductionAssemblerGui::createModelViews() {
+void AssemblerUnitUserInterface::createModelViews() {
   ModelViewLayout = new QVBoxLayout();
   MainLayout->addLayout(ModelViewLayout);
 

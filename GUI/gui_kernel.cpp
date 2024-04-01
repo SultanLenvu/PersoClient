@@ -3,38 +3,34 @@
 #include <QFile>
 #include <QString>
 
-#include "authorization_gui.h"
+#include "assembler_unit_user_interface.h"
+#include "authorization_user_interface.h"
 #include "definitions.h"
 #include "gui_kernel.h"
-#include "master_gui.h"
 #include "master_password_input_dialog.h"
-#include "production_assembler_gui.h"
-#include "production_gui_subkernel.h"
-#include "production_manager.h"
-#include "production_tester_gui.h"
+#include "master_user_interface.h"
+#include "production_manager_gui_subkernel.h"
 #include "programmer_gui_subkernel.h"
 #include "settings_dialog.h"
 #include "sticker_printer_gui_subkernel.h"
+#include "tester_unit_user_interface.h"
 
 GuiKernel::GuiKernel(QWidget* parent)
-    : QMainWindow(parent), CurrentGui(nullptr) {
+    : QMainWindow(parent), CurrentMode(Authorization) {
   DesktopGeometry = QApplication::primaryScreen()->size();
-
-  /* !!!
-   * Порядок создания сущностей критически важен
-   * !!!
-   */
+  showMaximized();
+  createTopMenu();
 
   Service = std::make_unique<ServiceObjectSpace>();
   createReactions();
-  Async = std::make_unique<AsyncObjectSpace>();
+  Async = std::make_unique<AsynchronousObjectSpace>();
 
   // Создаем графический интерфейс для авторизации
-  createAuthorizationGui();
-  //  createMasterGui();
+  createAuthorizationUserIInterface();
+  //  createMasterInterface();
 }
 
-void GuiKernel::displayMasterGui_slot() {
+void GuiKernel::displayMasterInterface() {
   StringDictionary param;
   MasterPasswordInputDialog dialog(nullptr);
   if (dialog.exec() == QDialog::Rejected) {
@@ -49,21 +45,21 @@ void GuiKernel::displayMasterGui_slot() {
   }
 
   // Создаем мастер интерфейс
-  createMasterGui();
+  createMasterInterface();
 }
 
-void GuiKernel::displayProductionAssemblerGui_slot() {
-  createProductionAssemblerGui();
+void GuiKernel::displayAssemblerUnitInterface() {
+  createAssemblerUnitUserInterface();
 }
 
-void GuiKernel::displayProductionTesterGui_slot() {
+void GuiKernel::displayTesterUnitInterface() {
   createProductionTesterGui();
 }
 
 void GuiKernel::logOutServerAct_slot() {
   emit logOutServer_signal();
 
-  createAuthorizationGui();
+  createAuthorizationUserIInterface();
 }
 
 void GuiKernel::displaySettingsDialog_slot() {
@@ -74,61 +70,12 @@ void GuiKernel::displaySettingsDialog_slot() {
   dialog.exec();
 }
 
-void GuiKernel::onServerDisconnected() {
-  if ((CurrentGui->type() == AbstractGui::ProductionAssembler) ||
-      (CurrentGui->type() == AbstractGui::ProductionTester)) {
-    Interactor->generateErrorMessage("Соединение с сервером оборвалось.");
-
-    delete CurrentGui;
-    createAuthorizationGui();
-  } else {
-    Interactor->generateErrorMessage("Соединение с сервером оборвалось.");
-  }
-}
-
 void GuiKernel::createReactions() {
-  Interactor = std::unique_ptr<InteractionSystem>(
-      new InteractionSystem("InteractionSystem"));
-  connect(this, &GuiKernel::applySettings_signal, Interactor.get(),
-          &InteractionSystem::applySettings);
+  PIndicator = std::make_unique<ProgressIndicator>("ProgressIndicator");
+  SIndicator = std::make_unique<StatusIndicator>("StatusIndicator");
 }
 
-void GuiKernel::createManagersInstance() {
-  std::shared_ptr<ProductionManager> pm(
-      new ProductionManager("ProductionManager"));
-  connect(this, &GuiKernel::logOutServer_signal, pm.get(),
-          &ProductionManager::logOutServer);
-
-  Managers["ProductionManager"] = pm;
-  Managers["ProgrammerManager"] = std::shared_ptr<ProgrammerManager>(
-      new ProgrammerManager("ProgrammerManager"));
-  Managers["StickerPrinterManager"] = std::shared_ptr<StickerPrinterManager>(
-      new StickerPrinterManager("StickerPrinterManager"));
-
-  // Создаем отдельный поток
-  ManagersThread = std::unique_ptr<QThread>(new QThread());
-
-  for (auto it = Managers.cbegin(); it != Managers.cend(); it++) {
-    connect(this, &GuiKernel::applySettings_signal, it->second.get(),
-            &AbstractManager::applySettings);
-
-    connect(ManagersThread.get(), &QThread::started, it->second.get(),
-            &AbstractManager::onInstanceThreadStarted);
-
-    it->second.get()->moveToThread(ManagersThread.get());
-  }
-
-  ManagersThread->start();
-
-  connect(static_cast<ProductionManager*>(Managers["ProductionManager"].get()),
-          &ProductionManager::printTransponderSticker_signal,
-          static_cast<StickerPrinterManager*>(
-              Managers["StickerPrinterManager"].get()),
-          &StickerPrinterManager::printTransponderSticker_sync,
-          Qt::DirectConnection);
-}
-
-void GuiKernel::createAuthorizationGui() {
+void GuiKernel::createAuthorizationUserIInterface() {
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
@@ -137,21 +84,16 @@ void GuiKernel::createAuthorizationGui() {
   setMinimumWidth(DesktopGeometry.width() * 0.2);
 
   // Создаем интерфейс
-  CurrentGui = new AuthorizationGui(this);
-  setCentralWidget(CurrentGui);
-  CurrentGui->showMaximized();
+  setCentralWidget(new AuthorizationUserInterface());
 
   adjustSize();
   setFixedSize(size());
-
-  // Подключаем интерфейс
-  connectGui();
 
   // Создаем верхнее меню
   createTopMenu();
 }
 
-void GuiKernel::createMasterGui() {
+void GuiKernel::createMasterInterface() {
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
@@ -159,28 +101,20 @@ void GuiKernel::createMasterGui() {
   setLayoutDirection(Qt::LeftToRight);
 
   // Создаем интерфейс
-  CurrentGui = new MasterGui(this);
-  setCentralWidget(CurrentGui);
-
-  // Подключаем интерфейс
-  connectGui();
+  setCentralWidget(new MasterUserInterface());
 
   // Создаем верхнее меню
   createTopMenu();
 }
 
-void GuiKernel::createProductionAssemblerGui() {
+void GuiKernel::createAssemblerUnitUserInterface() {
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
               DesktopGeometry.width() * 0.8, DesktopGeometry.height() * 0.8);
   setLayoutDirection(Qt::LeftToRight);
 
-  CurrentGui = new ProductionAssemblerGui(this);
-  setCentralWidget(CurrentGui);
-
-  // Подключаем интерфейс
-  connectGui();
+  setCentralWidget(new AssemblerUnitUserInterface());
 
   // Создаем верхнее меню
   createTopMenu();
@@ -193,27 +127,17 @@ void GuiKernel::createProductionTesterGui() {
               DesktopGeometry.width() * 0.8, DesktopGeometry.height() * 0.8);
   setLayoutDirection(Qt::LeftToRight);
 
-  CurrentGui = new ProductionTesterGui(this);
-  setCentralWidget(CurrentGui);
-
-  // Подключаем интерфейс
-  connectGui();
+  setCentralWidget(new TesterUnitUserInterface());
 
   // Создаем верхнее меню
   createTopMenu();
 }
 
-void GuiKernel::connectGui() {
-  for (auto it = Subkernels.cbegin(); it != Subkernels.cend(); it++) {
-    it->second->connectGui(CurrentGui);
-  }
-}
-
 void GuiKernel::createTopMenuActions() {
-  OpenMasterGuiAct = new QAction("Мастер доступ", this);
-  OpenMasterGuiAct->setStatusTip("Открыть мастер интерфейс");
-  connect(OpenMasterGuiAct, &QAction::triggered, this,
-          &GuiKernel::displayMasterGui_slot);
+  OpenMasterInterfaceAct = new QAction("Мастер доступ", this);
+  OpenMasterInterfaceAct->setStatusTip("Открыть мастер интерфейс");
+  connect(OpenMasterInterfaceAct, &QAction::triggered, this,
+          &GuiKernel::displayMasterInterface);
 
   LogOutServerAct = new QAction("Авторизация", this);
   LogOutServerAct->setStatusTip("Открыть интерфейс авторизации");
@@ -230,24 +154,12 @@ void GuiKernel::createTopMenuActions() {
 }
 
 void GuiKernel::createTopMenu() {
-  // Удаляем предыдущее топ меню
   menuBar()->clear();
 
-  // Создаем меню
   ServiceMenu = menuBar()->addMenu("Сервис");
-  switch (CurrentGui->type()) {
-    case AbstractGui::ProductionTester:
-    case AbstractGui::ProductionAssembler:
-      ServiceMenu->addAction(OpenMasterGuiAct);
-      ServiceMenu->addAction(LogOutServerAct);
-      break;
-    case AbstractGui::Master:
-      ServiceMenu->addAction(LogOutServerAct);
-      break;
-    case AbstractGui::Authorization:
-      ServiceMenu->addAction(OpenMasterGuiAct);
-      break;
-  }
+
+  ServiceMenu->addAction(OpenMasterInterfaceAct);
+  ServiceMenu->addAction(LogOutServerAct);
   ServiceMenu->addAction(OpenSettingsDialogAct);
 
   HelpMenu = menuBar()->addMenu("Справка");
@@ -256,7 +168,8 @@ void GuiKernel::createTopMenu() {
 }
 
 void GuiKernel::createGuiSubkernels() {
-  Subkernels.emplace_back(new ProductionGuiSubkernel("ProductionGuiSubkernel"));
+  Subkernels.emplace_back(
+      new ProductionManagerGuiSubkernel("ProductionManagerGuiSubkernel"));
   Subkernels.emplace_back(new ProgrammerGuiSubkernel("ProgrammerGuiSubkernel"));
   Subkernels.emplace_back(
       new StickerPrinterGuiSubkernel("StickerPrinterGuiSubkernel"));

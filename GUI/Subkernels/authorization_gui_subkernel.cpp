@@ -5,19 +5,19 @@ AuthorizationGuiSubkernel::AuthorizationGuiSubkernel(const QString& name)
   connectDependencies();
 }
 
-void AuthorizationGuiSubkernel::logOn_guiSlot() {}
+void AuthorizationGuiSubkernel::logOn() {}
 
 void AuthorizationGuiSubkernel::logOnCompleted_slot() {
-  if (Role == Assembler) {
-    emit displayProductionAssemblerGui();
-  }
+  //  if (Role == Assembler) {
+  //    emit displayAssemblerUnitUserInterface();
+  //  }
 
-  if (Role == Tester) {
-    emit displayProductionTesterGui();
-  }
+  //  if (Role == Tester) {
+  //    emit displayProductionTesterGui();
+  //  }
 }
 
 void AuthorizationGuiSubkernel::connectDependencies() {
-  connect(manager, &ProductionManager::authorizationCompleted, this,
-          &ProductionGuiSubkernel::logOnCompleted_slot);
+  //  connect(manager, &ProductionManager::authorizationCompleted, this,
+  //          &ProductionManagerGuiSubkernel::logOnCompleted_slot);
 }

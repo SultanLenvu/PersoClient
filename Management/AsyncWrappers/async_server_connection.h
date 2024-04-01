@@ -6,14 +6,16 @@
 #include "i_server_connection.h"
 #include "progressable_async_wrapper.h"
 
-class ServerConnectionAsyncWrapper : public ProgressableAsyncWrapper {
+class AsyncServerConnection : public ProgressableAsyncWrapper {
   Q_OBJECT
  private:
   std::shared_ptr<IServerConnection> Server;
 
  public:
-  Q_INVOKABLE explicit ServerConnectionAsyncWrapper(const QString& name);
-  ~ServerConnectionAsyncWrapper() = default;
+  Q_INVOKABLE explicit AsyncServerConnection(
+      const QString& name,
+      std::shared_ptr<IServerConnection> sc);
+  ~AsyncServerConnection() = default;
 
  public slots:
   void connect(void);
@@ -45,7 +47,7 @@ class ServerConnectionAsyncWrapper : public ProgressableAsyncWrapper {
   void printLastPalletSticker(void);
 
  private:
-  Q_DISABLE_COPY_MOVE(ServerConnectionAsyncWrapper)
+  Q_DISABLE_COPY_MOVE(AsyncServerConnection)
   void connectDependecies(void);
 
  signals:

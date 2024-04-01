@@ -5,51 +5,33 @@
 
 class ProgrammerGuiSubkernel : public AbstractGuiSubkernel {
   Q_OBJECT
- private:
-  AbstractGui* CurrentGui;
-  std::shared_ptr<AbstractManager> Manager;
 
  public:
   explicit ProgrammerGuiSubkernel(const QString& name);
-  ~ProgrammerGuiSubkernel();
-
-  // AbstractGuiSubkernel interface
- public:
-  virtual void connectGui(AbstractGui* gui) override;
-  virtual void connectManager(
-      std::shared_ptr<AbstractManager> manager) override;
-  virtual void reset() override;
-
- public slots:
-  void displayUcid_slot(const std::shared_ptr<QString> ucid);
+  ~ProgrammerGuiSubkernel() = default;
 
  private:
   Q_DISABLE_COPY_MOVE(ProgrammerGuiSubkernel);
+  void connectDependencies(void) const;
 
-  void connectAuthorizationGui();
-  void connectMasterGui();
-  void connectProductionAssemblerGui();
-  void connectProductionTesterGui();
+ private:
+  void programMemory(void);
+  void readMemory(void);
+  void eraseMemory(void);
 
-  void connectProgrammerManager(void) const;
+  void programUserData(void);
+  void readUserData(void);
+  void readUcid(void);
 
-  void programMemory_guiSlot(void);
-  void readMemory_guiSlot(void);
-  void eraseMemory_guiSlot(void);
-
-  void programUserData_guiSlot(void);
-  void readUserData_guiSlot(void);
-  void readUcid_guiSlot(void);
-
-  void unlockMemory_guiSlot(void);
-  void lockMemory_guiSlot(void);
+  void unlockMemory(void);
+  void lockMemory(void);
 
  signals:
-  void programMemory_signal(const std::shared_ptr<QString> path);
+  void programMemory_signal(const QByteArray& data);
   void readMemory_signal(void);
   void eraseMemory_signal(void);
 
-  void programUserData_signal(const std::shared_ptr<QString> path);
+  void programUserData_signal(const QByteArray& data);
   void readUserData_signal(void);
   void readUcid_signal(void);
 

@@ -25,8 +25,8 @@ class TransponderStickerScanDialog : public AbstractInputDialog {
   QRegularExpression Regex;
 
  public:
-  explicit TransponderStickerScanDialog(QWidget* parent);
-  ~TransponderStickerScanDialog();
+  explicit TransponderStickerScanDialog(QWidget* parent = nullptr);
+  ~TransponderStickerScanDialog() = default;
 
   // AbstractInputDialog interface
  public:

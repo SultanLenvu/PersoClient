@@ -4,15 +4,15 @@
 #include "production_manager.h"
 #include "progressable_async_wrapper.h"
 
-class ProductionManagerAsyncWrapper : public ProgressableAsyncWrapper {
+class AsyncProductionManager : public ProgressableAsyncWrapper {
   Q_OBJECT
 
  private:
   std::unique_ptr<ProductionManager> Manager;
 
  public:
-  Q_INVOKABLE explicit ProductionManagerAsyncWrapper(const QString& name);
-  ~ProductionManagerAsyncWrapper() = default;
+  Q_INVOKABLE explicit AsyncProductionManager(const QString& name);
+  ~AsyncProductionManager() = default;
 
  public slots:
   void logOn(const StringDictionary& param);
@@ -27,7 +27,13 @@ class ProductionManagerAsyncWrapper : public ProgressableAsyncWrapper {
   void rollbackTransponder(void);
 
  private:
-  Q_DISABLE_COPY_MOVE(ProductionManagerAsyncWrapper)
+  Q_DISABLE_COPY_MOVE(AsyncProductionManager)
+  void createManager(void);
+
+ signals:
+  void displayProductionLineData_signal(const StringDictionary& data);
+  void displayTransponderData_signal(const StringDictionary& data);
+  void displayBoxData_signal(const StringDictionary& data);
 };
 
 #endif  // ASYNCPRODUCTIONMANAGER_H

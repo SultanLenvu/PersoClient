@@ -8,7 +8,6 @@
 #include <QTextStream>
 #include <QtWidgets>
 
-#include "abstract_gui.h"
 #include "abstract_gui_subkernel.h"
 #include "asynchronous_object_space.h"
 #include "progress_indicator.h"
@@ -17,14 +16,23 @@
 
 class GuiKernel : public QMainWindow {
   Q_OBJECT
+ private:
+  enum GuiKernelMode {
+    Authorization,
+    AssemblyUnit,
+    TesterUnit,
+    Master,
+  };
+  Q_ENUM(GuiKernelMode)
 
  private:
   QSize DesktopGeometry;
+  GuiKernelMode CurrentMode;
 
   // Верхнее меню
   //==================================================
   QMenu* ServiceMenu;
-  QAction* OpenMasterGuiAct;
+  QAction* OpenMasterInterfaceAct;
   QAction* LogOutServerAct;
   QAction* OpenSettingsDialogAct;
 
@@ -32,7 +40,6 @@ class GuiKernel : public QMainWindow {
   QAction* AboutProgramAct;
   //==================================================
 
-  AbstractGui* CurrentGui;
   std::vector<AbstractGuiSubkernel> Subkernels;
 
   std::unique_ptr<ProgressIndicator> PIndicator;
@@ -48,9 +55,10 @@ class GuiKernel : public QMainWindow {
  public slots:
   void applySettings(void);
 
-  void displayMasterGui_slot(void);
-  void displayProductionAssemblerGui_slot(void);
-  void displayProductionTesterGui_slot(void);
+  void displayMasterInterface(void);
+  void displayAssemblerUnitInterface(void);
+  void displayTesterUnitInterface(void);
+
   void logOutServerAct_slot(void);
   void displaySettingsDialog_slot(void);
 
@@ -64,16 +72,12 @@ class GuiKernel : public QMainWindow {
 
   void createLoggerInstance(void);
   void createReactions(void);
-
-  void createManagersInstance(void);
-
   void createGuiSubkernels(void);
 
-  void createAuthorizationGui(void);
-  void createMasterGui(void);
-  void createProductionAssemblerGui(void);
+  void createAuthorizationUserIInterface(void);
+  void createMasterInterface(void);
+  void createAssemblerUnitUserInterface(void);
   void createProductionTesterGui(void);
-  void connectGui(void);
 
  signals:
   void logOutServer_signal(void);

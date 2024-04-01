@@ -69,7 +69,7 @@ void ProgressIndicator::destroyProgressDialog() {
 void ProgressIndicator::createTimers() {
   // Таймер, отслеживающий длительность выполняющихся операций
   ODTimer = std::unique_ptr<QTimer>(new QTimer());
-  ODTimer->setInterval(SERVER_MANAGER_OPERATION_MAX_DURATION);
+  ODTimer->setInterval(USER_OPERATION_MAX_DURATION);
   connect(ODTimer.get(), &QTimer::timeout, this,
           &ProgressIndicator::ODTimerTimeout_slot);
   connect(ODTimer.get(), &QTimer::timeout, ODTimer.get(), &QTimer::stop);

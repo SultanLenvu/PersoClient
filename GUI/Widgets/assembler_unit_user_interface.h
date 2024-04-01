@@ -1,10 +1,10 @@
-#ifndef PRODUCTION_ASSEMBLER_GUI_H
-#define PRODUCTION_ASSEMBLER_GUI_H
+#ifndef ASSEMBLER_UNIT_USER_INTERFACE_H
+#define ASSEMBLER_UNIT_USER_INTERFACE_H
 
 #include <QTableView>
 #include <QtWidgets>
 
-class ProductionAssemblerGui final : public QWidget {
+class AssemblerUnitUserInterface final : public QWidget {
  public:
   QHBoxLayout* MainLayout;
 
@@ -48,11 +48,11 @@ class ProductionAssemblerGui final : public QWidget {
   QTableView* TransponderDataView;
 
  public:
-  explicit ProductionAssemblerGui(QWidget* parent);
-  ~ProductionAssemblerGui() = default;
+  explicit AssemblerUnitUserInterface(QWidget* parent = nullptr);
+  ~AssemblerUnitUserInterface() = default;
 
  private:
-  Q_DISABLE_COPY_MOVE(ProductionAssemblerGui);
+  Q_DISABLE_COPY_MOVE(AssemblerUnitUserInterface);
   void connectDependecies(void);
 
  private:
@@ -62,4 +62,4 @@ class ProductionAssemblerGui final : public QWidget {
   void createModelViews(void);
 };
 
-#endif  // PRODUCTION_ASSEMBLER_GUI_H
+#endif  // ASSEMBLER_UNIT_USER_INTERFACE_H

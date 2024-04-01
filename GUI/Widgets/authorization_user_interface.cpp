@@ -1,24 +1,25 @@
-#include "authorization_gui.h"
+#include "authorization_user_interface.h"
 #include "authorization_gui_subkernel.h"
 #include "global_environment.h"
 
-AuthorizationGui::AuthorizationGui(QWidget* parent) : QWidget(parent) {
+AuthorizationUserInterface::AuthorizationUserInterface(QWidget* parent)
+    : QWidget(parent) {
   create();
   connectDependecies();
 }
 
-void AuthorizationGui::logOn_guiSlot() {}
+void AuthorizationUserInterface::logOn() {}
 
-void AuthorizationGui::connectDependecies() {
+void AuthorizationUserInterface::connectDependecies() {
   AuthorizationGuiSubkernel* ags =
       GlobalEnvironment::instance()->getObject<AuthorizationGuiSubkernel>(
           "AuthorizationGuiSubkernel");
 
   connect(AuthorizePushButton, &QPushButton::clicked, ags,
-          &AuthorizationGuiSubkernel::logOn_guiSlot);
+          &AuthorizationGuiSubkernel::logOn);
 }
 
-void AuthorizationGui::create() {
+void AuthorizationUserInterface::create() {
   GeneralLayout = new QVBoxLayout();
   MainLayout->addLayout(GeneralLayout);
 
@@ -43,7 +44,7 @@ void AuthorizationGui::create() {
   GeneralLayout->addItem(ControlPanelVS);
 }
 
-void AuthorizationGui::createAuthorizationGroup() {
+void AuthorizationUserInterface::createAuthorizationGroup() {
   AuthorizationGroup = new QGroupBox("Авторизация");
   AuthorizationGroup->setAlignment(Qt::AlignCenter);
   GeneralLayout->insertWidget(GeneralLayout->indexOf(ControlPanelVS) - 1,

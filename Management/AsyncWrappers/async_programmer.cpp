@@ -1,15 +1,12 @@
-#include "programmer_async_wrapper.h"
-#include "jlink_exe_programmer.h"
+#include "async_programmer.h"
 
-ProgrammerAsyncWrapper::ProgrammerAsyncWrapper(
-    const QString& name,
-    std::shared_ptr<IProgrammer> programmer)
+AsyncProgrammer::AsyncProgrammer(const QString& name,
+                                 std::shared_ptr<IProgrammer> programmer)
     : ProgressableAsyncWrapper(name), Programmer(programmer) {}
 
-void ProgrammerAsyncWrapper::checkConfig() {}
+void AsyncProgrammer::checkConfig() {}
 
-void ProgrammerAsyncWrapper::programMemory(
-    const TransponderFirmware& firmware) {
+void AsyncProgrammer::programMemory(const QByteArray& firmware) {
   initOperation("programMemory");
 
   ReturnStatus ret = Programmer->programMemory(firmware);
@@ -21,8 +18,7 @@ void ProgrammerAsyncWrapper::programMemory(
   completeOperation("programMemory");
 }
 
-void ProgrammerAsyncWrapper::programMemoryWithUnlock(
-    const TransponderFirmware& firmware) {
+void AsyncProgrammer::programMemoryWithUnlock(const QByteArray& firmware) {
   initOperation("programMemoryWithUnlock");
 
   ReturnStatus ret = Programmer->programMemoryWithUnlock(firmware);
@@ -34,10 +30,10 @@ void ProgrammerAsyncWrapper::programMemoryWithUnlock(
   completeOperation("programMemoryWithUnlock");
 }
 
-void ProgrammerAsyncWrapper::readMemory() {
+void AsyncProgrammer::readMemory() {
   initOperation("readMemory");
 
-  TransponderFirmware firmware;
+  QByteArray firmware;
   ReturnStatus ret = Programmer->readMemory(firmware);
   if (ret != ReturnStatus::NoError) {
     processOperationError("readMemory", ret);
@@ -48,7 +44,7 @@ void ProgrammerAsyncWrapper::readMemory() {
   completeOperation("readMemory");
 }
 
-void ProgrammerAsyncWrapper::eraseMemory() {
+void AsyncProgrammer::eraseMemory() {
   initOperation("eraseMemory");
 
   ReturnStatus ret = Programmer->eraseMemory();
@@ -60,7 +56,7 @@ void ProgrammerAsyncWrapper::eraseMemory() {
   completeOperation("eraseMemory");
 }
 
-void ProgrammerAsyncWrapper::programUserData(const TransponderUserData& data) {
+void AsyncProgrammer::programUserData(const QByteArray& data) {
   initOperation("programUserData");
 
   ReturnStatus ret = Programmer->programUserData(data);
@@ -72,10 +68,10 @@ void ProgrammerAsyncWrapper::programUserData(const TransponderUserData& data) {
   completeOperation("programUserData");
 }
 
-void ProgrammerAsyncWrapper::readUserData() {
+void AsyncProgrammer::readUserData() {
   initOperation("readUserData");
 
-  TransponderUserData userData;
+  QByteArray userData;
   ReturnStatus ret = Programmer->readUserData(userData);
   if (ret != ReturnStatus::NoError) {
     processOperationError("readUserData", ret);
@@ -86,7 +82,7 @@ void ProgrammerAsyncWrapper::readUserData() {
   completeOperation("readUserData");
 }
 
-void ProgrammerAsyncWrapper::readTransponderUcid() {
+void AsyncProgrammer::readTransponderUcid() {
   initOperation("readTransponderUcid");
 
   QString ucid;
@@ -100,7 +96,7 @@ void ProgrammerAsyncWrapper::readTransponderUcid() {
   completeOperation("readTransponderUcid");
 }
 
-void ProgrammerAsyncWrapper::unlockMemory() {
+void AsyncProgrammer::unlockMemory() {
   initOperation("unlockMemory");
 
   ReturnStatus ret = Programmer->unlockMemory();
@@ -112,7 +108,7 @@ void ProgrammerAsyncWrapper::unlockMemory() {
   completeOperation("unlockMemory");
 }
 
-void ProgrammerAsyncWrapper::lockMemory() {
+void AsyncProgrammer::lockMemory() {
   initOperation("unlockMemory");
 
   ReturnStatus ret = Programmer->unlockMemory();

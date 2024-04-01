@@ -8,14 +8,11 @@ class NamedObject : public QObject {
 
  public:
   explicit NamedObject(const QString& name);
-  virtual ~NamedObject();
+  virtual ~NamedObject() = default;
 
  private:
   NamedObject();
   Q_DISABLE_COPY_MOVE(NamedObject)
-
- signals:
-  void deleted(const QString& name) const;
 };
 
 #endif  // NAMED_OBJECT_H

@@ -1,10 +1,9 @@
 #include "server_connection_gui_subkernel.h"
+#include "async_server_connection.h"
 #include "authorization_dialog.h"
-#include "confirm_transponder_rerelease_input_dialog.h"
 #include "global_environment.h"
 #include "numeric_string_checker.h"
-#include "server_connection_async_wrapper.h"
-#include "string_input_dialog.h"
+#include "transponder_sticker_scan_dialog.h"
 
 ServerConnectionGuiSubkernel::ServerConnectionGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel(name) {
@@ -13,7 +12,7 @@ ServerConnectionGuiSubkernel::ServerConnectionGuiSubkernel(const QString& name)
 }
 
 void ServerConnectionGuiSubkernel::executeCommand(const QString& name) {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
 
   (this->*CommandMethods.value(name))();
 }
@@ -24,17 +23,17 @@ void ServerConnectionGuiSubkernel::onServerDisconnected() {
 }
 
 void ServerConnectionGuiSubkernel::connect() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit connect_signal();
 }
 
 void ServerConnectionGuiSubkernel::disconnect() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit disconnect_signal();
 }
 
 void ServerConnectionGuiSubkernel::echo() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit echo_signal();
 }
 
@@ -47,42 +46,42 @@ void ServerConnectionGuiSubkernel::launchProductionLine() {
   }
   dialog.getData(param);
 
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit launchProductionLine_signal(param);
 }
 
 void ServerConnectionGuiSubkernel::shutdownProductionLine() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit shutdownProductionLine_signal();
 }
 
 void ServerConnectionGuiSubkernel::getProductionLineData() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit getProductionLineData_signal();
 }
 
 void ServerConnectionGuiSubkernel::requestBox() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit requestBox_signal();
 }
 
 void ServerConnectionGuiSubkernel::getCurrentBoxData() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit getCurrentBoxData_signal();
 }
 
 void ServerConnectionGuiSubkernel::refundCurrentBox() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit refundCurrentBox_signal();
 }
 
 void ServerConnectionGuiSubkernel::completeCurrentBox() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit completeCurrentBox_signal();
 }
 
 void ServerConnectionGuiSubkernel::releaseTransponder() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit releaseTransponder_signal();
 }
 
@@ -97,43 +96,42 @@ void ServerConnectionGuiSubkernel::confirmTransponderRelease() {
   dialog.getData(param);
 
   emit confirmTransponderRelease_signal(param);
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
 }
 
 void ServerConnectionGuiSubkernel::rereleaseTransponder() {
   StringDictionary param;
 
-  NumericStringChecker checker;
-  StringInputDialog dialog("transponder_pan", &checker);
+  TransponderStickerScanDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
   dialog.getData(param);
 
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit rereleaseTransponder_signal(param);
 }
 
 void ServerConnectionGuiSubkernel::confirmTransponderRerelease() {
   StringDictionary param;
 
-  ConfirmTransponderRereleaseInputDialog dialog;
+  TransponderStickerScanDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
   dialog.getData(param);
 
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit confirmTransponderRerelease_signal(param);
 }
 
 void ServerConnectionGuiSubkernel::rollbackTransponder() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit rollbackTransponder_signal();
 }
 
 void ServerConnectionGuiSubkernel::getCurrentTransponderData() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit getCurrentTransponderData_signal();
 }
 
@@ -148,7 +146,7 @@ void ServerConnectionGuiSubkernel::getTransponderData() {
   }
   dialog.getData(param);
 
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit getTransponderData_signal(param);
 }
 
@@ -161,12 +159,12 @@ void ServerConnectionGuiSubkernel::printBoxSticker() {
   }
   dialog.getData(param);
 
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit printBoxSticker_signal(param);
 }
 
 void ServerConnectionGuiSubkernel::printLastBoxSticker() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit printLastBoxSticker_signal();
 }
 
@@ -179,84 +177,83 @@ void ServerConnectionGuiSubkernel::printPalletSticker() {
   }
   dialog.getData(param);
 
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit printPalletSticker_signal(param);
 }
 
 void ServerConnectionGuiSubkernel::printLastPalletSticker() {
-  emit clearLogDisplay();
+  emit clearLogDisplay_signal();
   emit printLastPalletSticker_signal();
 }
 
 void ServerConnectionGuiSubkernel::connectDependecies() {
-  const ServerConnectionAsyncWrapper* psm =
-      GlobalEnvironment::instance()
-          ->getObject<const ServerConnectionAsyncWrapper>(
-              "ServerConnectionAsyncWrapper");
+  AsyncServerConnection* psm =
+      GlobalEnvironment::instance()->getObject<AsyncServerConnection>(
+          "AsyncServerConnection");
 
   // К менеджерам
   QObject::connect(this, &ServerConnectionGuiSubkernel::connect_signal, psm,
-                   &ServerConnectionAsyncWrapper::connect);
+                   &AsyncServerConnection::connect);
   QObject::connect(this, &ServerConnectionGuiSubkernel::disconnect_signal, psm,
-                   &ServerConnectionAsyncWrapper::disconnect);
+                   &AsyncServerConnection::disconnect);
 
   QObject::connect(this, &ServerConnectionGuiSubkernel::echo_signal, psm,
-                   &ServerConnectionAsyncWrapper::echo);
+                   &AsyncServerConnection::echo);
 
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::launchProductionLine_signal,
-                   psm, &ServerConnectionAsyncWrapper::launchProductionLine);
+                   psm, &AsyncServerConnection::launchProductionLine);
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::shutdownProductionLine_signal,
-                   psm, &ServerConnectionAsyncWrapper::shutdownProductionLine);
+                   psm, &AsyncServerConnection::shutdownProductionLine);
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::getProductionLineData_signal,
-                   psm, &ServerConnectionAsyncWrapper::getProductionLineData);
+                   psm, &AsyncServerConnection::getProductionLineData);
 
   QObject::connect(this, &ServerConnectionGuiSubkernel::requestBox_signal, psm,
-                   &ServerConnectionAsyncWrapper::requestBox);
+                   &AsyncServerConnection::requestBox);
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::getCurrentBoxData_signal, psm,
-                   &ServerConnectionAsyncWrapper::getCurrentBoxData);
+                   &AsyncServerConnection::getCurrentBoxData);
   QObject::connect(this, &ServerConnectionGuiSubkernel::refundCurrentBox_signal,
-                   psm, &ServerConnectionAsyncWrapper::refundCurrentBox);
+                   psm, &AsyncServerConnection::refundCurrentBox);
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::completeCurrentBox_signal,
-                   psm, &ServerConnectionAsyncWrapper::completeCurrentBox);
+                   psm, &AsyncServerConnection::completeCurrentBox);
 
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::releaseTransponder_signal,
-                   psm, &ServerConnectionAsyncWrapper::releaseTransponder);
+                   psm, &AsyncServerConnection::releaseTransponder);
   QObject::connect(
       this, &ServerConnectionGuiSubkernel::confirmTransponderRelease_signal,
-      psm, &ServerConnectionAsyncWrapper::confirmTransponderRelease);
+      psm, &AsyncServerConnection::confirmTransponderRelease);
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::rereleaseTransponder_signal,
-                   psm, &ServerConnectionAsyncWrapper::rereleaseTransponder);
+                   psm, &AsyncServerConnection::rereleaseTransponder);
   QObject::connect(
       this, &ServerConnectionGuiSubkernel::confirmTransponderRerelease_signal,
-      psm, &ServerConnectionAsyncWrapper::rereleaseTransponder);
+      psm, &AsyncServerConnection::rereleaseTransponder);
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::rollbackTransponder_signal,
-                   psm, &ServerConnectionAsyncWrapper::rollbackTransponder);
+                   psm, &AsyncServerConnection::rollbackTransponder);
   QObject::connect(
       this, &ServerConnectionGuiSubkernel::getCurrentTransponderData_signal,
-      psm, &ServerConnectionAsyncWrapper::getCurrentTransponderData);
+      psm, &AsyncServerConnection::getCurrentTransponderData);
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::getTransponderData_signal,
-                   psm, &ServerConnectionAsyncWrapper::getTransponderData);
+                   psm, &AsyncServerConnection::getTransponderData);
 
   QObject::connect(this, &ServerConnectionGuiSubkernel::printBoxSticker_signal,
-                   psm, &ServerConnectionAsyncWrapper::printBoxSticker);
+                   psm, &AsyncServerConnection::printBoxSticker);
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::printLastBoxSticker_signal,
-                   psm, &ServerConnectionAsyncWrapper::printLastBoxSticker);
+                   psm, &AsyncServerConnection::printLastBoxSticker);
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::printPalletSticker_signal,
-                   psm, &ServerConnectionAsyncWrapper::printPalletSticker);
+                   psm, &AsyncServerConnection::printPalletSticker);
   QObject::connect(this,
                    &ServerConnectionGuiSubkernel::printLastPalletSticker_signal,
-                   psm, &ServerConnectionAsyncWrapper::printLastPalletSticker);
+                   psm, &AsyncServerConnection::printLastPalletSticker);
 }
 
 void ServerConnectionGuiSubkernel::createCommandMethod() {

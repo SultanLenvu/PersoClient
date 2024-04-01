@@ -2,11 +2,12 @@
 #define ABSTRACTCLIENTCOMMAND_H
 
 #include <QJsonObject>
-#include <QObject>
 
+#include "loggable_object.h"
+#include "named_object.h"
 #include "types.h"
 
-class AbstractClientCommand : public QObject {
+class AbstractClientCommand : public NamedObject, public LoggableObject {
   Q_OBJECT
 
   enum CommandReturnStatus {
@@ -85,7 +86,7 @@ class AbstractClientCommand : public QObject {
 
  public:
   explicit AbstractClientCommand(const QString& name);
-  virtual ~AbstractClientCommand();
+  virtual ~AbstractClientCommand() = default;
 
   virtual const QString& name(void) = 0;
   virtual ReturnStatus generate(const StringDictionary& param,
@@ -100,7 +101,6 @@ class AbstractClientCommand : public QObject {
   Q_DISABLE_COPY_MOVE(AbstractClientCommand)
 
  protected:
-  void sendLog(const QString& log);
   void generateDataBlock(QByteArray& dataBlock);
   bool processDataBlock(const QByteArray& dataBlock);
   ReturnStatus processReturnStatus(const QString& ret);
@@ -108,9 +108,6 @@ class AbstractClientCommand : public QObject {
  private:
   void createCrtMap(void);
   void createCrtLogMap(void);
-
- signals:
-  void logging(const QString& log);
 };
 
 #endif  // ABSTRACTCLIENTCOMMAND_H

@@ -15,8 +15,6 @@ TransponderStickerScanDialog::TransponderStickerScanDialog(QWidget* parent)
   Regex.setPattern("^[0-9]+$");
 }
 
-TransponderStickerScanDialog::~TransponderStickerScanDialog() {}
-
 AbstractInputDialog::InputDialogType TransponderStickerScanDialog::type()
     const {
   return TransponderStickerScan;

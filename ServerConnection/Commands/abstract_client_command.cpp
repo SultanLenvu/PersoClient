@@ -4,33 +4,15 @@
 #include <QIODevice>
 #include <QJsonDocument>
 
-#include "global_environment.h"
-#include "log_system.h"
-
 AbstractClientCommand::AbstractClientCommand(const QString& name)
-    : QObject{nullptr} {
-  setObjectName(name);
-
-  connect(this, &AbstractClientCommand::logging,
-          dynamic_cast<LogSystem*>(
-              GlobalEnvironment::instance()->getObject("LogSystem")),
-          &LogSystem::generate);
-
+    : NamedObject{name}, LoggableObject{name} {
   createCrtMap();
   createCrtLogMap();
 }
 
-AbstractClientCommand::~AbstractClientCommand() {}
-
 void AbstractClientCommand::clear() {
   Request = QJsonObject();
   Response = QJsonObject();
-}
-
-AbstractClientCommand::AbstractClientCommand() {}
-
-void AbstractClientCommand::sendLog(const QString& log) {
-  emit logging("Command " + objectName() + " - " + log);
 }
 
 void AbstractClientCommand::generateDataBlock(QByteArray& dataBlock) {

@@ -1,9 +1,9 @@
-#ifndef AUTHORIZATIONGUI_H
-#define AUTHORIZATIONGUI_H
+#ifndef AUTHORIZATIONUSERINTERFACE_H
+#define AUTHORIZATIONUSERINTERFACE_H
 
 #include <QtWidgets>
 
-class AuthorizationGui : public QWidget {
+class AuthorizationUserInterface : public QWidget {
   Q_OBJECT
 
  private:
@@ -34,14 +34,14 @@ class AuthorizationGui : public QWidget {
   QSpacerItem* ControlPanelVS;
 
  public:
-  explicit AuthorizationGui(QWidget* parent);
-  ~AuthorizationGui() = default;
+  explicit AuthorizationUserInterface(QWidget* parent = nullptr);
+  ~AuthorizationUserInterface() = default;
 
  private slots:
-  void logOn_guiSlot(void);
+  void logOn(void);
 
  private:
-  Q_DISABLE_COPY(AuthorizationGui);
+  Q_DISABLE_COPY(AuthorizationUserInterface);
   void connectDependecies(void);
 
  private:
@@ -49,4 +49,4 @@ class AuthorizationGui : public QWidget {
   void createAuthorizationGroup(void);
 };
 
-#endif  // AUTHORIZATIONGUI_H
+#endif  // AUTHORIZATIONUSERINTERFACE_H

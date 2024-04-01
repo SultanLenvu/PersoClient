@@ -13,17 +13,17 @@ class StickerPrinterGuiSubkernel : public AbstractGuiSubkernel {
 
  private:
   Q_DISABLE_COPY_MOVE(StickerPrinterGuiSubkernel);
+  void connectDependecies(void);
 
-  void connectStickerPrinterManager(void) const;
-
-  void printLastTransponderSticker_guiSlot(void);
-  void printCustomTransponderSticker_guiSlot(void);
-  void executeStickerPrinterCommandScript_guiSlot(void);
+ private slots:
+  void printTransponderSticker(void);
+  void printLastTransponderSticker(void);
+  void exec(const QStringList& script);
 
  signals:
   void printLastTransponderSticker_signal(void);
-  void printCustomTransponderSticker_signal(StringDictionary& param);
-  void executeCommandScript_signal(std::shared_ptr<QStringList> script);
+  void printTransponderSticker_signal(const StringDictionary& param);
+  void exec_signal(const QStringList& script);
 };
 
 #endif  // STICKERPRINTERGUISUBKERNEL_H

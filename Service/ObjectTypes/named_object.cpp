@@ -6,7 +6,3 @@ NamedObject::NamedObject(const QString& name) : QObject{nullptr} {
 
   GlobalEnvironment::instance()->registerObject(this);
 }
-
-NamedObject::~NamedObject() {
-  emit deleted(objectName());
-}

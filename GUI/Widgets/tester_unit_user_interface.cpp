@@ -1,11 +1,48 @@
-#include "production_tester_gui.h"
+#include "tester_unit_user_interface.h"
+#include "async_production_manager.h"
+#include "async_server_connection.h"
+#include "async_sticker_printer.h"
+#include "global_environment.h"
 
-ProductionTesterGui::ProductionTesterGui(QWidget* parent)
-    : AbstractGui(parent) {
+TesterUnitUserInterface::TesterUnitUserInterface(QWidget* parent)
+    : QWidget(parent) {
   create();
 }
 
-void ProductionTesterGui::create() {
+void TesterUnitUserInterface::connectDependencies() {
+  AsyncProductionManager* apm =
+      GlobalEnvironment::instance()->getObject<AsyncProductionManager>(
+          "AsyncProductionManager");
+
+  connect(RereleaseTransponderButton, &QPushButton::clicked, apm,
+          &AsyncProductionManager::rereleaseTransponder);
+
+  AsyncServerConnection* asc =
+      GlobalEnvironment::instance()->getObject<AsyncServerConnection>(
+          "AsyncServerConnection");
+
+  connect(PrintLastBoxStickerButton, &QPushButton::clicked, asc,
+          &AsyncServerConnection::printLastBoxSticker);
+  connect(PrintBoxStickerButton, &QPushButton::clicked, asc,
+          &AsyncServerConnection::printBoxSticker);
+  connect(PrintLastPalletStickerButton, &QPushButton::clicked, asc,
+          &AsyncServerConnection::printLastPalletSticker);
+  connect(PrintPalletStickerButton, &QPushButton::clicked, asc,
+          &AsyncServerConnection::printPalletSticker);
+
+  AsyncStickerPrinter* asp =
+      GlobalEnvironment::instance()->getObject<AsyncStickerPrinter>(
+          "AsyncStickerPrinter");
+
+  // Связывание моделей и представлений
+  ProductionLineDataView->setModel(ProductionLineModel.get());
+  TransponderDataView->setModel(TransponderDataModel.get());
+}
+
+void TesterUnitUserInterface::create() {
+  MainLayout = new QHBoxLayout();
+  setLayout(MainLayout);
+
   ControlPanelLayout = new QVBoxLayout();
   MainLayout->addLayout(ControlPanelLayout);
 
@@ -17,7 +54,7 @@ void ProductionTesterGui::create() {
   MainLayout->setStretch(1, 3);
 }
 
-void ProductionTesterGui::createTransponderGroup() {
+void TesterUnitUserInterface::createTransponderGroup() {
   TransponderGroup = new QGroupBox("Сборка");
   ControlPanelLayout->addWidget(TransponderGroup);
 
@@ -34,7 +71,7 @@ void ProductionTesterGui::createTransponderGroup() {
   ControlPanelLayout->addItem(ControlPanelVS);
 }
 
-void ProductionTesterGui::createPrinterStickerGroup() {
+void TesterUnitUserInterface::createPrinterStickerGroup() {
   PrinterStickerGroup = new QGroupBox("Печать");
   ControlPanelLayout->addWidget(PrinterStickerGroup);
 
@@ -80,7 +117,7 @@ void ProductionTesterGui::createPrinterStickerGroup() {
   PrinterStickerLayout->addWidget(PrintPalletStickerButton);
 }
 
-void ProductionTesterGui::createModelViews() {
+void TesterUnitUserInterface::createModelViews() {
   ModelViewLayout = new QVBoxLayout();
   MainLayout->addLayout(ModelViewLayout);
 

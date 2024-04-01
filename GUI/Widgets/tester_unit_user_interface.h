@@ -1,9 +1,9 @@
-#ifndef PRODUCTION_TESTER_GUI_H
-#define PRODUCTION_TESTER_GUI_H
+#ifndef TESTER_UNIT_USER_INTERFACE_H
+#define TESTER_UNIT_USER_INTERFACE_H
 
 #include <QtWidgets>
 
-class ProductionTesterGui final : public QWidget {
+class TesterUnitUserInterface final : public QWidget {
  public:
   QVBoxLayout* ControlPanelLayout;
 
@@ -36,11 +36,12 @@ class ProductionTesterGui final : public QWidget {
   QTableView* TransponderDataView;
 
  public:
-  explicit ProductionTesterGui(QWidget* parent);
-  ~ProductionTesterGui() = default;
+  explicit TesterUnitUserInterface(QWidget* parent = nullptr);
+  ~TesterUnitUserInterface() = default;
 
  private:
-  Q_DISABLE_COPY_MOVE(ProductionTesterGui);
+  Q_DISABLE_COPY_MOVE(TesterUnitUserInterface);
+  void connectDependencies(void);
 
   void create(void);
   void createTransponderGroup(void);
@@ -48,4 +49,4 @@ class ProductionTesterGui final : public QWidget {
   void createModelViews(void);
 };
 
-#endif  // PRODUCTION_TESTER_GUI_H
+#endif  // TESTER_UNIT_USER_INTERFACE_H

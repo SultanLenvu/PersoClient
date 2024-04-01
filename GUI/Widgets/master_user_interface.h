@@ -1,10 +1,11 @@
-#ifndef MASTER_GUI_H
-#define MASTER_GUI_H
+#ifndef MASTER_USER_INTERFACE_H
+#define MASTER_USER_INTERFACE_H
 
 #include <QtWidgets>
 
-class MasterGui final : public QWidget {
+class MasterUserInterface final : public QWidget {
  public:
+  QHBoxLayout* MainLayout;
   QTabWidget* Tabs;
 
   // Виджеты для отображения логов
@@ -99,11 +100,11 @@ class MasterGui final : public QWidget {
   //============================================================
 
  public:
-  explicit MasterGui(QWidget* parent);
-  ~MasterGui() = default;
+  explicit MasterUserInterface(QWidget* parent = nullptr);
+  ~MasterUserInterface() = default;
 
  private:
-  Q_DISABLE_COPY_MOVE(MasterGui);
+  Q_DISABLE_COPY_MOVE(MasterUserInterface);
   void create(void);
   void createServerTab(void);
   void createServerTabViews(void);
@@ -119,4 +120,4 @@ class MasterGui final : public QWidget {
   void clearLogDisplay(void);
 };
 
-#endif  // MASTER_GUI_H
+#endif  // MASTER_USER_INTERFACE_H

@@ -1,12 +1,15 @@
-#include "master_gui.h"
+#include "master_user_interface.h"
 #include "global_environment.h"
 #include "widget_log_backend.h"
 
-MasterGui::MasterGui(QWidget* parent) : AbstractGui(parent) {
+MasterUserInterface::MasterUserInterface(QWidget* parent) : QWidget(parent) {
   create();
 }
 
-void MasterGui::create() {
+void MasterUserInterface::create() {
+  MainLayout = new QHBoxLayout();
+  setLayout(MainLayout);
+
   // Вкладки с всеми интерфейсами
   Tabs = new QTabWidget();
   MainLayout->addWidget(Tabs);
@@ -31,7 +34,7 @@ void MasterGui::create() {
   MainLayout->setStretch(1, 2);
 }
 
-void MasterGui::createServerTab() {
+void MasterUserInterface::createServerTab() {
   ServerTab = new QWidget();
   Tabs->addTab(ServerTab, "Сервер");
 
@@ -113,7 +116,7 @@ void MasterGui::createServerTab() {
   ServerTabMainLayout->setStretch(1, 2);
 }
 
-void MasterGui::createServerTabViews() {
+void MasterUserInterface::createServerTabViews() {
   ModelViewLayout = new QVBoxLayout();
   ServerTabMainLayout->addLayout(ModelViewLayout);
 
@@ -153,7 +156,7 @@ void MasterGui::createServerTabViews() {
   TransponderDataLayout->addWidget(TransponderDataView);
 }
 
-void MasterGui::createProgrammatorTab() {
+void MasterUserInterface::createProgrammatorTab() {
   ProgrammatorTab = new QWidget();
   Tabs->addTab(ProgrammatorTab, "Программатор");
 
@@ -192,7 +195,7 @@ void MasterGui::createProgrammatorTab() {
   ProgrammatorControlPanelLayout->addWidget(lockMemoryButton);
 }
 
-void MasterGui::createStickerPrinterTab() {
+void MasterUserInterface::createStickerPrinterTab() {
   StickerPrinterTab = new QWidget();
   Tabs->addTab(StickerPrinterTab, "Стикер принтер");
   // Загружаем настройки приложения
@@ -232,7 +235,7 @@ void MasterGui::createStickerPrinterTab() {
       StickerPrinterCommandSriptTextEdit);
 }
 
-void MasterGui::createLogWidgets() {
+void MasterUserInterface::createLogWidgets() {
   // Виджеты для отображения логов
   GeneralLogGroup = new QGroupBox("Логи");
   MainLayout->addWidget(GeneralLogGroup);
@@ -249,24 +252,91 @@ void MasterGui::createLogWidgets() {
   GeneralLogLayout->addWidget(GeneralLogs);
 }
 
-void MasterGui::connectDepedencies() {
+void MasterUserInterface::connectDepedencies() {
   WidgetLogBackend* ls = dynamic_cast<WidgetLogBackend*>(
       GlobalEnvironment::instance()->getObject("WidgetLogBackend"));
   assert(ls != nullptr);
 
   connect(ls, &WidgetLogBackend::displayLog_signal, this,
-          &MasterGui::displayLog);
+          &MasterUserInterface::displayLog);
   connect(ls, &WidgetLogBackend::clearLogDisplay_signal, this,
-          &MasterGui::clearLogDisplay);
+          &MasterUserInterface::clearLogDisplay);
+
+  MasterUserInterface* gui = dynamic_cast<MasterUserInterface*>(CurrentGui);
+
+  connect(gui->ProgramDeviceButton, &QPushButton::clicked, this,
+          &ProgrammerGuiSubkernel::programMemory);
+  connect(gui->ReadDeviceFirmwareButton, &QPushButton::clicked, this,
+          &ProgrammerGuiSubkernel::readMemory);
+  connect(gui->EraseDeviceButton, &QPushButton::clicked, this,
+          &ProgrammerGuiSubkernel::eraseMemory);
+
+  connect(gui->ReadDeviceUserDataButton, &QPushButton::clicked, this,
+          &ProgrammerGuiSubkernel::readUserData);
+  connect(gui->ProgramDeviceUserDataButton, &QPushButton::clicked, this,
+          &ProgrammerGuiSubkernel::programUserData);
+  connect(gui->ReadDeviceUcidButton, &QPushButton::clicked, this,
+          &ProgrammerGuiSubkernel::readUcid);
+
+  connect(gui->unlockMemoryButton, &QPushButton::clicked, this,
+          &ProgrammerGuiSubkernel::unlockMemory);
+  connect(gui->lockMemoryButton, &QPushButton::clicked, this,
+          &ProgrammerGuiSubkernel::lockMemory);
+
+  // Сигналы от GUI
+  connect(gui->ServerConnectPushButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::connect);
+  connect(gui->ServerDisconnectButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::disconnect);
+  connect(gui->ServerEchoRequestButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::echoRequest);
+  connect(gui->AuthorizePushButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::logOn);
+  connect(gui->GetProductionLineDataButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::getProductionLineData);
+
+  connect(gui->RequestBoxButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::requestBox);
+  connect(gui->GetCurrentBoxDataButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::getCurrentBoxData);
+  connect(gui->RefundCurrentBoxButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::refundCurrentBox);
+  connect(gui->CompleteCurrentBoxButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::completeCurrentBox);
+
+  connect(gui->ReleaseTransponderButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::releaseTransponder);
+  connect(gui->RereleaseTransponderButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::rereleaseTransponder);
+  connect(gui->RollbackTransponderPushButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::rollbackTransponder);
+  connect(gui->GetCurrentTransponderDataButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::getCurrentTransponderData);
+  connect(gui->GetTransponderDataButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::getTransponderData);
+
+  connect(gui->PrintBoxStickerButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::printBoxSticker);
+  connect(gui->PrintLastBoxStickerButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::printLastBoxSticker);
+  connect(gui->PrintPalletStickerButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::printPalletSticker);
+  connect(gui->PrintLastPalletStickerButton, &QPushButton::clicked, this,
+          &ProductionManagerGuiSubkernel::printLastPalletSticker);
+
+  // Связывание моделей и представлений
+  gui->ProductionLineDataView->setModel(ProductionLineModel.get());
+  gui->TransponderDataView->setModel(TransponderDataModel.get());
+  gui->BoxDataView->setModel(BoxDataModel.get());
 }
 
-void MasterGui::displayLog(const QString& log) {
+void MasterUserInterface::displayLog(const QString& log) {
   if (GeneralLogs->toPlainText().size() > 500000)
     GeneralLogs->clear();
 
   GeneralLogs->appendPlainText(log);
 }
 
-void MasterGui::clearLogDisplay() {
+void MasterUserInterface::clearLogDisplay() {
   GeneralLogs->clear();
 }

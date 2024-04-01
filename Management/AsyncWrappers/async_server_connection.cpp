@@ -1,20 +1,16 @@
-#include "server_connection_async_wrapper.h"
-#include "production_manager_subkernel.h"
+#include "async_server_connection.h"
 #include "global_environment.h"
-#include "perso_server_connection.h"
+#include "production_manager_gui_subkernel.h"
 
 #include <QDir>
 #include <QSettings>
 
-ServerConnectionAsyncWrapper::ServerConnectionAsyncWrapper(const QString& name)
-    : ProgressableAsyncWrapper{name},
-      Server(new PersoServerConnection("PersoServerConnection")) {
-  // Шерим подключение к серверу
-  GlobalEnvironment::instance()->registerSharedObject<PersoServerConnection>(
-      std::static_pointer_cast<PersoServerConnection>(Server));
-}
+AsyncServerConnection::AsyncServerConnection(
+    const QString& name,
+    std::shared_ptr<IServerConnection> sc)
+    : ProgressableAsyncWrapper{name}, Server(sc) {}
 
-void ServerConnectionAsyncWrapper::connect() {
+void AsyncServerConnection::connect() {
   initOperation("connectToServer");
 
   ReturnStatus ret = Server->connect();
@@ -26,7 +22,7 @@ void ServerConnectionAsyncWrapper::connect() {
   completeOperation("connectToServer");
 }
 
-void ServerConnectionAsyncWrapper::disconnect() {
+void AsyncServerConnection::disconnect() {
   initOperation("connectToServer");
 
   Server->disconnect();
@@ -34,7 +30,7 @@ void ServerConnectionAsyncWrapper::disconnect() {
   completeOperation("connectToServer");
 }
 
-void ServerConnectionAsyncWrapper::launchProductionLine(
+void AsyncServerConnection::launchProductionLine(
     const StringDictionary& param) {
   initOperation("launchProductionLine");
 
@@ -47,7 +43,7 @@ void ServerConnectionAsyncWrapper::launchProductionLine(
   completeOperation("launchProductionLine");
 }
 
-void ServerConnectionAsyncWrapper::shutdownProductionLine() {
+void AsyncServerConnection::shutdownProductionLine() {
   initOperation("shutdownProductionLine");
 
   Server->shutdownProductionLine();
@@ -55,7 +51,7 @@ void ServerConnectionAsyncWrapper::shutdownProductionLine() {
   completeOperation("shutdownProductionLine");
 }
 
-void ServerConnectionAsyncWrapper::getProductionLineData() {
+void AsyncServerConnection::getProductionLineData() {
   initOperation("getProductionLineData");
 
   ReturnStatus ret = ReturnStatus::NoError;
@@ -72,7 +68,7 @@ void ServerConnectionAsyncWrapper::getProductionLineData() {
   completeOperation("getProductionLineData");
 }
 
-void ServerConnectionAsyncWrapper::echo() {
+void AsyncServerConnection::echo() {
   initOperation("echoServer");
 
   ReturnStatus ret;
@@ -85,7 +81,7 @@ void ServerConnectionAsyncWrapper::echo() {
   completeOperation("echoServer");
 }
 
-void ServerConnectionAsyncWrapper::requestBox() {
+void AsyncServerConnection::requestBox() {
   initOperation("requestBox");
 
   ReturnStatus ret = Server->requestBox();
@@ -97,7 +93,7 @@ void ServerConnectionAsyncWrapper::requestBox() {
   completeOperation("requestBox");
 }
 
-void ServerConnectionAsyncWrapper::getCurrentBoxData() {
+void AsyncServerConnection::getCurrentBoxData() {
   initOperation("getCurrentBoxData");
 
   StringDictionary bdata;
@@ -112,7 +108,7 @@ void ServerConnectionAsyncWrapper::getCurrentBoxData() {
   completeOperation("getCurrentBoxData");
 }
 
-void ServerConnectionAsyncWrapper::refundCurrentBox() {
+void AsyncServerConnection::refundCurrentBox() {
   initOperation("refundCurrentBox");
 
   ReturnStatus ret = Server->refundCurrentBox();
@@ -124,7 +120,7 @@ void ServerConnectionAsyncWrapper::refundCurrentBox() {
   completeOperation("refundCurrentBox");
 }
 
-void ServerConnectionAsyncWrapper::completeCurrentBox() {
+void AsyncServerConnection::completeCurrentBox() {
   initOperation("completeCurrentBox");
 
   ReturnStatus ret = Server->completeCurrentBox();
@@ -136,7 +132,7 @@ void ServerConnectionAsyncWrapper::completeCurrentBox() {
   completeOperation("completeCurrentBox");
 }
 
-void ServerConnectionAsyncWrapper::releaseTransponder() {
+void AsyncServerConnection::releaseTransponder() {
   initOperation("releaseTransponder");
 
   StringDictionary result;
@@ -149,7 +145,7 @@ void ServerConnectionAsyncWrapper::releaseTransponder() {
   completeOperation("releaseTransponder");
 }
 
-void ServerConnectionAsyncWrapper::confirmTransponderRelease(
+void AsyncServerConnection::confirmTransponderRelease(
     const StringDictionary& param) {
   initOperation("confirmTransponderRelease");
 
@@ -162,7 +158,7 @@ void ServerConnectionAsyncWrapper::confirmTransponderRelease(
   completeOperation("confirmTransponderRelease");
 }
 
-void ServerConnectionAsyncWrapper::rereleaseTransponder(
+void AsyncServerConnection::rereleaseTransponder(
     const StringDictionary& param) {
   initOperation("rereleaseTransponder");
 
@@ -176,7 +172,7 @@ void ServerConnectionAsyncWrapper::rereleaseTransponder(
   completeOperation("rereleaseTransponder");
 }
 
-void ServerConnectionAsyncWrapper::rollbackTransponder() {
+void AsyncServerConnection::rollbackTransponder() {
   initOperation("rollbackTransponder");
 
   ReturnStatus ret = Server->rollbackTransponder();
@@ -188,7 +184,7 @@ void ServerConnectionAsyncWrapper::rollbackTransponder() {
   completeOperation("rollbackTransponder");
 }
 
-void ServerConnectionAsyncWrapper::getCurrentTransponderData() {
+void AsyncServerConnection::getCurrentTransponderData() {
   initOperation("getCurrentTransponderData");
 
   ReturnStatus ret = ReturnStatus::NoError;
@@ -205,8 +201,7 @@ void ServerConnectionAsyncWrapper::getCurrentTransponderData() {
   completeOperation("getCurrentTransponderData");
 }
 
-void ServerConnectionAsyncWrapper::getTransponderData(
-    const StringDictionary& param) {
+void AsyncServerConnection::getTransponderData(const StringDictionary& param) {
   initOperation("getTransponderData");
 
   ReturnStatus ret = ReturnStatus::NoError;
@@ -223,8 +218,7 @@ void ServerConnectionAsyncWrapper::getTransponderData(
   completeOperation("getTransponderData");
 }
 
-void ServerConnectionAsyncWrapper::printBoxSticker(
-    const StringDictionary& param) {
+void AsyncServerConnection::printBoxSticker(const StringDictionary& param) {
   initOperation("printBoxSticker");
 
   ReturnStatus ret;
@@ -237,7 +231,7 @@ void ServerConnectionAsyncWrapper::printBoxSticker(
   completeOperation("printBoxSticker");
 }
 
-void ServerConnectionAsyncWrapper::printLastBoxSticker() {
+void AsyncServerConnection::printLastBoxSticker() {
   initOperation("printLastBoxSticker");
 
   ReturnStatus ret;
@@ -250,8 +244,7 @@ void ServerConnectionAsyncWrapper::printLastBoxSticker() {
   completeOperation("printLastBoxSticker");
 }
 
-void ServerConnectionAsyncWrapper::printPalletSticker(
-    const StringDictionary& param) {
+void AsyncServerConnection::printPalletSticker(const StringDictionary& param) {
   initOperation("printPalletSticker");
 
   ReturnStatus ret;
@@ -264,7 +257,7 @@ void ServerConnectionAsyncWrapper::printPalletSticker(
   completeOperation("printPalletSticker");
 }
 
-void ServerConnectionAsyncWrapper::printLastPalletSticker() {
+void AsyncServerConnection::printLastPalletSticker() {
   initOperation("printLastPalletSticker");
 
   ReturnStatus ret;
@@ -277,17 +270,17 @@ void ServerConnectionAsyncWrapper::printLastPalletSticker() {
   completeOperation("printLastPalletSticker");
 }
 
-void ServerConnectionAsyncWrapper::connectDependecies() {
-  AssemblyUnitGuiSubkernel* augs =
-      GlobalEnvironment::instance()->getObject<AssemblyUnitGuiSubkernel>(
-          "AssemblyUnitGuiSubkernel");
+void AsyncServerConnection::connectDependecies() {
+  ProductionManagerGuiSubkernel* augs =
+      GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
+          "ProductionManagerGuiSubkernel");
 
-  QObject::connect(this, &ServerConnectionAsyncWrapper::productionLineDataReady,
-                   augs, &AssemblyUnitGuiSubkernel::displayProductionLineData);
-  QObject::connect(this, &ServerConnectionAsyncWrapper::boxDataReady, augs,
-                   &AssemblyUnitGuiSubkernel::displayBoxData);
-  QObject::connect(this, &ServerConnectionAsyncWrapper::transponderDataReady,
-                   augs, &AssemblyUnitGuiSubkernel::displayTransponderData);
-  QObject::connect(this, &ServerConnectionAsyncWrapper::firwareReady, augs,
-                   &AssemblyUnitGuiSubkernel::displayFirmware);
+  QObject::connect(this, &AsyncServerConnection::productionLineDataReady, augs,
+                   &ProductionManagerGuiSubkernel::displayProductionLineData);
+  QObject::connect(this, &AsyncServerConnection::boxDataReady, augs,
+                   &ProductionManagerGuiSubkernel::displayBoxData);
+  QObject::connect(this, &AsyncServerConnection::transponderDataReady, augs,
+                   &ProductionManagerGuiSubkernel::displayTransponderData);
+  QObject::connect(this, &AsyncServerConnection::firwareReady, augs,
+                   &ProductionManagerGuiSubkernel::displayFirmware);
 }

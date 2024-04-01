@@ -1,10 +1,12 @@
 #include "async_production_manager.h"
+#include "global_environment.h"
 
-ProductionManagerAsyncWrapper::ProductionManagerAsyncWrapper(
-    const QString& name)
-    : ProgressableAsyncWrapper(name) {}
+AsyncProductionManager::AsyncProductionManager(const QString& name)
+    : ProgressableAsyncWrapper(name) {
+  createManager();
+}
 
-void ProductionManagerAsyncWrapper::logOn(const StringDictionary& param) {
+void AsyncProductionManager::logOn(const StringDictionary& param) {
   initOperation("logOn");
 
   ReturnStatus ret;
@@ -17,7 +19,7 @@ void ProductionManagerAsyncWrapper::logOn(const StringDictionary& param) {
   completeOperation("logOn");
 }
 
-void ProductionManagerAsyncWrapper::logOut() {
+void AsyncProductionManager::logOut() {
   initOperation("logOut");
 
   ReturnStatus ret = Manager->logOut();
@@ -29,7 +31,7 @@ void ProductionManagerAsyncWrapper::logOut() {
   completeOperation("logOut");
 }
 
-void ProductionManagerAsyncWrapper::requestBox() {
+void AsyncProductionManager::requestBox() {
   initOperation("requestBox");
 
   ReturnStatus ret = Manager->requestBox();
@@ -41,7 +43,7 @@ void ProductionManagerAsyncWrapper::requestBox() {
   completeOperation("requestBox");
 }
 
-void ProductionManagerAsyncWrapper::refundCurrentBox() {
+void AsyncProductionManager::refundCurrentBox() {
   initOperation("refundCurrentBox");
 
   ReturnStatus ret = Manager->refundCurrentBox();
@@ -53,7 +55,7 @@ void ProductionManagerAsyncWrapper::refundCurrentBox() {
   completeOperation("refundCurrentBox");
 }
 
-void ProductionManagerAsyncWrapper::completeCurrentBox() {
+void AsyncProductionManager::completeCurrentBox() {
   initOperation("completeCurrentBox");
 
   ReturnStatus ret = Manager->completeCurrentBox();
@@ -65,7 +67,7 @@ void ProductionManagerAsyncWrapper::completeCurrentBox() {
   completeOperation("completeCurrentBox");
 }
 
-void ProductionManagerAsyncWrapper::releaseTransponder() {
+void AsyncProductionManager::releaseTransponder() {
   initOperation("releaseTransponder");
 
   ReturnStatus ret = Manager->releaseTransponder();
@@ -77,7 +79,7 @@ void ProductionManagerAsyncWrapper::releaseTransponder() {
   completeOperation("releaseTransponder");
 }
 
-void ProductionManagerAsyncWrapper::rereleaseTransponder(
+void AsyncProductionManager::rereleaseTransponder(
     const StringDictionary& param) {
   initOperation("rereleaseTransponder");
 
@@ -90,7 +92,7 @@ void ProductionManagerAsyncWrapper::rereleaseTransponder(
   completeOperation("rereleaseTransponder");
 }
 
-void ProductionManagerAsyncWrapper::rollbackTransponder() {
+void AsyncProductionManager::rollbackTransponder() {
   initOperation("rollbackTransponder");
 
   ReturnStatus ret = Manager->rollbackTransponder();
@@ -100,4 +102,20 @@ void ProductionManagerAsyncWrapper::rollbackTransponder() {
   }
 
   completeOperation("rollbackTransponder");
+}
+
+void AsyncProductionManager::createManager() {
+  std::shared_ptr<IStickerPrinter> sp =
+      GlobalEnvironment::instance()->getSharedObject<IStickerPrinter>(
+          "IStickerPrinter");
+
+  std::shared_ptr<IProgrammer> p =
+      GlobalEnvironment::instance()->getSharedObject<IProgrammer>(
+          "IProgrammer");
+
+  std::shared_ptr<IServerConnection> sc =
+      GlobalEnvironment::instance()->getSharedObject<IServerConnection>(
+          "IServerConnection");
+
+  Manager = std::make_unique<ProductionManager>("ProductionManager", sc, sp, p);
 }

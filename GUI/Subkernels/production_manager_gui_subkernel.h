@@ -1,5 +1,5 @@
-#ifndef ASSEMBLYUNITGUISUBKERNEL_H
-#define ASSEMBLYUNITGUISUBKERNEL_H
+#ifndef PRODUCTIONMANAGERGUISUBKERNEL_H
+#define PRODUCTIONMANAGERGUISUBKERNEL_H
 
 #include <QStringListModel>
 
@@ -7,10 +7,8 @@
 #include "hash_table_model.h"
 #include "types.h"
 
-class AssemblyUnitGuiSubkernel final : public AbstractGuiSubkernel {
+class ProductionManagerGuiSubkernel final : public AbstractGuiSubkernel {
   Q_OBJECT
-  friend class ServerUserInterface;
-
  private:
   HashTableModel ProductionLineModel;
   HashTableModel BoxModel;
@@ -19,10 +17,11 @@ class AssemblyUnitGuiSubkernel final : public AbstractGuiSubkernel {
   QStringListModel FirmwareModel;
 
  public:
-  explicit AssemblyUnitGuiSubkernel(const QString& name);
-  ~AssemblyUnitGuiSubkernel() = default;
+  explicit ProductionManagerGuiSubkernel(const QString& name);
+  ~ProductionManagerGuiSubkernel() = default;
 
- private slots:  // Слоты для сигналов от GUI
+ public slots:
+  void logOn(const StringDictionary& param);
   void logOn(void);
   void logOut(void);
 
@@ -41,7 +40,7 @@ class AssemblyUnitGuiSubkernel final : public AbstractGuiSubkernel {
   void displayFirmware(const QStringList& firmware);
 
  private:
-  Q_DISABLE_COPY_MOVE(AssemblyUnitGuiSubkernel)
+  Q_DISABLE_COPY_MOVE(ProductionManagerGuiSubkernel)
   void createModels(void);
   void connectDependecies(void);
 
@@ -59,4 +58,4 @@ class AssemblyUnitGuiSubkernel final : public AbstractGuiSubkernel {
   void rollbackTransponder_signal(void);
 };
 
-#endif // ASSEMBLYUNITGUISUBKERNEL_H
+#endif  // PRODUCTIONMANAGERGUISUBKERNEL_H
