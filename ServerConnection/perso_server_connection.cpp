@@ -153,7 +153,7 @@ ReturnStatus PersoServerConnection::refundCurrentBox() {
 }
 
 ReturnStatus PersoServerConnection::getCurrentTransponderData(
-    StringDictionary result) {
+    StringDictionary& result) {
   CurrentCommand = Commands.at(GetCurrentTransponderData);
 
   StringDictionary param;

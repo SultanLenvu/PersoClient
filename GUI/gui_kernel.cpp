@@ -18,7 +18,6 @@
 GuiKernel::GuiKernel(QWidget* parent)
     : QMainWindow(parent), CurrentMode(Authorization) {
   DesktopGeometry = QApplication::primaryScreen()->size();
-  showMaximized();
   createTopMenu();
 
   Service = std::make_unique<ServiceObjectSpace>();
@@ -26,8 +25,10 @@ GuiKernel::GuiKernel(QWidget* parent)
   Async = std::make_unique<AsynchronousObjectSpace>();
 
   // Создаем графический интерфейс для авторизации
-  createAuthorizationUserIInterface();
+  createAuthorizationUserInterface();
   //  createMasterInterface();
+
+  showMaximized();
 }
 
 void GuiKernel::displayMasterInterface() {
@@ -59,15 +60,7 @@ void GuiKernel::displayTesterUnitInterface() {
 void GuiKernel::logOutServerAct_slot() {
   emit logOutServer_signal();
 
-  createAuthorizationUserIInterface();
-}
-
-void GuiKernel::displaySettingsDialog_slot() {
-  SettingsDialog dialog(this);
-  connect(&dialog, &SettingsDialog::applyNewSettings, this,
-          &GuiKernel::applySettings);
-
-  dialog.exec();
+  createAuthorizationUserInterface();
 }
 
 void GuiKernel::createReactions() {
@@ -75,7 +68,7 @@ void GuiKernel::createReactions() {
   SIndicator = std::make_unique<StatusIndicator>("StatusIndicator");
 }
 
-void GuiKernel::createAuthorizationUserIInterface() {
+void GuiKernel::createAuthorizationUserInterface() {
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
@@ -88,9 +81,6 @@ void GuiKernel::createAuthorizationUserIInterface() {
 
   adjustSize();
   setFixedSize(size());
-
-  // Создаем верхнее меню
-  createTopMenu();
 }
 
 void GuiKernel::createMasterInterface() {
@@ -102,9 +92,6 @@ void GuiKernel::createMasterInterface() {
 
   // Создаем интерфейс
   setCentralWidget(new MasterUserInterface());
-
-  // Создаем верхнее меню
-  createTopMenu();
 }
 
 void GuiKernel::createAssemblerUnitUserInterface() {
@@ -115,9 +102,6 @@ void GuiKernel::createAssemblerUnitUserInterface() {
   setLayoutDirection(Qt::LeftToRight);
 
   setCentralWidget(new AssemblerUnitUserInterface());
-
-  // Создаем верхнее меню
-  createTopMenu();
 }
 
 void GuiKernel::createProductionTesterGui() {
@@ -128,9 +112,13 @@ void GuiKernel::createProductionTesterGui() {
   setLayoutDirection(Qt::LeftToRight);
 
   setCentralWidget(new TesterUnitUserInterface());
+}
 
-  // Создаем верхнее меню
-  createTopMenu();
+void GuiKernel::displaySettingsDialog() {
+  SettingsDialog dialog;
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
+  }
 }
 
 void GuiKernel::createTopMenuActions() {
@@ -144,10 +132,10 @@ void GuiKernel::createTopMenuActions() {
   connect(LogOutServerAct, &QAction::triggered, this,
           &GuiKernel::logOutServerAct_slot);
 
-  OpenSettingsDialogAct = new QAction("Настройки", this);
-  OpenSettingsDialogAct->setStatusTip("Открыть интерфейс настроек");
-  connect(OpenSettingsDialogAct, &QAction::triggered, this,
-          &GuiKernel::displaySettingsDialog_slot);
+  SettingsDialogAction = new QAction("Настройки", this);
+  SettingsDialogAction->setStatusTip("Открыть интерфейс настроек");
+  connect(SettingsDialogAction, &QAction::triggered, this,
+          &GuiKernel::displaySettingsDialog);
 
   AboutProgramAct = new QAction("О программе", this);
   AboutProgramAct->setStatusTip("Показать сведения о программе");
@@ -160,7 +148,7 @@ void GuiKernel::createTopMenu() {
 
   ServiceMenu->addAction(OpenMasterInterfaceAct);
   ServiceMenu->addAction(LogOutServerAct);
-  ServiceMenu->addAction(OpenSettingsDialogAct);
+  ServiceMenu->addAction(SettingsDialogAction);
 
   HelpMenu = menuBar()->addMenu("Справка");
   HelpMenu->addAction(AboutProgramAct);

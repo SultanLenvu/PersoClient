@@ -1,9 +1,9 @@
 #include "settings_dialog.h"
-#include "General/definitions.h"
+#include "configuration_system.h"
+#include "definitions.h"
+#include "global_environment.h"
 
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
-  setObjectName("SettingsDialog");
-
   // Создаем виджеты
   create();
   adjustSize();
@@ -11,8 +11,6 @@ SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
   // Задаем заголовок
   setWindowTitle("Настройки");
 }
-
-SettingsDialog::~SettingsDialog() {}
 
 void SettingsDialog::accept() {
   if (!check()) {
@@ -55,6 +53,14 @@ void SettingsDialog::create() {
   //  MainLayout->addItem(VS1);
 }
 
+void SettingsDialog::connectDependencies() {
+  ConfigurationSystem* cum =
+      GlobalEnvironment::instance()->getObject<ConfigurationSystem>(
+          "ConfigurationSystem");
+
+  connect(this, &SettingsDialog::applyNewSettings, cum,
+          &ConfigurationSystem::applySettings_signal);
+}
 
 void SettingsDialog::createLogSystem() {
   LogSystemGroupBox = new QGroupBox(QString("Система логгирования"));

@@ -19,7 +19,7 @@ class ConfigurableObject {
   virtual void loadSettings(void) = 0;
 };
 
-class SettingsApplyBundle : public QObject {
+class SettingsApplyBundle final : public QObject {
   Q_OBJECT
 
  private:
@@ -27,7 +27,7 @@ class SettingsApplyBundle : public QObject {
 
  public:
   SettingsApplyBundle(ConfigurableObject* entity);
-  virtual ~SettingsApplyBundle();
+  ~SettingsApplyBundle() = default;
 
  private slots:
   void apply(void);

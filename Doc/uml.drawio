@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2024-03-29T09:46:28.345Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.0.4 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="apPij0SsK19ckrTV6kG4" version="24.0.4" type="device">
+<mxfile host="Electron" modified="2024-04-02T08:23:16.946Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.0.4 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="7AR9nbmhVhhUc2PzU0am" version="24.0.4" type="device">
   <diagram name="Страница — 1" id="xjbYhO8doR0Xn5XljVLI">
-    <mxGraphModel dx="4194" dy="2785" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2339" pageHeight="3300" math="0" shadow="0">
+    <mxGraphModel dx="4432" dy="2969" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="2339" pageHeight="3300" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -175,17 +175,6 @@
         </mxCell>
         <mxCell id="4Vr9gAasm6H4yabcwDiH-1" value="&lt;p style=&quot;margin: 0px ; margin-top: 4px ; text-align: center&quot;&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;GuiKernel&lt;/b&gt;&lt;br&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;text-align: center ; margin: 0px 0px 0px 4px&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;" parent="1" vertex="1">
           <mxGeometry x="80" y="-1120" width="280" height="120" as="geometry" />
-        </mxCell>
-        <mxCell id="4Vr9gAasm6H4yabcwDiH-2" value="1" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="4Vr9gAasm6H4yabcwDiH-1" target="1ihi_Qld2Xo-b5XpUB7F-61" edge="1">
-          <mxGeometry x="-0.5" relative="1" as="geometry">
-            <mxPoint x="380" y="-1080" as="sourcePoint" />
-            <mxPoint x="220" y="-1290" as="targetPoint" />
-            <mxPoint as="offset" />
-            <Array as="points">
-              <mxPoint x="220" y="-1170" />
-              <mxPoint x="220" y="-1170" />
-            </Array>
-          </mxGeometry>
         </mxCell>
         <mxCell id="4Vr9gAasm6H4yabcwDiH-3" value="&lt;p style=&quot;margin: 0px ; margin-top: 4px ; text-align: center&quot;&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;ProductionManagerAsyncWrapper&lt;/b&gt;&lt;br&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;text-align: center ; margin: 0px 0px 0px 4px&quot;&gt;«slots»&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;&lt;span&gt;+ connectToServer(void) : void&lt;/span&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;&lt;span&gt;+ disconnectFromServer(void) : void&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;&lt;span&gt;+&amp;nbsp;&lt;/span&gt;echoServer(void) : void&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;+ releaseTransponder(void) : void&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;+ rereleaseTransponder(std::shared_ptr&amp;lt;StringDictionary&amp;gt; param) : void&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;+ rollbackProductionLine(void) : void&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;+ printBoxSticker(std::shared_ptr&amp;lt;StringDictionary&amp;gt; param) : void&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;+ printLastBoxSticker(void) : void&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;+ printPalletSticker(std::shared_ptr&amp;lt;StringDictionary&amp;gt; param) : void&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;+ printLastPalletSticker(void) : void&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;text-align: center ; margin: 0px 0px 0px 4px&quot;&gt;«signals»&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 4px&quot;&gt;&lt;span&gt;+ displayTransponderData_signal(const std::shared_ptr&amp;lt;StringDictionary&amp;gt;)&lt;/span&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 4px&quot;&gt;+ displayBoxData_signal(const std::shared_ptr&amp;lt;StringDictionary&amp;gt;)&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 4px&quot;&gt;+ authorizationCompleted(void) : void&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;" parent="1" vertex="1">
           <mxGeometry x="2480" width="480" height="320" as="geometry" />
@@ -425,39 +414,8 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="1ihi_Qld2Xo-b5XpUB7F-40" value="&lt;p style=&quot;margin: 0px ; margin-top: 4px ; text-align: center&quot;&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;AuthorizationManagerAsyncWrapper&lt;/b&gt;&lt;br&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;text-align: center ; margin: 0px 0px 0px 4px&quot;&gt;«slots»&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;text-align: center ; margin: 0px 0px 0px 4px&quot;&gt;«signals»&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 4px&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1200" width="480" height="320" as="geometry" />
-        </mxCell>
-        <mxCell id="1ihi_Qld2Xo-b5XpUB7F-41" value="&lt;p style=&quot;margin: 0px ; margin-top: 4px ; text-align: center&quot;&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;AuthorizationManager&lt;/b&gt;&lt;br&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;text-align: center ; margin: 0px 0px 0px 4px&quot;&gt;«slots»&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;text-align: center ; margin: 0px 0px 0px 4px&quot;&gt;«signals»&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1200" y="480" width="480" height="200" as="geometry" />
-        </mxCell>
-        <mxCell id="1ihi_Qld2Xo-b5XpUB7F-42" value="1" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="1ihi_Qld2Xo-b5XpUB7F-40" target="1ihi_Qld2Xo-b5XpUB7F-41">
-          <mxGeometry x="-0.625" relative="1" as="geometry">
-            <mxPoint x="1508.5700000000002" y="340" as="sourcePoint" />
-            <mxPoint x="1508.5700000000002" y="420" as="targetPoint" />
-            <mxPoint as="offset" />
-            <Array as="points" />
-          </mxGeometry>
-        </mxCell>
         <mxCell id="1ihi_Qld2Xo-b5XpUB7F-43" value="&lt;p style=&quot;margin: 0px ; margin-top: 4px ; text-align: center&quot;&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;Authorization&lt;/b&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;Gui&lt;/b&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;Subkernel&lt;/b&gt;&lt;br&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;text-align: center ; margin: 0px 0px 0px 4px&quot;&gt;«abstract»&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 4px&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;text-align: center ; margin: 0px 0px 0px 4px&quot;&gt;«signals»&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;" vertex="1" parent="1">
           <mxGeometry x="1200" y="-680" width="480" height="440" as="geometry" />
-        </mxCell>
-        <mxCell id="1ihi_Qld2Xo-b5XpUB7F-44" value="Use" style="endArrow=open;endSize=12;dashed=1;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="1ihi_Qld2Xo-b5XpUB7F-43" target="1ihi_Qld2Xo-b5XpUB7F-40">
-          <mxGeometry width="160" relative="1" as="geometry">
-            <mxPoint x="1740" y="-240" as="sourcePoint" />
-            <mxPoint x="1740" y="180" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="1ihi_Qld2Xo-b5XpUB7F-45" value="&lt;span style=&quot;text-wrap: nowrap;&quot;&gt;IServerConnection&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1240" y="720" width="160" height="40" as="geometry" />
-        </mxCell>
-        <mxCell id="1ihi_Qld2Xo-b5XpUB7F-46" value="1" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=0;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="1ihi_Qld2Xo-b5XpUB7F-41" target="1ihi_Qld2Xo-b5XpUB7F-45">
-          <mxGeometry x="-0.5" relative="1" as="geometry">
-            <mxPoint x="1118.9499999999998" y="770" as="sourcePoint" />
-            <mxPoint x="1118.9499999999998" y="890" as="targetPoint" />
-            <mxPoint as="offset" />
-            <Array as="points" />
-          </mxGeometry>
         </mxCell>
         <mxCell id="1ihi_Qld2Xo-b5XpUB7F-51" value="&lt;p style=&quot;margin: 0px ; margin-top: 4px ; text-align: center&quot;&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;TestingUnitUserInterface&lt;/b&gt;&lt;br&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;text-align: center ; margin: 0px 0px 0px 4px&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;" vertex="1" parent="1">
           <mxGeometry x="1840" y="-1000" width="480" height="120" as="geometry" />
@@ -506,9 +464,6 @@
             <mxPoint x="4300" y="-820" as="sourcePoint" />
             <mxPoint x="4300" y="-620" as="targetPoint" />
           </mxGeometry>
-        </mxCell>
-        <mxCell id="1ihi_Qld2Xo-b5XpUB7F-61" value="&lt;p style=&quot;margin: 0px ; margin-top: 4px ; text-align: center&quot;&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;MainwindowGui&lt;/b&gt;&lt;br&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 4px;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;+ displayLog()&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 4px;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;+ clearLogDisplay()&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;" vertex="1" parent="1">
-          <mxGeometry x="80" y="-1400" width="280" height="120" as="geometry" />
         </mxCell>
         <mxCell id="1ihi_Qld2Xo-b5XpUB7F-67" value="&lt;p style=&quot;margin: 0px ; margin-top: 4px ; text-align: center&quot;&gt;&lt;/p&gt;&lt;span&gt;&lt;div style=&quot;text-align: center&quot;&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;LogSystem&lt;/b&gt;&lt;br&gt;&lt;/div&gt;&lt;/span&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;+ generate(const QString&amp;amp;)&lt;/span&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 4px&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;" vertex="1" parent="1">
           <mxGeometry x="-1840" y="-800" width="280" height="120" as="geometry" />
@@ -801,16 +756,16 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="1ihi_Qld2Xo-b5XpUB7F-125" value="&lt;p style=&quot;margin: 0px ; margin-top: 4px ; text-align: center&quot;&gt;«abstract class»&lt;b style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/b&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-top: 4px ; text-align: center&quot;&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;AbstractUserInterface&lt;/b&gt;&lt;br&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 4px;&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px ; margin-left: 4px&quot;&gt;&lt;br&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Helvetica;html=1;" vertex="1" parent="1">
-          <mxGeometry x="480" y="-1400" width="280" height="120" as="geometry" />
+          <mxGeometry x="80" y="-1360" width="280" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="1ihi_Qld2Xo-b5XpUB7F-127" value="n" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="1ihi_Qld2Xo-b5XpUB7F-61" target="1ihi_Qld2Xo-b5XpUB7F-125">
+        <mxCell id="1ihi_Qld2Xo-b5XpUB7F-127" value="n" style="endArrow=open;html=1;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="4Vr9gAasm6H4yabcwDiH-1" target="1ihi_Qld2Xo-b5XpUB7F-125">
           <mxGeometry x="-0.6667" relative="1" as="geometry">
-            <mxPoint x="390" y="-1220" as="sourcePoint" />
+            <mxPoint x="360" y="-1340.0000000000002" as="sourcePoint" />
             <mxPoint x="510" y="-1220" as="targetPoint" />
             <mxPoint as="offset" />
             <Array as="points">
-              <mxPoint x="410" y="-1340" />
-              <mxPoint x="410" y="-1340" />
+              <mxPoint x="220" y="-1210" />
+              <mxPoint x="220" y="-1210" />
             </Array>
           </mxGeometry>
         </mxCell>

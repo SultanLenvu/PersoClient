@@ -71,8 +71,8 @@ class SettingsDialog : public QDialog {
   QPushButton* RejectPushButton;
 
  public:
-  explicit SettingsDialog(QWidget* parent);
-  ~SettingsDialog();
+  explicit SettingsDialog(QWidget* parent = nullptr);
+  ~SettingsDialog() = default;
 
  public:  // QDialog interface
   virtual void accept(void) override;
@@ -80,7 +80,9 @@ class SettingsDialog : public QDialog {
  private:
   Q_DISABLE_COPY_MOVE(SettingsDialog)
   void create(void);
+  void connectDependencies(void);
 
+ private:
   void createLogSystem(void);
   void createPersoServer(void);
   void createProgrammator(void);

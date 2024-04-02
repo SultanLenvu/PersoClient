@@ -10,11 +10,7 @@ class ProgrammerGuiSubkernel : public AbstractGuiSubkernel {
   explicit ProgrammerGuiSubkernel(const QString& name);
   ~ProgrammerGuiSubkernel() = default;
 
- private:
-  Q_DISABLE_COPY_MOVE(ProgrammerGuiSubkernel);
-  void connectDependencies(void) const;
-
- private:
+ public slots:
   void programMemory(void);
   void readMemory(void);
   void eraseMemory(void);
@@ -25,6 +21,10 @@ class ProgrammerGuiSubkernel : public AbstractGuiSubkernel {
 
   void unlockMemory(void);
   void lockMemory(void);
+
+ private:
+  Q_DISABLE_COPY_MOVE(ProgrammerGuiSubkernel);
+  void connectDependencies(void) const;
 
  signals:
   void programMemory_signal(const QByteArray& data);

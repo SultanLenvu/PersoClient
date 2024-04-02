@@ -123,7 +123,7 @@ void StatusIndicator::createMessageMatchTable() {
       "Не удалось инициализировать принтер стикеров.";
   MessageTable[ReturnStatus::StickerPrinterConnectionError] =
       "Не удалось подключиться к принтеру стикеров.";
-  MessageTable[ReturnStatus::StickerPrintError] =
+  MessageTable[ReturnStatus::StickerPrintingFailed] =
       "Не удалось распечатать стикер.";
   MessageTable[ReturnStatus::LastStickerMissed] =
       "Ранее не было распечатано ни одного стикера. Повтор печати невозможен.";

@@ -20,6 +20,11 @@ class ProductionManagerGuiSubkernel final : public AbstractGuiSubkernel {
   explicit ProductionManagerGuiSubkernel(const QString& name);
   ~ProductionManagerGuiSubkernel() = default;
 
+ public:
+  HashTableModel& productionLineModel(void);
+  HashTableModel& boxModel(void);
+  HashTableModel& transponderModel(void);
+
  public slots:
   void logOn(const StringDictionary& param);
   void logOn(void);

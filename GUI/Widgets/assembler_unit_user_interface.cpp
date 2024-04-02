@@ -1,5 +1,7 @@
 #include "assembler_unit_user_interface.h"
+#include "global_environment.h"
 #include "production_manager_gui_subkernel.h"
+#include "server_connection_gui_subkernel.h"
 
 AssemblerUnitUserInterface::AssemblerUnitUserInterface(QWidget* parent)
     : QWidget(parent) {
@@ -20,6 +22,10 @@ void AssemblerUnitUserInterface::connectDependecies() {
       GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
           "ProductionManagerGuiSubkernel");
 
+  ServerConnectionGuiSubkernel* scgs =
+      GlobalEnvironment::instance()->getObject<ServerConnectionGuiSubkernel>(
+          "ServerConnectionGuiSubkernel");
+
   connect(RequestBoxButton, &QPushButton::clicked, pgs,
           &ProductionManagerGuiSubkernel::requestBox);
   connect(RefundCurrentBoxButton, &QPushButton::clicked, pgs,
@@ -34,13 +40,13 @@ void AssemblerUnitUserInterface::connectDependecies() {
   connect(RollbackTransponderPushButton, &QPushButton::clicked, pgs,
           &ProductionManagerGuiSubkernel::rollbackTransponder);
 
-  connect(PrintBoxStickerButton, &QPushButton::clicked, pgs,
-          &ProductionManagerGuiSubkernel::printBoxSticker);
+  connect(PrintBoxStickerButton, &QPushButton::clicked, scgs,
+          &ServerConnectionGuiSubkernel::printBoxSticker);
 
   // Связывание моделей и представлений
-  ProductionLineDataView->setModel(&pgs->ProductionLineModel);
-  TransponderDataView->setModel(&pgs->TransponderDataModel);
-  BoxDataView->setModel(&pgs->BoxDataModel);
+  ProductionLineDataView->setModel(&pgs->productionLineModel());
+  TransponderDataView->setModel(&pgs->transponderModel());
+  BoxDataView->setModel(&pgs->boxModel());
 }
 
 void AssemblerUnitUserInterface::createBoxGroup() {
@@ -107,10 +113,10 @@ void AssemblerUnitUserInterface::createPrinterStickerGroup() {
   PrintLastTransponderStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
   PrinterStickerLayout->addWidget(PrintLastTransponderStickerButton);
 
-  PrintCustomTransponderStickerButton =
+  PrintTransponderStickerButton =
       new QPushButton(QString("Распечатать произвольный стикер"));
-  PrintCustomTransponderStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
-  PrinterStickerLayout->addWidget(PrintCustomTransponderStickerButton);
+  PrintTransponderStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
+  PrinterStickerLayout->addWidget(PrintTransponderStickerButton);
 
   PrintBoxStickerButton =
       new QPushButton(QString("Распечатать стикер для бокса"));

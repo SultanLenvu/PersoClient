@@ -28,7 +28,7 @@ class AssemblerUnitUserInterface final : public QWidget {
   QGroupBox* PrinterStickerGroup;
   QVBoxLayout* PrinterStickerLayout;
   QPushButton* PrintLastTransponderStickerButton;
-  QPushButton* PrintCustomTransponderStickerButton;
+  QPushButton* PrintTransponderStickerButton;
   QPushButton* PrintBoxStickerButton;
 
   // Представления для моделей

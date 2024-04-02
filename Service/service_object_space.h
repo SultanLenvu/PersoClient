@@ -4,14 +4,14 @@
 #include <QThread>
 
 #include "abstract_service_object_space.h"
-#include "configuration_manager.h"
+#include "configuration_system.h"
 #include "log_system.h"
 
 class ServiceObjectSpace final : public AbstractServiceObjectSpace {
  private:
   QThread Thread;
   std::unique_ptr<LogSystem> Logger;
-  std::unique_ptr<ConfigurationManager> ConfigUpdater;
+  std::unique_ptr<ConfigurationSystem> ConfigUpdater;
 
  public:
   explicit ServiceObjectSpace();

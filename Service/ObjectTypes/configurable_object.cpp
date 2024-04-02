@@ -1,6 +1,6 @@
 #include "configurable_object.h"
 
-#include "configuration_manager.h"
+#include "configuration_system.h"
 #include "global_environment.h"
 
 ConfigurableObject::ConfigurableObject() {
@@ -11,15 +11,13 @@ ConfigurableObject::ConfigurableObject() {
 SettingsApplyBundle::SettingsApplyBundle(ConfigurableObject* object) {
   Object = object;
 
-  ConfigurationManager* cum =
-      GlobalEnvironment::instance()->getObject<ConfigurationManager>(
-          "ConfigurationManager");
+  ConfigurationSystem* cum =
+      GlobalEnvironment::instance()->getObject<ConfigurationSystem>(
+          "ConfigurationSystem");
 
-  connect(cum, &ConfigurationManager::applySettings_signal, this,
+  connect(cum, &ConfigurationSystem::applySettings_signal, this,
           &SettingsApplyBundle::apply);
 }
-
-SettingsApplyBundle::~SettingsApplyBundle() {}
 
 void SettingsApplyBundle::apply() {
   Object->loadSettings();

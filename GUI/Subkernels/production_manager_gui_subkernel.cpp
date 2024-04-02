@@ -11,6 +11,18 @@ ProductionManagerGuiSubkernel::ProductionManagerGuiSubkernel(
   connectDependecies();
 }
 
+HashTableModel& ProductionManagerGuiSubkernel::productionLineModel() {
+  return ProductionLineModel;
+}
+
+HashTableModel& ProductionManagerGuiSubkernel::boxModel() {
+  return BoxModel;
+}
+
+HashTableModel& ProductionManagerGuiSubkernel::transponderModel() {
+  return TransponderModel;
+}
+
 void ProductionManagerGuiSubkernel::logOn(const StringDictionary& param) {}
 
 void ProductionManagerGuiSubkernel::logOn() {

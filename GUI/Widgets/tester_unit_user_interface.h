@@ -16,7 +16,7 @@ class TesterUnitUserInterface final : public QWidget {
   QGroupBox* PrinterStickerGroup;
   QVBoxLayout* PrinterStickerLayout;
   QPushButton* PrintLastTransponderStickerButton;
-  QPushButton* PrintCustomTransponderStickerButton;
+  QPushButton* PrintTransponderStickerButton;
   QSpacerItem* ControlPanelVS1;
   QPushButton* PrintLastBoxStickerButton;
   QPushButton* PrintBoxStickerButton;

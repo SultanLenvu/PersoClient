@@ -6,18 +6,6 @@
 StickerPrinterGuiSubkernel::StickerPrinterGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel{name} {}
 
-void StickerPrinterGuiSubkernel::connectDependecies() {
-  AsyncStickerPrinter* asp =
-      GlobalEnvironment::instance()->getObject<AsyncStickerPrinter>(
-          "AsyncStickerPrinter");
-
-  connect(this, &StickerPrinterGuiSubkernel::printLastTransponderSticker_signal,
-          asp, &AsyncStickerPrinter::printLastTransponderSticker);
-  connect(this, &StickerPrinterGuiSubkernel::printTransponderSticker_signal,
-          asp, &AsyncStickerPrinter::printTransponderSticker);
-  connect(this, &StickerPrinterGuiSubkernel::exec_signal, asp,
-          &AsyncStickerPrinter::exec);
-}
 
 void StickerPrinterGuiSubkernel::printLastTransponderSticker() {
   emit clearLogDisplay_signal();
@@ -42,4 +30,17 @@ void StickerPrinterGuiSubkernel::exec(const QStringList& script) {
   emit clearLogDisplay_signal();
 
   emit exec_signal(script);
+}
+
+void StickerPrinterGuiSubkernel::connectDependecies() {
+  AsyncStickerPrinter* asp =
+      GlobalEnvironment::instance()->getObject<AsyncStickerPrinter>(
+          "AsyncStickerPrinter");
+
+  connect(this, &StickerPrinterGuiSubkernel::printLastTransponderSticker_signal,
+          asp, &AsyncStickerPrinter::printLastTransponderSticker);
+  connect(this, &StickerPrinterGuiSubkernel::printTransponderSticker_signal,
+          asp, &AsyncStickerPrinter::printTransponderSticker);
+  connect(this, &StickerPrinterGuiSubkernel::exec_signal, asp,
+          &AsyncStickerPrinter::exec);
 }

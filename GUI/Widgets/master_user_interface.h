@@ -62,42 +62,8 @@ class MasterUserInterface final : public QWidget {
   QTableView* TransponderDataView;
   //============================================================
 
-  /* Интерфейс для взаимодействия с программатором */
-  //============================================================
   QWidget* ProgrammatorTab;
-  QHBoxLayout* ProgrammatorTabMainLayout;
-
-  QGroupBox* ProgrammatorControlPanel;
-  QVBoxLayout* ProgrammatorControlPanelLayout;
-
-  QPushButton* ProgramDeviceButton;
-  QPushButton* ReadDeviceFirmwareButton;
-  QPushButton* EraseDeviceButton;
-  QPushButton* ProgramDeviceUserDataButton;
-  QPushButton* ReadDeviceUserDataButton;
-  QPushButton* ReadDeviceUcidButton;
-  QSpacerItem* ButtonVS1;
-  QPushButton* unlockMemoryButton;
-  QPushButton* lockMemoryButton;
-  //============================================================
-
-  /* Интерфейс для взаимодействия с принтером */
-  //============================================================
   QWidget* StickerPrinterTab;
-  QHBoxLayout* StickerPrinterTabMainLayout;
-
-  QGroupBox* StickerPrinterControlPanel;
-  QVBoxLayout* StickerPrinterControlPanelLayout;
-
-  QPushButton* PrintLastTransponderStickerButton;
-  QPushButton* PrintCustomTransponderStickerButton;
-  QSpacerItem* StickerPrinterControlPanelVS1;
-  QPushButton* ExecuteStickerPrinterCommandScriptButton;
-
-  QGroupBox* StickerPrinterCommandSriptGroup;
-  QVBoxLayout* StickerPrinterCommandSriptLayout;
-  QPlainTextEdit* StickerPrinterCommandSriptTextEdit;
-  //============================================================
 
  public:
   explicit MasterUserInterface(QWidget* parent = nullptr);
@@ -118,6 +84,9 @@ class MasterUserInterface final : public QWidget {
  private slots:
   void displayLog(const QString& log);
   void clearLogDisplay(void);
+
+ signals:
+  void execCommandScript_signal(const QStringList& script);
 };
 
 #endif  // MASTER_USER_INTERFACE_H

@@ -8,30 +8,6 @@
 ProgrammerGuiSubkernel ::ProgrammerGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel{name} {}
 
-void ProgrammerGuiSubkernel::connectDependencies() const {
-  AsyncProgrammer* ap =
-      GlobalEnvironment::instance()->getObject<AsyncProgrammer>(
-          "AsyncProgrammer");
-
-  connect(this, &ProgrammerGuiSubkernel::programMemory_signal, ap,
-          &AsyncProgrammer::programMemory);
-  connect(this, &ProgrammerGuiSubkernel::readMemory_signal, ap,
-          &AsyncProgrammer::readMemory);
-  connect(this, &ProgrammerGuiSubkernel::eraseMemory_signal, ap,
-          &AsyncProgrammer::eraseMemory);
-
-  connect(this, &ProgrammerGuiSubkernel::programUserData_signal, ap,
-          &AsyncProgrammer::programUserData);
-  connect(this, &ProgrammerGuiSubkernel::readUserData_signal, ap,
-          &AsyncProgrammer::readUserData);
-  connect(this, &ProgrammerGuiSubkernel::readUcid_signal, ap,
-          &AsyncProgrammer::readTransponderUcid);
-
-  connect(this, &ProgrammerGuiSubkernel::unlockMemory_signal, ap,
-          &AsyncProgrammer::unlockMemory);
-  connect(this, &ProgrammerGuiSubkernel::lockMemory_signal, ap,
-          &AsyncProgrammer::lockMemory);
-}
 
 void ProgrammerGuiSubkernel::programMemory() {
   emit clearLogDisplay_signal();
@@ -111,4 +87,29 @@ void ProgrammerGuiSubkernel::lockMemory() {
   emit clearLogDisplay_signal();
 
   emit lockMemory_signal();
+}
+
+void ProgrammerGuiSubkernel::connectDependencies() const {
+  AsyncProgrammer* ap =
+      GlobalEnvironment::instance()->getObject<AsyncProgrammer>(
+          "AsyncProgrammer");
+
+  connect(this, &ProgrammerGuiSubkernel::programMemory_signal, ap,
+          &AsyncProgrammer::programMemory);
+  connect(this, &ProgrammerGuiSubkernel::readMemory_signal, ap,
+          &AsyncProgrammer::readMemory);
+  connect(this, &ProgrammerGuiSubkernel::eraseMemory_signal, ap,
+          &AsyncProgrammer::eraseMemory);
+
+  connect(this, &ProgrammerGuiSubkernel::programUserData_signal, ap,
+          &AsyncProgrammer::programUserData);
+  connect(this, &ProgrammerGuiSubkernel::readUserData_signal, ap,
+          &AsyncProgrammer::readUserData);
+  connect(this, &ProgrammerGuiSubkernel::readUcid_signal, ap,
+          &AsyncProgrammer::readTransponderUcid);
+
+  connect(this, &ProgrammerGuiSubkernel::unlockMemory_signal, ap,
+          &AsyncProgrammer::unlockMemory);
+  connect(this, &ProgrammerGuiSubkernel::lockMemory_signal, ap,
+          &AsyncProgrammer::lockMemory);
 }

@@ -83,10 +83,10 @@ void TesterUnitUserInterface::createPrinterStickerGroup() {
   PrintLastTransponderStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
   PrinterStickerLayout->addWidget(PrintLastTransponderStickerButton);
 
-  PrintCustomTransponderStickerButton =
+  PrintTransponderStickerButton =
       new QPushButton(QString("Распечатать произвольный стикер"));
-  PrintCustomTransponderStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
-  PrinterStickerLayout->addWidget(PrintCustomTransponderStickerButton);
+  PrintTransponderStickerButton->setFont(QFont("Arial", 12, QFont::Bold));
+  PrinterStickerLayout->addWidget(PrintTransponderStickerButton);
 
   ControlPanelVS1 =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);

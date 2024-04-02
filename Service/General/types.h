@@ -66,7 +66,7 @@ enum class ReturnStatus {
   StickerPrinterLibraryMissing,
   StickerPrinterInitError,
   StickerPrinterConnectionError,
-  StickerPrintError,
+  StickerPrinterCommandScriptExecutionError,
   LastStickerMissed,
 
   InvalidFirmwareFile,

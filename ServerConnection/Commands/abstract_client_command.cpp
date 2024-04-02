@@ -225,7 +225,7 @@ void AbstractClientCommand::createCrtLogMap() {
       "Server return status: StickerPrinterLibraryMissing";
   CrtLogMap[StickerPrinterConnectionError] =
       "Server return status: StickerPrinterConnectionError";
-  CrtLogMap[StickerPrintingError] = "Server return status: StickerPrintError";
+  CrtLogMap[StickerPrintingError] = "Server return status: StickerPrintingFailed";
   CrtLogMap[LastStickerMissed] = "Server return status: LastStickerMissed";
 
   CrtLogMap[Unknown] = "Server return status: Unknown";

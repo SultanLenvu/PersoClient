@@ -2,8 +2,9 @@
 #include "async_server_connection.h"
 #include "authorization_dialog.h"
 #include "global_environment.h"
-#include "numeric_string_checker.h"
+#include "string_input_dialog.h"
 #include "transponder_sticker_scan_dialog.h"
+#include "ucid_checker.h"
 
 ServerConnectionGuiSubkernel::ServerConnectionGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel(name) {
@@ -15,11 +16,6 @@ void ServerConnectionGuiSubkernel::executeCommand(const QString& name) {
   emit clearLogDisplay_signal();
 
   (this->*CommandMethods.value(name))();
-}
-
-void ServerConnectionGuiSubkernel::onServerDisconnected() {
-  QMessageBox::critical(nullptr, "Ошибка", "Соединение с сервером оборвалось.",
-                        QMessageBox::Ok);
 }
 
 void ServerConnectionGuiSubkernel::connect() {
@@ -138,9 +134,7 @@ void ServerConnectionGuiSubkernel::getCurrentTransponderData() {
 void ServerConnectionGuiSubkernel::getTransponderData() {
   StringDictionary param;
 
-  StringInputDialog dialog("transponder_pan");
-  NumericStringChecker checker;
-  dialog.setChecker(&checker);
+  TransponderStickerScanDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -153,7 +147,7 @@ void ServerConnectionGuiSubkernel::getTransponderData() {
 void ServerConnectionGuiSubkernel::printBoxSticker() {
   StringDictionary param;
 
-  StringInputDialog dialog("transponder_pan");
+  TransponderStickerScanDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -184,6 +178,11 @@ void ServerConnectionGuiSubkernel::printPalletSticker() {
 void ServerConnectionGuiSubkernel::printLastPalletSticker() {
   emit clearLogDisplay_signal();
   emit printLastPalletSticker_signal();
+}
+
+void ServerConnectionGuiSubkernel::onServerDisconnected() {
+  QMessageBox::critical(nullptr, "Ошибка", "Соединение с сервером оборвалось.",
+                        QMessageBox::Ok);
 }
 
 void ServerConnectionGuiSubkernel::connectDependecies() {

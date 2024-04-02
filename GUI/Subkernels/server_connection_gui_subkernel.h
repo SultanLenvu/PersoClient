@@ -21,9 +21,7 @@ class ServerConnectionGuiSubkernel final : public AbstractGuiSubkernel {
 
  public slots:  // Слоты для сигналов от GUI
   void executeCommand(const QString& name);
-  void onServerDisconnected(void);
 
- private:
   void connect(void);
   void disconnect(void);
 
@@ -49,6 +47,8 @@ class ServerConnectionGuiSubkernel final : public AbstractGuiSubkernel {
   void printLastBoxSticker(void);
   void printPalletSticker(void);
   void printLastPalletSticker(void);
+
+  void onServerDisconnected(void);
 
  private:
   Q_DISABLE_COPY_MOVE(ServerConnectionGuiSubkernel)

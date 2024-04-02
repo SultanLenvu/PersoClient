@@ -16,7 +16,7 @@
 
 class GuiKernel : public QMainWindow {
   Q_OBJECT
- private:
+ public:
   enum GuiKernelMode {
     Authorization,
     AssemblyUnit,
@@ -31,12 +31,12 @@ class GuiKernel : public QMainWindow {
 
   // Верхнее меню
   //==================================================
-  QMenu* ServiceMenu;
+  QWidget* ServiceMenu;
   QAction* OpenMasterInterfaceAct;
   QAction* LogOutServerAct;
-  QAction* OpenSettingsDialogAct;
+  QAction* SettingsDialogAction;
 
-  QMenu* HelpMenu;
+  QWidget* HelpMenu;
   QAction* AboutProgramAct;
   //==================================================
 
@@ -53,15 +53,11 @@ class GuiKernel : public QMainWindow {
   ~GuiKernel() = default;
 
  public slots:
-  void applySettings(void);
-
   void displayMasterInterface(void);
   void displayAssemblerUnitInterface(void);
   void displayTesterUnitInterface(void);
 
   void logOutServerAct_slot(void);
-  void displaySettingsDialog_slot(void);
-
   void onServerDisconnected(void);
 
  private:
@@ -74,10 +70,13 @@ class GuiKernel : public QMainWindow {
   void createReactions(void);
   void createGuiSubkernels(void);
 
-  void createAuthorizationUserIInterface(void);
+  void createAuthorizationUserInterface(void);
   void createMasterInterface(void);
   void createAssemblerUnitUserInterface(void);
   void createProductionTesterGui(void);
+
+ private slots:
+  void displaySettingsDialog(void);
 
  signals:
   void logOutServer_signal(void);

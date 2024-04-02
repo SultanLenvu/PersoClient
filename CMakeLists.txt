@@ -43,7 +43,7 @@ add_executable(PersoClient WIN32
     Service/abstract_service_object_space.h Service/abstract_service_object_space.cpp
     Service/service_object_space.h Service/service_object_space.cpp
     Service/asynchronous_object_space.h Service/asynchronous_object_space.cpp
-    Service/configuration_manager.h Service/configuration_manager.cpp
+    Service/configuration_system.h Service/configuration_system.cpp
 
     Service/General/definitions.h
     Service/General/hash_table_model.cpp Service/General/hash_table_model.h
@@ -84,6 +84,9 @@ add_executable(PersoClient WIN32
     GUI/Widgets/tester_unit_user_interface.cpp GUI/Widgets/tester_unit_user_interface.h
     GUI/Widgets/server_user_interface.cpp GUI/Widgets/server_user_interface.h
     GUI/Widgets/abstract_user_interface.cpp GUI/Widgets/abstract_user_interface.h
+    GUI/Widgets/sticker_printer_user_interface.h GUI/Widgets/sticker_printer_user_interface.cpp
+    GUI/Widgets/server_commands_widget.h GUI/Widgets/server_commands_widget.cpp
+    GUI/Widgets/programmator_user_interface.h GUI/Widgets/programmator_user_interface.cpp
 
     GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
 
