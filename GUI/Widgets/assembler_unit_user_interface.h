@@ -5,7 +5,7 @@
 #include <QtWidgets>
 
 class AssemblerUnitUserInterface final : public QWidget {
- public:
+ private:
   QHBoxLayout* MainLayout;
 
   QVBoxLayout* ControlPanelLayout;

@@ -30,7 +30,11 @@ class StickerPrinterUserInterface : public QWidget
   void create(void);
   void connectDependencies(void);
 
+ private slots:
+  void execCommandSript(void);
+
  signals:
+  void execCommandScript_signal(const QStringList& script);
 };
 
 #endif // STICKERPRINTERUSERINTERFACE_H

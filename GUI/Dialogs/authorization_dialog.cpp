@@ -13,12 +13,6 @@ AuthorizationDialog::AuthorizationDialog(QWidget* parent)
   setFixedSize(size());
 }
 
-AuthorizationDialog::~AuthorizationDialog() {}
-
-AbstractInputDialog::InputDialogType AuthorizationDialog::type() const {
-  return Authorization;
-}
-
 void AuthorizationDialog::getData(StringDictionary& data) const {
   data.insert("login", LoginLineEdit->text());
   data.insert("password", PasswordLineEdit->text());

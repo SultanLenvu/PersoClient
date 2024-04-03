@@ -29,11 +29,10 @@ class AuthorizationDialog : public AbstractInputDialog {
 
  public:
   explicit AuthorizationDialog(QWidget* parent = nullptr);
-  ~AuthorizationDialog();
+  ~AuthorizationDialog() = default;
 
   // AbstractInputDialog interface
  public:
-  virtual InputDialogType type() const override;
   virtual void getData(StringDictionary& data) const override;
 
  private:

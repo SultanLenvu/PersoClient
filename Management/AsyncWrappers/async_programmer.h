@@ -5,6 +5,8 @@
 #include "progressable_async_wrapper.h"
 
 class AsyncProgrammer : public ProgressableAsyncWrapper {
+  Q_OBJECT
+
  private:
   std::shared_ptr<IProgrammer> Programmer;
 

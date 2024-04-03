@@ -23,10 +23,11 @@ GuiKernel::GuiKernel(QWidget* parent)
   Service = std::make_unique<ServiceObjectSpace>();
   createReactions();
   Async = std::make_unique<AsynchronousObjectSpace>();
+  createGuiSubkernels();
 
   // Создаем графический интерфейс для авторизации
-  createAuthorizationUserInterface();
-  //  createMasterInterface();
+  //  createAuthorizationUserInterface();
+  createMasterInterface();
 
   showMaximized();
 }
@@ -142,6 +143,7 @@ void GuiKernel::createTopMenuActions() {
 }
 
 void GuiKernel::createTopMenu() {
+  createTopMenuActions();
   menuBar()->clear();
 
   ServiceMenu = menuBar()->addMenu("Сервис");

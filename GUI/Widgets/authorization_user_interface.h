@@ -2,6 +2,7 @@
 #define AUTHORIZATIONUSERINTERFACE_H
 
 #include <QtWidgets>
+#include "types.h"
 
 class AuthorizationUserInterface : public QWidget {
   Q_OBJECT
@@ -37,16 +38,19 @@ class AuthorizationUserInterface : public QWidget {
   explicit AuthorizationUserInterface(QWidget* parent = nullptr);
   ~AuthorizationUserInterface() = default;
 
- private slots:
-  void logOn(void);
-
  private:
-  Q_DISABLE_COPY(AuthorizationUserInterface);
+  Q_DISABLE_COPY_MOVE(AuthorizationUserInterface);
   void connectDependecies(void);
 
  private:
   void create(void);
   void createAuthorizationGroup(void);
+
+ private slots:
+  void logOn(void);
+
+ signals:
+  void logOn_signal(const StringDictionary& param);
 };
 
 #endif  // AUTHORIZATIONUSERINTERFACE_H

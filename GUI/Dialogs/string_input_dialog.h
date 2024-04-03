@@ -4,7 +4,7 @@
 #include "abstract_input_dialog.h"
 #include "abstract_string_checker.h"
 
-class StringInputDialog : public AbstractInputDialog {
+class StringInputDialog final : public AbstractInputDialog {
   Q_OBJECT
  private:
   QSize DesktopGeometry;
@@ -33,8 +33,6 @@ class StringInputDialog : public AbstractInputDialog {
 
  public:  // AbstractInputDialog interface
   virtual void getData(StringDictionary& data) const override;
-  virtual InputDialogType type(void) const override;
-
   virtual void accept() override;
 
  public:

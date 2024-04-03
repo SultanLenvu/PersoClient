@@ -1,6 +1,6 @@
 #include "authorization_user_interface.h"
-#include "authorization_gui_subkernel.h"
 #include "global_environment.h"
+#include "production_manager_gui_subkernel.h"
 
 AuthorizationUserInterface::AuthorizationUserInterface(QWidget* parent)
     : QWidget(parent) {
@@ -8,18 +8,20 @@ AuthorizationUserInterface::AuthorizationUserInterface(QWidget* parent)
   connectDependecies();
 }
 
-void AuthorizationUserInterface::logOn() {}
-
 void AuthorizationUserInterface::connectDependecies() {
-  AuthorizationGuiSubkernel* ags =
-      GlobalEnvironment::instance()->getObject<AuthorizationGuiSubkernel>(
-          "AuthorizationGuiSubkernel");
+  ProductionManagerGuiSubkernel* pmgs =
+      GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
+          "ProductionManagerGuiSubkernel");
 
-  connect(AuthorizePushButton, &QPushButton::clicked, ags,
-          &AuthorizationGuiSubkernel::logOn);
+  void (ProductionManagerGuiSubkernel::*mptr)(const StringDictionary&) =
+      &ProductionManagerGuiSubkernel::logOn;
+  connect(this, &AuthorizationUserInterface::logOn_signal, pmgs, mptr);
 }
 
 void AuthorizationUserInterface::create() {
+  MainLayout = new QHBoxLayout();
+  setLayout(MainLayout);
+
   GeneralLayout = new QVBoxLayout();
   MainLayout->addLayout(GeneralLayout);
 
@@ -38,6 +40,8 @@ void AuthorizationUserInterface::create() {
 
   AuthorizePushButton = new QPushButton("Войти");
   GeneralLayout->addWidget(AuthorizePushButton);
+  connect(AuthorizePushButton, &QPushButton::clicked, this,
+          &AuthorizationUserInterface::logOn);
 
   ControlPanelVS =
       new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -70,4 +74,12 @@ void AuthorizationUserInterface::createAuthorizationGroup() {
   PasswordLineEdit = new QLineEdit();
   PasswordLineEdit->setEchoMode(QLineEdit::Password);
   PasswordLayout->addWidget(PasswordLineEdit);
+}
+
+void AuthorizationUserInterface::logOn() {
+  StringDictionary param;
+  param.insert("login", LoginLineEdit->text());
+  param.insert("password", PasswordLineEdit->text());
+
+  emit logOn_signal(param);
 }

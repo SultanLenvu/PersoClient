@@ -15,11 +15,6 @@ TransponderStickerScanDialog::TransponderStickerScanDialog(QWidget* parent)
   Regex.setPattern("^[0-9]+$");
 }
 
-AbstractInputDialog::InputDialogType TransponderStickerScanDialog::type()
-    const {
-  return TransponderStickerScan;
-}
-
 void TransponderStickerScanDialog::getData(StringDictionary& data) const {
   QStringList input = StickerData->toPlainText().split("\n");
   if (!checkInput(input)) {

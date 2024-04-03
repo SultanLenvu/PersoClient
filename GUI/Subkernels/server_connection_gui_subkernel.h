@@ -4,12 +4,12 @@
 #include <QPlainTextEdit>
 
 #include "abstract_gui_subkernel.h"
-#include "server_user_interface.h"
+#include "production_manager_user_interface.h"
 #include "types.h"
 
 class ServerConnectionGuiSubkernel final : public AbstractGuiSubkernel {
   Q_OBJECT
-  friend class ServerUserInterface;
+  friend class ProductionManagerUserInterface;
 
  private:
   typedef void (ServerConnectionGuiSubkernel::*MethodPtr)();

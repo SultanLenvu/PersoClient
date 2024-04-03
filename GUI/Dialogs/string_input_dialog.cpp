@@ -20,10 +20,6 @@ void StringInputDialog::getData(StringDictionary& data) const {
   data.insert(ParamName, InputData->text());
 }
 
-AbstractInputDialog::InputDialogType StringInputDialog::type() const {
-  return StringInput;
-}
-
 void StringInputDialog::accept() {
   if (!Checker) {
     QDialog::accept();

@@ -21,12 +21,11 @@ class MasterPasswordInputDialog : public AbstractInputDialog {
 
  public:
   explicit MasterPasswordInputDialog(QWidget* parent);
-  ~MasterPasswordInputDialog();
+  ~MasterPasswordInputDialog() = default;
 
   // AbstractInputDialog interface
  public:
   virtual void getData(StringDictionary& data) const override;
-  virtual InputDialogType type(void) const override;
 
  private:
   Q_DISABLE_COPY_MOVE(MasterPasswordInputDialog);

@@ -1,8 +1,6 @@
 #ifndef ABSTRACTGUISUBKERNEL_H
 #define ABSTRACTGUISUBKERNEL_H
 
-#include <QObject>
-
 #include "named_object.h"
 
 class AbstractGuiSubkernel : public NamedObject {

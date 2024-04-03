@@ -24,6 +24,7 @@ class ProductionManagerGuiSubkernel final : public AbstractGuiSubkernel {
   HashTableModel& productionLineModel(void);
   HashTableModel& boxModel(void);
   HashTableModel& transponderModel(void);
+  QStringListModel& firmwareModel(void);
 
  public slots:
   void logOn(const StringDictionary& param);

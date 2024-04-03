@@ -8,22 +8,13 @@
 
 class AbstractInputDialog : public QDialog {
   Q_OBJECT
- public:
-  enum InputDialogType {
-    MasterPassword,
-    Authorization,
-    TransponderStickerScan,
-    CustomTransponderSticker,
-    PanInput,
-  };
-  Q_ENUM(InputDialogType);
 
  public:
-  explicit AbstractInputDialog(QWidget* parent);
-  virtual ~AbstractInputDialog();
+  explicit AbstractInputDialog(QWidget* parent = nullptr);
+  virtual ~AbstractInputDialog() = default;
 
+ public:
   virtual void getData(StringDictionary& data) const = 0;
-  virtual InputDialogType type(void) const = 0;
 
  private:
   Q_DISABLE_COPY_MOVE(AbstractInputDialog);

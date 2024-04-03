@@ -3,20 +3,17 @@
 
 #include "abstract_user_interface.h"
 
-class ServerUserInterface final : public AbstractUserInterface {
+class ProductionManagerUserInterface final : public AbstractUserInterface {
   Q_OBJECT
 
  private:
   QHBoxLayout* MainLayout;
   QVBoxLayout* SubLayout;
 
- private:  // Одиночные команды
-  QGroupBox* RawCommandGroup;
-  QVBoxLayout* RawCommandLayout;
-  QComboBox* CommandComboBox;
-  QPushButton* ExecuteCommandButton;
+ private:
+  QWidget* CommandsWidget;
 
- private:  // Команды сборочного юнита
+ private:
   QGroupBox* ControlPanel;
   QVBoxLayout* ControlPanelLayout;
 
@@ -65,13 +62,13 @@ class ServerUserInterface final : public AbstractUserInterface {
   QListView* FirmwareView;
 
  public:
-  explicit ServerUserInterface(QWidget* parent = nullptr);
-  ~ServerUserInterface() = default;
+  explicit ProductionManagerUserInterface(QWidget* parent = nullptr);
+  ~ProductionManagerUserInterface() = default;
 
  private:
   void createWidgets(void);
   void createControlPanel(void);
-  void createRawCommandGroup(void);
+  void createCommandsWidget(void);
   void createInitGroup(void);
   void createProductionLineGroup(void);
   void createBoxGroup(void);
@@ -80,12 +77,6 @@ class ServerUserInterface final : public AbstractUserInterface {
   void createDataDisplayPanel(void);
 
   void connectDependencies(void);
-
- private slots:
-  void onExecuteCommandButton_slot(void);
-
- signals:
-  void executeCommand_signal(const QString& name);
 };
 
 #endif  // PERSOSERVERWIDGET_H

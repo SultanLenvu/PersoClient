@@ -36,11 +36,10 @@ class CustomTransponderStickerScanDialog : public AbstractInputDialog {
 
  public:
   explicit CustomTransponderStickerScanDialog(QWidget* parent);
-  ~CustomTransponderStickerScanDialog();
+  ~CustomTransponderStickerScanDialog() = default;
 
   // AbstractInputDialog interface
  public:
-  virtual InputDialogType type() const override;
   virtual void getData(StringDictionary& data) const override;
 
  private:

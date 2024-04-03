@@ -30,6 +30,8 @@ void StickerPrinterUserInterface::create() {
   ExecCommandScriptButton =
       new QPushButton(QString("Выполнить командный скрипт"));
   ControlPanelLayout->addWidget(ExecCommandScriptButton);
+  connect(ExecCommandScriptButton, &QPushButton::clicked, this,
+          &StickerPrinterUserInterface::execCommandSript);
 
   CommandSriptGroup = new QGroupBox(QString("Командный скрипт"));
   MainLayout->addWidget(CommandSriptGroup);
@@ -48,6 +50,15 @@ void StickerPrinterUserInterface::connectDependencies() {
           &StickerPrinterGuiSubkernel::printTransponderSticker);
   connect(PrintTransponderStickerButton, &QPushButton::clicked, spgs,
           &StickerPrinterGuiSubkernel::printLastTransponderSticker);
-  connect(this, &MasterUserInterface::execCommandScript_signal, spgs,
+
+  connect(this, &StickerPrinterUserInterface::execCommandScript_signal, spgs,
           &StickerPrinterGuiSubkernel::exec);
+}
+
+void StickerPrinterUserInterface::execCommandSript() {
+  QString scriptStr = CommandSriptInput->toPlainText();
+  scriptStr.remove("\r");
+
+  QStringList script = scriptStr.split("\n");
+  emit execCommandScript_signal(script);
 }

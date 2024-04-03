@@ -12,14 +12,8 @@ MasterPasswordInputDialog::MasterPasswordInputDialog(QWidget* parent)
   setWindowTitle("Мастер доступ");
 }
 
-MasterPasswordInputDialog::~MasterPasswordInputDialog() {}
-
 void MasterPasswordInputDialog::getData(StringDictionary& data) const {
   data.insert("password", PasswordLineEdit->text());
-}
-
-AbstractInputDialog::InputDialogType MasterPasswordInputDialog::type() const {
-  return MasterPassword;
 }
 
 void MasterPasswordInputDialog::create()

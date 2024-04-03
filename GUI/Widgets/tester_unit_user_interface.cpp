@@ -1,8 +1,8 @@
 #include "tester_unit_user_interface.h"
-#include "async_production_manager.h"
-#include "async_server_connection.h"
-#include "async_sticker_printer.h"
 #include "global_environment.h"
+#include "production_manager_gui_subkernel.h"
+#include "server_connection_gui_subkernel.h"
+#include "sticker_printer_gui_subkernel.h"
 
 TesterUnitUserInterface::TesterUnitUserInterface(QWidget* parent)
     : QWidget(parent) {
@@ -10,33 +10,33 @@ TesterUnitUserInterface::TesterUnitUserInterface(QWidget* parent)
 }
 
 void TesterUnitUserInterface::connectDependencies() {
-  AsyncProductionManager* apm =
-      GlobalEnvironment::instance()->getObject<AsyncProductionManager>(
-          "AsyncProductionManager");
+  ProductionManagerGuiSubkernel* pmgs =
+      GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
+          "ProductionManagerGuiSubkernel");
 
-  connect(RereleaseTransponderButton, &QPushButton::clicked, apm,
-          &AsyncProductionManager::rereleaseTransponder);
+  connect(RereleaseTransponderButton, &QPushButton::clicked, pmgs,
+          &ProductionManagerGuiSubkernel::rereleaseTransponder);
 
-  AsyncServerConnection* asc =
-      GlobalEnvironment::instance()->getObject<AsyncServerConnection>(
-          "AsyncServerConnection");
+  ServerConnectionGuiSubkernel* asc =
+      GlobalEnvironment::instance()->getObject<ServerConnectionGuiSubkernel>(
+          "ServerConnectionGuiSubkernel");
 
   connect(PrintLastBoxStickerButton, &QPushButton::clicked, asc,
-          &AsyncServerConnection::printLastBoxSticker);
+          &ServerConnectionGuiSubkernel::printLastBoxSticker);
   connect(PrintBoxStickerButton, &QPushButton::clicked, asc,
-          &AsyncServerConnection::printBoxSticker);
+          &ServerConnectionGuiSubkernel::printBoxSticker);
   connect(PrintLastPalletStickerButton, &QPushButton::clicked, asc,
-          &AsyncServerConnection::printLastPalletSticker);
+          &ServerConnectionGuiSubkernel::printLastPalletSticker);
   connect(PrintPalletStickerButton, &QPushButton::clicked, asc,
-          &AsyncServerConnection::printPalletSticker);
+          &ServerConnectionGuiSubkernel::printPalletSticker);
 
-  AsyncStickerPrinter* asp =
-      GlobalEnvironment::instance()->getObject<AsyncStickerPrinter>(
-          "AsyncStickerPrinter");
+  StickerPrinterGuiSubkernel* asp =
+      GlobalEnvironment::instance()->getObject<StickerPrinterGuiSubkernel>(
+          "StickerPrinterGuiSubkernel");
 
   // Связывание моделей и представлений
-  ProductionLineDataView->setModel(ProductionLineModel.get());
-  TransponderDataView->setModel(TransponderDataModel.get());
+  ProductionLineDataView->setModel(&pmgs->productionLineModel());
+  TransponderDataView->setModel(&pmgs->transponderModel());
 }
 
 void TesterUnitUserInterface::create() {

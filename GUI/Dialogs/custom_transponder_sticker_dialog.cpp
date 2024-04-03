@@ -15,13 +15,6 @@ CustomTransponderStickerScanDialog::CustomTransponderStickerScanDialog(
   setWindowTitle("Данные стикера");
 }
 
-CustomTransponderStickerScanDialog::~CustomTransponderStickerScanDialog() {}
-
-AbstractInputDialog::InputDialogType CustomTransponderStickerScanDialog::type()
-    const {
-  return CustomTransponderSticker;
-}
-
 void CustomTransponderStickerScanDialog::getData(StringDictionary& data) const {
   if (!checkInput()) {
     return;

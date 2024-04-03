@@ -4,7 +4,10 @@
 #include <QtWidgets>
 
 class TesterUnitUserInterface final : public QWidget {
- public:
+ private:
+  QHBoxLayout* MainLayout;
+
+ private:
   QVBoxLayout* ControlPanelLayout;
 
   QGroupBox* TransponderGroup;
@@ -24,6 +27,7 @@ class TesterUnitUserInterface final : public QWidget {
   QPushButton* PrintLastPalletStickerButton;
   QPushButton* PrintPalletStickerButton;
 
+ private:
   QVBoxLayout* ModelViewLayout;
   QHBoxLayout* ModelViewSublayout;
 

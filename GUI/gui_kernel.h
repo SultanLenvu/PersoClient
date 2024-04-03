@@ -40,7 +40,7 @@ class GuiKernel : public QMainWindow {
   QAction* AboutProgramAct;
   //==================================================
 
-  std::vector<AbstractGuiSubkernel> Subkernels;
+  std::vector<std::unique_ptr<AbstractGuiSubkernel>> Subkernels;
 
   std::unique_ptr<ProgressIndicator> PIndicator;
   std::unique_ptr<StatusIndicator> SIndicator;
@@ -58,7 +58,6 @@ class GuiKernel : public QMainWindow {
   void displayTesterUnitInterface(void);
 
   void logOutServerAct_slot(void);
-  void onServerDisconnected(void);
 
  private:
   Q_DISABLE_COPY_MOVE(GuiKernel);

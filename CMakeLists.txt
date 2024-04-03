@@ -51,9 +51,10 @@ add_executable(PersoClient WIN32
     Service/General/global_environment.cpp Service/General/global_environment.h
     Service/General/named_object_factory.h Service/General/named_object_factory.cpp
 
-    Service/Functors/abstract_string_checker.h Service/Functors/abstract_string_checker.cpp
-    Service/Functors/ucid_checker.h Service/Functors/ucid_checker.cpp
-    Service/Functors/numeric_string_checker.h Service/Functors/numeric_string_checker.cpp
+    Service/Functors/abstract_string_checker.cpp Service/Functors/abstract_string_checker.h
+    Service/Functors/numeric_string_checker.cpp Service/Functors/numeric_string_checker.h
+    Service/Functors/pan_checker.cpp Service/Functors/pan_checker.h
+    Service/Functors/ucid_checker.cpp Service/Functors/ucid_checker.h
 
     Service/ObjectTypes/named_object.cpp Service/ObjectTypes/named_object.h
     Service/ObjectTypes/configurable_object.h Service/ObjectTypes/configurable_object.cpp
@@ -82,11 +83,12 @@ add_executable(PersoClient WIN32
     GUI/Widgets/master_user_interface.cpp GUI/Widgets/master_user_interface.h
     GUI/Widgets/assembler_unit_user_interface.cpp GUI/Widgets/assembler_unit_user_interface.h
     GUI/Widgets/tester_unit_user_interface.cpp GUI/Widgets/tester_unit_user_interface.h
-    GUI/Widgets/server_user_interface.cpp GUI/Widgets/server_user_interface.h
+    GUI/Widgets/production_manager_user_interface.cpp GUI/Widgets/production_manager_user_interface.h
     GUI/Widgets/abstract_user_interface.cpp GUI/Widgets/abstract_user_interface.h
     GUI/Widgets/sticker_printer_user_interface.h GUI/Widgets/sticker_printer_user_interface.cpp
     GUI/Widgets/server_commands_widget.h GUI/Widgets/server_commands_widget.cpp
     GUI/Widgets/programmator_user_interface.h GUI/Widgets/programmator_user_interface.cpp
+    GUI/Widgets/log_display_widget.h GUI/Widgets/log_display_widget.cpp
 
     GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
 
@@ -94,7 +96,6 @@ add_executable(PersoClient WIN32
     GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
     GUI/Subkernels/production_manager_gui_subkernel.cpp GUI/Subkernels/production_manager_gui_subkernel.h
     GUI/Subkernels/server_connection_gui_subkernel.cpp GUI/Subkernels/server_connection_gui_subkernel.h
-    GUI/Subkernels/authorization_gui_subkernel.h GUI/Subkernels/authorization_gui_subkernel.cpp
 
     GUI/Dialogs/authorization_dialog.cpp GUI/Dialogs/authorization_dialog.h
     GUI/Dialogs/master_password_input_dialog.cpp GUI/Dialogs/master_password_input_dialog.h
@@ -102,6 +103,7 @@ add_executable(PersoClient WIN32
     GUI/Dialogs/transponder_sticker_scan_dialog.cpp GUI/Dialogs/transponder_sticker_scan_dialog.h
     GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
     GUI/Dialogs/settings_dialog.cpp GUI/Dialogs/settings_dialog.h
+    GUI/Dialogs/string_input_dialog.cpp GUI/Dialogs/string_input_dialog.h
 
     GUI/Reactions/i_progress_indicator.h GUI/Reactions/i_progress_indicator.cpp
     GUI/Reactions/progress_indicator.cpp GUI/Reactions/progress_indicator.h

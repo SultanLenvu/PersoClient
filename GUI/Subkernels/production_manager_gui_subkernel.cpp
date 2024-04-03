@@ -23,6 +23,10 @@ HashTableModel& ProductionManagerGuiSubkernel::transponderModel() {
   return TransponderModel;
 }
 
+QStringListModel& ProductionManagerGuiSubkernel::firmwareModel() {
+  return FirmwareModel;
+}
+
 void ProductionManagerGuiSubkernel::logOn(const StringDictionary& param) {}
 
 void ProductionManagerGuiSubkernel::logOn() {

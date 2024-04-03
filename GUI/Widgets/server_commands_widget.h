@@ -1,16 +1,32 @@
 #ifndef SERVERCOMMANDSWIDGET_H
 #define SERVERCOMMANDSWIDGET_H
 
-#include <QWidget>
+#include <QComboBox>
+#include <QGroupBox>
+#include <QPushButton>
+#include <QVBoxLayout>
 
-class ServerCommandsWidget : public QWidget
-{
+class ServerCommandsWidget : public QGroupBox {
   Q_OBJECT
-      public:
-                explicit ServerCommandsWidget(QWidget *parent = nullptr);
+
+ private:
+  QVBoxLayout* Layout;
+  QComboBox* ComboBox;
+  QPushButton* Button;
+
+ public:
+  explicit ServerCommandsWidget(QWidget* parent = nullptr);
+  ~ServerCommandsWidget() = default;
+
+ private:
+  void create(void);
+  void connectDependencies(void);
+
+ private slots:
+  void prepareCommandExecution(void);
 
  signals:
-
+  void executeCommand_signal(const QString& name);
 };
 
-#endif // SERVERCOMMANDSWIDGET_H
+#endif  // SERVERCOMMANDSWIDGET_H

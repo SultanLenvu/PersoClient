@@ -1,22 +1,22 @@
-#include "server_user_interface.h"
+#include "production_manager_user_interface.h"
 #include "global_environment.h"
 #include "production_manager_gui_subkernel.h"
-#include "server_connection_gui_subkernel.h"
+#include "server_commands_widget.h"
 
-ServerUserInterface::ServerUserInterface(QWidget* parent)
+ProductionManagerUserInterface::ProductionManagerUserInterface(QWidget* parent)
     : AbstractUserInterface{parent} {
   createWidgets();
   connectDependencies();
 }
 
-void ServerUserInterface::createWidgets() {
+void ProductionManagerUserInterface::createWidgets() {
   MainLayout = new QHBoxLayout();
   setLayout(MainLayout);
 
   SubLayout = new QVBoxLayout();
   MainLayout->addLayout(SubLayout);
 
-  createRawCommandGroup();
+  createCommandsWidget();
   createControlPanel();
   createDataDisplayPanel();
 
@@ -25,7 +25,7 @@ void ServerUserInterface::createWidgets() {
   MainLayout->setStretch(1, 3);
 }
 
-void ServerUserInterface::createControlPanel() {
+void ProductionManagerUserInterface::createControlPanel() {
   ControlPanel = new QGroupBox("Команды сборочной единицы");
   SubLayout->addWidget(ControlPanel);
 
@@ -43,48 +43,12 @@ void ServerUserInterface::createControlPanel() {
   ControlPanelLayout->addItem(ControlPanelVS);
 }
 
-void ServerUserInterface::createRawCommandGroup() {
-  RawCommandGroup = new QGroupBox("Клиентские запросы");
-  SubLayout->addWidget(RawCommandGroup);
-
-  RawCommandLayout = new QVBoxLayout();
-  RawCommandGroup->setLayout(RawCommandLayout);
-
-  CommandComboBox = new QComboBox();
-  RawCommandLayout->addWidget(CommandComboBox);
-  CommandComboBox->addItem("connect");
-  CommandComboBox->addItem("disconnect");
-
-  CommandComboBox->addItem("echo");
-  CommandComboBox->addItem("launch_production_line");
-  CommandComboBox->addItem("shutdown_production_line");
-  CommandComboBox->addItem("get_production_line_data");
-
-  CommandComboBox->addItem("request_box");
-  CommandComboBox->addItem("get_current_box_data");
-  CommandComboBox->addItem("refund_current_box");
-  CommandComboBox->addItem("complete_current_box");
-
-  CommandComboBox->addItem("release_transponder");
-  CommandComboBox->addItem("confirm_transponder_release");
-  CommandComboBox->addItem("rerelease_transponder");
-  CommandComboBox->addItem("confirm_transponder_rerelease");
-  CommandComboBox->addItem("rollback_tranponder");
-  CommandComboBox->addItem("get_current_transponder_data");
-  CommandComboBox->addItem("get_transponder_data");
-
-  CommandComboBox->addItem("print_box_sticker");
-  CommandComboBox->addItem("print_last_box_sticker");
-  CommandComboBox->addItem("print_pallet_sticker");
-  CommandComboBox->addItem("print_last_pallet_sticker");
-
-  ExecuteCommandButton = new QPushButton("Выполнить");
-  RawCommandLayout->addWidget(ExecuteCommandButton);
-  connect(ExecuteCommandButton, &QPushButton::clicked, this,
-          &ServerUserInterface::onExecuteCommandButton_slot);
+void ProductionManagerUserInterface::createCommandsWidget() {
+  CommandsWidget = new ServerCommandsWidget();
+  SubLayout->addWidget(CommandsWidget);
 }
 
-void ServerUserInterface::createInitGroup() {
+void ProductionManagerUserInterface::createInitGroup() {
   InitGroup = new QGroupBox("Авторизация");
   ControlPanelLayout->addWidget(InitGroup);
 
@@ -97,7 +61,7 @@ void ServerUserInterface::createInitGroup() {
   InitGroupLayout->addWidget(LogOutPushButton);
 }
 
-void ServerUserInterface::createProductionLineGroup() {
+void ProductionManagerUserInterface::createProductionLineGroup() {
   ProductionLineGroup = new QGroupBox("Производственная линия");
   ControlPanelLayout->addWidget(ProductionLineGroup);
 
@@ -110,7 +74,7 @@ void ServerUserInterface::createProductionLineGroup() {
   ProductionLineGroupLayout->addWidget(ShutdownProductionLinePushButton);
 }
 
-void ServerUserInterface::createBoxGroup() {
+void ProductionManagerUserInterface::createBoxGroup() {
   BoxGroup = new QGroupBox("Боксы");
   ControlPanelLayout->addWidget(BoxGroup);
 
@@ -125,7 +89,7 @@ void ServerUserInterface::createBoxGroup() {
   BoxGroupLayout->addWidget(CompleteCurrentBoxPushButton);
 }
 
-void ServerUserInterface::createTransponderGroup() {
+void ProductionManagerUserInterface::createTransponderGroup() {
   TransponderGroup = new QGroupBox("Транспондеры");
   ControlPanelLayout->addWidget(TransponderGroup);
 
@@ -140,10 +104,9 @@ void ServerUserInterface::createTransponderGroup() {
   TransponderGroupLayout->addWidget(RollbackTransponderPushButton);
 }
 
-void ServerUserInterface::createPrintingGroup() {
-}
+void ProductionManagerUserInterface::createPrintingGroup() {}
 
-void ServerUserInterface::createDataDisplayPanel() {
+void ProductionManagerUserInterface::createDataDisplayPanel() {
   DataDisplayPanel = new QGroupBox("Данные");
   MainLayout->addWidget(DataDisplayPanel);
 
@@ -179,20 +142,14 @@ void ServerUserInterface::createDataDisplayPanel() {
   FirmwareLayout->addWidget(FirmwareView);
 }
 
-void ServerUserInterface::connectDependencies() {
-  const ServerConnectionGuiSubkernel* sgs =
-      GlobalEnvironment::instance()->getObject<const ServerConnectionGuiSubkernel>(
-          "ServerConnectionGuiSubkernel");
-
-  QObject::connect(this, &ServerUserInterface::executeCommand_signal, sgs,
-                   &ServerConnectionGuiSubkernel::executeCommand);
-
+void ProductionManagerUserInterface::connectDependencies() {
   ProductionManagerGuiSubkernel* augs =
       GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
           "ProductionManagerGuiSubkernel");
 
-  QObject::connect(LogOnPushButton, &QPushButton::clicked, augs,
-                   &ProductionManagerGuiSubkernel::logOn);
+  void (ProductionManagerGuiSubkernel::*mptr)(void) =
+      &ProductionManagerGuiSubkernel::logOn;
+  QObject::connect(LogOnPushButton, &QPushButton::clicked, augs, mptr);
   QObject::connect(LogOutPushButton, &QPushButton::clicked, augs,
                    &ProductionManagerGuiSubkernel::logOut);
 
@@ -210,12 +167,8 @@ void ServerUserInterface::connectDependencies() {
   QObject::connect(RollbackTransponderPushButton, &QPushButton::clicked, augs,
                    &ProductionManagerGuiSubkernel::rollbackTransponder);
 
-  ProductionLineDataView->setModel(&augs->ProductionLineModel);
-  BoxDataView->setModel(&augs->BoxModel);
-  TransponderDataView->setModel(&augs->TransponderModel);
-  FirmwareView->setModel(&augs->FirmwareModel);
-}
-
-void ServerUserInterface::onExecuteCommandButton_slot() {
-  emit executeCommand_signal(CommandComboBox->currentText());
+  ProductionLineDataView->setModel(&augs->productionLineModel());
+  BoxDataView->setModel(&augs->boxModel());
+  TransponderDataView->setModel(&augs->transponderModel());
+  FirmwareView->setModel(&augs->firmwareModel());
 }

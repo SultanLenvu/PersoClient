@@ -30,7 +30,6 @@ class TransponderStickerScanDialog : public AbstractInputDialog {
 
   // AbstractInputDialog interface
  public:
-  virtual InputDialogType type() const override;
   virtual void getData(StringDictionary& data) const override;
 
  private:

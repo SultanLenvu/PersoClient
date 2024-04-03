@@ -172,6 +172,20 @@ void AsyncServerConnection::rereleaseTransponder(
   completeOperation("rereleaseTransponder");
 }
 
+void AsyncServerConnection::confirmTransponderRerelease(
+    const StringDictionary& param) {
+  initOperation("confirmTransponderRerelease");
+
+  StringDictionary result;
+  ReturnStatus ret = Server->confirmTransponderRerelease(param);
+  if (ret != ReturnStatus::NoError) {
+    processOperationError("confirmTransponderRerelease", ret);
+    return;
+  }
+
+  completeOperation("confirmTransponderRerelease");
+}
+
 void AsyncServerConnection::rollbackTransponder() {
   initOperation("rollbackTransponder");
 
