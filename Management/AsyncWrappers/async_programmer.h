@@ -11,13 +11,10 @@ class AsyncProgrammer : public ProgressableAsyncWrapper {
   std::shared_ptr<IProgrammer> Programmer;
 
  public:
-  Q_INVOKABLE explicit AsyncProgrammer(const QString& name,
-                                       std::shared_ptr<IProgrammer> programmer);
+  Q_INVOKABLE explicit AsyncProgrammer(const QString& name);
   ~AsyncProgrammer() = default;
 
  public:
-  void checkConfig(void);
-
   void programMemory(const QByteArray& data);
   void programMemoryWithUnlock(const QByteArray& data);
   void readMemory(void);

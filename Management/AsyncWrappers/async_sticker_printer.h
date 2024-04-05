@@ -10,9 +10,7 @@ class AsyncStickerPrinter final : public ProgressableAsyncWrapper {
   std::shared_ptr<IStickerPrinter> StickerPrinter;
 
  public:
-  Q_INVOKABLE explicit AsyncStickerPrinter(
-      const QString& name,
-      std::shared_ptr<IStickerPrinter> isp);
+  Q_INVOKABLE explicit AsyncStickerPrinter(const QString& name);
   ~AsyncStickerPrinter() = default;
 
  public slots:

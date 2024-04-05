@@ -24,7 +24,7 @@ class JLinkExeProgrammer : public NamedObject,
   QStringList ProcessArguments;
 
  public:
-  explicit JLinkExeProgrammer(const QString& name);
+  Q_INVOKABLE explicit JLinkExeProgrammer(const QString& name);
   ~JLinkExeProgrammer() = default;
 
  public:  // IProgrammer interface

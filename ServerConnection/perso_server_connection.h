@@ -67,7 +67,7 @@ class PersoServerConnection final : public NamedObject,
   std::unique_ptr<QEventLoop> WaitingLoop;
 
  public:
-  explicit PersoServerConnection(const QString& name);
+  Q_INVOKABLE explicit PersoServerConnection(const QString& name);
   ~PersoServerConnection();
 
   // IServerConnection interface

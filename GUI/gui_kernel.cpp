@@ -11,6 +11,7 @@
 #include "master_user_interface.h"
 #include "production_manager_gui_subkernel.h"
 #include "programmer_gui_subkernel.h"
+#include "server_connection_gui_subkernel.h"
 #include "settings_dialog.h"
 #include "sticker_printer_gui_subkernel.h"
 #include "tester_unit_user_interface.h"
@@ -163,4 +164,6 @@ void GuiKernel::createGuiSubkernels() {
   Subkernels.emplace_back(new ProgrammerGuiSubkernel("ProgrammerGuiSubkernel"));
   Subkernels.emplace_back(
       new StickerPrinterGuiSubkernel("StickerPrinterGuiSubkernel"));
+  Subkernels.emplace_back(
+      new ServerConnectionGuiSubkernel("ServerConnectionGuiSubkernel"));
 }

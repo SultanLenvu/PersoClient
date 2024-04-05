@@ -12,9 +12,7 @@ class AsyncServerConnection : public ProgressableAsyncWrapper {
   std::shared_ptr<IServerConnection> Server;
 
  public:
-  Q_INVOKABLE explicit AsyncServerConnection(
-      const QString& name,
-      std::shared_ptr<IServerConnection> sc);
+  Q_INVOKABLE explicit AsyncServerConnection(const QString& name);
   ~AsyncServerConnection() = default;
 
  public slots:

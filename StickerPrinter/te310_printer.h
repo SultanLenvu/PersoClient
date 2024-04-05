@@ -46,7 +46,7 @@ class TE310Printer final : public NamedObject,
   TscOpenEthernet openEthernet;
 
  public:
-  explicit TE310Printer(const QString& name);
+  Q_INVOKABLE explicit TE310Printer(const QString& name);
   ~TE310Printer() = default;
 
   // IStickerPrinter interface

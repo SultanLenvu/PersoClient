@@ -1,14 +1,17 @@
 #include "async_server_connection.h"
 #include "global_environment.h"
+#include "named_object_factory.h"
+#include "perso_server_connection.h"
 #include "production_manager_gui_subkernel.h"
 
 #include <QDir>
 #include <QSettings>
 
-AsyncServerConnection::AsyncServerConnection(
-    const QString& name,
-    std::shared_ptr<IServerConnection> sc)
-    : ProgressableAsyncWrapper{name}, Server(sc) {}
+AsyncServerConnection::AsyncServerConnection(const QString& name)
+    : ProgressableAsyncWrapper{name} {
+  NamedObjectFactory factory(thread());
+  Server = factory.createShared<PersoServerConnection>("PersoServerConnection");
+}
 
 void AsyncServerConnection::connect() {
   initOperation("connectToServer");

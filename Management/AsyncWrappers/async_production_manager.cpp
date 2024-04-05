@@ -1,5 +1,9 @@
 #include "async_production_manager.h"
 #include "global_environment.h"
+#include "jlink_exe_programmer.h"
+#include "named_object_factory.h"
+#include "perso_server_connection.h"
+#include "te310_printer.h"
 
 AsyncProductionManager::AsyncProductionManager(const QString& name)
     : ProgressableAsyncWrapper(name) {
@@ -105,17 +109,16 @@ void AsyncProductionManager::rollbackTransponder() {
 }
 
 void AsyncProductionManager::createManager() {
+  NamedObjectFactory factory(thread());
+
   std::shared_ptr<IStickerPrinter> sp =
-      GlobalEnvironment::instance()->getSharedObject<IStickerPrinter>(
-          "IStickerPrinter");
+      factory.createShared<TE310Printer>("TE310Printer");
 
   std::shared_ptr<IProgrammer> p =
-      GlobalEnvironment::instance()->getSharedObject<IProgrammer>(
-          "IProgrammer");
+      factory.createShared<JLinkExeProgrammer>("JLinkExeProgrammer");
 
   std::shared_ptr<IServerConnection> sc =
-      GlobalEnvironment::instance()->getSharedObject<IServerConnection>(
-          "IServerConnection");
+      factory.createShared<PersoServerConnection>("PersoServerConnection");
 
   Manager = std::make_unique<ProductionManager>("ProductionManager", sc, sp, p);
 }

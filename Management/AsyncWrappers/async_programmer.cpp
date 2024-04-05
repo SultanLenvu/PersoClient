@@ -1,10 +1,12 @@
 #include "async_programmer.h"
+#include "jlink_exe_programmer.h"
+#include "named_object_factory.h"
 
-AsyncProgrammer::AsyncProgrammer(const QString& name,
-                                 std::shared_ptr<IProgrammer> programmer)
-    : ProgressableAsyncWrapper(name), Programmer(programmer) {}
-
-void AsyncProgrammer::checkConfig() {}
+AsyncProgrammer::AsyncProgrammer(const QString& name)
+    : ProgressableAsyncWrapper(name) {
+  NamedObjectFactory factory(thread());
+  Programmer = factory.createShared<JLinkExeProgrammer>("JLinkExeProgrammer");
+}
 
 void AsyncProgrammer::programMemory(const QByteArray& firmware) {
   initOperation("programMemory");

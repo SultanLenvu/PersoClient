@@ -4,12 +4,11 @@
 #include "global_environment.h"
 
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
-  // Создаем виджеты
+  setWindowTitle("Настройки");
+  connectDependencies();
+
   create();
   adjustSize();
-
-  // Задаем заголовок
-  setWindowTitle("Настройки");
 }
 
 void SettingsDialog::accept() {
@@ -69,35 +68,43 @@ void SettingsDialog::createLogSystem() {
   LogSystemMainLayout = new QGridLayout();
   LogSystemGroupBox->setLayout(LogSystemMainLayout);
 
-  LogSystemGlobalEnableLabel = new QLabel("Активно");
-  LogSystemMainLayout->addWidget(LogSystemGlobalEnableLabel, 0, 0, 1, 3);
+  LogSystemGlobalEnableLabel = new QLabel("Глобальное вкл/выкл");
+  LogSystemMainLayout->addWidget(LogSystemGlobalEnableLabel, 0, 0, 1, 1);
   LogSystemGlobalEnableCheckBox = new QCheckBox();
   LogSystemGlobalEnableCheckBox->setCheckState(
       Settings.value("log_system/global_enable").toBool() ? Qt::Checked
                                                           : Qt::Unchecked);
-  LogSystemMainLayout->addWidget(LogSystemGlobalEnableCheckBox, 0, 1, 1, 3);
+  LogSystemMainLayout->addWidget(LogSystemGlobalEnableCheckBox, 0, 1, 1, 2);
+
+  LogSystemDisplayEnableLabel = new QLabel("Отображение на дисплее вкл/выкл");
+  LogSystemMainLayout->addWidget(LogSystemDisplayEnableLabel, 1, 0, 1, 1);
+  LogSystemDisplayEnableCheckBox = new QCheckBox();
+  LogSystemDisplayEnableCheckBox->setCheckState(
+      Settings.value("log_system/display_enable").toBool() ? Qt::Checked
+                                                           : Qt::Unchecked);
+  LogSystemMainLayout->addWidget(LogSystemDisplayEnableCheckBox, 1, 1, 1, 2);
 
   LogSystemMessageMaxSizeLabel = new QLabel("Максимальный размер сообщения");
-  LogSystemMainLayout->addWidget(LogSystemMessageMaxSizeLabel, 1, 0, 1, 3);
+  LogSystemMainLayout->addWidget(LogSystemMessageMaxSizeLabel, 2, 0, 1, 1);
   LogSystemMessageMaxSizeLineEdit =
       new QLineEdit(Settings.value("log_system/message_max_size").toString());
-  LogSystemMainLayout->addWidget(LogSystemMessageMaxSizeLineEdit, 1, 1, 1, 3);
+  LogSystemMainLayout->addWidget(LogSystemMessageMaxSizeLineEdit, 2, 1, 1, 2);
 
   LogSystemFileDirLabel = new QLabel("Директория для лог-файлов");
-  LogSystemMainLayout->addWidget(LogSystemFileDirLabel, 2, 0, 1, 1);
+  LogSystemMainLayout->addWidget(LogSystemFileDirLabel, 3, 0, 1, 1);
   LogSystemFileDirLineEdit =
       new QLineEdit(Settings.value("log_system/file_directory").toString());
-  LogSystemMainLayout->addWidget(LogSystemFileDirLineEdit, 2, 1, 1, 1);
+  LogSystemMainLayout->addWidget(LogSystemFileDirLineEdit, 3, 1, 1, 1);
   LogSystemFileDirPushButton = new QPushButton("Обзор");
-  LogSystemMainLayout->addWidget(LogSystemFileDirPushButton, 2, 2, 1, 1);
+  LogSystemMainLayout->addWidget(LogSystemFileDirPushButton, 3, 2, 1, 1);
   connect(LogSystemFileDirPushButton, &QPushButton::clicked, this,
           &SettingsDialog::logSystemFileDirPushButton_slot);
 
   LogSystemFileMaxNumberLabel = new QLabel("Максимум лог-файлов");
-  LogSystemMainLayout->addWidget(LogSystemFileMaxNumberLabel, 3, 0, 1, 1);
+  LogSystemMainLayout->addWidget(LogSystemFileMaxNumberLabel, 4, 0, 1, 1);
   LogSystemFileMaxNumberLineEdit =
       new QLineEdit(Settings.value("log_system/file_max_number").toString());
-  LogSystemMainLayout->addWidget(LogSystemFileMaxNumberLineEdit, 3, 1, 1, 2);
+  LogSystemMainLayout->addWidget(LogSystemFileMaxNumberLineEdit, 4, 1, 1, 2);
 }
 
 void SettingsDialog::createPersoServer() {
@@ -281,6 +288,8 @@ bool SettingsDialog::check() const {
 void SettingsDialog::save() {
   Settings.setValue("log_system/global_enable",
                     LogSystemGlobalEnableCheckBox->isChecked());
+  Settings.setValue("log_system/display_enable",
+                    LogSystemDisplayEnableCheckBox->isChecked());
   Settings.setValue("log_system/message_max_size",
                     LogSystemMessageMaxSizeLineEdit->text().toInt());
   Settings.setValue("log_system/file_directory",

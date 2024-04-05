@@ -1,4 +1,5 @@
 #include "master_user_interface.h"
+#include "log_display_widget.h"
 #include "production_manager_user_interface.h"
 #include "programmator_user_interface.h"
 #include "sticker_printer_user_interface.h"
@@ -52,7 +53,7 @@ void MasterUserInterface::createStickerPrinterTab() {
 }
 
 void MasterUserInterface::createLogWidgets() {
-  LogDisplay = new QGroupBox("Лог");
+  LogDisplay = new LogDisplayWidget();
   MainLayout->addWidget(LogDisplay);
 }
 

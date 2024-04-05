@@ -27,5 +27,5 @@ void WidgetLogBackend::loadSettings() {
 void WidgetLogBackend::doLoadSettings() {
   QSettings settings;
 
-  Enable = settings.value("log_system/display_log_enable").toBool();
+  Enable = settings.value("log_system/display_enable").toBool();
 }

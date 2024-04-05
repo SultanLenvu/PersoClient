@@ -8,6 +8,7 @@ LogDisplayWidget::LogDisplayWidget(QWidget* parent) {
 }
 
 void LogDisplayWidget::create() {
+  setTitle("Логи");
   Layout = new QVBoxLayout();
   setLayout(Layout);
 

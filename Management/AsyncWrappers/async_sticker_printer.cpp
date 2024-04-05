@@ -1,8 +1,12 @@
 #include "async_sticker_printer.h"
+#include "named_object_factory.h"
+#include "te310_printer.h"
 
-AsyncStickerPrinter::AsyncStickerPrinter(const QString& name,
-                                         std::shared_ptr<IStickerPrinter> isp)
-    : ProgressableAsyncWrapper(name), StickerPrinter(isp) {}
+AsyncStickerPrinter::AsyncStickerPrinter(const QString& name)
+    : ProgressableAsyncWrapper(name) {
+  NamedObjectFactory factory(thread());
+  StickerPrinter = factory.createShared<TE310Printer>("TE310Printer");
+}
 
 void AsyncStickerPrinter::printTransponderSticker(
     const StringDictionary& param) {

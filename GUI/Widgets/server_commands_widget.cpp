@@ -12,6 +12,7 @@ void ServerCommandsWidget::create() {
   setTitle("Клиентские запросы");
 
   Layout = new QVBoxLayout();
+  setLayout(Layout);
 
   ComboBox = new QComboBox();
   Layout->addWidget(ComboBox);

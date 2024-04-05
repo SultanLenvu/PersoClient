@@ -9,8 +9,10 @@ GlobalEnvironment* GlobalEnvironment::instance() {
   return &context;
 }
 
-void GlobalEnvironment::registerObject(QObject* obj) {
-  QString name = obj->objectName();
+void GlobalEnvironment::registerObject(NamedObject* obj) {
+  Objects.insert(obj->objectName(), obj);
+}
 
-  Objects.insert(name, obj);
+void GlobalEnvironment::registerSharedObject(std::shared_ptr<NamedObject> obj) {
+  SharedObjects.insert(obj->objectName(), obj);
 }

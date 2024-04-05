@@ -19,6 +19,8 @@ class SettingsDialog : public QDialog {
   QGridLayout* LogSystemMainLayout;
   QLabel* LogSystemGlobalEnableLabel;
   QCheckBox* LogSystemGlobalEnableCheckBox;
+  QLabel* LogSystemDisplayEnableLabel;
+  QCheckBox* LogSystemDisplayEnableCheckBox;
   QLabel* LogSystemMessageMaxSizeLabel;
   QLineEdit* LogSystemMessageMaxSizeLineEdit;
   QLabel* LogSystemFileDirLabel;

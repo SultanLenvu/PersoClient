@@ -4,11 +4,7 @@
 #include "async_programmer.h"
 #include "async_server_connection.h"
 #include "async_sticker_printer.h"
-#include "global_environment.h"
-#include "jlink_exe_programmer.h"
 #include "named_object_factory.h"
-#include "perso_server_connection.h"
-#include "te310_printer.h"
 
 AsynchronousObjectSpace::AsynchronousObjectSpace() {
   Thread.start();
@@ -23,23 +19,11 @@ AsynchronousObjectSpace::~AsynchronousObjectSpace() {
 void AsynchronousObjectSpace::createWrappers() {
   NamedObjectFactory factory(&Thread);
 
-  std::shared_ptr<IStickerPrinter> sp(
-      factory.create<TE310Printer>("TE310Printer"));
-  GlobalEnvironment::instance()->registerSharedObject<IStickerPrinter>(
-      "IStickerPrinter", sp);
-  Wrappers.emplace_back(new AsyncStickerPrinter("AsyncStickerPrinter", sp));
-
-  std::shared_ptr<IProgrammer> pr(
-      factory.create<JLinkExeProgrammer>("JLinkExeProgrammer"));
-  GlobalEnvironment::instance()->registerSharedObject<IProgrammer>(
-      "IProgrammer", pr);
-  Wrappers.emplace_back(new AsyncProgrammer("AsyncProgrammer", pr));
-
-  std::shared_ptr<IServerConnection> sc(
-      factory.create<PersoServerConnection>("PersoServerConnection"));
-  GlobalEnvironment::instance()->registerSharedObject<IServerConnection>(
-      "IServerConnection", sc);
-  Wrappers.emplace_back(new AsyncServerConnection("AsyncServerConnection", sc));
-
-  Wrappers.emplace_back(new AsyncProductionManager("AsyncProductionManager"));
+  Wrappers.emplace_back(
+      factory.create<AsyncStickerPrinter>("AsyncStickerPrinter"));
+  Wrappers.emplace_back(factory.create<AsyncProgrammer>("AsyncProgrammer"));
+  Wrappers.emplace_back(
+      factory.create<AsyncServerConnection>("AsyncServerConnection"));
+  Wrappers.emplace_back(
+      factory.create<AsyncProductionManager>("AsyncProductionManager"));
 }

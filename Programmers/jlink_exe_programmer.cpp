@@ -353,7 +353,7 @@ JLinkExeProgrammer::lockMemory() {  // Проверка на существов�
  */
 
 void JLinkExeProgrammer::loadSettings() {
-  sendLog("Применение новых настроек.");
+  sendLog("Загрузка настроек.");
   doLoadSettings();
   createJLinkProcess();
 }
