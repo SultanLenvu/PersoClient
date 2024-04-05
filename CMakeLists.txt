@@ -65,6 +65,7 @@ add_executable(PersoClient WIN32
     Service/Log/abstract_log_backend.cpp Service/Log/abstract_log_backend.h
     Service/Log/log_system.cpp Service/Log/log_system.h
     Service/Log/widget_log_backend.cpp Service/Log/widget_log_backend.h
+    Service/Log/log_message.h Service/Log/log_message.cpp
 
     Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
     Management/Managers/production_manager.h Management/Managers/production_manager.cpp

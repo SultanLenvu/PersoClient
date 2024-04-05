@@ -6,7 +6,10 @@
 #include "log_system_bundle.h"
 
 class LoggableObject {
+ public:
+ private:
   LogSystemBundle Connection;
+
   QString SourceName;
   size_t ThreadId;
 

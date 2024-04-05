@@ -18,9 +18,9 @@
 /* Глобальная система логгирования */
 //==================================================================================
 
-class LogSystem : public NamedObject,
-                  public ConfigurableObject,
-                  public LoggableObject {
+class LogSystem final : public NamedObject,
+                        public ConfigurableObject,
+                        public LoggableObject {
   Q_OBJECT
 
  private:
@@ -42,12 +42,11 @@ class LogSystem : public NamedObject,
   void generate(const QString& log, const LoggableObject* source) const;
 
  private:
-  virtual void loadSettings(void) override;
-
- private:
   Q_DISABLE_COPY_MOVE(LogSystem)
+  virtual void loadSettings(void) override;
   void doLoadSettings(void);
 
+ private:
   void createPersoServerLogSocket(void);
 
  private slots:
