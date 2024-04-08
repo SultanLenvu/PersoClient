@@ -68,6 +68,27 @@ ReturnStatus JLinkExeProgrammer::programMemory(const QByteArray& data) {
   return ReturnStatus::NoError;
 }
 
+ReturnStatus JLinkExeProgrammer::programMemory(const QString& fileName) {
+  sendLog(QString("Загрузка прошивки."));
+
+  // Формируем скрипт JLink
+  initScript();
+  // Очищаем FLash
+  JLinkScript->write(QByteArray("Erase\n"));
+  // Загружаем прошивку
+  JLinkScript->write(
+      QString("LoadFile %1, 0x08000000\n").arg(fileName).toUtf8());
+
+  // Запускаем выполнение скрипта JLink
+  bool ok = executeJLinkScript();
+
+  if (!ok) {
+    return ReturnStatus::ProgrammatorCommandScriptError;
+  }
+
+  return ReturnStatus::NoError;
+}
+
 ReturnStatus JLinkExeProgrammer::programMemoryWithUnlock(
     const QByteArray& data) {
   sendLog(QString("Разблокировка памяти и загрузка прошивки."));
@@ -126,6 +147,42 @@ ReturnStatus JLinkExeProgrammer::programMemoryWithUnlock(
   return ReturnStatus::NoError;
 }
 
+ReturnStatus JLinkExeProgrammer::programMemoryWithUnlock(
+    const QString& fileName) {
+  sendLog(QString("Загрузка прошивки."));
+
+  // Формируем скрипт JLink
+  initScript();
+
+  // Снимаем защиту с flash-памяти
+  JLinkScript->write(QByteArray("w4 0x40022004, 0x45670123\n"));
+  JLinkScript->write(QByteArray("w4 0x40022004, 0xCDEF89AB\n"));
+  JLinkScript->write(QByteArray("w4 0x40022008, 0x45670123\n"));
+  JLinkScript->write(QByteArray("w4 0x40022008, 0xCDEF89AB\n"));
+
+  JLinkScript->write(QByteArray("w4 0x1FFFF800, 0x00FF5AA5\n"));
+  JLinkScript->write(QByteArray("r\n"));
+  JLinkScript->write(QByteArray("halt\n"));
+  JLinkScript->write(QByteArray("mem 0x1FFFF800, 4\n"));
+  JLinkScript->write(QByteArray("connect\n"));
+
+  // Очищаем FLash
+  JLinkScript->write(QByteArray("erase\n"));
+
+  // Загружаем прошивку
+  JLinkScript->write(
+      QString("LoadFile %1, 0x08000000\n").arg(fileName).toUtf8());
+
+  // Запускаем выполнение скрипта JLink
+  bool ok = executeJLinkScript();
+
+  if (!ok) {
+    return ReturnStatus::ProgrammatorCommandScriptError;
+  }
+
+  return ReturnStatus::NoError;
+}
+
 ReturnStatus JLinkExeProgrammer::readMemory(QByteArray& data) {
   sendLog(QString("Считывание прошивки."));
 
@@ -158,6 +215,26 @@ ReturnStatus JLinkExeProgrammer::readMemory(QByteArray& data) {
   if (!tempFile.remove()) {
     sendLog(
         "Не удалось удалить временный файл с данными, считанными из памяти.");
+  }
+
+  return ReturnStatus::NoError;
+}
+
+ReturnStatus JLinkExeProgrammer::readMemory(const QString& fileName) {
+  sendLog(QString("Считывание прошивки."));
+
+  // Формируем скрипт JLink
+  initScript();
+  // Считываем всю flash-память
+  JLinkScript->write(
+      QString("savebin %1, 0x08000000, 0x10000\n").arg(fileName).toUtf8());
+
+  // Запускаем выполнение скрипта JLink
+  executeJLinkScript();
+
+  // Запускаем выполнение скрипта JLink
+  if (!executeJLinkScript()) {
+    return ReturnStatus::ProgrammatorCommandScriptError;
   }
 
   return ReturnStatus::NoError;
@@ -214,6 +291,25 @@ ReturnStatus JLinkExeProgrammer::readUserData(QByteArray& data) {
   return ReturnStatus::NoError;
 }
 
+ReturnStatus JLinkExeProgrammer::readUserData(const QString& fileName) {
+  sendLog(QString("Чтение пользовательских данных."));
+
+  // Формируем скрипт JLink
+  initScript();
+  // Считываем часть flash-памяти, в которой хранятся пользовательские данные
+  JLinkScript->write(QString("savebin %1, %2, %3\n")
+                         .arg(fileName, TRANSPONDER_USER_DATA_START_ADDRESS,
+                              QString::number(TRANSPONDER_USER_DATA_SIZE))
+                         .toUtf8());
+
+  // Запускаем выполнение скрипта JLink
+  if (!executeJLinkScript()) {
+    return ReturnStatus::ProgrammatorCommandScriptError;
+  }
+
+  return ReturnStatus::NoError;
+}
+
 ReturnStatus JLinkExeProgrammer::programUserData(const QByteArray& data) {
   sendLog(QString("Запись пользовательских данных."));
 
@@ -254,6 +350,30 @@ ReturnStatus JLinkExeProgrammer::programUserData(const QByteArray& data) {
     sendLog(
         "Не удалось удалить временный файл с данными для загрузки в память.");
   }
+
+  if (!ok) {
+    return ReturnStatus::ProgrammatorCommandScriptError;
+  }
+
+  return ReturnStatus::NoError;
+}
+
+ReturnStatus JLinkExeProgrammer::programUserData(
+    const QString& fileName) {  // Формируем скрипт JLink
+  initScript();
+
+  // Очищаем старые пользовательские данные
+  JLinkScript->write(QString("Erase %1, %2\n")
+                         .arg(TRANSPONDER_USER_DATA_START_ADDRESS,
+                              TRANSPONDER_USER_DATA_END_ADDRESS)
+                         .toUtf8());
+  // Загружаем новые пользовательских данных
+  JLinkScript->write(QString("LoadFile %1, %2\n")
+                         .arg(fileName, TRANSPONDER_USER_DATA_START_ADDRESS)
+                         .toUtf8());
+
+  // Запускаем выполнение скрипта JLink
+  bool ok = executeJLinkScript();
 
   if (!ok) {
     return ReturnStatus::ProgrammatorCommandScriptError;

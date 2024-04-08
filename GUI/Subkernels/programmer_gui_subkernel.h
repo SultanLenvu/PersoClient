@@ -22,16 +22,19 @@ class ProgrammerGuiSubkernel : public AbstractGuiSubkernel {
   void unlockMemory(void);
   void lockMemory(void);
 
+ public slots:
+  void displayUcid(const QString& ucid);
+
  private:
   Q_DISABLE_COPY_MOVE(ProgrammerGuiSubkernel);
   void connectDependencies(void) const;
 
  signals:
-  void programMemory_signal(const QByteArray& data);
+  void programMemory_signal(const QString& fileName);
   void readMemory_signal(void);
   void eraseMemory_signal(void);
 
-  void programUserData_signal(const QByteArray& data);
+  void programUserData_signal(const QString& fileName);
   void readUserData_signal(void);
   void readUcid_signal(void);
 

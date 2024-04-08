@@ -31,12 +31,18 @@ class JLinkExeProgrammer : public NamedObject,
   virtual ReturnStatus checkConfig(void) override;
 
   virtual ReturnStatus programMemory(const QByteArray& data) override;
+  virtual ReturnStatus programMemory(const QString& fileName) override;
   virtual ReturnStatus programMemoryWithUnlock(const QByteArray& data) override;
+  virtual ReturnStatus programMemoryWithUnlock(
+      const QString& fileName) override;
   virtual ReturnStatus readMemory(QByteArray& data) override;
+  virtual ReturnStatus readMemory(const QString& fileName) override;
   virtual ReturnStatus eraseMemory(void) override;
 
-  virtual ReturnStatus readUserData(QByteArray& data) override;
   virtual ReturnStatus programUserData(const QByteArray& data) override;
+  virtual ReturnStatus programUserData(const QString& fileName) override;
+  virtual ReturnStatus readUserData(QByteArray& data) override;
+  virtual ReturnStatus readUserData(const QString& fileName) override;
 
   virtual ReturnStatus readTransponderUcid(QString& ucid) override;
 

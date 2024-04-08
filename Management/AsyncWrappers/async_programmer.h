@@ -15,12 +15,12 @@ class AsyncProgrammer : public ProgressableAsyncWrapper {
   ~AsyncProgrammer() = default;
 
  public:
-  void programMemory(const QByteArray& data);
-  void programMemoryWithUnlock(const QByteArray& data);
+  void programMemory(const QString& fileName);
+  void programMemoryWithUnlock(const QString& fileName);
   void readMemory(void);
   void eraseMemory(void);
 
-  void programUserData(const QByteArray& data);
+  void programUserData(const QString& fileName);
   void readUserData(void);
 
   void readTransponderUcid(void);
@@ -32,9 +32,9 @@ class AsyncProgrammer : public ProgressableAsyncWrapper {
   Q_DISABLE_COPY_MOVE(AsyncProgrammer)
 
  signals:
-  void transponderUcidReady(QString& ucid);
-  void transponderFirmwareReady(QByteArray& firmware);
-  void transponderUserDataReady(QByteArray& data);
+  void transponderUcidReady(const QString& ucid);
+  void transponderFirmwareReady(const QByteArray& firmware);
+  void transponderUserDataReady(const QByteArray& data);
 };
 
 #endif  // ASYNCPROGRAMMER_H

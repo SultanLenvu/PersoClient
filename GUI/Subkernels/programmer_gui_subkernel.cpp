@@ -6,8 +6,9 @@
 #include <QMessageBox>
 
 ProgrammerGuiSubkernel ::ProgrammerGuiSubkernel(const QString& name)
-    : AbstractGuiSubkernel{name} {}
-
+    : AbstractGuiSubkernel{name} {
+  connectDependencies();
+}
 
 void ProgrammerGuiSubkernel::programMemory() {
   emit clearLogDisplay_signal();
@@ -15,20 +16,11 @@ void ProgrammerGuiSubkernel::programMemory() {
   QString path(QFileDialog::getOpenFileName(nullptr, "Выберите файл", "",
                                             "Все файлы (*.*)"));
 
-  // Считываем данные из файла
-  QFile tempFile(path);
-  if (!tempFile.open(QIODevice::ReadOnly)) {
-    QMessageBox::critical(nullptr, "Ошибка",
-                          "Не удалось открыть считать содержимое файла.",
-                          QMessageBox::Ok);
+  if (path.isEmpty()) {
     return;
   }
 
-  QByteArray data;
-  data.reserve(tempFile.size());
-  data = tempFile.readAll();
-
-  emit programMemory_signal(data);
+  emit programMemory_signal(path);
 }
 
 void ProgrammerGuiSubkernel::readMemory() {
@@ -46,23 +38,14 @@ void ProgrammerGuiSubkernel::eraseMemory() {
 void ProgrammerGuiSubkernel::programUserData() {
   emit clearLogDisplay_signal();
 
-  QString path(QFileDialog::getOpenFileName(nullptr, "Выберите файл", "",
-                                            "Все файлы (*.*)"));
+  QString path(QFileDialog::getOpenFileName(
+      nullptr, "Выберите файл", QDir::currentPath(), "Все файлы (*.*)"));
 
-  // Считываем данные из файла
-  QFile tempFile(path);
-  if (!tempFile.open(QIODevice::ReadOnly)) {
-    QMessageBox::critical(nullptr, "Ошибка",
-                          "Не удалось открыть считать содержимое файла.",
-                          QMessageBox::Ok);
+  if (path.isEmpty()) {
     return;
   }
 
-  QByteArray data;
-  data.reserve(tempFile.size());
-  data = tempFile.readAll();
-
-  emit programUserData_signal(data);
+  emit programUserData_signal(path);
 }
 
 void ProgrammerGuiSubkernel::readUserData() {
@@ -89,6 +72,16 @@ void ProgrammerGuiSubkernel::lockMemory() {
   emit lockMemory_signal();
 }
 
+void ProgrammerGuiSubkernel::displayUcid(const QString& ucid) {
+  QMessageBox messageBox;
+  messageBox.setWindowTitle("UCID");
+  messageBox.setIcon(QMessageBox::Information);
+  messageBox.setText(ucid);
+  messageBox.setTextInteractionFlags(Qt::TextSelectableByMouse);
+
+  messageBox.exec();
+}
+
 void ProgrammerGuiSubkernel::connectDependencies() const {
   AsyncProgrammer* ap =
       GlobalEnvironment::instance()->getObject<AsyncProgrammer>(
@@ -112,4 +105,7 @@ void ProgrammerGuiSubkernel::connectDependencies() const {
           &AsyncProgrammer::unlockMemory);
   connect(this, &ProgrammerGuiSubkernel::lockMemory_signal, ap,
           &AsyncProgrammer::lockMemory);
+
+  connect(ap, &AsyncProgrammer::transponderUcidReady, this,
+          &ProgrammerGuiSubkernel::displayUcid);
 }

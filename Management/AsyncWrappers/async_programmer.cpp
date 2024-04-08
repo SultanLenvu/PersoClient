@@ -8,10 +8,10 @@ AsyncProgrammer::AsyncProgrammer(const QString& name)
   Programmer = factory.createShared<JLinkExeProgrammer>("JLinkExeProgrammer");
 }
 
-void AsyncProgrammer::programMemory(const QByteArray& firmware) {
+void AsyncProgrammer::programMemory(const QString& fileName) {
   initOperation("programMemory");
 
-  ReturnStatus ret = Programmer->programMemory(firmware);
+  ReturnStatus ret = Programmer->programMemory(fileName);
   if (ret != ReturnStatus::NoError) {
     processOperationError("programMemory", ret);
     return;
@@ -20,10 +20,10 @@ void AsyncProgrammer::programMemory(const QByteArray& firmware) {
   completeOperation("programMemory");
 }
 
-void AsyncProgrammer::programMemoryWithUnlock(const QByteArray& firmware) {
+void AsyncProgrammer::programMemoryWithUnlock(const QString& fileName) {
   initOperation("programMemoryWithUnlock");
 
-  ReturnStatus ret = Programmer->programMemoryWithUnlock(firmware);
+  ReturnStatus ret = Programmer->programMemoryWithUnlock(fileName);
   if (ret != ReturnStatus::NoError) {
     processOperationError("programMemoryWithUnlock", ret);
     return;
@@ -35,13 +35,11 @@ void AsyncProgrammer::programMemoryWithUnlock(const QByteArray& firmware) {
 void AsyncProgrammer::readMemory() {
   initOperation("readMemory");
 
-  QByteArray firmware;
-  ReturnStatus ret = Programmer->readMemory(firmware);
+  ReturnStatus ret = Programmer->readMemory("memory.bin");
   if (ret != ReturnStatus::NoError) {
     processOperationError("readMemory", ret);
     return;
   }
-  emit transponderFirmwareReady(firmware);
 
   completeOperation("readMemory");
 }
@@ -58,10 +56,10 @@ void AsyncProgrammer::eraseMemory() {
   completeOperation("eraseMemory");
 }
 
-void AsyncProgrammer::programUserData(const QByteArray& data) {
+void AsyncProgrammer::programUserData(const QString& fileName) {
   initOperation("programUserData");
 
-  ReturnStatus ret = Programmer->programUserData(data);
+  ReturnStatus ret = Programmer->programUserData(fileName);
   if (ret != ReturnStatus::NoError) {
     processOperationError("programUserData", ret);
     return;
@@ -73,14 +71,12 @@ void AsyncProgrammer::programUserData(const QByteArray& data) {
 void AsyncProgrammer::readUserData() {
   initOperation("readUserData");
 
-  QByteArray userData;
-  ReturnStatus ret = Programmer->readUserData(userData);
+  ReturnStatus ret = Programmer->readUserData("user_data.bin");
   if (ret != ReturnStatus::NoError) {
     processOperationError("readUserData", ret);
     return;
   }
 
-  emit transponderUserDataReady(userData);
   completeOperation("readUserData");
 }
 
@@ -94,8 +90,9 @@ void AsyncProgrammer::readTransponderUcid() {
     return;
   }
 
+  sendLog(QString("Операция %1 успешно выполнена.").arg("readTransponderUcid"));
+  emit executionFinished("readTransponderUcid");
   emit transponderUcidReady(ucid);
-  completeOperation("readTransponderUcid");
 }
 
 void AsyncProgrammer::unlockMemory() {
@@ -111,13 +108,13 @@ void AsyncProgrammer::unlockMemory() {
 }
 
 void AsyncProgrammer::lockMemory() {
-  initOperation("unlockMemory");
+  initOperation("lockMemory");
 
-  ReturnStatus ret = Programmer->unlockMemory();
+  ReturnStatus ret = Programmer->lockMemory();
   if (ret != ReturnStatus::NoError) {
-    processOperationError("unlockMemory", ret);
+    processOperationError("lockMemory", ret);
     return;
   }
 
-  completeOperation("unlockMemory");
+  completeOperation("lockMemory");
 }
