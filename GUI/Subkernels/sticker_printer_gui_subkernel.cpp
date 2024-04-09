@@ -1,11 +1,12 @@
 #include "sticker_printer_gui_subkernel.h"
 #include "async_sticker_printer.h"
-#include "custom_transponder_sticker_dialog.h"
 #include "global_environment.h"
+#include "transponder_sticker_setup_dialog.h"
 
 StickerPrinterGuiSubkernel::StickerPrinterGuiSubkernel(const QString& name)
-    : AbstractGuiSubkernel{name} {}
-
+    : AbstractGuiSubkernel{name} {
+  connectDependecies();
+}
 
 void StickerPrinterGuiSubkernel::printLastTransponderSticker() {
   emit clearLogDisplay_signal();
@@ -17,7 +18,7 @@ void StickerPrinterGuiSubkernel::printTransponderSticker() {
   emit clearLogDisplay_signal();
 
   StringDictionary param;
-  CustomTransponderStickerScanDialog dialog(nullptr);
+  TransponderStickerSetupDialog dialog;
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }

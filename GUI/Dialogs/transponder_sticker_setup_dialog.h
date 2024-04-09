@@ -6,11 +6,9 @@
 
 #include "abstract_input_dialog.h"
 
-class CustomTransponderStickerScanDialog : public AbstractInputDialog {
+class TransponderStickerSetupDialog : public AbstractInputDialog {
  private:
-  QSize DesktopGeometry;
-
-  QGridLayout* MainLayout;
+  QVBoxLayout* MainLayout;
 
   QHBoxLayout* StickerFormatLayout;
   QLabel* StickerFormatLabel;
@@ -32,21 +30,20 @@ class CustomTransponderStickerScanDialog : public AbstractInputDialog {
 
   QHash<QString, QString> MatchTable;
 
-  QRegularExpression Regex;
-
  public:
-  explicit CustomTransponderStickerScanDialog(QWidget* parent);
-  ~CustomTransponderStickerScanDialog() = default;
+  explicit TransponderStickerSetupDialog(QWidget* parent = nullptr);
+  ~TransponderStickerSetupDialog() = default;
 
-  // AbstractInputDialog interface
- public:
+ public slots:  // QDialog interface
+  virtual void accept(void) override;
+
+ public:  // AbstractInputDialog interface
   virtual void getData(StringDictionary& data) const override;
 
  private:
-  Q_DISABLE_COPY_MOVE(CustomTransponderStickerScanDialog);
+  Q_DISABLE_COPY_MOVE(TransponderStickerSetupDialog);
 
   void create(void);
-  void createMatchTable(void);
   bool checkInput(void) const;
 };
 

@@ -100,7 +100,7 @@ add_executable(PersoClient WIN32
 
     GUI/Dialogs/authorization_dialog.cpp GUI/Dialogs/authorization_dialog.h
     GUI/Dialogs/master_password_input_dialog.cpp GUI/Dialogs/master_password_input_dialog.h
-    GUI/Dialogs/custom_transponder_sticker_dialog.cpp GUI/Dialogs/custom_transponder_sticker_dialog.h
+    GUI/Dialogs/transponder_sticker_setup_dialog.cpp GUI/Dialogs/transponder_sticker_setup_dialog.h
     GUI/Dialogs/transponder_sticker_scan_dialog.cpp GUI/Dialogs/transponder_sticker_scan_dialog.h
     GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
     GUI/Dialogs/settings_dialog.cpp GUI/Dialogs/settings_dialog.h

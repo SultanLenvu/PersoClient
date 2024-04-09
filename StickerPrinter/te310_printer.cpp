@@ -47,7 +47,7 @@ ReturnStatus TE310Printer::printTransponderSticker(
   }
 
   if ((param.value("issuer_name") != "Новое качество дорог") &&
-      (param.value("issuer_name") == "Магистраль северной столицы")) {
+      (param.value("issuer_name") != "Магистраль северной столицы")) {
     sendLog("Получено неизвестное название компании-эмитента. Сброс.");
     return ReturnStatus::ParameterError;
   }
@@ -70,7 +70,7 @@ ReturnStatus TE310Printer::printTransponderSticker(
 }
 
 ReturnStatus TE310Printer::printLastTransponderSticker() {
-  if (LastPalletSticker.isEmpty()) {
+  if (LastTransponderSticker.isEmpty()) {
     sendLog(
         "Ранее не было распечатано ни одного стикера на транспондер. Повтор "
         "печати невозможен.");
@@ -413,7 +413,7 @@ void TE310Printer::printMssSticker(const StringDictionary& param) {
   sendCommand("GAP 2 mm, 1 mm");
   sendCommand("DIRECTION 1");
   sendCommand("CLS");
-  sendCommand(QString("TEXT 180,12,\"D.FNT\",0,1,1,2,\"SN: %1\"")
+  sendCommand(QString("TEXT 180,12,\"2\",0,1,1,2,\"SN: %1\"")
                   .arg(param.value("transponder_sn"))
                   .toUtf8()
                   .data());

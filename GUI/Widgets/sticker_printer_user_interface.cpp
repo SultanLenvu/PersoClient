@@ -2,9 +2,8 @@
 #include "global_environment.h"
 #include "sticker_printer_gui_subkernel.h"
 
-StickerPrinterUserInterface::StickerPrinterUserInterface(QWidget *parent)
-    : QWidget{parent}
-{
+StickerPrinterUserInterface::StickerPrinterUserInterface(QWidget* parent)
+    : QWidget{parent} {
   create();
   connectDependencies();
 }
@@ -46,9 +45,9 @@ void StickerPrinterUserInterface::connectDependencies() {
       GlobalEnvironment::instance()->getObject<StickerPrinterGuiSubkernel>(
           "StickerPrinterGuiSubkernel");
 
-  connect(PrintLastTransponderStickerButton, &QPushButton::clicked, spgs,
-          &StickerPrinterGuiSubkernel::printTransponderSticker);
   connect(PrintTransponderStickerButton, &QPushButton::clicked, spgs,
+          &StickerPrinterGuiSubkernel::printTransponderSticker);
+  connect(PrintLastTransponderStickerButton, &QPushButton::clicked, spgs,
           &StickerPrinterGuiSubkernel::printLastTransponderSticker);
 
   connect(this, &StickerPrinterUserInterface::execCommandScript_signal, spgs,
