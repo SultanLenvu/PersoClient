@@ -29,8 +29,6 @@ GuiKernel::GuiKernel(QWidget* parent)
   // Создаем графический интерфейс для авторизации
   //  createAuthorizationUserInterface();
   createMasterInterface();
-
-  showMaximized();
 }
 
 void GuiKernel::displayMasterInterface() {
