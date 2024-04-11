@@ -8,9 +8,7 @@ class MasterUserInterface final : public QWidget {
   QHBoxLayout* MainLayout;
   QTabWidget* Tabs;
 
-  // Виджеты для отображения логов
   QWidget* LogDisplay;
-
   QWidget* ProductionManagerTab;
   QWidget* ProgrammatorTab;
   QWidget* StickerPrinterTab;

@@ -173,4 +173,12 @@ void ProductionManagerGuiSubkernel::connectDependecies() {
   QObject::connect(this,
                    &ProductionManagerGuiSubkernel::rollbackTransponder_signal,
                    psm, &AsyncProductionManager::rollbackTransponder);
+
+  //  QObject::connect(psm, &AsyncProductionManager::productionLineDataReady,
+  //  this,
+  //                   &ProductionManagerGuiSubkernel::displayProductionLineData);
+  //  QObject::connect(psm, &AsyncProductionManager::transponderDataReady, this,
+  //                   &ProductionManagerGuiSubkernel::displayTransponderData);
+  //  QObject::connect(psm, &AsyncProductionManager::boxDataReady, this,
+  //                   &ProductionManagerGuiSubkernel::displayBoxData);
 }

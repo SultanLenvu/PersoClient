@@ -1,5 +1,4 @@
 #include "async_production_manager.h"
-#include "global_environment.h"
 #include "jlink_exe_programmer.h"
 #include "named_object_factory.h"
 #include "perso_server_connection.h"

@@ -31,9 +31,9 @@ class AsyncProductionManager : public ProgressableAsyncWrapper {
   void createManager(void);
 
  signals:
-  void displayProductionLineData_signal(const StringDictionary& data);
-  void displayTransponderData_signal(const StringDictionary& data);
-  void displayBoxData_signal(const StringDictionary& data);
+  void productionLineDataReady(const StringDictionary& data);
+  void transponderDataReady(const StringDictionary& data);
+  void boxDataReady(const StringDictionary& data);
 };
 
 #endif  // ASYNCPRODUCTIONMANAGER_H
