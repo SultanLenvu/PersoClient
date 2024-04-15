@@ -19,18 +19,22 @@ class HashTableModel : public QAbstractTableModel {
   HashTableModel() = default;
   ~HashTableModel() = default;
 
+ public:
   void setData(const StringDictionary& match);
   void setMatchTable(const StringDictionary& match);
   void clear(void);
   bool isEmpty(void) const;
 
-  // QAbstractTableModel interface
+ public:  // QAbstractTableModel interface
   int columnCount(const QModelIndex& parent = QModelIndex()) const override;
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
   QVariant data(const QModelIndex& index, int role) const override;
   QVariant headerData(int section,
                       Qt::Orientation orientation,
                       int role = Qt::DisplayRole) const override;
+
+ private:
+  Q_DISABLE_COPY_MOVE(HashTableModel)
 };
 
 #endif  // HASH_TABLE_MODEL_H

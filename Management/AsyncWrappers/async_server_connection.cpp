@@ -10,6 +10,9 @@
 AsyncServerConnection::AsyncServerConnection(const QString& name)
     : ProgressableAsyncWrapper{name} {
   NamedObjectFactory factory(thread());
+  Context =
+      factory.createShared<ProductionUnitContext>("ProductionUnitContext");
+
   Server = factory.createShared<PersoServerConnection>("PersoServerConnection");
 }
 
@@ -58,15 +61,14 @@ void AsyncServerConnection::getProductionLineData() {
   initOperation("getProductionLineData");
 
   ReturnStatus ret = ReturnStatus::NoError;
-  StringDictionary pldata;
+  StringDictionary data;
 
-  ret = Server->getProductionLineData(pldata);
+  ret = Server->getProductionLineData(data);
   if (ret != ReturnStatus::NoError) {
     processOperationError("getProductionLineData", ret);
     return;
   }
-
-  emit productionLineDataReady(pldata);
+  Context->setState(std::move(data));
 
   completeOperation("getProductionLineData");
 }
@@ -74,7 +76,7 @@ void AsyncServerConnection::getProductionLineData() {
 void AsyncServerConnection::echo() {
   initOperation("echoServer");
 
-  ReturnStatus ret;
+  ReturnStatus ret = ReturnStatus::NoError;
   ret = Server->echo();
   if (ret != ReturnStatus::NoError) {
     processOperationError("echoServer", ret);
@@ -99,14 +101,13 @@ void AsyncServerConnection::requestBox() {
 void AsyncServerConnection::getCurrentBoxData() {
   initOperation("getCurrentBoxData");
 
-  StringDictionary bdata;
-  ReturnStatus ret = Server->getCurrentBoxData(bdata);
+  StringDictionary data;
+  ReturnStatus ret = Server->getCurrentBoxData(data);
   if (ret != ReturnStatus::NoError) {
     processOperationError("getCurrentBoxData", ret);
     return;
   }
-
-  emit boxDataReady(bdata);
+  Context->setState(std::move(data));
 
   completeOperation("getCurrentBoxData");
 }
@@ -138,8 +139,9 @@ void AsyncServerConnection::completeCurrentBox() {
 void AsyncServerConnection::releaseTransponder() {
   initOperation("releaseTransponder");
 
-  StringDictionary result;
-  ReturnStatus ret = Server->releaseTransponder(result);
+  StringDictionary data;
+
+  ReturnStatus ret = Server->releaseTransponder(data);
   if (ret != ReturnStatus::NoError) {
     processOperationError("releaseTransponder", ret);
     return;
@@ -165,12 +167,13 @@ void AsyncServerConnection::rereleaseTransponder(
     const StringDictionary& param) {
   initOperation("rereleaseTransponder");
 
-  StringDictionary result;
-  ReturnStatus ret = Server->rereleaseTransponder(param, result);
+  StringDictionary data;
+  ReturnStatus ret = Server->rereleaseTransponder(param, data);
   if (ret != ReturnStatus::NoError) {
     processOperationError("rereleaseTransponder", ret);
     return;
   }
+  Context->setTransponder(std::move(data));
 
   completeOperation("rereleaseTransponder");
 }
@@ -179,7 +182,6 @@ void AsyncServerConnection::confirmTransponderRerelease(
     const StringDictionary& param) {
   initOperation("confirmTransponderRerelease");
 
-  StringDictionary result;
   ReturnStatus ret = Server->confirmTransponderRerelease(param);
   if (ret != ReturnStatus::NoError) {
     processOperationError("confirmTransponderRerelease", ret);
@@ -205,15 +207,14 @@ void AsyncServerConnection::getCurrentTransponderData() {
   initOperation("getCurrentTransponderData");
 
   ReturnStatus ret = ReturnStatus::NoError;
-  StringDictionary tdata;
+  StringDictionary data;
 
-  ret = Server->getCurrentTransponderData(tdata);
+  ret = Server->getCurrentTransponderData(data);
   if (ret != ReturnStatus::NoError) {
     processOperationError("getCurrentTransponderData", ret);
     return;
   }
-
-  emit transponderDataReady(tdata);
+  Context->setTransponder(std::move(data));
 
   completeOperation("getCurrentTransponderData");
 }
@@ -222,15 +223,14 @@ void AsyncServerConnection::getTransponderData(const StringDictionary& param) {
   initOperation("getTransponderData");
 
   ReturnStatus ret = ReturnStatus::NoError;
-  StringDictionary tdata;
+  StringDictionary data;
 
-  ret = Server->getTransponderData(param, tdata);
+  ret = Server->getTransponderData(param, data);
   if (ret != ReturnStatus::NoError) {
     processOperationError("getTransponderData", ret);
     return;
   }
-
-  emit transponderDataReady(tdata);
+  Context->setTransponder(std::move(data));
 
   completeOperation("getTransponderData");
 }
@@ -288,16 +288,4 @@ void AsyncServerConnection::printLastPalletSticker() {
 }
 
 void AsyncServerConnection::connectDependecies() {
-  ProductionManagerGuiSubkernel* augs =
-      GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
-          "ProductionManagerGuiSubkernel");
-
-  QObject::connect(this, &AsyncServerConnection::productionLineDataReady, augs,
-                   &ProductionManagerGuiSubkernel::displayProductionLineData);
-  QObject::connect(this, &AsyncServerConnection::boxDataReady, augs,
-                   &ProductionManagerGuiSubkernel::displayBoxData);
-  QObject::connect(this, &AsyncServerConnection::transponderDataReady, augs,
-                   &ProductionManagerGuiSubkernel::displayTransponderData);
-  QObject::connect(this, &AsyncServerConnection::firwareReady, augs,
-                   &ProductionManagerGuiSubkernel::displayFirmware);
 }

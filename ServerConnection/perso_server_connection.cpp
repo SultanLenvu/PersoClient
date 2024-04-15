@@ -283,7 +283,7 @@ void PersoServerConnection::doLoadSettings() {
 
 ReturnStatus PersoServerConnection::processCurrentCommand(
     const StringDictionary& param,
-    StringDictionary result) {
+    StringDictionary& result) {
   sendLog(
       QString("Начало выполнения команды '%1'.").arg(CurrentCommand->name()));
 

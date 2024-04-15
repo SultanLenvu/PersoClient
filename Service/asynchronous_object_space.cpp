@@ -4,6 +4,7 @@
 #include "async_programmer.h"
 #include "async_server_connection.h"
 #include "async_sticker_printer.h"
+
 #include "named_object_factory.h"
 
 AsynchronousObjectSpace::AsynchronousObjectSpace() {

@@ -2,6 +2,7 @@
 #include "jlink_exe_programmer.h"
 #include "named_object_factory.h"
 #include "perso_server_connection.h"
+#include "production_unit_context.h"
 #include "te310_printer.h"
 
 AsyncProductionManager::AsyncProductionManager(const QString& name)
@@ -110,6 +111,9 @@ void AsyncProductionManager::rollbackTransponder() {
 void AsyncProductionManager::createManager() {
   NamedObjectFactory factory(thread());
 
+  std::shared_ptr<ProductionUnitContext> con =
+      factory.createShared<ProductionUnitContext>("ProductionUnitContext");
+
   std::shared_ptr<IStickerPrinter> sp =
       factory.createShared<TE310Printer>("TE310Printer");
 
@@ -119,5 +123,6 @@ void AsyncProductionManager::createManager() {
   std::shared_ptr<IServerConnection> sc =
       factory.createShared<PersoServerConnection>("PersoServerConnection");
 
-  Manager = std::make_unique<ProductionManager>("ProductionManager", sc, sp, p);
+  Manager =
+      std::make_unique<ProductionManager>("ProductionManager", con, sc, sp, p);
 }

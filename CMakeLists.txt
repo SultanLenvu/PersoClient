@@ -69,7 +69,7 @@ add_executable(PersoClient WIN32
 
     Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
     Management/Managers/production_manager.h Management/Managers/production_manager.cpp
-
+    Management/production_unit_context.h Management/production_unit_context.cpp
     Management/AsyncWrappers/i_async_wrapper.h Management/AsyncWrappers/i_async_wrapper.cpp
     Management/AsyncWrappers/async_programmer.cpp Management/AsyncWrappers/async_programmer.h
     Management/AsyncWrappers/progressable_async_wrapper.cpp Management/AsyncWrappers/progressable_async_wrapper.h

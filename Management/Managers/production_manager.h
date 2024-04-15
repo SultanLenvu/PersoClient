@@ -9,6 +9,7 @@
 #include "i_sticker_printer.h"
 #include "loggable_object.h"
 #include "named_object.h"
+#include "production_unit_context.h"
 
 class ProductionManager : public NamedObject,
                           public AbstractManager,
@@ -16,25 +17,19 @@ class ProductionManager : public NamedObject,
   Q_OBJECT
 
  private:
+  std::shared_ptr<ProductionUnitContext> Context;
+
   std::shared_ptr<IServerConnection> Server;
   std::shared_ptr<IProgrammer> Programmer;
   std::shared_ptr<IStickerPrinter> StickerPrinter;
 
-  StringDictionary ProductionLineData;
-  StringDictionary BoxData;
-  StringDictionary TransponderData;
-
  public:
   explicit ProductionManager(const QString& name,
+                             std::shared_ptr<ProductionUnitContext> context,
                              std::shared_ptr<IServerConnection> server,
                              std::shared_ptr<IStickerPrinter> stickerPrinter,
                              std::shared_ptr<IProgrammer> programmer);
   ~ProductionManager() = default;
-
- public:
-  StringDictionary& productionLineData(void);
-  StringDictionary& boxData(void);
-  StringDictionary& transponderData(void);
 
  public:
   ReturnStatus logOn(const StringDictionary& param);

@@ -40,7 +40,7 @@ class ProductionManagerGuiSubkernel final : public AbstractGuiSubkernel {
   void rollbackTransponder(void);
 
  public slots:
-  void displayProductionLineData(const StringDictionary& data);
+  void displayStateData(const StringDictionary& data);
   void displayBoxData(const StringDictionary& data);
   void displayTransponderData(const StringDictionary& data);
   void displayFirmware(const QStringList& firmware);

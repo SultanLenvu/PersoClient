@@ -2,6 +2,7 @@
 #include "async_production_manager.h"
 #include "authorization_dialog.h"
 #include "global_environment.h"
+#include "production_unit_context.h"
 #include "transponder_sticker_scan_dialog.h"
 
 ProductionManagerGuiSubkernel::ProductionManagerGuiSubkernel(
@@ -85,7 +86,7 @@ void ProductionManagerGuiSubkernel::rollbackTransponder() {
   emit rollbackTransponder_signal();
 }
 
-void ProductionManagerGuiSubkernel::displayProductionLineData(
+void ProductionManagerGuiSubkernel::displayStateData(
     const StringDictionary& data) {
   ProductionLineModel.setData(data);
 }
@@ -174,11 +175,14 @@ void ProductionManagerGuiSubkernel::connectDependecies() {
                    &ProductionManagerGuiSubkernel::rollbackTransponder_signal,
                    psm, &AsyncProductionManager::rollbackTransponder);
 
-  //  QObject::connect(psm, &AsyncProductionManager::productionLineDataReady,
-  //  this,
-  //                   &ProductionManagerGuiSubkernel::displayProductionLineData);
-  //  QObject::connect(psm, &AsyncProductionManager::transponderDataReady, this,
-  //                   &ProductionManagerGuiSubkernel::displayTransponderData);
-  //  QObject::connect(psm, &AsyncProductionManager::boxDataReady, this,
-  //                   &ProductionManagerGuiSubkernel::displayBoxData);
+  ProductionUnitContext* puc =
+      GlobalEnvironment::instance()->getObject<ProductionUnitContext>(
+          "ProductionUnitContext");
+
+  QObject::connect(puc, &ProductionUnitContext::stateChanged, this,
+                   &ProductionManagerGuiSubkernel::displayStateData);
+  QObject::connect(puc, &ProductionUnitContext::boxChanged, this,
+                   &ProductionManagerGuiSubkernel::displayBoxData);
+  QObject::connect(puc, &ProductionUnitContext::transponderChanged, this,
+                   &ProductionManagerGuiSubkernel::displayTransponderData);
 }

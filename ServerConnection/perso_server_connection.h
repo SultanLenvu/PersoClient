@@ -116,7 +116,7 @@ class PersoServerConnection final : public NamedObject,
 
  private:
   ReturnStatus processCurrentCommand(const StringDictionary& param,
-                                     StringDictionary result);
+                                     StringDictionary& result);
   ReturnStatus transmitDataBlock(const QByteArray& dataBlock);
   bool waitResponse(void);
 

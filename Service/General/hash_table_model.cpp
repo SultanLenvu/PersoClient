@@ -70,13 +70,10 @@ QVariant HashTableModel::headerData(int section,
     return "Значение";
   }
 
-  if (orientation == Qt::Vertical) {
-    return QVariant();
-  }
-
+  // if (orientation == Qt::Vertical)
   if (!MatchTable.isEmpty()) {
     return MatchTable.value(Converter[section]);
   }
 
-  return Converter[section];
+  return QVariant();
 }

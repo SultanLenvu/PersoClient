@@ -4,11 +4,14 @@
 #include <QFile>
 
 #include "i_server_connection.h"
+#include "production_unit_context.h"
 #include "progressable_async_wrapper.h"
 
 class AsyncServerConnection : public ProgressableAsyncWrapper {
   Q_OBJECT
  private:
+  std::shared_ptr<ProductionUnitContext> Context;
+
   std::shared_ptr<IServerConnection> Server;
 
  public:
@@ -47,12 +50,6 @@ class AsyncServerConnection : public ProgressableAsyncWrapper {
  private:
   Q_DISABLE_COPY_MOVE(AsyncServerConnection)
   void connectDependecies(void);
-
- signals:
-  void productionLineDataReady(const StringDictionary& data);
-  void transponderDataReady(const StringDictionary& data);
-  void boxDataReady(const StringDictionary& data);
-  void firwareReady(const QStringList& firmware);
 };
 
 #endif  // PERSOSERVERMANAGER_H
