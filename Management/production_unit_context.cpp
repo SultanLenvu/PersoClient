@@ -3,24 +3,25 @@
 ProductionUnitContext::ProductionUnitContext(const QString& name)
     : NamedObject(name) {}
 
-void ProductionUnitContext::setState(const StringDictionary&& state) {
+void ProductionUnitContext::setState(const StringDictionary& state) {
   State = state;
   emit stateChanged(state);
 }
 
-void ProductionUnitContext::setBox(const StringDictionary&& box) {
+void ProductionUnitContext::setBox(const StringDictionary& box) {
   Box = box;
   emit boxChanged(Box);
 }
 
 void ProductionUnitContext::setTransponder(
-    const StringDictionary&& transponder) {
+    const StringDictionary& transponder) {
   Transponder = transponder;
   emit transponderChanged(Transponder);
 }
 
-void ProductionUnitContext::setFirmware(const QByteArray&& firmware) {
+void ProductionUnitContext::setFirmware(const QByteArray& firmware) {
   Firmware = firmware;
+  emit firmwareChanged(Firmware);
 }
 
 StringDictionary ProductionUnitContext::state() {
@@ -45,20 +46,32 @@ bool ProductionUnitContext::isBoxEmpty() const {
 
 void ProductionUnitContext::completeBox() {
   Box.clear();
+  Transponder.clear();
+  Firmware.clear();
+
   emit boxChanged(Box);
+  emit transponderChanged(Transponder);
+  emit firmwareChanged(Firmware);
 }
 
 void ProductionUnitContext::refundBox() {
   Box.clear();
+  Transponder.clear();
+  Firmware.clear();
+
   emit boxChanged(Box);
+  emit transponderChanged(Transponder);
+  emit firmwareChanged(Firmware);
 }
 
 void ProductionUnitContext::clear() {
   State.clear();
   Box.clear();
   Transponder.clear();
+  Firmware.clear();
 
   emit stateChanged(State);
   emit boxChanged(Box);
   emit transponderChanged(Transponder);
+  emit firmwareChanged(Firmware);
 }

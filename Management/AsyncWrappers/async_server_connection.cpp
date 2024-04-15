@@ -1,8 +1,7 @@
 #include "async_server_connection.h"
-#include "global_environment.h"
+#include "definitions.h"
 #include "named_object_factory.h"
 #include "perso_server_connection.h"
-#include "production_manager_gui_subkernel.h"
 
 #include <QDir>
 #include <QSettings>
@@ -107,7 +106,7 @@ void AsyncServerConnection::getCurrentBoxData() {
     processOperationError("getCurrentBoxData", ret);
     return;
   }
-  Context->setState(std::move(data));
+  Context->setBox(std::move(data));
 
   completeOperation("getCurrentBoxData");
 }
@@ -120,6 +119,7 @@ void AsyncServerConnection::refundCurrentBox() {
     processOperationError("refundCurrentBox", ret);
     return;
   }
+  Context->refundBox();
 
   completeOperation("refundCurrentBox");
 }
@@ -132,6 +132,7 @@ void AsyncServerConnection::completeCurrentBox() {
     processOperationError("completeCurrentBox", ret);
     return;
   }
+  Context->completeBox();
 
   completeOperation("completeCurrentBox");
 }
@@ -140,12 +141,23 @@ void AsyncServerConnection::releaseTransponder() {
   initOperation("releaseTransponder");
 
   StringDictionary data;
+  QByteArray firmware;
 
   ReturnStatus ret = Server->releaseTransponder(data);
   if (ret != ReturnStatus::NoError) {
     processOperationError("releaseTransponder", ret);
     return;
   }
+
+  firmware =
+      QByteArray::fromBase64(data.value("transponder_firmware").toUtf8());
+  // Проверка корректности присланной прошивки
+  if (firmware.size() != TRANSPONDER_FIRMWARE_SIZE) {
+    sendLog(QString("Получен некорректный файл прошивки. "));
+    processOperationError("rereleaseTransponder",
+                          ReturnStatus::InvalidFirmwareFile);
+  }
+  Context->setFirmware(std::move(firmware));
 
   completeOperation("releaseTransponder");
 }
@@ -167,13 +179,24 @@ void AsyncServerConnection::rereleaseTransponder(
     const StringDictionary& param) {
   initOperation("rereleaseTransponder");
 
+  QByteArray firmware;
   StringDictionary data;
+
   ReturnStatus ret = Server->rereleaseTransponder(param, data);
   if (ret != ReturnStatus::NoError) {
     processOperationError("rereleaseTransponder", ret);
     return;
   }
-  Context->setTransponder(std::move(data));
+
+  firmware =
+      QByteArray::fromBase64(data.value("transponder_firmware").toUtf8());
+  // Проверка корректности присланной прошивки
+  if (firmware.size() != TRANSPONDER_FIRMWARE_SIZE) {
+    sendLog(QString("Получен некорректный файл прошивки. "));
+    processOperationError("rereleaseTransponder",
+                          ReturnStatus::InvalidFirmwareFile);
+  }
+  Context->setFirmware(std::move(firmware));
 
   completeOperation("rereleaseTransponder");
 }
@@ -285,7 +308,4 @@ void AsyncServerConnection::printLastPalletSticker() {
   }
 
   completeOperation("printLastPalletSticker");
-}
-
-void AsyncServerConnection::connectDependecies() {
 }

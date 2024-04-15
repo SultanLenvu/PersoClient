@@ -40,6 +40,7 @@ PersoServerConnection::PersoServerConnection(const QString& name)
 PersoServerConnection::~PersoServerConnection() {
   if (Socket->isOpen()) {
     Socket->disconnectFromHost();
+    Socket->reset();
   }
 }
 

@@ -59,13 +59,17 @@ class ProductionManagerUserInterface final : public AbstractUserInterface {
 
   QGroupBox* FirmwareGroup;
   QVBoxLayout* FirmwareLayout;
-  QListView* FirmwareView;
+  QPlainTextEdit* FirmwareView;
 
  public:
   explicit ProductionManagerUserInterface(QWidget* parent = nullptr);
   ~ProductionManagerUserInterface() = default;
 
+ public:
+  void displayFirmware(const QByteArray& firmware);
+
  private:
+  Q_DISABLE_COPY_MOVE(ProductionManagerUserInterface)
   void createWidgets(void);
   void createControlPanel(void);
   void createCommandsWidget(void);

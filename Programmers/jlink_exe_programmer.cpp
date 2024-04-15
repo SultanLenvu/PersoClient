@@ -31,7 +31,7 @@ ReturnStatus JLinkExeProgrammer::programMemory(const QByteArray& data) {
   QString fileName =
       QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME);
   QFile tempFile(fileName);
-  if (tempFile.open(QIODevice::WriteOnly)) {
+  if (!tempFile.open(QIODevice::WriteOnly)) {
     sendLog(
         "Не удалось открыть временный файл с данными для загрузки в память.");
     return ReturnStatus::FileOpenError;
@@ -96,7 +96,7 @@ ReturnStatus JLinkExeProgrammer::programMemoryWithUnlock(
   QString fileName =
       QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME);
   QFile tempFile(fileName);
-  if (tempFile.open(QIODevice::WriteOnly)) {
+  if (!tempFile.open(QIODevice::WriteOnly)) {
     sendLog(
         "Не удалось открыть временный файл с данными для загрузки в память.");
     return ReturnStatus::FileOpenError;
@@ -316,7 +316,7 @@ ReturnStatus JLinkExeProgrammer::programUserData(const QByteArray& data) {
   QString fileName =
       QString("%1/%2").arg(QDir::tempPath(), TRANSPONDER_FIRMWARE_FILE_NAME);
   QFile tempFile(fileName);
-  if (tempFile.open(QIODevice::WriteOnly)) {
+  if (!tempFile.open(QIODevice::WriteOnly)) {
     sendLog(
         "Не удалось открыть временный файл с данными для загрузки в память.");
     return ReturnStatus::FileOpenError;

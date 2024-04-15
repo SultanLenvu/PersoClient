@@ -1,12 +1,18 @@
 #include "production_manager_user_interface.h"
 #include "global_environment.h"
 #include "production_manager_gui_subkernel.h"
+#include "production_unit_context.h"
 #include "server_commands_widget.h"
 
 ProductionManagerUserInterface::ProductionManagerUserInterface(QWidget* parent)
     : AbstractUserInterface{parent} {
   createWidgets();
   connectDependencies();
+}
+
+void ProductionManagerUserInterface::displayFirmware(
+    const QByteArray& firmware) {
+  FirmwareView->setPlainText(firmware);
 }
 
 void ProductionManagerUserInterface::createWidgets() {
@@ -138,7 +144,7 @@ void ProductionManagerUserInterface::createDataDisplayPanel() {
   DataDisplayLayout->addWidget(FirmwareGroup, 1, 1, 1, 1);
   FirmwareLayout = new QVBoxLayout();
   FirmwareGroup->setLayout(FirmwareLayout);
-  FirmwareView = new QListView();
+  FirmwareView = new QPlainTextEdit();
   FirmwareLayout->addWidget(FirmwareView);
 }
 
@@ -170,5 +176,11 @@ void ProductionManagerUserInterface::connectDependencies() {
   ProductionLineDataView->setModel(&augs->productionLineModel());
   BoxDataView->setModel(&augs->boxModel());
   TransponderDataView->setModel(&augs->transponderModel());
-  FirmwareView->setModel(&augs->firmwareModel());
+
+  ProductionUnitContext* puc =
+      GlobalEnvironment::instance()->getObject<ProductionUnitContext>(
+          "ProductionUnitContext");
+
+  QObject::connect(puc, &ProductionUnitContext::firmwareChanged, this,
+                   &ProductionManagerUserInterface::displayFirmware);
 }

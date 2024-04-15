@@ -101,10 +101,6 @@ void ProductionManagerGuiSubkernel::displayTransponderData(
   TransponderModel.setData(data);
 }
 
-void ProductionManagerGuiSubkernel::displayFirmware(
-    const QStringList& firmware) {
-  FirmwareModel.setStringList(firmware);
-}
 
 void ProductionManagerGuiSubkernel::createModels() {
   StringDictionary plMatchTable;

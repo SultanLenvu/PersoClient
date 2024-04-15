@@ -49,7 +49,6 @@ class AsyncServerConnection : public ProgressableAsyncWrapper {
 
  private:
   Q_DISABLE_COPY_MOVE(AsyncServerConnection)
-  void connectDependecies(void);
 };
 
 #endif  // PERSOSERVERMANAGER_H

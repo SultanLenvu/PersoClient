@@ -19,7 +19,7 @@ ProductionManager::ProductionManager(
 
 ReturnStatus ProductionManager::logOn(const StringDictionary& param) {
   ReturnStatus ret = ReturnStatus::NoError;
-  StringDictionary data;
+  StringDictionary state;
 
   ret = Server->connect();
   if (ret != ReturnStatus::NoError) {
@@ -31,11 +31,11 @@ ReturnStatus ProductionManager::logOn(const StringDictionary& param) {
     return ret;
   }
 
-  ret = Server->getProductionLineData(data);
+  ret = Server->getProductionLineData(state);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
-  Context->setState(std::move(data));
+  Context->setState(state);
 
   return ReturnStatus::NoError;
 }
@@ -52,40 +52,42 @@ ReturnStatus ProductionManager::logOut() {
 
 ReturnStatus ProductionManager::requestBox() {
   ReturnStatus ret = ReturnStatus::NoError;
-  StringDictionary data;
+  StringDictionary box;
+  StringDictionary state;
+  StringDictionary transponder;
 
   ret = Server->requestBox();
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
 
-  ret = Server->getCurrentBoxData(data);
+  ret = Server->getCurrentBoxData(box);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
-  Context->setBox(std::move(data));
+  Context->setBox(box);
 
-  ret = Server->getProductionLineData(data);
+  ret = Server->getProductionLineData(state);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
-  Context->setState(std::move(data));
+  Context->setState(state);
 
   // Если в боксе есть собранные транспондеры
   if (!Context->isBoxEmpty()) {
-    ret = Server->getCurrentTransponderData(data);
+    ret = Server->getCurrentTransponderData(transponder);
     if (ret != ReturnStatus::NoError) {
       return ret;
     }
   }
-  Context->setTransponder(std::move(data));
+  Context->setTransponder(transponder);
 
   return ReturnStatus::NoError;
 }
 
 ReturnStatus ProductionManager::refundCurrentBox() {
   ReturnStatus ret = ReturnStatus::NoError;
-  StringDictionary data;
+  StringDictionary state;
 
   ret = Server->refundCurrentBox();
   if (ret != ReturnStatus::NoError) {
@@ -93,18 +95,18 @@ ReturnStatus ProductionManager::refundCurrentBox() {
   }
   Context->refundBox();
 
-  ret = Server->getProductionLineData(data);
+  ret = Server->getProductionLineData(state);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
-  Context->setState(std::move(data));
+  Context->setState(state);
 
   return ReturnStatus::NoError;
 }
 
 ReturnStatus ProductionManager::completeCurrentBox() {
   ReturnStatus ret = ReturnStatus::NoError;
-  StringDictionary data;
+  StringDictionary state;
 
   ret = Server->completeCurrentBox();
   if (ret != ReturnStatus::NoError) {
@@ -112,10 +114,11 @@ ReturnStatus ProductionManager::completeCurrentBox() {
   }
   Context->completeBox();
 
-  ret = Server->getProductionLineData(data);
+  ret = Server->getProductionLineData(state);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
+  Context->setState(state);
 
   return ReturnStatus::NoError;
 }
@@ -125,6 +128,8 @@ ReturnStatus ProductionManager::releaseTransponder() {
   QString ucid;
   QByteArray firmware;
   StringDictionary data;
+  StringDictionary box;
+  StringDictionary transponder;
   StringDictionary param;
 
   // Разблокируем память
@@ -155,8 +160,8 @@ ReturnStatus ProductionManager::releaseTransponder() {
     sendLog(QString("Получен некорректный файл прошивки. "));
     return ReturnStatus::InvalidFirmwareFile;
   }
+  Context->setFirmware(firmware.toHex());
   sendLog(QString("Прошивка транспондера получена."));
-  data.clear();
 
   // Загружаем прошивку
   ret = Programmer->programMemory(firmware);
@@ -174,22 +179,22 @@ ReturnStatus ProductionManager::releaseTransponder() {
   sendLog(QString("Выпуск транспондера подтвержден."));
 
   // Обновляем данные бокса
-  ret = Server->getCurrentBoxData(data);
+  ret = Server->getCurrentBoxData(box);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
-  Context->setBox(std::move(data));
+  Context->setBox(box);
 
   // Запрашиваем данные выпущенного транспондера
-  ret = Server->getCurrentTransponderData(data);
+  ret = Server->getCurrentTransponderData(transponder);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
-  Context->setTransponder(std::move(data));
+  Context->setTransponder(transponder);
   sendLog(QString("Данные выпускаемого транспондера получены."));
 
   // Печатаем стикер
-  ret = StickerPrinter->printTransponderSticker(Context->transponder());
+  ret = StickerPrinter->printTransponderSticker(transponder);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
@@ -206,6 +211,7 @@ ReturnStatus ProductionManager::rereleaseTransponder(
   QString ucid;
   QByteArray firmware;
   StringDictionary data;
+  StringDictionary transponder;
   StringDictionary requestParam;
 
   // Разблокируем память
@@ -235,7 +241,7 @@ ReturnStatus ProductionManager::rereleaseTransponder(
     return ReturnStatus::InvalidFirmwareFile;
   }
   data.clear();
-  Context->setFirmware(std::move(firmware));
+  Context->setFirmware(firmware);
   sendLog(QString("Прошивка транспондера получена."));
 
   // Загружаем прошивку
@@ -253,14 +259,14 @@ ReturnStatus ProductionManager::rereleaseTransponder(
 
   // Запрашиваем данные перевыпущенного транспондера
   requestParam.remove("transponder_ucid");
-  ret = Server->getTransponderData(requestParam, data);
+  ret = Server->getTransponderData(requestParam, transponder);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
-  Context->setTransponder(std::move(data));
+  Context->setTransponder(transponder);
 
   // Печатаем стикер
-  ret = StickerPrinter->printTransponderSticker(Context->transponder());
+  ret = StickerPrinter->printTransponderSticker(transponder);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
@@ -272,7 +278,8 @@ ReturnStatus ProductionManager::rollbackTransponder() {
   sendLog("Откат производственной линии. ");
 
   ReturnStatus ret = ReturnStatus::NoError;
-  StringDictionary data;
+  StringDictionary transponder;
+  StringDictionary box;
 
   ret = Server->rollbackTransponder();
   if (ret != ReturnStatus::NoError) {
@@ -280,20 +287,20 @@ ReturnStatus ProductionManager::rollbackTransponder() {
   }
 
   // Обновляем данные бокса
-  ret = Server->getCurrentBoxData(data);
+  ret = Server->getCurrentBoxData(box);
   if (ret != ReturnStatus::NoError) {
     return ret;
   }
-  Context->setBox(std::move(data));
+  Context->setBox(box);
 
   // Если в боксе есть собранные транспондеры
   if (!Context->isBoxEmpty()) {
-    ret = Server->getCurrentTransponderData(data);
+    ret = Server->getCurrentTransponderData(transponder);
     if (ret != ReturnStatus::NoError) {
       return ret;
     }
   }
-  Context->setTransponder(std::move(data));
+  Context->setTransponder(transponder);
 
   return ReturnStatus::NoError;
 }

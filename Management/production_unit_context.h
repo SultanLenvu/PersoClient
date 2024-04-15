@@ -18,10 +18,10 @@ class ProductionUnitContext : public NamedObject {
   ~ProductionUnitContext() = default;
 
  public:
-  void setState(const StringDictionary&& state);
-  void setBox(const StringDictionary&& box);
-  void setTransponder(const StringDictionary&& transponder);
-  void setFirmware(const QByteArray&& firmware);
+  void setState(const StringDictionary& state);
+  void setBox(const StringDictionary& box);
+  void setTransponder(const StringDictionary& transponder);
+  void setFirmware(const QByteArray& firmware);
 
  public:
   StringDictionary state();
@@ -44,7 +44,7 @@ class ProductionUnitContext : public NamedObject {
   void stateChanged(const StringDictionary& data);
   void boxChanged(const StringDictionary& data);
   void transponderChanged(const StringDictionary& data);
-  void firmwareChanged(const QByteArray& data);
+  void firmwareChanged(const QByteArray& firmware);
 };
 
 #endif  // PRODUCTIONUNITCONTEXT_H
