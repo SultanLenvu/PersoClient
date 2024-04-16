@@ -39,7 +39,6 @@ void ProductionManagerUserInterface::createControlPanel() {
   ControlPanel->setLayout(ControlPanelLayout);
 
   createInitGroup();
-  createProductionLineGroup();
   createBoxGroup();
   createTransponderGroup();
   createPrintingGroup();
@@ -65,19 +64,6 @@ void ProductionManagerUserInterface::createInitGroup() {
   InitGroupLayout->addWidget(LogOnPushButton);
   LogOutPushButton = new QPushButton("Выйти");
   InitGroupLayout->addWidget(LogOutPushButton);
-}
-
-void ProductionManagerUserInterface::createProductionLineGroup() {
-  ProductionLineGroup = new QGroupBox("Производственная линия");
-  ControlPanelLayout->addWidget(ProductionLineGroup);
-
-  ProductionLineGroupLayout = new QVBoxLayout();
-  ProductionLineGroup->setLayout(ProductionLineGroupLayout);
-
-  LaunchProductionLinePushButton = new QPushButton("Запустить");
-  ProductionLineGroupLayout->addWidget(LaunchProductionLinePushButton);
-  ShutdownProductionLinePushButton = new QPushButton("Остановить");
-  ProductionLineGroupLayout->addWidget(ShutdownProductionLinePushButton);
 }
 
 void ProductionManagerUserInterface::createBoxGroup() {

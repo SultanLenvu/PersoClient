@@ -9,9 +9,8 @@
 #include <QtWidgets>
 
 #include "abstract_gui_subkernel.h"
-#include "asynchronous_object_space.h"
+#include "async_object_space.h"
 #include "progress_indicator.h"
-#include "service_object_space.h"
 #include "status_indicator.h"
 
 class GuiKernel : public QMainWindow {
@@ -45,8 +44,8 @@ class GuiKernel : public QMainWindow {
   std::unique_ptr<ProgressIndicator> PIndicator;
   std::unique_ptr<StatusIndicator> SIndicator;
 
-  std::unique_ptr<ServiceObjectSpace> Service;
-  std::unique_ptr<AsynchronousObjectSpace> Async;
+  std::unique_ptr<AsyncObjectSpace> ServiceLogic;
+  std::unique_ptr<AsyncObjectSpace> BusinessLogic;
 
  public:
   explicit GuiKernel(QWidget* parent = nullptr);
@@ -65,7 +64,8 @@ class GuiKernel : public QMainWindow {
   void createTopMenuActions(void);
   void createTopMenu(void);
 
-  void createLoggerInstance(void);
+  void createServiceLogic(void);
+  void createBusinessLogic(void);
   void createReactions(void);
   void createGuiSubkernels(void);
 

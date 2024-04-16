@@ -22,11 +22,6 @@ class ProductionManagerUserInterface final : public AbstractUserInterface {
   QPushButton* LogOnPushButton;
   QPushButton* LogOutPushButton;
 
-  QGroupBox* ProductionLineGroup;
-  QVBoxLayout* ProductionLineGroupLayout;
-  QPushButton* LaunchProductionLinePushButton;
-  QPushButton* ShutdownProductionLinePushButton;
-
   QGroupBox* BoxGroup;
   QVBoxLayout* BoxGroupLayout;
   QPushButton* RequestBoxPushButton;
@@ -74,7 +69,6 @@ class ProductionManagerUserInterface final : public AbstractUserInterface {
   void createControlPanel(void);
   void createCommandsWidget(void);
   void createInitGroup(void);
-  void createProductionLineGroup(void);
   void createBoxGroup(void);
   void createTransponderGroup(void);
   void createPrintingGroup(void);

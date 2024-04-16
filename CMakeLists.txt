@@ -41,8 +41,7 @@ include_directories(ServerConnection/Commands/)
 
 add_executable(PersoClient WIN32
     Service/abstract_service_object_space.h Service/abstract_service_object_space.cpp
-    Service/service_object_space.h Service/service_object_space.cpp
-    Service/asynchronous_object_space.h Service/asynchronous_object_space.cpp
+    Service/async_object_space.h Service/async_object_space.cpp
     Service/configuration_system.h Service/configuration_system.cpp
 
     Service/General/definitions.h

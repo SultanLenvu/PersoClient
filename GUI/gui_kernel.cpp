@@ -4,9 +4,15 @@
 #include <QString>
 
 #include "assembler_unit_user_interface.h"
+#include "async_production_manager.h"
+#include "async_programmer.h"
+#include "async_server_connection.h"
+#include "async_sticker_printer.h"
 #include "authorization_user_interface.h"
+#include "configuration_system.h"
 #include "definitions.h"
 #include "gui_kernel.h"
+#include "log_system.h"
 #include "master_password_input_dialog.h"
 #include "master_user_interface.h"
 #include "production_manager_gui_subkernel.h"
@@ -21,9 +27,9 @@ GuiKernel::GuiKernel(QWidget* parent)
   DesktopGeometry = QApplication::primaryScreen()->size();
   createTopMenu();
 
-  Service = std::make_unique<ServiceObjectSpace>();
+  createServiceLogic();
   createReactions();
-  Async = std::make_unique<AsynchronousObjectSpace>();
+  createBusinessLogic();
   createGuiSubkernels();
 
   // Создаем графический интерфейс для авторизации
@@ -154,6 +160,20 @@ void GuiKernel::createTopMenu() {
   HelpMenu = menuBar()->addMenu("Справка");
   HelpMenu->addAction(AboutProgramAct);
   HelpMenu->addAction(AboutProgramAct);
+}
+
+void GuiKernel::createServiceLogic() {
+  ServiceLogic = std::make_unique<AsyncObjectSpace>();
+  ServiceLogic->add<ConfigurationSystem>("ConfigurationSystem");
+  ServiceLogic->add<LogSystem>("LogSystem");
+}
+
+void GuiKernel::createBusinessLogic() {
+  BusinessLogic = std::make_unique<AsyncObjectSpace>();
+  BusinessLogic->add<AsyncStickerPrinter>("AsyncStickerPrinter");
+  BusinessLogic->add<AsyncProgrammer>("AsyncProgrammer");
+  BusinessLogic->add<AsyncServerConnection>("AsyncServerConnection");
+  BusinessLogic->add<AsyncProductionManager>("AsyncProductionManager");
 }
 
 void GuiKernel::createGuiSubkernels() {

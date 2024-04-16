@@ -1,6 +1,15 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+#define CHECK_EXECUTION_THREAD                            \
+  {                                                       \
+    if (QApplication::instance()->thread() != thread()) { \
+      qDebug() << "Запущено в отдельном потоке.";         \
+    } else {                                              \
+      qDebug() << "Запущено в главном потоке.";           \
+    }                                                     \
+  }
+
 /* Общие определения */
 //===============================================================
 #define PROGRAM_NAME "PersoClient"

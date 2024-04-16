@@ -24,19 +24,11 @@ class LogSystem final : public NamedObject,
   Q_OBJECT
 
  private:
-  QString SavePath;
   std::vector<std::unique_ptr<AbstractLogBackend>> Backends;
-
-  bool UdpListenEnable;
-  //  std::unique_ptr<QUdpSocket> PersoServerLogSocket;
-  // Из-за внутренних механизмов Qt лучше использовать "сырой" указатель
-  QUdpSocket* PersoServerLogSocket;
-  QHostAddress UdpListenIp;
-  uint32_t UdpListenPort;
 
  public:
   Q_INVOKABLE LogSystem(const QString& name);
-  ~LogSystem();
+  ~LogSystem() = default;
 
  public slots:
   void generate(const QString& log, const LoggableObject* source) const;
@@ -45,12 +37,6 @@ class LogSystem final : public NamedObject,
   Q_DISABLE_COPY_MOVE(LogSystem)
   virtual void loadSettings(void) override;
   void doLoadSettings(void);
-
- private:
-  void createPersoServerLogSocket(void);
-
- private slots:
-  void udpSocketReadyRead_slot();
 };
 
 //==================================================================================
