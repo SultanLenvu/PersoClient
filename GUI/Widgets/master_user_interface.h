@@ -24,8 +24,6 @@ class MasterUserInterface final : public QWidget {
   void createProgrammatorTab(void);
   void createStickerPrinterTab(void);
   void createLogWidgets(void);
-
-  void connectDepedencies(void);
 };
 
 #endif  // MASTER_USER_INTERFACE_H

@@ -6,7 +6,6 @@
 
 MasterUserInterface::MasterUserInterface(QWidget* parent) : QWidget(parent) {
   create();
-  connectDepedencies();
 }
 
 void MasterUserInterface::create() {
@@ -28,9 +27,6 @@ void MasterUserInterface::create() {
 
   // Виджеты для отображения логов
   createLogWidgets();
-
-  // Подключаем внешние зависимости
-  connectDepedencies();
 
   // Настройка пропорции между объектами на макете
   MainLayout->setStretch(0, 5);
@@ -55,7 +51,4 @@ void MasterUserInterface::createStickerPrinterTab() {
 void MasterUserInterface::createLogWidgets() {
   LogDisplay = new LogDisplayWidget();
   MainLayout->addWidget(LogDisplay);
-}
-
-void MasterUserInterface::connectDepedencies() {
 }
