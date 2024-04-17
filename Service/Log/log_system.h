@@ -28,7 +28,7 @@ class LogSystem final : public NamedObject,
 
  public:
   Q_INVOKABLE LogSystem(const QString& name);
-  ~LogSystem() = default;
+  ~LogSystem();
 
  public slots:
   void generate(const QString& log, const LoggableObject* source) const;

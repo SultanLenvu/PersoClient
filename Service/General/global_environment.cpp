@@ -33,7 +33,7 @@ void GlobalEnvironment::removeSharedObject(const QString& name) {
 void GlobalEnvironment::removeObject() {
   QString name = sender()->objectName();
 
-  qDebug() << "Object: " << name;
+  qDebug() << "Object: " << name << ". Thread:" << QThread::currentThread();
 
   Objects.remove(name);
 }

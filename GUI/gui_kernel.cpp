@@ -24,7 +24,6 @@
 
 GuiKernel::GuiKernel(QWidget* parent)
     : QMainWindow(parent), CurrentMode(Authorization) {
-  GlobalEnvironment::instance();
   DesktopGeometry = QApplication::primaryScreen()->size();
   createTopMenu();
 

@@ -49,9 +49,14 @@ class GlobalEnvironment : public QObject {
       return nullptr;
     }
 
+    std::shared_ptr<QObject> ptr = SharedObjects[name];
+    if (!ptr) {
+      SharedObjects.remove(name);
+      return nullptr;
+    }
+
     // Шерить объекты можно только между теми владельцами, которые находятся в
     // том же потоке QThread, что и разделяемый объект
-    std::shared_ptr<QObject> ptr = SharedObjects[name];
     if (ptr->thread() != QThread::currentThread()) {
       return nullptr;
     }

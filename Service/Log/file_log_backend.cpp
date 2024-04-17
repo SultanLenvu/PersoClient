@@ -1,8 +1,8 @@
+#include "file_log_backend.h"
 #include <QMessageBox>
 #include <QSettings>
 #include <QStandardPaths>
-
-#include "file_log_backend.h"
+#include <QThread>
 
 FileLogBackend::FileLogBackend(const QString& name)
     : NamedObject(name), LoggableObject(name) {
@@ -11,6 +11,7 @@ FileLogBackend::FileLogBackend(const QString& name)
 }
 
 FileLogBackend::~FileLogBackend() {
+  qDebug() << "FileLogBackend destructor: " << QThread::currentThread();
   CurrentFile.close();
 }
 
