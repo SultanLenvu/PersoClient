@@ -140,6 +140,8 @@ add_executable(PersoClient WIN32
     ServerConnection/Commands/get_production_line_data.h ServerConnection/Commands/get_production_line_data.cpp
 
     main.cpp
+    Service/General/qobject_container.h Service/General/qobject_container.cpp
+    Service/General/shared_qobject_container.h Service/General/shared_qobject_container.cpp
     )
 
 target_link_libraries(PersoClient PRIVATE
