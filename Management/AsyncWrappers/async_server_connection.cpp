@@ -1,6 +1,6 @@
 #include "async_server_connection.h"
 #include "definitions.h"
-#include "named_object_factory.h"
+#include "qobject_factory.h"
 #include "perso_server_connection.h"
 
 #include <QDir>
@@ -8,7 +8,7 @@
 
 AsyncServerConnection::AsyncServerConnection(const QString& name)
     : ProgressableAsyncWrapper{name} {
-  NamedObjectFactory factory(thread());
+  QObjectFactory factory(thread());
   Context =
       factory.createShared<ProductionUnitContext>("ProductionUnitContext");
 

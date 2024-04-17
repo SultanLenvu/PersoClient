@@ -4,12 +4,12 @@
 #include <QObject>
 #include <QThread>
 
-#include "named_object_factory.h"
+#include "qobject_factory.h"
 
 class AsyncObjectSpace final {
  private:
   QThread Thread;
-  std::unique_ptr<NamedObjectFactory> Factory;
+  std::unique_ptr<QObjectFactory> Factory;
   std::vector<QObject*> Objects;
 
  public:
@@ -17,26 +17,15 @@ class AsyncObjectSpace final {
   ~AsyncObjectSpace();
 
  public:
-  template <typename T>
-  void add(const QString& name) {
-    static_assert(std::is_base_of<NamedObject, T>::value,
-                  "T must be derived from NamedObject");
-    static_assert(
-        std::is_constructible<T, const QString&>::value,
-        "T must have a constructor with one argument of type const QString&");
-
-    QObject* obj = Factory->create<T>(name);
-    QObject::connect(&Thread, &QThread::finished, obj, &QObject::deleteLater);
-
-    Objects.push_back(obj);
-  };
-
-  template <typename T>
-  void add() {
+  template <typename T, typename... Args>
+  void add(Args... args) {
     static_assert(std::is_base_of<QObject, T>::value,
-                  "T must be derived from NamedObject");
+                  "T must be derived from QObject");
+    static_assert(
+        std::is_constructible<T, Args...>::value,
+        "T does not have a constructor that can be constructed from Args");
 
-    QObject* obj = Factory->create<T>();
+    QObject* obj = Factory->create<T>(std::forward<Args>(args)...);
     QObject::connect(&Thread, &QThread::finished, obj, &QObject::deleteLater);
 
     Objects.push_back(obj);

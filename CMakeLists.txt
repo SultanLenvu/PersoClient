@@ -48,7 +48,7 @@ add_executable(PersoClient WIN32
     Service/General/hash_table_model.cpp Service/General/hash_table_model.h
     Service/General/types.h
     Service/General/global_environment.cpp Service/General/global_environment.h
-    Service/General/named_object_factory.h Service/General/named_object_factory.cpp
+    Service/General/qobject_factory.h Service/General/qobject_factory.cpp
 
     Service/Functors/abstract_string_checker.cpp Service/Functors/abstract_string_checker.h
     Service/Functors/numeric_string_checker.cpp Service/Functors/numeric_string_checker.h

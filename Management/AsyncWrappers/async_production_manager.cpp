@@ -1,6 +1,6 @@
 #include "async_production_manager.h"
 #include "jlink_exe_programmer.h"
-#include "named_object_factory.h"
+#include "qobject_factory.h"
 #include "perso_server_connection.h"
 #include "production_unit_context.h"
 #include "te310_printer.h"
@@ -109,7 +109,7 @@ void AsyncProductionManager::rollbackTransponder() {
 }
 
 void AsyncProductionManager::createManager() {
-  NamedObjectFactory factory(thread());
+  QObjectFactory factory(thread());
 
   std::shared_ptr<ProductionUnitContext> con =
       factory.createShared<ProductionUnitContext>("ProductionUnitContext");

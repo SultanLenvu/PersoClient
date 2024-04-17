@@ -39,13 +39,14 @@ class GuiKernel : public QMainWindow {
   QAction* AboutProgramAct;
   //==================================================
 
+  std::unique_ptr<AsyncObjectSpace> ServiceLogic;
+
   std::vector<std::unique_ptr<AbstractGuiSubkernel>> Subkernels;
+
+  std::unique_ptr<AsyncObjectSpace> BusinessLogic;
 
   std::unique_ptr<ProgressIndicator> PIndicator;
   std::unique_ptr<StatusIndicator> SIndicator;
-
-  std::unique_ptr<AsyncObjectSpace> ServiceLogic;
-  std::unique_ptr<AsyncObjectSpace> BusinessLogic;
 
  public:
   explicit GuiKernel(QWidget* parent = nullptr);

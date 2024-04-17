@@ -1,10 +1,10 @@
 #include "async_sticker_printer.h"
-#include "named_object_factory.h"
+#include "qobject_factory.h"
 #include "te310_printer.h"
 
 AsyncStickerPrinter::AsyncStickerPrinter(const QString& name)
     : ProgressableAsyncWrapper(name) {
-  NamedObjectFactory factory(thread());
+  QObjectFactory factory(thread());
   StickerPrinter = factory.createShared<TE310Printer>("TE310Printer");
 }
 

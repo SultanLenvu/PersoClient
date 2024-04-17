@@ -1,10 +1,10 @@
 #include "async_programmer.h"
 #include "jlink_exe_programmer.h"
-#include "named_object_factory.h"
+#include "qobject_factory.h"
 
 AsyncProgrammer::AsyncProgrammer(const QString& name)
     : ProgressableAsyncWrapper(name) {
-  NamedObjectFactory factory(thread());
+  QObjectFactory factory(thread());
   Programmer = factory.createShared<JLinkExeProgrammer>("JLinkExeProgrammer");
 }
 

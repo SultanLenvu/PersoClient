@@ -2,7 +2,7 @@
 
 AsyncObjectSpace::AsyncObjectSpace() {
   Thread.start();
-  Factory = std::make_unique<NamedObjectFactory>(&Thread);
+  Factory = std::make_unique<QObjectFactory>(&Thread);
 }
 
 AsyncObjectSpace::~AsyncObjectSpace() {
