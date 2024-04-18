@@ -11,7 +11,7 @@ class GlobalEnvironment : public QObject {
 
  private:
   QHash<QString, QObject*> Objects;
-  QHash<QString, std::shared_ptr<QObject>> SharedObjects;
+  QHash<QString, std::weak_ptr<QObject>> SharedObjects;
 
  public:
   static GlobalEnvironment* instance(void);
@@ -38,7 +38,6 @@ class GlobalEnvironment : public QObject {
 
  public:
   void registerSharedObject(std::shared_ptr<QObject> obj);
-  void removeSharedObject(const QString& name);
 
   template <typename T>
   std::shared_ptr<T> getSharedObject(const QString& name) {
@@ -49,14 +48,9 @@ class GlobalEnvironment : public QObject {
       return nullptr;
     }
 
-    std::shared_ptr<QObject> ptr = SharedObjects[name];
-    if (!ptr) {
-      SharedObjects.remove(name);
-      return nullptr;
-    }
-
     // Шерить объекты можно только между теми владельцами, которые находятся в
     // том же потоке QThread, что и разделяемый объект
+    std::shared_ptr<QObject> ptr = SharedObjects[name].lock();
     if (ptr->thread() != QThread::currentThread()) {
       return nullptr;
     }
@@ -71,6 +65,7 @@ class GlobalEnvironment : public QObject {
 
  private slots:
   void removeObject(void);
+  void removeSharedObject(void);
 
  signals:
 };

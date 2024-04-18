@@ -1,10 +1,14 @@
 #ifndef CONFIGURATIONMANAGER_H
 #define CONFIGURATIONMANAGER_H
 
+#include "global_environment.h"
 #include "named_object.h"
 
 class ConfigurationSystem : public NamedObject {
   Q_OBJECT
+ private:
+  GlobalEnvironment* Global;
+
  public:
   Q_INVOKABLE explicit ConfigurationSystem(const QString& name);
   ~ConfigurationSystem() = default;
@@ -13,7 +17,7 @@ class ConfigurationSystem : public NamedObject {
   Q_DISABLE_COPY_MOVE(ConfigurationSystem)
 
  private:
-  void init(void);
+  void initApplication(void);
   void registerMetaTypes(void);
 
  signals:

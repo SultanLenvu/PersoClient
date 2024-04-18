@@ -10,11 +10,6 @@ FileLogBackend::FileLogBackend(const QString& name)
   initialize();
 }
 
-FileLogBackend::~FileLogBackend() {
-  qDebug() << "FileLogBackend destructor: " << QThread::currentThread();
-  CurrentFile.close();
-}
-
 void FileLogBackend::writeMessage(const QString& str) {
   if (!Enable) {
     return;

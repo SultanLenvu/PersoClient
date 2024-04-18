@@ -49,6 +49,7 @@ class GuiKernel : public QMainWindow {
  public:
   explicit GuiKernel(QWidget* parent = nullptr);
   ~GuiKernel() = default;
+  Q_DISABLE_COPY_MOVE(GuiKernel);
 
  public slots:
   void displayMasterInterface(void);
@@ -58,8 +59,6 @@ class GuiKernel : public QMainWindow {
   void logOutServerAct_slot(void);
 
  private:
-  Q_DISABLE_COPY_MOVE(GuiKernel);
-
   void createTopMenuActions(void);
   void createTopMenu(void);
 

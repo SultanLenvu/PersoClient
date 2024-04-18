@@ -24,16 +24,33 @@ void GlobalEnvironment::registerObject(QObject* obj) {
 
 void GlobalEnvironment::registerSharedObject(std::shared_ptr<QObject> obj) {
   SharedObjects.insert(obj->objectName(), obj);
-}
 
-void GlobalEnvironment::removeSharedObject(const QString& name) {
-  SharedObjects.remove(name);
+  Qt::ConnectionType conType = Qt::DirectConnection;
+  if (obj->thread() != thread()) {
+    conType = Qt::BlockingQueuedConnection;
+  }
+  connect(obj.get(), &QObject::destroyed, this,
+          &GlobalEnvironment::removeSharedObject, conType);
 }
 
 void GlobalEnvironment::removeObject() {
   QString name = sender()->objectName();
 
-  qDebug() << "Object: " << name << ". Thread:" << QThread::currentThread();
+  //  qDebug() << "Removing object: " << name
+  //           << ". Thread:" << QThread::currentThread();
 
   Objects.remove(name);
+}
+
+void GlobalEnvironment::removeSharedObject() {
+  QString name = sender()->objectName();
+
+  //  qDebug() << "Try to remove shared object: " << name
+  //           << ". Thread:" << QThread::currentThread();
+
+  if (SharedObjects[name].expired()) {
+    //    qDebug() << "Removing shared object: " << name
+    //             << ". Thread:" << QThread::currentThread();
+    SharedObjects.remove(name);
+  }
 }

@@ -13,10 +13,6 @@ LogSystem::LogSystem(const QString& name)
   Backends.emplace_back(new FileLogBackend("FileLogBackend"));
 }
 
-LogSystem::~LogSystem() {
-  qDebug() << "LogSystem destructor: " << QThread::currentThread();
-}
-
 void LogSystem::generate(const QString& log,
                          const LoggableObject* source) const {
   QTime time = QDateTime::currentDateTime().time();

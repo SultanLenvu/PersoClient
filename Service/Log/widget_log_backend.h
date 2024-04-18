@@ -16,7 +16,7 @@ class WidgetLogBackend final : public NamedObject,
 
  public:
   explicit WidgetLogBackend(const QString& name);
-  ~WidgetLogBackend();
+  ~WidgetLogBackend() = default;
 
   // AbstractLogBackend interface
  public:

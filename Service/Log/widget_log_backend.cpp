@@ -1,15 +1,10 @@
 #include <QSettings>
-#include <QThread>
 
 #include "widget_log_backend.h"
 
 WidgetLogBackend::WidgetLogBackend(const QString& name)
     : NamedObject(name), LoggableObject(name) {
   doLoadSettings();
-}
-
-WidgetLogBackend::~WidgetLogBackend() {
-  qDebug() << "WidgetLogBackend destructor: " << QThread::currentThread();
 }
 
 void WidgetLogBackend::writeMessage(const QString& str) {

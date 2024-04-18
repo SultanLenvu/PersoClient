@@ -8,11 +8,13 @@
 
 ConfigurationSystem::ConfigurationSystem(const QString& name)
     : NamedObject(name) {
-  init();
+  Global = GlobalEnvironment::instance();
+
+  initApplication();
   registerMetaTypes();
 }
 
-void ConfigurationSystem::init() {
+void ConfigurationSystem::initApplication() {
   QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
   QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
   QCoreApplication::setApplicationName(PROGRAM_NAME);

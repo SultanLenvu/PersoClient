@@ -5,8 +5,8 @@
 
 class AbstractLogBackend {
  public:
-  AbstractLogBackend() = default;
-  virtual ~AbstractLogBackend() = default;
+  explicit AbstractLogBackend() = default;
+  virtual ~AbstractLogBackend();
 
  public:
   virtual void writeMessage(const QString& str) = 0;

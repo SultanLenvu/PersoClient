@@ -27,14 +27,12 @@ class FileLogBackend final : public NamedObject,
 
  public:
   explicit FileLogBackend(const QString& name);
-  ~FileLogBackend();
+  ~FileLogBackend() = default;
+  Q_DISABLE_COPY_MOVE(FileLogBackend)
 
   // AbstractLogBackend interface
  public:
   virtual void writeMessage(const QString& str) override;
-
- private:
-  Q_DISABLE_COPY_MOVE(FileLogBackend)
 
  private:
   virtual void loadSettings(void) override;

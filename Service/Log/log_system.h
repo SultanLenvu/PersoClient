@@ -15,9 +15,6 @@
 #include "loggable_object.h"
 #include "named_object.h"
 
-/* Глобальная система логгирования */
-//==================================================================================
-
 class LogSystem final : public NamedObject,
                         public ConfigurableObject,
                         public LoggableObject {
@@ -28,7 +25,7 @@ class LogSystem final : public NamedObject,
 
  public:
   Q_INVOKABLE LogSystem(const QString& name);
-  ~LogSystem();
+  ~LogSystem() = default;
 
  public slots:
   void generate(const QString& log, const LoggableObject* source) const;
@@ -38,7 +35,5 @@ class LogSystem final : public NamedObject,
   virtual void loadSettings(void) override;
   void doLoadSettings(void);
 };
-
-//==================================================================================
 
 #endif  // LOGSYSTEM_H
