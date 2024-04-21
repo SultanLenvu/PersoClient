@@ -7,6 +7,7 @@ class IServerConnection {
  public:
   explicit IServerConnection() = default;
   virtual ~IServerConnection() = default;
+  Q_DISABLE_COPY_MOVE(IServerConnection)
 
  public:
   virtual ReturnStatus connect(void) = 0;
@@ -41,9 +42,6 @@ class IServerConnection {
   virtual ReturnStatus printLastBoxSticker(void) = 0;
   virtual ReturnStatus printPalletSticker(const StringDictionary& param) = 0;
   virtual ReturnStatus printLastPalletSticker(void) = 0;
-
- private:
-  Q_DISABLE_COPY_MOVE(IServerConnection)
 };
 
 #endif  // ISERVERCONNECTION_H

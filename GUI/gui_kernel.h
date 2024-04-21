@@ -9,7 +9,7 @@
 #include <QtWidgets>
 
 #include "abstract_gui_subkernel.h"
-#include "async_object_space.h"
+#include "async_environment.h"
 #include "progress_indicator.h"
 #include "status_indicator.h"
 
@@ -39,9 +39,8 @@ class GuiKernel : public QMainWindow {
   QAction* AboutProgramAct;
   //==================================================
 
-  std::unique_ptr<AsyncObjectSpace> ServiceLogic;
-  std::vector<std::unique_ptr<AbstractGuiSubkernel>> Subkernels;
-  std::unique_ptr<AsyncObjectSpace> BusinessLogic;
+  std::vector<std::unique_ptr<AsyncEnvironment>> Environments;
+  QHash<QString, std::shared_ptr<AbstractGuiSubkernel>> Subkernels;
 
   std::unique_ptr<ProgressIndicator> PIndicator;
   std::unique_ptr<StatusIndicator> SIndicator;
@@ -62,8 +61,7 @@ class GuiKernel : public QMainWindow {
   void createTopMenuActions(void);
   void createTopMenu(void);
 
-  void createServiceLogic(void);
-  void createBusinessLogic(void);
+  void createEnvironments(void);
   void createReactions(void);
   void createGuiSubkernels(void);
 

@@ -40,15 +40,6 @@ PersoServerConnection::PersoServerConnection(const QString& name)
   createCommands();
 }
 
-PersoServerConnection::~PersoServerConnection() {
-  //  qDebug() << (QString::number(
-  //      reinterpret_cast<long long>(QThread::currentThreadId()), 16));
-
-  if (Socket->isOpen()) {
-    Socket->disconnectFromHost();
-  }
-}
-
 ReturnStatus PersoServerConnection::connect() {
   if (Socket->state() == QTcpSocket::ConnectedState) {
     sendLog("Соединение с сервером персонализации уже установлено. ");
@@ -271,7 +262,7 @@ void PersoServerConnection::connectDependencies() {
               "ServerConnectionGuiSubkernel");
 
   QObject::connect(this, &PersoServerConnection::disconnected, scgs,
-                   &ServerConnectionGuiSubkernel::onServerDisconnected);
+                   &ServerConnectionGuiSubkernel::generateDisconnectionAlert);
 }
 
 void PersoServerConnection::loadSettings() {

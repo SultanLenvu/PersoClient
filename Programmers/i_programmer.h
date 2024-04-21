@@ -12,6 +12,7 @@ class IProgrammer {
  public:
   explicit IProgrammer() = default;
   virtual ~IProgrammer() = default;
+  Q_DISABLE_COPY_MOVE(IProgrammer)
 
  public:
   virtual ReturnStatus checkConfig(void) = 0;
@@ -33,9 +34,6 @@ class IProgrammer {
 
   virtual ReturnStatus unlockMemory(void) = 0;
   virtual ReturnStatus lockMemory(void) = 0;
-
- private:
-  Q_DISABLE_COPY_MOVE(IProgrammer)
 };
 
 #endif  // ABSTRACTPROGRAMMER_H

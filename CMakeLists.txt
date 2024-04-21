@@ -16,9 +16,9 @@ find_package(Qt${QT_VERSION_MAJOR} OPTIONAL_COMPONENTS Widgets)
 #======================================================================================================#
 
 #========================================== SOURCE DIRECTORIES ===========================================#
-include_directories(Management/)
-include_directories(Management/Managers)
-include_directories(Management/AsyncWrappers)
+include_directories(BusinessLogic/)
+include_directories(BusinessLogic/Managers)
+include_directories(BusinessLogic/AsyncObjects)
 
 include_directories(GUI/)
 include_directories(GUI/Dialogs)
@@ -31,6 +31,7 @@ include_directories(Service/Functors)
 include_directories(Service/General)
 include_directories(Service/Log)
 include_directories(Service/ObjectTypes)
+include_directories(Service/Connectors)
 
 include_directories(Programmers/)
 include_directories(StickerPrinter/)
@@ -41,14 +42,15 @@ include_directories(ServerConnection/Commands/)
 
 add_executable(PersoClient WIN32
     Service/abstract_service_object_space.h Service/abstract_service_object_space.cpp
-    Service/async_object_space.h Service/async_object_space.cpp
+    Service/async_environment.h Service/async_environment.cpp
     Service/configuration_system.h Service/configuration_system.cpp
+    Service/abstract_object_environment.h Service/abstract_object_environment.cpp
 
     Service/General/definitions.h
     Service/General/hash_table_model.cpp Service/General/hash_table_model.h
     Service/General/types.h
     Service/General/global_environment.cpp Service/General/global_environment.h
-    Service/General/qobject_factory.h Service/General/qobject_factory.cpp
+    Service/General/async_object_factory.h Service/General/async_object_factory.cpp
 
     Service/Functors/abstract_string_checker.cpp Service/Functors/abstract_string_checker.h
     Service/Functors/numeric_string_checker.cpp Service/Functors/numeric_string_checker.h
@@ -66,16 +68,25 @@ add_executable(PersoClient WIN32
     Service/Log/widget_log_backend.cpp Service/Log/widget_log_backend.h
     Service/Log/log_message.h Service/Log/log_message.cpp
 
-    Management/Managers/abstract_manager.h Management/Managers/abstract_manager.cpp
-    Management/Managers/production_manager.h Management/Managers/production_manager.cpp
-    Management/production_unit_context.h Management/production_unit_context.cpp
-    Management/AsyncWrappers/i_async_wrapper.h Management/AsyncWrappers/i_async_wrapper.cpp
-    Management/AsyncWrappers/async_programmer.cpp Management/AsyncWrappers/async_programmer.h
-    Management/AsyncWrappers/progressable_async_wrapper.cpp Management/AsyncWrappers/progressable_async_wrapper.h
-    Management/AsyncWrappers/async_server_connection.cpp Management/AsyncWrappers/async_server_connection.h
-    Management/AsyncWrappers/async_sticker_printer.cpp Management/AsyncWrappers/async_sticker_printer.h
-    Management/AsyncWrappers/async_production_manager.cpp Management/AsyncWrappers/async_production_manager.h
-    Management/AsyncWrappers/async_wrapper.h Management/AsyncWrappers/async_wrapper.cpp
+    Service/Connectors/i_object_connector.h Service/Connectors/i_object_connector.cpp
+    Service/Connectors/production_connector.h Service/Connectors/production_connector.cpp
+    Service/Connectors/i_connection_manager.h Service/Connectors/i_connection_manager.cpp
+    Service/Connectors/connection_manager.h Service/Connectors/connection_manager.cpp
+    Service/Connectors/production_context_connector.h Service/Connectors/production_context_connector.cpp
+    Service/Connectors/programmer_connector.h Service/Connectors/programmer_connector.cpp
+    Service/Connectors/server_connection_connector.h Service/Connectors/server_connection_connector.cpp
+    Service/Connectors/sticker_printer_connector.h Service/Connectors/sticker_printer_connector.cpp
+
+    BusinessLogic/Managers/abstract_manager.h BusinessLogic/Managers/abstract_manager.cpp
+    BusinessLogic/Managers/production_manager.h BusinessLogic/Managers/production_manager.cpp
+    BusinessLogic/production_unit_context.h BusinessLogic/production_unit_context.cpp
+    BusinessLogic/AsyncObjects/i_async_wrapper.h BusinessLogic/AsyncObjects/i_async_wrapper.cpp
+    BusinessLogic/AsyncObjects/async_programmer.cpp BusinessLogic/AsyncObjects/async_programmer.h
+    BusinessLogic/AsyncObjects/progressable_async_wrapper.cpp BusinessLogic/AsyncObjects/progressable_async_wrapper.h
+    BusinessLogic/AsyncObjects/async_server_connection.cpp BusinessLogic/AsyncObjects/async_server_connection.h
+    BusinessLogic/AsyncObjects/async_sticker_printer.cpp BusinessLogic/AsyncObjects/async_sticker_printer.h
+    BusinessLogic/AsyncObjects/async_production_manager.cpp BusinessLogic/AsyncObjects/async_production_manager.h
+    BusinessLogic/AsyncObjects/async_wrapper.h BusinessLogic/AsyncObjects/async_wrapper.cpp
 
     GUI/gui_kernel.cpp GUI/gui_kernel.h
 
@@ -98,7 +109,7 @@ add_executable(PersoClient WIN32
     GUI/Subkernels/server_connection_gui_subkernel.cpp GUI/Subkernels/server_connection_gui_subkernel.h
 
     GUI/Dialogs/authorization_dialog.cpp GUI/Dialogs/authorization_dialog.h
-    GUI/Dialogs/master_password_input_dialog.cpp GUI/Dialogs/master_password_input_dialog.h
+    GUI/Dialogs/master_access_dialog.cpp GUI/Dialogs/master_access_dialog.h
     GUI/Dialogs/transponder_sticker_setup_dialog.cpp GUI/Dialogs/transponder_sticker_setup_dialog.h
     GUI/Dialogs/transponder_sticker_scan_dialog.cpp GUI/Dialogs/transponder_sticker_scan_dialog.h
     GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
@@ -140,8 +151,9 @@ add_executable(PersoClient WIN32
     ServerConnection/Commands/get_production_line_data.h ServerConnection/Commands/get_production_line_data.cpp
 
     main.cpp
-    Service/General/qobject_container.h Service/General/qobject_container.cpp
-    Service/General/shared_qobject_container.h Service/General/shared_qobject_container.cpp
+    Service/business_object_environment.h Service/business_object_environment.cpp
+    Service/service_object_environment.h Service/service_object_environment.cpp
+    Service/iasync_client.h Service/iasync_client.cpp
     )
 
 target_link_libraries(PersoClient PRIVATE

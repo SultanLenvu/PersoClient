@@ -1,13 +1,10 @@
 #include "programmer_gui_subkernel.h"
-#include "async_programmer.h"
-#include "global_environment.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 
 ProgrammerGuiSubkernel ::ProgrammerGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel{name} {
-  connectDependencies();
 }
 
 void ProgrammerGuiSubkernel::programMemory() {
@@ -80,32 +77,4 @@ void ProgrammerGuiSubkernel::displayUcid(const QString& ucid) {
   messageBox.setTextInteractionFlags(Qt::TextSelectableByMouse);
 
   messageBox.exec();
-}
-
-void ProgrammerGuiSubkernel::connectDependencies() const {
-  AsyncProgrammer* ap =
-      GlobalEnvironment::instance()->getObject<AsyncProgrammer>(
-          "AsyncProgrammer");
-
-  connect(this, &ProgrammerGuiSubkernel::programMemory_signal, ap,
-          &AsyncProgrammer::programMemory);
-  connect(this, &ProgrammerGuiSubkernel::readMemory_signal, ap,
-          &AsyncProgrammer::readMemory);
-  connect(this, &ProgrammerGuiSubkernel::eraseMemory_signal, ap,
-          &AsyncProgrammer::eraseMemory);
-
-  connect(this, &ProgrammerGuiSubkernel::programUserData_signal, ap,
-          &AsyncProgrammer::programUserData);
-  connect(this, &ProgrammerGuiSubkernel::readUserData_signal, ap,
-          &AsyncProgrammer::readUserData);
-  connect(this, &ProgrammerGuiSubkernel::readUcid_signal, ap,
-          &AsyncProgrammer::readTransponderUcid);
-
-  connect(this, &ProgrammerGuiSubkernel::unlockMemory_signal, ap,
-          &AsyncProgrammer::unlockMemory);
-  connect(this, &ProgrammerGuiSubkernel::lockMemory_signal, ap,
-          &AsyncProgrammer::lockMemory);
-
-  connect(ap, &AsyncProgrammer::transponderUcidReady, this,
-          &ProgrammerGuiSubkernel::displayUcid);
 }

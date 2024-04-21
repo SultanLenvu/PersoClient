@@ -1,14 +1,11 @@
 #include "server_connection_gui_subkernel.h"
-#include "async_server_connection.h"
 #include "authorization_dialog.h"
-#include "global_environment.h"
 #include "string_input_dialog.h"
 #include "transponder_sticker_scan_dialog.h"
 #include "ucid_checker.h"
 
 ServerConnectionGuiSubkernel::ServerConnectionGuiSubkernel(const QString& name)
     : AbstractGuiSubkernel(name) {
-  connectDependecies();
   createCommandMethod();
 }
 
@@ -180,79 +177,9 @@ void ServerConnectionGuiSubkernel::printLastPalletSticker() {
   emit printLastPalletSticker_signal();
 }
 
-void ServerConnectionGuiSubkernel::onServerDisconnected() {
+void ServerConnectionGuiSubkernel::generateDisconnectionAlert() {
   QMessageBox::critical(nullptr, "Ошибка", "Соединение с сервером оборвалось.",
                         QMessageBox::Ok);
-}
-
-void ServerConnectionGuiSubkernel::connectDependecies() {
-  AsyncServerConnection* psm =
-      GlobalEnvironment::instance()->getObject<AsyncServerConnection>(
-          "AsyncServerConnection");
-
-  // К менеджерам
-  QObject::connect(this, &ServerConnectionGuiSubkernel::connect_signal, psm,
-                   &AsyncServerConnection::connect);
-  QObject::connect(this, &ServerConnectionGuiSubkernel::disconnect_signal, psm,
-                   &AsyncServerConnection::disconnect);
-
-  QObject::connect(this, &ServerConnectionGuiSubkernel::echo_signal, psm,
-                   &AsyncServerConnection::echo);
-
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::launchProductionLine_signal,
-                   psm, &AsyncServerConnection::launchProductionLine);
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::shutdownProductionLine_signal,
-                   psm, &AsyncServerConnection::shutdownProductionLine);
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::getProductionLineData_signal,
-                   psm, &AsyncServerConnection::getProductionLineData);
-
-  QObject::connect(this, &ServerConnectionGuiSubkernel::requestBox_signal, psm,
-                   &AsyncServerConnection::requestBox);
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::getCurrentBoxData_signal, psm,
-                   &AsyncServerConnection::getCurrentBoxData);
-  QObject::connect(this, &ServerConnectionGuiSubkernel::refundCurrentBox_signal,
-                   psm, &AsyncServerConnection::refundCurrentBox);
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::completeCurrentBox_signal,
-                   psm, &AsyncServerConnection::completeCurrentBox);
-
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::releaseTransponder_signal,
-                   psm, &AsyncServerConnection::releaseTransponder);
-  QObject::connect(
-      this, &ServerConnectionGuiSubkernel::confirmTransponderRelease_signal,
-      psm, &AsyncServerConnection::confirmTransponderRelease);
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::rereleaseTransponder_signal,
-                   psm, &AsyncServerConnection::rereleaseTransponder);
-  QObject::connect(
-      this, &ServerConnectionGuiSubkernel::confirmTransponderRerelease_signal,
-      psm, &AsyncServerConnection::rereleaseTransponder);
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::rollbackTransponder_signal,
-                   psm, &AsyncServerConnection::rollbackTransponder);
-  QObject::connect(
-      this, &ServerConnectionGuiSubkernel::getCurrentTransponderData_signal,
-      psm, &AsyncServerConnection::getCurrentTransponderData);
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::getTransponderData_signal,
-                   psm, &AsyncServerConnection::getTransponderData);
-
-  QObject::connect(this, &ServerConnectionGuiSubkernel::printBoxSticker_signal,
-                   psm, &AsyncServerConnection::printBoxSticker);
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::printLastBoxSticker_signal,
-                   psm, &AsyncServerConnection::printLastBoxSticker);
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::printPalletSticker_signal,
-                   psm, &AsyncServerConnection::printPalletSticker);
-  QObject::connect(this,
-                   &ServerConnectionGuiSubkernel::printLastPalletSticker_signal,
-                   psm, &AsyncServerConnection::printLastPalletSticker);
 }
 
 void ServerConnectionGuiSubkernel::createCommandMethod() {

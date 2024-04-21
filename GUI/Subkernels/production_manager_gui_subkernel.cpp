@@ -9,7 +9,6 @@ ProductionManagerGuiSubkernel::ProductionManagerGuiSubkernel(
     const QString& name)
     : AbstractGuiSubkernel(name) {
   createModels();
-  connectDependecies();
 }
 
 HashTableModel& ProductionManagerGuiSubkernel::productionLineModel() {
@@ -22,10 +21,6 @@ HashTableModel& ProductionManagerGuiSubkernel::boxModel() {
 
 HashTableModel& ProductionManagerGuiSubkernel::transponderModel() {
   return TransponderModel;
-}
-
-QStringListModel& ProductionManagerGuiSubkernel::firmwareModel() {
-  return FirmwareModel;
 }
 
 void ProductionManagerGuiSubkernel::logOn(const StringDictionary& param) {}
@@ -140,45 +135,4 @@ void ProductionManagerGuiSubkernel::createModels() {
   bMatchTable.insert("production_line_id", "ID производственной линии");
 
   BoxModel.setMatchTable(bMatchTable);
-}
-
-void ProductionManagerGuiSubkernel::connectDependecies() {
-  AsyncProductionManager* psm =
-      GlobalEnvironment::instance()->getObject<AsyncProductionManager>(
-          "AsyncProductionManager");
-
-  QObject::connect(this, &ProductionManagerGuiSubkernel::logOn_signal, psm,
-                   &AsyncProductionManager::logOn);
-  QObject::connect(this, &ProductionManagerGuiSubkernel::logOut_signal, psm,
-                   &AsyncProductionManager::logOut);
-
-  QObject::connect(this, &ProductionManagerGuiSubkernel::requestBox_signal, psm,
-                   &AsyncProductionManager::requestBox);
-  QObject::connect(this,
-                   &ProductionManagerGuiSubkernel::refundCurrentBox_signal, psm,
-                   &AsyncProductionManager::refundCurrentBox);
-  QObject::connect(this,
-                   &ProductionManagerGuiSubkernel::completeCurrentBox_signal,
-                   psm, &AsyncProductionManager::completeCurrentBox);
-
-  QObject::connect(this,
-                   &ProductionManagerGuiSubkernel::releaseTransponder_signal,
-                   psm, &AsyncProductionManager::releaseTransponder);
-  QObject::connect(this,
-                   &ProductionManagerGuiSubkernel::rereleaseTransponder_signal,
-                   psm, &AsyncProductionManager::rereleaseTransponder);
-  QObject::connect(this,
-                   &ProductionManagerGuiSubkernel::rollbackTransponder_signal,
-                   psm, &AsyncProductionManager::rollbackTransponder);
-
-  ProductionUnitContext* puc =
-      GlobalEnvironment::instance()->getObject<ProductionUnitContext>(
-          "ProductionUnitContext");
-
-  QObject::connect(puc, &ProductionUnitContext::stateChanged, this,
-                   &ProductionManagerGuiSubkernel::displayStateData);
-  QObject::connect(puc, &ProductionUnitContext::boxChanged, this,
-                   &ProductionManagerGuiSubkernel::displayBoxData);
-  QObject::connect(puc, &ProductionUnitContext::transponderChanged, this,
-                   &ProductionManagerGuiSubkernel::displayTransponderData);
 }

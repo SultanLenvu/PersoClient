@@ -14,17 +14,15 @@ class ProductionManagerGuiSubkernel final : public AbstractGuiSubkernel {
   HashTableModel BoxModel;
   HashTableModel TransponderModel;
 
-  QStringListModel FirmwareModel;
-
  public:
   explicit ProductionManagerGuiSubkernel(const QString& name);
   ~ProductionManagerGuiSubkernel() = default;
+  Q_DISABLE_COPY_MOVE(ProductionManagerGuiSubkernel)
 
  public:
   HashTableModel& productionLineModel(void);
   HashTableModel& boxModel(void);
   HashTableModel& transponderModel(void);
-  QStringListModel& firmwareModel(void);
 
  public slots:
   void logOn(const StringDictionary& param);
@@ -45,9 +43,7 @@ class ProductionManagerGuiSubkernel final : public AbstractGuiSubkernel {
   void displayTransponderData(const StringDictionary& data);
 
  private:
-  Q_DISABLE_COPY_MOVE(ProductionManagerGuiSubkernel)
   void createModels(void);
-  void connectDependecies(void);
 
  signals:
   void logOn_signal(const StringDictionary& param);

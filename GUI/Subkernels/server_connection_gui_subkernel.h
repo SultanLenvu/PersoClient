@@ -16,14 +16,15 @@ class ServerConnectionGuiSubkernel final : public AbstractGuiSubkernel {
  public:
   explicit ServerConnectionGuiSubkernel(const QString& name);
   ~ServerConnectionGuiSubkernel() = default;
+  Q_DISABLE_COPY_MOVE(ServerConnectionGuiSubkernel)
 
  public slots:  // Слоты для сигналов от GUI
   void executeCommand(const QString& name);
 
   void connect(void);
   void disconnect(void);
-
   void echo(void);
+
   void launchProductionLine(void);
   void shutdownProductionLine(void);
   void getProductionLineData(void);
@@ -46,11 +47,9 @@ class ServerConnectionGuiSubkernel final : public AbstractGuiSubkernel {
   void printPalletSticker(void);
   void printLastPalletSticker(void);
 
-  void onServerDisconnected(void);
+  void generateDisconnectionAlert(void);
 
  private:
-  Q_DISABLE_COPY_MOVE(ServerConnectionGuiSubkernel)
-  void connectDependecies(void);
   void createCommandMethod(void);
 
  signals:

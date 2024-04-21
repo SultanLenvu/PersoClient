@@ -4,20 +4,16 @@
 #include <QString>
 
 #include "assembler_unit_user_interface.h"
-#include "async_production_manager.h"
-#include "async_programmer.h"
-#include "async_server_connection.h"
-#include "async_sticker_printer.h"
 #include "authorization_user_interface.h"
-#include "configuration_system.h"
+#include "business_object_environment.h"
 #include "definitions.h"
 #include "gui_kernel.h"
-#include "log_system.h"
-#include "master_password_input_dialog.h"
+#include "master_access_dialog.h"
 #include "master_user_interface.h"
 #include "production_manager_gui_subkernel.h"
 #include "programmer_gui_subkernel.h"
 #include "server_connection_gui_subkernel.h"
+#include "service_object_environment.h"
 #include "settings_dialog.h"
 #include "sticker_printer_gui_subkernel.h"
 #include "tester_unit_user_interface.h"
@@ -27,9 +23,8 @@ GuiKernel::GuiKernel(QWidget* parent)
   DesktopGeometry = QApplication::primaryScreen()->size();
   createTopMenu();
 
-  createServiceLogic();
+  createEnvironments();
   createReactions();
-  createBusinessLogic();
   createGuiSubkernels();
 
   // Создаем графический интерфейс для авторизации
@@ -39,7 +34,7 @@ GuiKernel::GuiKernel(QWidget* parent)
 
 void GuiKernel::displayMasterInterface() {
   StringDictionary param;
-  MasterPasswordInputDialog dialog(nullptr);
+  MasterAccessDialog dialog(nullptr);
   if (dialog.exec() == QDialog::Rejected) {
     return;
   }
@@ -162,26 +157,27 @@ void GuiKernel::createTopMenu() {
   HelpMenu->addAction(AboutProgramAct);
 }
 
-void GuiKernel::createServiceLogic() {
-  ServiceLogic = std::make_unique<AsyncObjectSpace>();
-  ServiceLogic->add<ConfigurationSystem>("ConfigurationSystem");
-  ServiceLogic->add<LogSystem>("LogSystem");
-}
+void GuiKernel::createEnvironments() {
+  std::unique_ptr<AsyncEnvironment> ae1 = std::make_unique<AsyncEnvironment>();
+  ae1->add<BusinessObjectEnvironment>(Subkernels);
 
-void GuiKernel::createBusinessLogic() {
-  BusinessLogic = std::make_unique<AsyncObjectSpace>();
-  BusinessLogic->add<AsyncStickerPrinter>("AsyncStickerPrinter");
-  BusinessLogic->add<AsyncProgrammer>("AsyncProgrammer");
-  BusinessLogic->add<AsyncServerConnection>("AsyncServerConnection");
-  BusinessLogic->add<AsyncProductionManager>("AsyncProductionManager");
+  std::unique_ptr<AsyncEnvironment> ae2 = std::make_unique<AsyncEnvironment>();
+  ae2->add<ServiceObjectEnvironment>();
+
+  Environments.push_back(std::move(ae1));
+  Environments.push_back(std::move(ae2));
 }
 
 void GuiKernel::createGuiSubkernels() {
-  Subkernels.emplace_back(
+  Subkernels.emplace(
+      "ProductionManagerGuiSubkernel",
       new ProductionManagerGuiSubkernel("ProductionManagerGuiSubkernel"));
-  Subkernels.emplace_back(new ProgrammerGuiSubkernel("ProgrammerGuiSubkernel"));
-  Subkernels.emplace_back(
+  Subkernels.emplace("ProductionManagerGuiSubkernel",
+                     new ProgrammerGuiSubkernel("ProgrammerGuiSubkernel"));
+  Subkernels.emplace(
+      "ProductionManagerGuiSubkernel",
       new StickerPrinterGuiSubkernel("StickerPrinterGuiSubkernel"));
-  Subkernels.emplace_back(
+  Subkernels.emplace(
+      "ProductionManagerGuiSubkernel",
       new ServerConnectionGuiSubkernel("ServerConnectionGuiSubkernel"));
 }

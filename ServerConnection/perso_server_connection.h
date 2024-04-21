@@ -67,8 +67,9 @@ class PersoServerConnection final : public NamedObject,
   std::unique_ptr<QEventLoop> WaitingLoop;
 
  public:
-  Q_INVOKABLE explicit PersoServerConnection(const QString& name);
-  ~PersoServerConnection();
+  explicit PersoServerConnection(const QString& name);
+  ~PersoServerConnection() = default;
+  Q_DISABLE_COPY_MOVE(PersoServerConnection)
 
   // IServerConnection interface
  public:
@@ -107,7 +108,6 @@ class PersoServerConnection final : public NamedObject,
   virtual ReturnStatus printLastPalletSticker(void) override;
 
  private:
-  Q_DISABLE_COPY_MOVE(PersoServerConnection)
   void connectDependencies(void);
 
  private:
