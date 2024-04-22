@@ -5,9 +5,7 @@
 #include "production_unit_context.h"
 #include "transponder_sticker_scan_dialog.h"
 
-ProductionManagerGuiSubkernel::ProductionManagerGuiSubkernel(
-    const QString& name)
-    : AbstractGuiSubkernel(name) {
+ProductionManagerGuiSubkernel::ProductionManagerGuiSubkernel() {
   createModels();
 }
 

@@ -3,9 +3,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-ProgrammerGuiSubkernel ::ProgrammerGuiSubkernel(const QString& name)
-    : AbstractGuiSubkernel{name} {
-}
+ProgrammerGuiSubkernel ::ProgrammerGuiSubkernel(const QString& name) {}
 
 void ProgrammerGuiSubkernel::programMemory() {
   emit clearLogDisplay_signal();

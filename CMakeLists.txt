@@ -154,6 +154,8 @@ add_executable(PersoClient WIN32
     Service/business_object_environment.h Service/business_object_environment.cpp
     Service/service_object_environment.h Service/service_object_environment.cpp
     Service/iasync_client.h Service/iasync_client.cpp
+    Service/connectable_object.h Service/connectable_object.cpp
+    Service/i_connectable.h Service/i_connectable.cpp
     )
 
 target_link_libraries(PersoClient PRIVATE

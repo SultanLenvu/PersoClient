@@ -8,7 +8,7 @@ AsyncServerConnection::AsyncServerConnection(
     const QString& name,
     std::shared_ptr<ProductionUnitContext> context,
     std::shared_ptr<IServerConnection> server)
-    : ProgressableAsyncWrapper{name}, Context(context), Server(server) {}
+    : AbstractAsyncObject{name}, Context(context), Server(server) {}
 
 void AsyncServerConnection::connect() {
   initOperation("connectToServer");

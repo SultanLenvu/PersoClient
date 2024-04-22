@@ -4,7 +4,7 @@
 #include "production_manager.h"
 #include "progressable_async_wrapper.h"
 
-class AsyncProductionManager final : public ProgressableAsyncWrapper {
+class AsyncProductionManager final : public AbstractAsyncObject {
   Q_OBJECT
 
  private:

@@ -1,27 +1,18 @@
 #ifndef PROGRESSABLEASYNCWRAPPER_H
 #define PROGRESSABLEASYNCWRAPPER_H
 
-#include "abstract_gui_subkernel.h"
 #include "i_async_wrapper.h"
 #include "loggable_object.h"
-#include "named_object.h"
 
-class ProgressableAsyncWrapper : public NamedObject,
-                                 public IAsyncWrapper,
-                                 public LoggableObject {
+class AbstractAsyncObject : public QObject,
+                            public IAsyncWrapper,
+                            public LoggableObject {
   Q_OBJECT
 
  public:
-  explicit ProgressableAsyncWrapper(const QString& name);
-  virtual ~ProgressableAsyncWrapper() = default;
-  Q_DISABLE_COPY_MOVE(ProgressableAsyncWrapper)
-
- public:
-  template <typename T>
-  void connectDependecies(AbstractGuiSubkernel subkernel) {
-    T connector(subkernel);
-    connector.connect();
-  }
+  explicit AbstractAsyncObject(const QString& name);
+  virtual ~AbstractAsyncObject() = default;
+  Q_DISABLE_COPY_MOVE(AbstractAsyncObject)
 
  protected:
   virtual void initOperation(const QString& name);

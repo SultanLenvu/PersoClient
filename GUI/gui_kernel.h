@@ -13,6 +13,11 @@
 #include "progress_indicator.h"
 #include "status_indicator.h"
 
+#include "production_manager_gui_subkernel.h"
+#include "programmer_gui_subkernel.h"
+#include "server_connection_gui_subkernel.h"
+#include "sticker_printer_gui_subkernel.h"
+
 class GuiKernel : public QMainWindow {
   Q_OBJECT
  public:
@@ -39,11 +44,16 @@ class GuiKernel : public QMainWindow {
   QAction* AboutProgramAct;
   //==================================================
 
-  std::vector<std::unique_ptr<AsyncEnvironment>> Environments;
-  QHash<QString, std::shared_ptr<AbstractGuiSubkernel>> Subkernels;
+  std::unique_ptr<ProductionManagerGuiSubkernel> PMGS;
+  std::unique_ptr<ProgrammerGuiSubkernel> PGS;
+  std::unique_ptr<StickerPrinterGuiSubkernel> SPGS;
+  std::unique_ptr<ServerConnectionGuiSubkernel> SCGS;
 
   std::unique_ptr<ProgressIndicator> PIndicator;
   std::unique_ptr<StatusIndicator> SIndicator;
+
+  std::unique_ptr<AsyncEnvironment> Service;
+  std::unique_ptr<AsyncEnvironment> Business;
 
  public:
   explicit GuiKernel(QWidget* parent = nullptr);

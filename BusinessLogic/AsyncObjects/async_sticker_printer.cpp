@@ -3,7 +3,7 @@
 AsyncStickerPrinter::AsyncStickerPrinter(
     const QString& name,
     std::shared_ptr<IStickerPrinter> printer)
-    : ProgressableAsyncWrapper(name), StickerPrinter(printer) {}
+    : AbstractAsyncObject(name), StickerPrinter(printer) {}
 
 void AsyncStickerPrinter::printTransponderSticker(
     const StringDictionary& param) {

@@ -3,7 +3,7 @@
 AsyncProductionManager::AsyncProductionManager(
     const QString& name,
     std::unique_ptr<ProductionManager> manager)
-    : ProgressableAsyncWrapper(name), Manager(std::move(manager)) {}
+    : AbstractAsyncObject(name), Manager(std::move(manager)) {}
 
 void AsyncProductionManager::logOn(const StringDictionary& param) {
   initOperation("logOn");

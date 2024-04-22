@@ -2,7 +2,7 @@
 
 AsyncProgrammer::AsyncProgrammer(const QString& name,
                                  std::shared_ptr<IProgrammer> programmer)
-    : ProgressableAsyncWrapper(name), Programmer(programmer) {}
+    : AbstractAsyncObject(name), Programmer(programmer) {}
 
 void AsyncProgrammer::programMemory(const QString& fileName) {
   initOperation("programMemory");

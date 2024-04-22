@@ -4,7 +4,7 @@
 #include "i_programmer.h"
 #include "progressable_async_wrapper.h"
 
-class AsyncProgrammer final : public ProgressableAsyncWrapper {
+class AsyncProgrammer final : public AbstractAsyncObject {
   Q_OBJECT
 
  private:

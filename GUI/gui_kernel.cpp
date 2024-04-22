@@ -10,12 +10,9 @@
 #include "gui_kernel.h"
 #include "master_access_dialog.h"
 #include "master_user_interface.h"
-#include "production_manager_gui_subkernel.h"
-#include "programmer_gui_subkernel.h"
-#include "server_connection_gui_subkernel.h"
+
 #include "service_object_environment.h"
 #include "settings_dialog.h"
-#include "sticker_printer_gui_subkernel.h"
 #include "tester_unit_user_interface.h"
 
 GuiKernel::GuiKernel(QWidget* parent)
@@ -23,9 +20,9 @@ GuiKernel::GuiKernel(QWidget* parent)
   DesktopGeometry = QApplication::primaryScreen()->size();
   createTopMenu();
 
-  createEnvironments();
-  createReactions();
   createGuiSubkernels();
+  createReactions();
+  createEnvironments();
 
   // Создаем графический интерфейс для авторизации
   //  createAuthorizationUserInterface();
@@ -158,26 +155,17 @@ void GuiKernel::createTopMenu() {
 }
 
 void GuiKernel::createEnvironments() {
-  std::unique_ptr<AsyncEnvironment> ae1 = std::make_unique<AsyncEnvironment>();
-  ae1->add<BusinessObjectEnvironment>(Subkernels);
+  Service = std::make_unique<AsyncEnvironment>();
+  Service->add<BusinessObjectEnvironment>(PMGS.get(), PGS.get(), SPGS.get(),
+                                          SCGS.get());
 
-  std::unique_ptr<AsyncEnvironment> ae2 = std::make_unique<AsyncEnvironment>();
-  ae2->add<ServiceObjectEnvironment>();
-
-  Environments.push_back(std::move(ae1));
-  Environments.push_back(std::move(ae2));
+  Business = std::make_unique<AsyncEnvironment>();
+  Business->add<ServiceObjectEnvironment>();
 }
 
 void GuiKernel::createGuiSubkernels() {
-  Subkernels.emplace(
-      "ProductionManagerGuiSubkernel",
-      new ProductionManagerGuiSubkernel("ProductionManagerGuiSubkernel"));
-  Subkernels.emplace("ProductionManagerGuiSubkernel",
-                     new ProgrammerGuiSubkernel("ProgrammerGuiSubkernel"));
-  Subkernels.emplace(
-      "ProductionManagerGuiSubkernel",
-      new StickerPrinterGuiSubkernel("StickerPrinterGuiSubkernel"));
-  Subkernels.emplace(
-      "ProductionManagerGuiSubkernel",
-      new ServerConnectionGuiSubkernel("ServerConnectionGuiSubkernel"));
+  PMGS = std::make_unique<ProductionManagerGuiSubkernel>();
+  PGS = std::make_unique<ProgrammerGuiSubkernel>();
+  SPGS = std::make_unique<StickerPrinterGuiSubkernel>();
+  SCGS = std::make_unique<ServerConnectionGuiSubkernel>();
 }

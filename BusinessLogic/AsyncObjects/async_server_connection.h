@@ -7,7 +7,7 @@
 #include "production_unit_context.h"
 #include "progressable_async_wrapper.h"
 
-class AsyncServerConnection final : public ProgressableAsyncWrapper {
+class AsyncServerConnection final : public AbstractAsyncObject {
   Q_OBJECT
  private:
   std::shared_ptr<ProductionUnitContext> Context;

@@ -15,7 +15,7 @@ class ProductionManagerGuiSubkernel final : public AbstractGuiSubkernel {
   HashTableModel TransponderModel;
 
  public:
-  explicit ProductionManagerGuiSubkernel(const QString& name);
+  explicit ProductionManagerGuiSubkernel();
   ~ProductionManagerGuiSubkernel() = default;
   Q_DISABLE_COPY_MOVE(ProductionManagerGuiSubkernel)
 

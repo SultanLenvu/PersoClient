@@ -1,9 +1,7 @@
 #include "sticker_printer_gui_subkernel.h"
 #include "transponder_sticker_setup_dialog.h"
 
-StickerPrinterGuiSubkernel::StickerPrinterGuiSubkernel(const QString& name)
-    : AbstractGuiSubkernel{name} {
-}
+StickerPrinterGuiSubkernel::StickerPrinterGuiSubkernel() {}
 
 void StickerPrinterGuiSubkernel::printLastTransponderSticker() {
   emit clearLogDisplay_signal();

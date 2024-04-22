@@ -7,7 +7,7 @@ class ProgrammerGuiSubkernel : public AbstractGuiSubkernel {
   Q_OBJECT
 
  public:
-  explicit ProgrammerGuiSubkernel(const QString& name);
+  explicit ProgrammerGuiSubkernel();
   ~ProgrammerGuiSubkernel() = default;
   Q_DISABLE_COPY_MOVE(ProgrammerGuiSubkernel);
 

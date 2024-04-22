@@ -1,19 +1,22 @@
 #ifndef ABSTRACTGUISUBKERNEL_H
 #define ABSTRACTGUISUBKERNEL_H
 
-#include "named_object.h"
+#include <QObject>
 
-class AbstractGuiSubkernel : public NamedObject {
+#include "types.h"
+
+class AbstractGuiSubkernel : public QObject {
   Q_OBJECT
  public:
-  explicit AbstractGuiSubkernel(const QString& name);
+  explicit AbstractGuiSubkernel();
   virtual ~AbstractGuiSubkernel() = default;
-
- private:
   Q_DISABLE_COPY_MOVE(AbstractGuiSubkernel);
 
  signals:
   void clearLogDisplay_signal(void);
+  void returnStatusReady(ReturnStatus ret);
+  void operationStarted(const QString& name);
+  void operationFinished(const QString& name);
 };
 
 #endif  // ABSTRACTGUISUBKERNEL_H

@@ -4,7 +4,7 @@
 #include "i_sticker_printer.h"
 #include "progressable_async_wrapper.h"
 
-class AsyncStickerPrinter final : public ProgressableAsyncWrapper {
+class AsyncStickerPrinter final : public AbstractAsyncObject {
   Q_OBJECT
  private:
   std::shared_ptr<IStickerPrinter> StickerPrinter;

@@ -4,8 +4,7 @@
 #include "transponder_sticker_scan_dialog.h"
 #include "ucid_checker.h"
 
-ServerConnectionGuiSubkernel::ServerConnectionGuiSubkernel(const QString& name)
-    : AbstractGuiSubkernel(name) {
+ServerConnectionGuiSubkernel::ServerConnectionGuiSubkernel() {
   createCommandMethod();
 }
 

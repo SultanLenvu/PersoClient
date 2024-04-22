@@ -8,7 +8,7 @@ class StickerPrinterGuiSubkernel : public AbstractGuiSubkernel {
   Q_OBJECT
 
  public:
-  explicit StickerPrinterGuiSubkernel(const QString& name);
+  explicit StickerPrinterGuiSubkernel();
   ~StickerPrinterGuiSubkernel() = default;
   Q_DISABLE_COPY_MOVE(StickerPrinterGuiSubkernel);
 

@@ -14,7 +14,7 @@ class ServerConnectionGuiSubkernel final : public AbstractGuiSubkernel {
   QHash<QString, MethodPtr> CommandMethods;
 
  public:
-  explicit ServerConnectionGuiSubkernel(const QString& name);
+  explicit ServerConnectionGuiSubkernel();
   ~ServerConnectionGuiSubkernel() = default;
   Q_DISABLE_COPY_MOVE(ServerConnectionGuiSubkernel)
 
