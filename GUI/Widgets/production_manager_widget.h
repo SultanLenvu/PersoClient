@@ -3,7 +3,7 @@
 
 #include "abstract_user_interface.h"
 
-class ProductionManagerUserInterface final : public AbstractUserInterface {
+class ProductionManagerWidget final : public AbstractUserInterface {
   Q_OBJECT
 
  private:
@@ -57,14 +57,14 @@ class ProductionManagerUserInterface final : public AbstractUserInterface {
   QPlainTextEdit* FirmwareView;
 
  public:
-  explicit ProductionManagerUserInterface(QWidget* parent = nullptr);
-  ~ProductionManagerUserInterface() = default;
+  explicit ProductionManagerWidget(QWidget* parent = nullptr);
+  ~ProductionManagerWidget() = default;
 
  public:
   void displayFirmware(const QByteArray& firmware);
 
  private:
-  Q_DISABLE_COPY_MOVE(ProductionManagerUserInterface)
+  Q_DISABLE_COPY_MOVE(ProductionManagerWidget)
   void createWidgets(void);
   void createControlPanel(void);
   void createCommandsWidget(void);

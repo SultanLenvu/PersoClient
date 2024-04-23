@@ -1,8 +1,8 @@
 #include "master_user_interface.h"
 #include "log_display_widget.h"
-#include "production_manager_user_interface.h"
-#include "programmator_user_interface.h"
-#include "sticker_printer_user_interface.h"
+#include "production_manager_widget.h"
+#include "programmator_widget.h"
+#include "sticker_printer_widget.h"
 
 MasterUserInterface::MasterUserInterface(QWidget* parent) : QWidget(parent) {
   create();
@@ -34,17 +34,17 @@ void MasterUserInterface::create() {
 }
 
 void MasterUserInterface::createProductionManagerTab() {
-  ProductionManagerTab = new ProductionManagerUserInterface();
+  ProductionManagerTab = new ProductionManagerWidget();
   Tabs->addTab(ProductionManagerTab, "Производство");
 }
 
 void MasterUserInterface::createProgrammatorTab() {
-  ProgrammatorTab = new ProgrammatorUserInterface();
+  ProgrammatorTab = new ProgrammatorWidget();
   Tabs->addTab(ProgrammatorTab, "Программатор");
 }
 
 void MasterUserInterface::createStickerPrinterTab() {
-  StickerPrinterTab = new StickerPrinterUserInterface();
+  StickerPrinterTab = new StickerPrinterWidget();
   Tabs->addTab(StickerPrinterTab, "Стикер принтер");
 }
 

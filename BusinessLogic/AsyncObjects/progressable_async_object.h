@@ -1,16 +1,15 @@
 #ifndef PROGRESSABLEASYNCWRAPPER_H
 #define PROGRESSABLEASYNCWRAPPER_H
 
-#include "i_async_wrapper.h"
-#include "loggable_object.h"
+#include <QObject>
 
-class AbstractAsyncObject : public QObject,
-                            public IAsyncWrapper,
-                            public LoggableObject {
+#include "i_async_object.h"
+
+class AbstractAsyncObject : public QObject, public IAsyncObject {
   Q_OBJECT
 
  public:
-  explicit AbstractAsyncObject(const QString& name);
+  explicit AbstractAsyncObject() = default;
   virtual ~AbstractAsyncObject() = default;
   Q_DISABLE_COPY_MOVE(AbstractAsyncObject)
 

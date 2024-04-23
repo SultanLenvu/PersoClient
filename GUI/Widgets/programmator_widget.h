@@ -3,7 +3,7 @@
 
 #include <QtWidgets>
 
-class ProgrammatorUserInterface : public QWidget {
+class ProgrammatorWidget : public QWidget {
   Q_OBJECT
  private:
   QHBoxLayout* MainLayout;
@@ -22,11 +22,11 @@ class ProgrammatorUserInterface : public QWidget {
   QPushButton* LockMemoryButton;
 
  public:
-  explicit ProgrammatorUserInterface(QWidget* parent = nullptr);
-  ~ProgrammatorUserInterface() = default;
+  explicit ProgrammatorWidget(QWidget* parent = nullptr);
+  ~ProgrammatorWidget() = default;
 
  private:
-  Q_DISABLE_COPY_MOVE(ProgrammatorUserInterface)
+  Q_DISABLE_COPY_MOVE(ProgrammatorWidget)
   void create(void);
   void connectDependencies(void);
 

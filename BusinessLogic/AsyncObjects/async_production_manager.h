@@ -1,18 +1,19 @@
 #ifndef ASYNCPRODUCTIONMANAGER_H
 #define ASYNCPRODUCTIONMANAGER_H
 
+#include "loggable_object.h"
 #include "production_manager.h"
-#include "progressable_async_wrapper.h"
+#include "progressable_async_object.h"
 
-class AsyncProductionManager final : public AbstractAsyncObject {
+class AsyncProductionManager final : public AbstractAsyncObject,
+                                     public LoggableObject {
   Q_OBJECT
 
  private:
   std::unique_ptr<ProductionManager> Manager;
 
  public:
-  explicit AsyncProductionManager(const QString& name,
-                                  std::unique_ptr<ProductionManager> manager);
+  explicit AsyncProductionManager(std::unique_ptr<ProductionManager> manager);
   ~AsyncProductionManager() = default;
   Q_DISABLE_COPY_MOVE(AsyncProductionManager)
 

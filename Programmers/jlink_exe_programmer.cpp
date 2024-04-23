@@ -6,8 +6,8 @@
 #include "jlink_exe_programmer.h"
 #include "definitions.h"
 
-JLinkExeProgrammer::JLinkExeProgrammer(const QString& name)
-    : NamedObject(name), LoggableObject(name) {
+JLinkExeProgrammer::JLinkExeProgrammer()
+    : LoggableObject("JLinkExeProgrammer") {
   doLoadSettings();
   createJLinkProcess();
 }

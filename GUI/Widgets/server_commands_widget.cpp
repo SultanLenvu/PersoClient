@@ -1,6 +1,4 @@
 #include "server_commands_widget.h"
-#include "global_environment.h"
-#include "server_connection_gui_subkernel.h"
 
 ServerCommandsWidget::ServerCommandsWidget(QWidget* parent)
     : QGroupBox{parent} {
@@ -46,16 +44,6 @@ void ServerCommandsWidget::create() {
   Layout->addWidget(Button);
   connect(Button, &QPushButton::clicked, this,
           &ServerCommandsWidget::prepareCommandExecution);
-}
-
-void ServerCommandsWidget::connectDependencies() {
-  const ServerConnectionGuiSubkernel* sgs =
-      GlobalEnvironment::instance()
-          ->getObject<const ServerConnectionGuiSubkernel>(
-              "ServerConnectionGuiSubkernel");
-
-  QObject::connect(this, &ServerCommandsWidget::executeCommand_signal, sgs,
-                   &ServerConnectionGuiSubkernel::executeCommand);
 }
 
 void ServerCommandsWidget::prepareCommandExecution() {

@@ -4,13 +4,13 @@
 #include <QHostAddress>
 #include <QHostInfo>
 #include <QLibrary>
+#include <QObject>
 
 #include "i_sticker_printer.h"
 #include "configurable_object.h"
 #include "loggable_object.h"
-#include "named_object.h"
 
-class TE310Printer final : public NamedObject,
+class TE310Printer final : public QObject,
                            public IStickerPrinter,
                            public ConfigurableObject,
                            public LoggableObject {
@@ -46,8 +46,9 @@ class TE310Printer final : public NamedObject,
   TscOpenEthernet openEthernet;
 
  public:
-  Q_INVOKABLE explicit TE310Printer(const QString& name);
+  Q_INVOKABLE explicit TE310Printer();
   ~TE310Printer() = default;
+  Q_DISABLE_COPY_MOVE(TE310Printer);
 
   // IStickerPrinter interface
  public slots:
@@ -65,9 +66,6 @@ class TE310Printer final : public NamedObject,
   virtual ReturnStatus printLastPalletSticker(void) override;
 
   virtual ReturnStatus exec(const QStringList& commandScript) override;
-
- private:
-  Q_DISABLE_COPY_MOVE(TE310Printer);
 
  private:
   virtual void loadSettings(void) override;

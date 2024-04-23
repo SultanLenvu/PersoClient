@@ -38,25 +38,19 @@ BusinessObjectEnvironment::BusinessObjectEnvironment(
 }
 
 void BusinessObjectEnvironment::createObjects() {
-  std::shared_ptr<TE310Printer> sp =
-      std::make_shared<TE310Printer>("TE310Printer");
-  StickerPrinter =
-      std::make_unique<AsyncStickerPrinter>("AsyncStickerPrinter", sp);
+  std::shared_ptr<TE310Printer> sp = std::make_shared<TE310Printer>();
+  StickerPrinter = std::make_unique<AsyncStickerPrinter>(sp);
 
   std::shared_ptr<JLinkExeProgrammer> p =
-      std::make_shared<JLinkExeProgrammer>("JLinkExeProgrammer");
-  Programmer = std::make_unique<AsyncProgrammer>("AsyncProgrammer", p);
+      std::make_shared<JLinkExeProgrammer>();
+  Programmer = std::make_unique<AsyncProgrammer>(p);
 
   std::shared_ptr<ProductionUnitContext> Context =
-      std::make_shared<ProductionUnitContext>("ProductionUnitContext");
+      std::make_shared<ProductionUnitContext>();
   std::shared_ptr<PersoServerConnection> sc =
-      std::make_shared<PersoServerConnection>("PersoServerConnection");
-  ServerConnection = std::make_unique<AsyncServerConnection>(
-      "AsyncServerConnection", Context, sc);
+      std::make_shared<PersoServerConnection>();
+  ServerConnection = std::make_unique<AsyncServerConnection>(Context, sc);
 
-  std::unique_ptr<ProductionManager> manager =
-      std::make_unique<ProductionManager>("ProductionManager", Context, sc, sp,
-                                          p);
-  Manager = std::make_unique<AsyncProductionManager>("AsyncProductionManager",
-                                                     std::move(manager));
+  Manager = std::make_unique<AsyncProductionManager>(
+      std::make_unique<ProductionManager>(Context, sc, sp, p));
 }

@@ -2,17 +2,18 @@
 #define ASYNCPROGRAMMER_H
 
 #include "i_programmer.h"
-#include "progressable_async_wrapper.h"
+#include "loggable_object.h"
+#include "progressable_async_object.h"
 
-class AsyncProgrammer final : public AbstractAsyncObject {
+class AsyncProgrammer final : public AbstractAsyncObject,
+                              public LoggableObject {
   Q_OBJECT
 
  private:
   std::shared_ptr<IProgrammer> Programmer;
 
  public:
-  explicit AsyncProgrammer(const QString& name,
-                           std::shared_ptr<IProgrammer> programmer);
+  explicit AsyncProgrammer(std::shared_ptr<IProgrammer> programmer);
   ~AsyncProgrammer() = default;
   Q_DISABLE_COPY_MOVE(AsyncProgrammer)
 

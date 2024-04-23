@@ -1,14 +1,13 @@
-#include "sticker_printer_user_interface.h"
 #include "global_environment.h"
 #include "sticker_printer_gui_subkernel.h"
+#include "sticker_printer_widget.h"
 
-StickerPrinterUserInterface::StickerPrinterUserInterface(QWidget* parent)
-    : QWidget{parent} {
+StickerPrinterWidget::StickerPrinterWidget(QWidget* parent) : QWidget{parent} {
   create();
   connectDependencies();
 }
 
-void StickerPrinterUserInterface::create() {
+void StickerPrinterWidget::create() {
   MainLayout = new QHBoxLayout();
   setLayout(MainLayout);
 
@@ -30,7 +29,7 @@ void StickerPrinterUserInterface::create() {
       new QPushButton(QString("Выполнить командный скрипт"));
   ControlPanelLayout->addWidget(ExecCommandScriptButton);
   connect(ExecCommandScriptButton, &QPushButton::clicked, this,
-          &StickerPrinterUserInterface::execCommandSript);
+          &StickerPrinterWidget::execCommandSript);
 
   CommandSriptGroup = new QGroupBox(QString("Командный скрипт"));
   MainLayout->addWidget(CommandSriptGroup);
@@ -40,7 +39,7 @@ void StickerPrinterUserInterface::create() {
   CommandSriptLayout->addWidget(CommandSriptInput);
 }
 
-void StickerPrinterUserInterface::connectDependencies() {
+void StickerPrinterWidget::connectDependencies() {
   StickerPrinterGuiSubkernel* spgs =
       GlobalEnvironment::instance()->getObject<StickerPrinterGuiSubkernel>(
           "StickerPrinterGuiSubkernel");
@@ -50,11 +49,11 @@ void StickerPrinterUserInterface::connectDependencies() {
   connect(PrintLastTransponderStickerButton, &QPushButton::clicked, spgs,
           &StickerPrinterGuiSubkernel::printLastTransponderSticker);
 
-  connect(this, &StickerPrinterUserInterface::execCommandScript_signal, spgs,
+  connect(this, &StickerPrinterWidget::execCommandScript_signal, spgs,
           &StickerPrinterGuiSubkernel::exec);
 }
 
-void StickerPrinterUserInterface::execCommandSript() {
+void StickerPrinterWidget::execCommandSript() {
   QString scriptStr = CommandSriptInput->toPlainText();
   scriptStr.remove("\r");
 

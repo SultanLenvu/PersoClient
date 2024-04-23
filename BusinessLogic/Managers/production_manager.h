@@ -2,16 +2,16 @@
 #define PRODUCTIONUNITMANAGER_H
 
 #include <QFile>
+#include <QObject>
 
 #include "abstract_manager.h"
 #include "i_programmer.h"
 #include "i_server_connection.h"
 #include "i_sticker_printer.h"
 #include "loggable_object.h"
-#include "named_object.h"
 #include "production_unit_context.h"
 
-class ProductionManager : public NamedObject,
+class ProductionManager : public QObject,
                           public AbstractManager,
                           public LoggableObject {
   Q_OBJECT
@@ -24,8 +24,7 @@ class ProductionManager : public NamedObject,
   std::shared_ptr<IStickerPrinter> StickerPrinter;
 
  public:
-  explicit ProductionManager(const QString& name,
-                             std::shared_ptr<ProductionUnitContext> context,
+  explicit ProductionManager(std::shared_ptr<ProductionUnitContext> context,
                              std::shared_ptr<IServerConnection> server,
                              std::shared_ptr<IStickerPrinter> stickerPrinter,
                              std::shared_ptr<IProgrammer> programmer);

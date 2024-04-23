@@ -80,29 +80,29 @@ add_executable(PersoClient WIN32
     BusinessLogic/Managers/abstract_manager.h BusinessLogic/Managers/abstract_manager.cpp
     BusinessLogic/Managers/production_manager.h BusinessLogic/Managers/production_manager.cpp
     BusinessLogic/production_unit_context.h BusinessLogic/production_unit_context.cpp
-    BusinessLogic/AsyncObjects/i_async_wrapper.h BusinessLogic/AsyncObjects/i_async_wrapper.cpp
+    BusinessLogic/AsyncObjects/i_async_object.h BusinessLogic/AsyncObjects/i_async_object.cpp
     BusinessLogic/AsyncObjects/async_programmer.cpp BusinessLogic/AsyncObjects/async_programmer.h
-    BusinessLogic/AsyncObjects/progressable_async_wrapper.cpp BusinessLogic/AsyncObjects/progressable_async_wrapper.h
+    BusinessLogic/AsyncObjects/progressable_async_object.cpp BusinessLogic/AsyncObjects/progressable_async_object.h
     BusinessLogic/AsyncObjects/async_server_connection.cpp BusinessLogic/AsyncObjects/async_server_connection.h
     BusinessLogic/AsyncObjects/async_sticker_printer.cpp BusinessLogic/AsyncObjects/async_sticker_printer.h
     BusinessLogic/AsyncObjects/async_production_manager.cpp BusinessLogic/AsyncObjects/async_production_manager.h
-    BusinessLogic/AsyncObjects/async_wrapper.h BusinessLogic/AsyncObjects/async_wrapper.cpp
 
     GUI/gui_kernel.cpp GUI/gui_kernel.h
+    GUI/user_interface_factory.h GUI/user_interface_factory.cpp
+    GUI/i_user_interface_factory.h GUI/i_user_interface_factory.cpp
 
     GUI/Widgets/authorization_user_interface.cpp GUI/Widgets/authorization_user_interface.h
     GUI/Widgets/master_user_interface.cpp GUI/Widgets/master_user_interface.h
     GUI/Widgets/assembler_unit_user_interface.cpp GUI/Widgets/assembler_unit_user_interface.h
     GUI/Widgets/tester_unit_user_interface.cpp GUI/Widgets/tester_unit_user_interface.h
-    GUI/Widgets/production_manager_user_interface.cpp GUI/Widgets/production_manager_user_interface.h
+    GUI/Widgets/production_manager_widget.cpp GUI/Widgets/production_manager_widget.h
     GUI/Widgets/abstract_user_interface.cpp GUI/Widgets/abstract_user_interface.h
-    GUI/Widgets/sticker_printer_user_interface.h GUI/Widgets/sticker_printer_user_interface.cpp
+    GUI/Widgets/sticker_printer_widget.h GUI/Widgets/sticker_printer_widget.cpp
     GUI/Widgets/server_commands_widget.h GUI/Widgets/server_commands_widget.cpp
-    GUI/Widgets/programmator_user_interface.h GUI/Widgets/programmator_user_interface.cpp
+    GUI/Widgets/programmator_widget.h GUI/Widgets/programmator_widget.cpp
     GUI/Widgets/log_display_widget.h GUI/Widgets/log_display_widget.cpp
 
     GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
-
     GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
     GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
     GUI/Subkernels/production_manager_gui_subkernel.cpp GUI/Subkernels/production_manager_gui_subkernel.h
@@ -156,6 +156,7 @@ add_executable(PersoClient WIN32
     Service/iasync_client.h Service/iasync_client.cpp
     Service/connectable_object.h Service/connectable_object.cpp
     Service/i_connectable.h Service/i_connectable.cpp
+    Service/function_slot.h Service/function_slot.cpp
     )
 
 target_link_libraries(PersoClient PRIVATE

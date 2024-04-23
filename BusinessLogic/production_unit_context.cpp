@@ -1,8 +1,5 @@
 #include "production_unit_context.h"
 
-ProductionUnitContext::ProductionUnitContext(const QString& name)
-    : NamedObject(name) {}
-
 void ProductionUnitContext::setState(const StringDictionary& state) {
   State = state;
   emit stateChanged(state);

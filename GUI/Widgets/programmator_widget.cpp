@@ -1,15 +1,15 @@
-#include "programmator_user_interface.h"
+#include "programmator_widget.h"
 #include "global_environment.h"
 #include "programmer_gui_subkernel.h"
 
-ProgrammatorUserInterface::ProgrammatorUserInterface(QWidget *parent)
+ProgrammatorWidget::ProgrammatorWidget(QWidget *parent)
     : QWidget{parent}
 {
   create();
   connectDependencies();
 }
 
-void ProgrammatorUserInterface::create() {
+void ProgrammatorWidget::create() {
   MainLayout = new QHBoxLayout();
   setLayout(MainLayout);
 
@@ -45,7 +45,7 @@ void ProgrammatorUserInterface::create() {
   ControlPanelLayout->addWidget(LockMemoryButton);
 }
 
-void ProgrammatorUserInterface::connectDependencies() {
+void ProgrammatorWidget::connectDependencies() {
   ProgrammerGuiSubkernel* pgs =
       GlobalEnvironment::instance()->getObject<ProgrammerGuiSubkernel>(
           "ProgrammerGuiSubkernel");

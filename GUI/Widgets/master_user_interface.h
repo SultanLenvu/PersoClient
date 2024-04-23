@@ -16,9 +16,9 @@ class MasterUserInterface final : public QWidget {
  public:
   explicit MasterUserInterface(QWidget* parent = nullptr);
   ~MasterUserInterface() = default;
+  Q_DISABLE_COPY_MOVE(MasterUserInterface);
 
  private:
-  Q_DISABLE_COPY_MOVE(MasterUserInterface);
   void create(void);
   void createProductionManagerTab(void);
   void createProgrammatorTab(void);

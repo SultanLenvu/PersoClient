@@ -2,14 +2,14 @@
 #define JLINKMANUALPROGRAMMER_H
 
 #include <QDir>
+#include <QObject>
 #include <QProcess>
 
 #include "configurable_object.h"
 #include "i_programmer.h"
 #include "loggable_object.h"
-#include "named_object.h"
 
-class JLinkExeProgrammer : public NamedObject,
+class JLinkExeProgrammer : public QObject,
                            public IProgrammer,
                            public LoggableObject,
                            public ConfigurableObject {
@@ -24,8 +24,9 @@ class JLinkExeProgrammer : public NamedObject,
   QStringList ProcessArguments;
 
  public:
-  Q_INVOKABLE explicit JLinkExeProgrammer(const QString& name);
+  explicit JLinkExeProgrammer();
   ~JLinkExeProgrammer() = default;
+  Q_DISABLE_COPY_MOVE(JLinkExeProgrammer);
 
  public:  // IProgrammer interface
   virtual ReturnStatus checkConfig(void) override;
@@ -50,7 +51,6 @@ class JLinkExeProgrammer : public NamedObject,
   virtual ReturnStatus lockMemory(void) override;
 
  private:
-  Q_DISABLE_COPY_MOVE(JLinkExeProgrammer);
   virtual void loadSettings(void) override;
   void doLoadSettings(void);
 

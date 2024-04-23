@@ -5,13 +5,11 @@
 #include "production_manager.h"
 
 ProductionManager::ProductionManager(
-    const QString& name,
     std::shared_ptr<ProductionUnitContext> context,
     std::shared_ptr<IServerConnection> server,
     std::shared_ptr<IStickerPrinter> stickerPrinter,
     std::shared_ptr<IProgrammer> programmer)
-    : NamedObject{name},
-      LoggableObject(name),
+    : LoggableObject("ProductionManager"),
       Context(context),
       Server(server),
       StickerPrinter(stickerPrinter),

@@ -1,10 +1,11 @@
 #ifndef PRODUCTIONUNITCONTEXT_H
 #define PRODUCTIONUNITCONTEXT_H
 
-#include "named_object.h"
+#include <QObject>
+
 #include "types.h"
 
-class ProductionUnitContext : public NamedObject {
+class ProductionUnitContext final : public QObject {
   Q_OBJECT
 
  private:
@@ -14,8 +15,9 @@ class ProductionUnitContext : public NamedObject {
   QByteArray Firmware;
 
  public:
-  Q_INVOKABLE ProductionUnitContext(const QString& name);
+  explicit ProductionUnitContext() = default;
   ~ProductionUnitContext() = default;
+  Q_DISABLE_COPY_MOVE(ProductionUnitContext)
 
  public:
   void setState(const StringDictionary& state);
@@ -36,9 +38,6 @@ class ProductionUnitContext : public NamedObject {
   void completeBox(void);
   void refundBox(void);
   void clear(void);
-
- private:
-  Q_DISABLE_COPY_MOVE(ProductionUnitContext)
 
  signals:
   void stateChanged(const StringDictionary& data);

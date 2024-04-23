@@ -1,9 +1,8 @@
 #include "async_sticker_printer.h"
 
 AsyncStickerPrinter::AsyncStickerPrinter(
-    const QString& name,
     std::shared_ptr<IStickerPrinter> printer)
-    : AbstractAsyncObject(name), StickerPrinter(printer) {}
+    : LoggableObject("AsyncStickerPrinter"), StickerPrinter(printer) {}
 
 void AsyncStickerPrinter::printTransponderSticker(
     const StringDictionary& param) {

@@ -1,8 +1,7 @@
 #include "async_programmer.h"
 
-AsyncProgrammer::AsyncProgrammer(const QString& name,
-                                 std::shared_ptr<IProgrammer> programmer)
-    : AbstractAsyncObject(name), Programmer(programmer) {}
+AsyncProgrammer::AsyncProgrammer(std::shared_ptr<IProgrammer> programmer)
+    : LoggableObject("AsyncProgrammer"), Programmer(programmer) {}
 
 void AsyncProgrammer::programMemory(const QString& fileName) {
   initOperation("programMemory");

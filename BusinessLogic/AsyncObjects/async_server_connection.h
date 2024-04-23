@@ -4,18 +4,19 @@
 #include <QFile>
 
 #include "i_server_connection.h"
+#include "loggable_object.h"
 #include "production_unit_context.h"
-#include "progressable_async_wrapper.h"
+#include "progressable_async_object.h"
 
-class AsyncServerConnection final : public AbstractAsyncObject {
+class AsyncServerConnection final : public AbstractAsyncObject,
+                                    public LoggableObject {
   Q_OBJECT
  private:
   std::shared_ptr<ProductionUnitContext> Context;
   std::shared_ptr<IServerConnection> Server;
 
  public:
-  explicit AsyncServerConnection(const QString& name,
-                                 std::shared_ptr<ProductionUnitContext> context,
+  explicit AsyncServerConnection(std::shared_ptr<ProductionUnitContext> context,
                                  std::shared_ptr<IServerConnection> server);
   ~AsyncServerConnection() = default;
   Q_DISABLE_COPY_MOVE(AsyncServerConnection)

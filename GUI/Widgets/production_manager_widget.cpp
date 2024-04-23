@@ -1,21 +1,21 @@
-#include "production_manager_user_interface.h"
+#include "production_manager_widget.h"
 #include "global_environment.h"
 #include "production_manager_gui_subkernel.h"
 #include "production_unit_context.h"
 #include "server_commands_widget.h"
 
-ProductionManagerUserInterface::ProductionManagerUserInterface(QWidget* parent)
+ProductionManagerWidget::ProductionManagerWidget(QWidget* parent)
     : AbstractUserInterface{parent} {
   createWidgets();
   connectDependencies();
 }
 
-void ProductionManagerUserInterface::displayFirmware(
+void ProductionManagerWidget::displayFirmware(
     const QByteArray& firmware) {
   FirmwareView->setPlainText(firmware);
 }
 
-void ProductionManagerUserInterface::createWidgets() {
+void ProductionManagerWidget::createWidgets() {
   MainLayout = new QHBoxLayout();
   setLayout(MainLayout);
 
@@ -31,7 +31,7 @@ void ProductionManagerUserInterface::createWidgets() {
   MainLayout->setStretch(1, 3);
 }
 
-void ProductionManagerUserInterface::createControlPanel() {
+void ProductionManagerWidget::createControlPanel() {
   ControlPanel = new QGroupBox("Команды сборочной единицы");
   SubLayout->addWidget(ControlPanel);
 
@@ -48,12 +48,12 @@ void ProductionManagerUserInterface::createControlPanel() {
   ControlPanelLayout->addItem(ControlPanelVS);
 }
 
-void ProductionManagerUserInterface::createCommandsWidget() {
+void ProductionManagerWidget::createCommandsWidget() {
   CommandsWidget = new ServerCommandsWidget();
   SubLayout->addWidget(CommandsWidget);
 }
 
-void ProductionManagerUserInterface::createInitGroup() {
+void ProductionManagerWidget::createInitGroup() {
   InitGroup = new QGroupBox("Авторизация");
   ControlPanelLayout->addWidget(InitGroup);
 
@@ -66,7 +66,7 @@ void ProductionManagerUserInterface::createInitGroup() {
   InitGroupLayout->addWidget(LogOutPushButton);
 }
 
-void ProductionManagerUserInterface::createBoxGroup() {
+void ProductionManagerWidget::createBoxGroup() {
   BoxGroup = new QGroupBox("Боксы");
   ControlPanelLayout->addWidget(BoxGroup);
 
@@ -81,7 +81,7 @@ void ProductionManagerUserInterface::createBoxGroup() {
   BoxGroupLayout->addWidget(CompleteCurrentBoxPushButton);
 }
 
-void ProductionManagerUserInterface::createTransponderGroup() {
+void ProductionManagerWidget::createTransponderGroup() {
   TransponderGroup = new QGroupBox("Транспондеры");
   ControlPanelLayout->addWidget(TransponderGroup);
 
@@ -96,9 +96,9 @@ void ProductionManagerUserInterface::createTransponderGroup() {
   TransponderGroupLayout->addWidget(RollbackTransponderPushButton);
 }
 
-void ProductionManagerUserInterface::createPrintingGroup() {}
+void ProductionManagerWidget::createPrintingGroup() {}
 
-void ProductionManagerUserInterface::createDataDisplayPanel() {
+void ProductionManagerWidget::createDataDisplayPanel() {
   DataDisplayPanel = new QGroupBox("Данные");
   MainLayout->addWidget(DataDisplayPanel);
 
@@ -134,7 +134,7 @@ void ProductionManagerUserInterface::createDataDisplayPanel() {
   FirmwareLayout->addWidget(FirmwareView);
 }
 
-void ProductionManagerUserInterface::connectDependencies() {
+void ProductionManagerWidget::connectDependencies() {
   ProductionManagerGuiSubkernel* augs =
       GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
           "ProductionManagerGuiSubkernel");
@@ -168,5 +168,5 @@ void ProductionManagerUserInterface::connectDependencies() {
           "ProductionUnitContext");
 
   QObject::connect(puc, &ProductionUnitContext::firmwareChanged, this,
-                   &ProductionManagerUserInterface::displayFirmware);
+                   &ProductionManagerWidget::displayFirmware);
 }

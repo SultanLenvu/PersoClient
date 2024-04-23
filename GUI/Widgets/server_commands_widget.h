@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-class ServerCommandsWidget : public QGroupBox {
+class ServerCommandsWidget final : public QGroupBox {
   Q_OBJECT
 
  private:
@@ -17,6 +17,7 @@ class ServerCommandsWidget : public QGroupBox {
  public:
   explicit ServerCommandsWidget(QWidget* parent = nullptr);
   ~ServerCommandsWidget() = default;
+  Q_DISABLE_COPY_MOVE(ServerCommandsWidget)
 
  private:
   void create(void);

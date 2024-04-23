@@ -3,8 +3,7 @@
 
 #include <QtWidgets>
 
-class StickerPrinterUserInterface : public QWidget
-{
+class StickerPrinterWidget : public QWidget {
   Q_OBJECT
  private:
   QHBoxLayout* MainLayout;
@@ -22,11 +21,11 @@ class StickerPrinterUserInterface : public QWidget
   QPlainTextEdit* CommandSriptInput;
 
  public:
-  explicit StickerPrinterUserInterface(QWidget* parent = nullptr);
-  ~StickerPrinterUserInterface() = default;
+  explicit StickerPrinterWidget(QWidget* parent = nullptr);
+  ~StickerPrinterWidget() = default;
 
  private:
-  Q_DISABLE_COPY_MOVE(StickerPrinterUserInterface)
+  Q_DISABLE_COPY_MOVE(StickerPrinterWidget)
   void create(void);
   void connectDependencies(void);
 

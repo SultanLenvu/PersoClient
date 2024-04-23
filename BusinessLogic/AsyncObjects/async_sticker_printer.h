@@ -2,16 +2,17 @@
 #define STICKERPRINTERMANAGER_H
 
 #include "i_sticker_printer.h"
-#include "progressable_async_wrapper.h"
+#include "loggable_object.h"
+#include "progressable_async_object.h"
 
-class AsyncStickerPrinter final : public AbstractAsyncObject {
+class AsyncStickerPrinter final : public AbstractAsyncObject,
+                                  public LoggableObject {
   Q_OBJECT
  private:
   std::shared_ptr<IStickerPrinter> StickerPrinter;
 
  public:
-  explicit AsyncStickerPrinter(const QString& name,
-                               std::shared_ptr<IStickerPrinter> printer);
+  explicit AsyncStickerPrinter(std::shared_ptr<IStickerPrinter> printer);
   ~AsyncStickerPrinter() = default;
   Q_DISABLE_COPY_MOVE(AsyncStickerPrinter)
 

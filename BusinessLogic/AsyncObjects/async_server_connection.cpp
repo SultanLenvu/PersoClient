@@ -5,10 +5,11 @@
 #include <QSettings>
 
 AsyncServerConnection::AsyncServerConnection(
-    const QString& name,
     std::shared_ptr<ProductionUnitContext> context,
     std::shared_ptr<IServerConnection> server)
-    : AbstractAsyncObject{name}, Context(context), Server(server) {}
+    : LoggableObject{"AsyncServerConnection"},
+      Context(context),
+      Server(server) {}
 
 void AsyncServerConnection::connect() {
   initOperation("connectToServer");

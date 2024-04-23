@@ -1,9 +1,8 @@
 #include "async_production_manager.h"
 
 AsyncProductionManager::AsyncProductionManager(
-    const QString& name,
     std::unique_ptr<ProductionManager> manager)
-    : AbstractAsyncObject(name), Manager(std::move(manager)) {}
+    : LoggableObject("AsyncProductionManager"), Manager(std::move(manager)) {}
 
 void AsyncProductionManager::logOn(const StringDictionary& param) {
   initOperation("logOn");

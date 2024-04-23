@@ -33,13 +33,6 @@ class BusinessObjectEnvironment : public AbstractObjectEnvironment {
   ~BusinessObjectEnvironment() = default;
   Q_DISABLE_COPY_MOVE(BusinessObjectEnvironment)
 
- public:
-  template <typename F,
-            typename S,
-            template <typename, typename>
-            class ConnectionStrategy>
-  void connect(const F* fobj);
-
  private:
   void createObjects(void);
 };

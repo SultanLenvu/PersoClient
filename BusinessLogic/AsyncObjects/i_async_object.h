@@ -4,11 +4,11 @@
 #include <QString>
 #include "types.h"
 
-class IAsyncWrapper {
+class IAsyncObject {
  public:
-  explicit IAsyncWrapper() = default;
-  virtual ~IAsyncWrapper() = default;
-  Q_DISABLE_COPY_MOVE(IAsyncWrapper)
+  explicit IAsyncObject() = default;
+  virtual ~IAsyncObject() = default;
+  Q_DISABLE_COPY_MOVE(IAsyncObject)
 
  protected:
   virtual void initOperation(const QString& name) = 0;
