@@ -59,12 +59,12 @@ class ProductionManagerWidget final : public AbstractUserInterface {
  public:
   explicit ProductionManagerWidget(QWidget* parent = nullptr);
   ~ProductionManagerWidget() = default;
+  Q_DISABLE_COPY_MOVE(ProductionManagerWidget)
 
  public:
   void displayFirmware(const QByteArray& firmware);
 
  private:
-  Q_DISABLE_COPY_MOVE(ProductionManagerWidget)
   void createWidgets(void);
   void createControlPanel(void);
   void createCommandsWidget(void);

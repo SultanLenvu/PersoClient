@@ -1,54 +1,25 @@
 #include "master_user_interface.h"
-#include "log_display_widget.h"
-#include "production_manager_widget.h"
-#include "programmator_widget.h"
-#include "sticker_printer_widget.h"
 
-MasterUserInterface::MasterUserInterface(QWidget* parent) : QWidget(parent) {
-  create();
-}
-
-void MasterUserInterface::create() {
+MasterUserInterface::MasterUserInterface(QWidget* pmw,
+                                         QWidget* pw,
+                                         QWidget* spw,
+                                         QWidget* ldw) {
   MainLayout = new QHBoxLayout();
   setLayout(MainLayout);
 
-  // Вкладки с всеми интерфейсами
-  Tabs = new QTabWidget();
-  MainLayout->addWidget(Tabs);
+  createTabs(pmw, pw, spw);
 
-  // Интерфейс для взаимодействия с сервером персонализации
-  createProductionManagerTab();
+  MainLayout->addWidget(ldw);
 
-  // Интерфейс для взаимодействия с программатором
-  createProgrammatorTab();
-
-  // Интерфейс для взаимодействия с принтером стикером
-  createStickerPrinterTab();
-
-  // Виджеты для отображения логов
-  createLogWidgets();
-
-  // Настройка пропорции между объектами на макете
   MainLayout->setStretch(0, 5);
   MainLayout->setStretch(1, 2);
 }
 
-void MasterUserInterface::createProductionManagerTab() {
-  ProductionManagerTab = new ProductionManagerWidget();
-  Tabs->addTab(ProductionManagerTab, "Производство");
-}
+void MasterUserInterface::createTabs(QWidget* pmw, QWidget* pw, QWidget* spw) {
+  Tabs = new QTabWidget();
+  MainLayout->addWidget(Tabs);
 
-void MasterUserInterface::createProgrammatorTab() {
-  ProgrammatorTab = new ProgrammatorWidget();
-  Tabs->addTab(ProgrammatorTab, "Программатор");
-}
-
-void MasterUserInterface::createStickerPrinterTab() {
-  StickerPrinterTab = new StickerPrinterWidget();
-  Tabs->addTab(StickerPrinterTab, "Стикер принтер");
-}
-
-void MasterUserInterface::createLogWidgets() {
-  LogDisplay = new LogDisplayWidget();
-  MainLayout->addWidget(LogDisplay);
+  Tabs->addTab(pmw, "Производство");
+  Tabs->addTab(pw, "Программатор");
+  Tabs->addTab(spw, "Стикер принтер");
 }

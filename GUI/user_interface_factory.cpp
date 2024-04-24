@@ -5,12 +5,19 @@
 #include "server_commands_widget.h"
 #include "tester_unit_user_interface.h"
 
+#include "log_display_widget.h"
+#include "production_manager_widget.h"
+#include "programmator_widget.h"
+#include "sticker_printer_widget.h"
+
 QWidget* UserInterfaceFactory::createMasterUI(
     const ProductionManagerGuiSubkernel* pmgs,
     const ProgrammerGuiSubkernel* pgs,
     const StickerPrinterGuiSubkernel* spgs,
     const ServerConnectionGuiSubkernel* scgs) const {
-  QWidget* mui = new MasterUserInterface();
+  QWidget* mui = new MasterUserInterface(, new ProgrammatorWidget(),
+                                         new StickerPrinterWidget(),
+                                         new LogDisplayWidget());
 
   QWidget* scw = new ServerCommandsWidget();
 
@@ -37,3 +44,43 @@ QWidget* UserInterfaceFactory::createAuthorizationUI(
 
   return aui;
 }
+
+QWidget* UserInterfaceFactory::createProductionManager(
+    const ProductionManagerGuiSubkernel* pmgs) {
+  QWidget* pmw = new ProductionManagerWidget();
+
+  void (ProductionManagerGuiSubkernel::*mptr)(void) =
+      &ProductionManagerGuiSubkernel::logOn;
+  QObject::connect(LogOnPushButton, &QPushButton::clicked, augs, mptr);
+  QObject::connect(LogOutPushButton, &QPushButton::clicked, augs,
+                   &ProductionManagerGuiSubkernel::logOut);
+
+  QObject::connect(RequestBoxPushButton, &QPushButton::clicked, augs,
+                   &ProductionManagerGuiSubkernel::requestBox);
+  QObject::connect(RefundBoxPushButton, &QPushButton::clicked, augs,
+                   &ProductionManagerGuiSubkernel::refundCurrentBox);
+  QObject::connect(CompleteCurrentBoxPushButton, &QPushButton::clicked, augs,
+                   &ProductionManagerGuiSubkernel::completeCurrentBox);
+
+  QObject::connect(ReleaseTransponderPushButton, &QPushButton::clicked, augs,
+                   &ProductionManagerGuiSubkernel::releaseTransponder);
+  QObject::connect(RereleaseTransponderPushButton, &QPushButton::clicked, augs,
+                   &ProductionManagerGuiSubkernel::rereleaseTransponder);
+  QObject::connect(RollbackTransponderPushButton, &QPushButton::clicked, augs,
+                   &ProductionManagerGuiSubkernel::rollbackTransponder);
+
+  ProductionLineDataView->setModel(&augs->productionLineModel());
+  BoxDataView->setModel(&augs->boxModel());
+  TransponderDataView->setModel(&augs->transponderModel());
+}
+
+QWidget* UserInterfaceFactory::createProgrammer(
+    const ProgrammerGuiSubkernel* pmgs) {}
+
+QWidget* UserInterfaceFactory::createServerCommands(
+    const ServerConnectionGuiSubkernel* pmgs) {}
+
+QWidget* UserInterfaceFactory::createStickerPrinter(
+    const StickerPrinterGuiSubkernel* pmgs) {}
+
+QWidget* UserInterfaceFactory::createLogDisplay() {}

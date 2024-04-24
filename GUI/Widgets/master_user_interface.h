@@ -14,16 +14,18 @@ class MasterUserInterface final : public QWidget {
   QWidget* StickerPrinterTab;
 
  public:
-  explicit MasterUserInterface(QWidget* parent = nullptr);
+  explicit MasterUserInterface(QWidget* pwg,
+                               QWidget* pw,
+                               QWidget* spw,
+                               QWidget* ldw);
   ~MasterUserInterface() = default;
   Q_DISABLE_COPY_MOVE(MasterUserInterface);
 
+  void addMenu();
+  void setLogDiplay(QWidget* ld);
+
  private:
-  void create(void);
-  void createProductionManagerTab(void);
-  void createProgrammatorTab(void);
-  void createStickerPrinterTab(void);
-  void createLogWidgets(void);
+  void createTabs(QWidget* pwg, QWidget* pw, QWidget* spw);
 };
 
 #endif  // MASTER_USER_INTERFACE_H

@@ -22,6 +22,13 @@ class UserInterfaceFactory final : public IUserInterfaceFactory {
       const ProductionManagerGuiSubkernel* pmgs) const override;
   virtual QWidget* createAuthorizationUI(
       const ProductionManagerGuiSubkernel* pmgs) const override;
+
+ private:
+  QWidget* createProductionManager(const ProductionManagerGuiSubkernel* pmgs);
+  QWidget* createProgrammer(const ProgrammerGuiSubkernel* pmgs);
+  QWidget* createServerCommands(const ServerConnectionGuiSubkernel* pmgs);
+  QWidget* createStickerPrinter(const StickerPrinterGuiSubkernel* pmgs);
+  QWidget* createLogDisplay();
 };
 
 #endif // USERINTERFACEBUILDER_H

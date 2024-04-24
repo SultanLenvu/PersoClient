@@ -162,11 +162,4 @@ void ProductionManagerWidget::connectDependencies() {
   ProductionLineDataView->setModel(&augs->productionLineModel());
   BoxDataView->setModel(&augs->boxModel());
   TransponderDataView->setModel(&augs->transponderModel());
-
-  ProductionUnitContext* puc =
-      GlobalEnvironment::instance()->getObject<ProductionUnitContext>(
-          "ProductionUnitContext");
-
-  QObject::connect(puc, &ProductionUnitContext::firmwareChanged, this,
-                   &ProductionManagerWidget::displayFirmware);
 }
