@@ -9,18 +9,12 @@
 class ServerConnectionGuiSubkernel final : public AbstractGuiSubkernel {
   Q_OBJECT
 
- private:
-  typedef void (ServerConnectionGuiSubkernel::*MethodPtr)();
-  QHash<QString, MethodPtr> CommandMethods;
-
  public:
-  explicit ServerConnectionGuiSubkernel();
+  explicit ServerConnectionGuiSubkernel() = default;
   ~ServerConnectionGuiSubkernel() = default;
   Q_DISABLE_COPY_MOVE(ServerConnectionGuiSubkernel)
 
- public slots:  // Слоты для сигналов от GUI
-  void executeCommand(const QString& name);
-
+ public slots:
   void connect(void);
   void disconnect(void);
   void echo(void);
@@ -49,13 +43,9 @@ class ServerConnectionGuiSubkernel final : public AbstractGuiSubkernel {
 
   void generateDisconnectionAlert(void);
 
- private:
-  void createCommandMethod(void);
-
  signals:
   void connect_signal(void);
   void disconnect_signal(void);
-
   void echo_signal(void);
 
   void launchProductionLine_signal(const StringDictionary& param);

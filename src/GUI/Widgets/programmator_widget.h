@@ -24,13 +24,27 @@ class ProgrammatorWidget : public QWidget {
  public:
   explicit ProgrammatorWidget(QWidget* parent = nullptr);
   ~ProgrammatorWidget() = default;
+  Q_DISABLE_COPY_MOVE(ProgrammatorWidget)
 
  private:
-  Q_DISABLE_COPY_MOVE(ProgrammatorWidget)
   void create(void);
-  void connectDependencies(void);
+  void connectInternals(void);
+
+ private slots:
+  void programMemory();
+  void programUserData();
 
  signals:
+  void programMemory_trigger(const QString& path);
+  void readMemory_trigger();
+  void eraseMemory_trigger();
+
+  void readUserData_trigger();
+  void programUserData_trigger(const QString& path);
+  void readUcid_trigger();
+
+  void unlockMemory_trigger();
+  void lockMemory_trigger();
 };
 
 #endif  // PROGRAMMATORUSERINTERFACE_H

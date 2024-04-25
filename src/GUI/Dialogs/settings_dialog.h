@@ -82,7 +82,7 @@ class SettingsDialog : public QDialog {
  private:
   Q_DISABLE_COPY_MOVE(SettingsDialog)
   void create(void);
-  void connectDependencies(void);
+  void connectInternals(void);
 
  private:
   void createLogSystem(void);

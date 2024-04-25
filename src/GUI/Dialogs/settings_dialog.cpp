@@ -5,7 +5,7 @@
 
 SettingsDialog::SettingsDialog(QWidget* parent) : QDialog(parent) {
   setWindowTitle("Настройки");
-  connectDependencies();
+  connectInternals();
 
   create();
   adjustSize();
@@ -52,7 +52,7 @@ void SettingsDialog::create() {
   //  MainLayout->addItem(VS1);
 }
 
-void SettingsDialog::connectDependencies() {
+void SettingsDialog::connectInternals() {
   ConfigurationSystem* cum =
       GlobalEnvironment::instance()->getObject<ConfigurationSystem>(
           "ConfigurationSystem");

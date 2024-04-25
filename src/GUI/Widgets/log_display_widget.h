@@ -14,15 +14,14 @@ class LogDisplayWidget : public QGroupBox {
  public:
   explicit LogDisplayWidget(QWidget* parent = nullptr);
   ~LogDisplayWidget(void) = default;
-
- private:
   Q_DISABLE_COPY_MOVE(LogDisplayWidget)
-  void create(void);
-  void connectDepedencies(void);
 
- private slots:
+ public slots:
   void displayLog(const QString& log);
   void clearLogDisplay(void);
+
+ private:
+  void create(void);
 };
 
 #endif  // LOGDISPLAYWIDGET_H

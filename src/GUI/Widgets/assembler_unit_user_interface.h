@@ -50,16 +50,33 @@ class AssemblerUnitUserInterface final : public QWidget {
  public:
   explicit AssemblerUnitUserInterface(QWidget* parent = nullptr);
   ~AssemblerUnitUserInterface() = default;
-
- private:
   Q_DISABLE_COPY_MOVE(AssemblerUnitUserInterface);
-  void connectDependecies(void);
+
+ public:
+  void setStateModel(QAbstractItemModel* model);
+  void setTransponderModel(QAbstractItemModel* model);
+  void setBoxModel(QAbstractItemModel* model);
 
  private:
   void createBoxGroup(void);
   void createTransponderGroup(void);
   void createPrinterStickerGroup(void);
   void createModelViews(void);
+
+  void connectInternals(void);
+
+ signals:
+  void requestBox_trigger();
+  void refundCurrentBox_trigger();
+  void completeCurrentBox_trigger();
+
+  void releaseTransponder_trigger();
+  void rereleaseTransponder_trigger();
+  void rollbackTransponder_trigger();
+
+  void printLastTransponderSticker_trigger();
+  void printTransponderSticker_trigger();
+  void printBoxSticker_trigger();
 };
 
 #endif  // ASSEMBLER_UNIT_USER_INTERFACE_H

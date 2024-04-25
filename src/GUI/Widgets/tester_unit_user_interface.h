@@ -42,15 +42,27 @@ class TesterUnitUserInterface final : public QWidget {
  public:
   explicit TesterUnitUserInterface(QWidget* parent = nullptr);
   ~TesterUnitUserInterface() = default;
+  Q_DISABLE_COPY_MOVE(TesterUnitUserInterface);
+
+ public:
+  void setStateModel(QAbstractItemModel* model);
+  void setTransponderModel(QAbstractItemModel* model);
 
  private:
-  Q_DISABLE_COPY_MOVE(TesterUnitUserInterface);
-  void connectDependencies(void);
+  void create();
+  void createTransponderGroup();
+  void createPrinterStickerGroup();
+  void createModelViews();
 
-  void create(void);
-  void createTransponderGroup(void);
-  void createPrinterStickerGroup(void);
-  void createModelViews(void);
+  void connectInternals();
+
+ signals:
+  void rereleaseTransponder_trigger();
+
+  void printBoxSticker_trigger();
+  void printLastBoxSticker_trigger();
+  void printPalletSticker_trigger();
+  void printLastPalletSticker_trigger();
 };
 
 #endif  // TESTER_UNIT_USER_INTERFACE_H

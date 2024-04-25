@@ -1,13 +1,25 @@
 #include "production_manager_widget.h"
-#include "global_environment.h"
-#include "production_manager_gui_subkernel.h"
-#include "production_unit_context.h"
-#include "server_commands_widget.h"
+#include "authorization_dialog.h"
+
+#include "transponder_sticker_scan_dialog.h"
 
 ProductionManagerWidget::ProductionManagerWidget(QWidget* parent)
     : AbstractUserInterface{parent} {
   createWidgets();
-  connectDependencies();
+  connectInternals();
+}
+
+void ProductionManagerWidget::setProductionLineModel(
+    QAbstractItemModel* model) {
+  ProductionLineDataView->setModel(model);
+}
+
+void ProductionManagerWidget::setBoxModel(QAbstractItemModel* model) {
+  BoxDataView->setModel(model);
+}
+
+void ProductionManagerWidget::setTransponderModel(QAbstractItemModel* model) {
+  TransponderDataView->setModel(model);
 }
 
 void ProductionManagerWidget::displayFirmware(
@@ -51,6 +63,71 @@ void ProductionManagerWidget::createControlPanel() {
 void ProductionManagerWidget::createCommandsWidget() {
   CommandsWidget = new ServerCommandsWidget();
   SubLayout->addWidget(CommandsWidget);
+
+  QObject::connect(CommandsWidget, &ServerCommandsWidget::connect_trigger, this,
+                   &ProductionManagerWidget::connect_trigger);
+  QObject::connect(CommandsWidget, &ServerCommandsWidget::disconnect_trigger,
+                   this, &ProductionManagerWidget::disconnect_trigger);
+  QObject::connect(CommandsWidget, &ServerCommandsWidget::echo_trigger, this,
+                   &ProductionManagerWidget::echo_trigger);
+
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::launchProductionLine_trigger, this,
+                   &ProductionManagerWidget::launchProductionLine_trigger);
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::shutdownProductionLine_trigger, this,
+                   &ProductionManagerWidget::shutdownProductionLine_trigger);
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::getProductionLineData_trigger, this,
+                   &ProductionManagerWidget::getProductionLineData_trigger);
+
+  QObject::connect(CommandsWidget, &ServerCommandsWidget::requestBox_trigger,
+                   this, &ProductionManagerWidget::requestBox_trigger);
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::getCurrentBoxData_trigger, this,
+                   &ProductionManagerWidget::getCurrentBoxData_trigger);
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::refundCurrentBox_trigger, this,
+                   &ProductionManagerWidget::refundCurrentBox_trigger);
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::completeCurrentBox_trigger, this,
+                   &ProductionManagerWidget::completeCurrentBox_trigger);
+
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::getTransponderFirmware_trigger, this,
+                   &ProductionManagerWidget::getTransponderFirmware_trigger);
+  QObject::connect(
+      CommandsWidget, &ServerCommandsWidget::confirmTransponderFirmware_trigger,
+      this, &ProductionManagerWidget::confirmTransponderFirmware_trigger);
+  QObject::connect(
+      CommandsWidget, &ServerCommandsWidget::repeatTransponderFirmware_trigger,
+      this, &ProductionManagerWidget::repeatTransponderFirmware_trigger);
+  QObject::connect(
+      CommandsWidget,
+      &ServerCommandsWidget::confirmRepeatedTransponderFirmware_trigger, this,
+      &ProductionManagerWidget::confirmRepeatedTransponderFirmware_trigger);
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::rollbackTransponder_trigger, this,
+                   &ProductionManagerWidget::rollbackTransponder_trigger);
+  QObject::connect(
+      CommandsWidget, &ServerCommandsWidget::getCurrentTransponderData_trigger,
+      this, &ProductionManagerWidget::getCurrentTransponderData_trigger);
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::getTransponderData_trigger, this,
+                   &ProductionManagerWidget::getTransponderData_trigger);
+
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::printBoxSticker_trigger, this,
+                   &ProductionManagerWidget::printBoxSticker_trigger);
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::printLastBoxSticker_trigger, this,
+                   &ProductionManagerWidget::printLastBoxSticker_trigger);
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::printPalletSticker_trigger, this,
+                   &ProductionManagerWidget::printPalletSticker_trigger);
+  QObject::connect(CommandsWidget,
+                   &ServerCommandsWidget::printLastPalletSticker_trigger, this,
+                   &ProductionManagerWidget::printLastPalletSticker_trigger);
 }
 
 void ProductionManagerWidget::createInitGroup() {
@@ -134,32 +211,47 @@ void ProductionManagerWidget::createDataDisplayPanel() {
   FirmwareLayout->addWidget(FirmwareView);
 }
 
-void ProductionManagerWidget::connectDependencies() {
-  ProductionManagerGuiSubkernel* augs =
-      GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
-          "ProductionManagerGuiSubkernel");
+void ProductionManagerWidget::connectInternals() {
+  QObject::connect(LogOnPushButton, &QPushButton::clicked, this,
+                   &ProductionManagerWidget::logOn_clicked);
+  QObject::connect(LogOutPushButton, &QPushButton::clicked, this,
+                   &ProductionManagerWidget::logOut_trigger);
 
-  void (ProductionManagerGuiSubkernel::*mptr)(void) =
-      &ProductionManagerGuiSubkernel::logOn;
-  QObject::connect(LogOnPushButton, &QPushButton::clicked, augs, mptr);
-  QObject::connect(LogOutPushButton, &QPushButton::clicked, augs,
-                   &ProductionManagerGuiSubkernel::logOut);
+  QObject::connect(RequestBoxPushButton, &QPushButton::clicked, this,
+                   &ProductionManagerWidget::requestBox_trigger);
+  QObject::connect(RefundBoxPushButton, &QPushButton::clicked, this,
+                   &ProductionManagerWidget::refundBox_trigger);
+  QObject::connect(CompleteCurrentBoxPushButton, &QPushButton::clicked, this,
+                   &ProductionManagerWidget::completeBox_trigger);
 
-  QObject::connect(RequestBoxPushButton, &QPushButton::clicked, augs,
-                   &ProductionManagerGuiSubkernel::requestBox);
-  QObject::connect(RefundBoxPushButton, &QPushButton::clicked, augs,
-                   &ProductionManagerGuiSubkernel::refundCurrentBox);
-  QObject::connect(CompleteCurrentBoxPushButton, &QPushButton::clicked, augs,
-                   &ProductionManagerGuiSubkernel::completeCurrentBox);
+  QObject::connect(ReleaseTransponderPushButton, &QPushButton::clicked, this,
+                   &ProductionManagerWidget::releaseTransponder_trigger);
+  QObject::connect(RereleaseTransponderPushButton, &QPushButton::clicked, this,
+                   &ProductionManagerWidget::rereleaseTransponder_clicked);
+  QObject::connect(RollbackTransponderPushButton, &QPushButton::clicked, this,
+                   &ProductionManagerWidget::rollbackTransponder_trigger);
+}
 
-  QObject::connect(ReleaseTransponderPushButton, &QPushButton::clicked, augs,
-                   &ProductionManagerGuiSubkernel::releaseTransponder);
-  QObject::connect(RereleaseTransponderPushButton, &QPushButton::clicked, augs,
-                   &ProductionManagerGuiSubkernel::rereleaseTransponder);
-  QObject::connect(RollbackTransponderPushButton, &QPushButton::clicked, augs,
-                   &ProductionManagerGuiSubkernel::rollbackTransponder);
+void ProductionManagerWidget::logOn_clicked() {
+  StringDictionary param;
 
-  ProductionLineDataView->setModel(&augs->productionLineModel());
-  BoxDataView->setModel(&augs->boxModel());
-  TransponderDataView->setModel(&augs->transponderModel());
+  AuthorizationDialog dialog;
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
+  }
+  dialog.getData(param);
+
+  void logOn_trigger(const StringDictionary& param);
+}
+
+void ProductionManagerWidget::rereleaseTransponder_clicked() {
+  StringDictionary param;
+
+  TransponderStickerScanDialog dialog;
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
+  }
+  dialog.getData(param);
+
+  void rereleaseTransponder_trigger(const StringDictionary& param);
 }

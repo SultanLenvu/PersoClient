@@ -1,7 +1,6 @@
 #include "sticker_printer_gui_subkernel.h"
-#include "transponder_sticker_setup_dialog.h"
 
-StickerPrinterGuiSubkernel::StickerPrinterGuiSubkernel() {}
+#include "transponder_sticker_setup_dialog.h"
 
 void StickerPrinterGuiSubkernel::printLastTransponderSticker() {
   emit clearLogDisplay_signal();

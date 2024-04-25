@@ -37,10 +37,10 @@ class AuthorizationUserInterface : public QWidget {
  public:
   explicit AuthorizationUserInterface(QWidget* parent = nullptr);
   ~AuthorizationUserInterface() = default;
+  Q_DISABLE_COPY_MOVE(AuthorizationUserInterface);
 
  private:
-  Q_DISABLE_COPY_MOVE(AuthorizationUserInterface);
-  void connectDependecies(void);
+  void connectInternals(void);
 
  private:
   void create(void);
@@ -50,7 +50,7 @@ class AuthorizationUserInterface : public QWidget {
   void logOn(void);
 
  signals:
-  void logOn_signal(const StringDictionary& param);
+  void logOn_trigger(const StringDictionary& param);
 };
 
 #endif  // AUTHORIZATIONUSERINTERFACE_H

@@ -5,17 +5,12 @@
 AuthorizationUserInterface::AuthorizationUserInterface(QWidget* parent)
     : QWidget(parent) {
   create();
-  connectDependecies();
+  connectInternals();
 }
 
-void AuthorizationUserInterface::connectDependecies() {
-  ProductionManagerGuiSubkernel* pmgs =
-      GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
-          "ProductionManagerGuiSubkernel");
-
-  void (ProductionManagerGuiSubkernel::*mptr)(const StringDictionary&) =
-      &ProductionManagerGuiSubkernel::logOn;
-  connect(this, &AuthorizationUserInterface::logOn_signal, pmgs, mptr);
+void AuthorizationUserInterface::connectInternals() {
+  connect(AuthorizePushButton, &QPushButton::clicked, this,
+          &AuthorizationUserInterface::logOn);
 }
 
 void AuthorizationUserInterface::create() {
@@ -81,5 +76,5 @@ void AuthorizationUserInterface::logOn() {
   param.insert("login", LoginLineEdit->text());
   param.insert("password", PasswordLineEdit->text());
 
-  emit logOn_signal(param);
+  emit logOn_trigger(param);
 }

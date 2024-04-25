@@ -2,6 +2,7 @@
 #define PERSOSERVERWIDGET_H
 
 #include "abstract_user_interface.h"
+#include "server_commands_widget.h"
 #include "types.h"
 
 class ProductionManagerWidget final : public AbstractUserInterface {
@@ -12,7 +13,7 @@ class ProductionManagerWidget final : public AbstractUserInterface {
   QVBoxLayout* SubLayout;
 
  private:
-  QWidget* CommandsWidget;
+  ServerCommandsWidget* CommandsWidget;
 
  private:
   QGroupBox* ControlPanel;
@@ -63,6 +64,9 @@ class ProductionManagerWidget final : public AbstractUserInterface {
   Q_DISABLE_COPY_MOVE(ProductionManagerWidget)
 
  public:
+  void setProductionLineModel(QAbstractItemModel* model);
+  void setBoxModel(QAbstractItemModel* model);
+  void setTransponderModel(QAbstractItemModel* model);
   void displayFirmware(const QByteArray& firmware);
 
  private:
@@ -74,13 +78,61 @@ class ProductionManagerWidget final : public AbstractUserInterface {
   void createTransponderGroup(void);
   void createPrintingGroup(void);
   void createDataDisplayPanel(void);
+  void connectInternals(void);
+
+ private slots:
+  void logOn_clicked(void);
+  void rereleaseTransponder_clicked(void);
 
  signals:
+  void connect_trigger();
+  void disconnect_trigger();
+  void echo_trigger();
+
+  void launchProductionLine_trigger(const StringDictionary& param);
+  void shutdownProductionLine_trigger();
+  void getProductionLineData_trigger();
+
+  void requestBox_trigger();
+  void getCurrentBoxData_trigger();
+  void refundCurrentBox_trigger();
+  void completeCurrentBox_trigger();
+
+  void getTransponderFirmware_trigger();
+  void confirmTransponderFirmware_trigger(const StringDictionary& param);
+  void repeatTransponderFirmware_trigger(const StringDictionary& param);
+  void confirmRepeatedTransponderFirmware_trigger(
+      const StringDictionary& param);
+  void rollbackTransponder_trigger();
+  void getCurrentTransponderData_trigger();
+  void getTransponderData_trigger(const StringDictionary& param);
+
+  void printBoxSticker_trigger(const StringDictionary& data);
+  void printLastBoxSticker_trigger();
+  void printPalletSticker_trigger(const StringDictionary& data);
+  void printLastPalletSticker_trigger();
+
   void logOn_trigger(const StringDictionary& param);
   void logOut_trigger();
 
-  void requestBox_trigger();
+  //  void requestBox_trigger();
+  void refundBox_trigger();
+  void completeBox_trigger();
+
   void releaseTransponder_trigger();
+  void rereleaseTransponder_trigger(const StringDictionary& param);
+  //  void rollbackTransponder_trigger();
+
+  void programMemory_trigger(const QString& path);
+  void readMemory_trigger();
+  void eraseMemory_trigger();
+
+  void readUserData_trigger();
+  void programUserData_trigger(const QString& path);
+  void readUcid_trigger();
+
+  void unlockMemory_trigger();
+  void lockMemory_trigger();
 };
 
 #endif  // PERSOSERVERWIDGET_H

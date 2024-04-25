@@ -25,9 +25,8 @@
 #include "server_connection_gui_subkernel.h"
 #include "shutdown_production_line.h"
 
-PersoServerConnection::PersoServerConnection(const QString& name)
-    : NamedObject(name),
-      LoggableObject(name),
+PersoServerConnection::PersoServerConnection()
+    : LoggableObject("PersoServerConnection"),
       PersoServerPort(0),
       ReceivedDataBlockSize(0) {
   doLoadSettings();
@@ -255,7 +254,7 @@ ReturnStatus PersoServerConnection::printLastPalletSticker() {
   return ret;
 }
 
-void PersoServerConnection::connectDependencies() {
+void PersoServerConnection::connectInternals() {
   const ServerConnectionGuiSubkernel* scgs =
       GlobalEnvironment::instance()
           ->getObject<const ServerConnectionGuiSubkernel>(

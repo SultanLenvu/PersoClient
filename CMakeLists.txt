@@ -12,7 +12,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Network PrintSupport)
+find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Network PrintSupport Core5Compat)
 #======================================================================================================#
 
 # Получение пути к директории src
@@ -41,6 +41,7 @@ target_link_libraries(PersoClient PRIVATE
     Qt::Gui
     Qt::Network
     Qt::PrintSupport
+    Qt6::Core5Compat
 )
 
 # Размещение собранной цели в заданной директории

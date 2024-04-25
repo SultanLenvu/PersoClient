@@ -1,7 +1,4 @@
 #include "assembler_unit_user_interface.h"
-#include "global_environment.h"
-#include "production_manager_gui_subkernel.h"
-#include "server_connection_gui_subkernel.h"
 
 AssemblerUnitUserInterface::AssemblerUnitUserInterface(QWidget* parent)
     : QWidget(parent) {
@@ -17,36 +14,40 @@ AssemblerUnitUserInterface::AssemblerUnitUserInterface(QWidget* parent)
   MainLayout->setStretch(1, 3);
 }
 
-void AssemblerUnitUserInterface::connectDependecies() {
-  ProductionManagerGuiSubkernel* pgs =
-      GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
-          "ProductionManagerGuiSubkernel");
+void AssemblerUnitUserInterface::setStateModel(QAbstractItemModel* model) {
+  ProductionLineDataView->setModel(model);
+}
 
-  ServerConnectionGuiSubkernel* scgs =
-      GlobalEnvironment::instance()->getObject<ServerConnectionGuiSubkernel>(
-          "ServerConnectionGuiSubkernel");
+void AssemblerUnitUserInterface::setTransponderModel(
+    QAbstractItemModel* model) {
+  TransponderDataView->setModel(model);
+}
 
-  connect(RequestBoxButton, &QPushButton::clicked, pgs,
-          &ProductionManagerGuiSubkernel::requestBox);
-  connect(RefundCurrentBoxButton, &QPushButton::clicked, pgs,
-          &ProductionManagerGuiSubkernel::refundCurrentBox);
-  connect(CompleteCurrentBoxButton, &QPushButton::clicked, pgs,
-          &ProductionManagerGuiSubkernel::completeCurrentBox);
+void AssemblerUnitUserInterface::setBoxModel(QAbstractItemModel* model) {
+  BoxDataView->setModel(model);
+}
 
-  connect(ReleaseTransponderButton, &QPushButton::clicked, pgs,
-          &ProductionManagerGuiSubkernel::releaseTransponder);
-  connect(RereleaseTransponderButton, &QPushButton::clicked, pgs,
-          &ProductionManagerGuiSubkernel::rereleaseTransponder);
-  connect(RollbackTransponderPushButton, &QPushButton::clicked, pgs,
-          &ProductionManagerGuiSubkernel::rollbackTransponder);
+void AssemblerUnitUserInterface::connectInternals() {
+  connect(RequestBoxButton, &QPushButton::clicked, this,
+          &AssemblerUnitUserInterface::requestBox_trigger);
+  connect(RefundCurrentBoxButton, &QPushButton::clicked, this,
+          &AssemblerUnitUserInterface::refundCurrentBox_trigger);
+  connect(CompleteCurrentBoxButton, &QPushButton::clicked, this,
+          &AssemblerUnitUserInterface::completeCurrentBox_trigger);
 
-  connect(PrintBoxStickerButton, &QPushButton::clicked, scgs,
-          &ServerConnectionGuiSubkernel::printBoxSticker);
+  connect(ReleaseTransponderButton, &QPushButton::clicked, this,
+          &AssemblerUnitUserInterface::releaseTransponder_trigger);
+  connect(RereleaseTransponderButton, &QPushButton::clicked, this,
+          &AssemblerUnitUserInterface::rereleaseTransponder_trigger);
+  connect(RollbackTransponderPushButton, &QPushButton::clicked, this,
+          &AssemblerUnitUserInterface::rollbackTransponder_trigger);
 
-  // Связывание моделей и представлений
-  ProductionLineDataView->setModel(&pgs->productionLineModel());
-  TransponderDataView->setModel(&pgs->transponderModel());
-  BoxDataView->setModel(&pgs->boxModel());
+  connect(PrintLastTransponderStickerButton, &QPushButton::clicked, this,
+          &AssemblerUnitUserInterface::printLastTransponderSticker_trigger);
+  connect(PrintTransponderStickerButton, &QPushButton::clicked, this,
+          &AssemblerUnitUserInterface::printTransponderSticker_trigger);
+  connect(PrintBoxStickerButton, &QPushButton::clicked, this,
+          &AssemblerUnitUserInterface::printBoxSticker_trigger);
 }
 
 void AssemblerUnitUserInterface::createBoxGroup() {

@@ -1,12 +1,12 @@
 #include "programmator_widget.h"
-#include "global_environment.h"
-#include "programmer_gui_subkernel.h"
+
+#include <QFileDialog>
 
 ProgrammatorWidget::ProgrammatorWidget(QWidget *parent)
     : QWidget{parent}
 {
   create();
-  connectDependencies();
+  connectInternals();
 }
 
 void ProgrammatorWidget::create() {
@@ -45,27 +45,45 @@ void ProgrammatorWidget::create() {
   ControlPanelLayout->addWidget(LockMemoryButton);
 }
 
-void ProgrammatorWidget::connectDependencies() {
-  ProgrammerGuiSubkernel* pgs =
-      GlobalEnvironment::instance()->getObject<ProgrammerGuiSubkernel>(
-          "ProgrammerGuiSubkernel");
+void ProgrammatorWidget::connectInternals() {
+  connect(ProgramDeviceButton, &QPushButton::clicked, this,
+          &ProgrammatorWidget::programMemory);
+  connect(ReadDeviceFirmwareButton, &QPushButton::clicked, this,
+          &ProgrammatorWidget::readMemory_trigger);
+  connect(EraseDeviceButton, &QPushButton::clicked, this,
+          &ProgrammatorWidget::eraseMemory_trigger);
 
-  connect(ProgramDeviceButton, &QPushButton::clicked, pgs,
-          &ProgrammerGuiSubkernel::programMemory);
-  connect(ReadDeviceFirmwareButton, &QPushButton::clicked, pgs,
-          &ProgrammerGuiSubkernel::readMemory);
-  connect(EraseDeviceButton, &QPushButton::clicked, pgs,
-          &ProgrammerGuiSubkernel::eraseMemory);
+  connect(ReadDeviceUserDataButton, &QPushButton::clicked, this,
+          &ProgrammatorWidget::readUserData_trigger);
+  connect(ProgramDeviceUserDataButton, &QPushButton::clicked, this,
+          &ProgrammatorWidget::programUserData);
+  connect(ReadDeviceUcidButton, &QPushButton::clicked, this,
+          &ProgrammatorWidget::readUcid_trigger);
 
-  connect(ReadDeviceUserDataButton, &QPushButton::clicked, pgs,
-          &ProgrammerGuiSubkernel::readUserData);
-  connect(ProgramDeviceUserDataButton, &QPushButton::clicked, pgs,
-          &ProgrammerGuiSubkernel::programUserData);
-  connect(ReadDeviceUcidButton, &QPushButton::clicked, pgs,
-          &ProgrammerGuiSubkernel::readUcid);
+  connect(UnlockMemoryButton, &QPushButton::clicked, this,
+          &ProgrammatorWidget::unlockMemory_trigger);
+  connect(LockMemoryButton, &QPushButton::clicked, this,
+          &ProgrammatorWidget::lockMemory_trigger);
+}
 
-  connect(UnlockMemoryButton, &QPushButton::clicked, pgs,
-          &ProgrammerGuiSubkernel::unlockMemory);
-  connect(LockMemoryButton, &QPushButton::clicked, pgs,
-          &ProgrammerGuiSubkernel::lockMemory);
+void ProgrammatorWidget::programMemory() {
+  QString path(QFileDialog::getOpenFileName(nullptr, "Выберите файл", "",
+                                            "Все файлы (*.*)"));
+
+  if (path.isEmpty()) {
+    return;
+  }
+
+  emit programMemory_trigger(path);
+}
+
+void ProgrammatorWidget::programUserData() {
+  QString path(QFileDialog::getOpenFileName(
+      nullptr, "Выберите файл", QDir::currentPath(), "Все файлы (*.*)"));
+
+  if (path.isEmpty()) {
+    return;
+  }
+
+  emit programUserData_trigger(path);
 }

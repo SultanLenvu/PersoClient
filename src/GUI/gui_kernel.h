@@ -8,7 +8,6 @@
 #include <QTextStream>
 #include <QtWidgets>
 
-#include "abstract_gui_subkernel.h"
 #include "async_environment.h"
 #include "progress_indicator.h"
 #include "status_indicator.h"
@@ -76,9 +75,16 @@ class GuiKernel : public QMainWindow {
   void createGuiSubkernels(void);
 
   void createAuthorizationUserInterface(void);
+  void connectAuthorizationUserInterface(void);
+
   void createMasterInterface(void);
+  void connectMasterInterafce(void);
+
   void createAssemblerUnitUserInterface(void);
-  void createProductionTesterGui(void);
+  void connectAssemblerUnitUserInterface(void);
+
+  void createTesterUnitUserInterface(void);
+  void connectTesterUnitUserInterface(void);
 
  private slots:
   void displaySettingsDialog(void);

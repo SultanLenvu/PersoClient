@@ -1,42 +1,31 @@
 #include "tester_unit_user_interface.h"
-#include "global_environment.h"
-#include "production_manager_gui_subkernel.h"
-#include "server_connection_gui_subkernel.h"
-#include "sticker_printer_gui_subkernel.h"
 
 TesterUnitUserInterface::TesterUnitUserInterface(QWidget* parent)
     : QWidget(parent) {
   create();
+  connectInternals();
 }
 
-void TesterUnitUserInterface::connectDependencies() {
-  ProductionManagerGuiSubkernel* pmgs =
-      GlobalEnvironment::instance()->getObject<ProductionManagerGuiSubkernel>(
-          "ProductionManagerGuiSubkernel");
+void TesterUnitUserInterface::setStateModel(QAbstractItemModel* model) {
+  ProductionLineDataView->setModel(model);
+}
 
-  connect(RereleaseTransponderButton, &QPushButton::clicked, pmgs,
-          &ProductionManagerGuiSubkernel::rereleaseTransponder);
+void TesterUnitUserInterface::setTransponderModel(QAbstractItemModel* model) {
+  TransponderDataView->setModel(model);
+}
 
-  ServerConnectionGuiSubkernel* asc =
-      GlobalEnvironment::instance()->getObject<ServerConnectionGuiSubkernel>(
-          "ServerConnectionGuiSubkernel");
+void TesterUnitUserInterface::connectInternals() {
+  connect(RereleaseTransponderButton, &QPushButton::clicked, this,
+          &TesterUnitUserInterface::rereleaseTransponder_trigger);
 
-  connect(PrintLastBoxStickerButton, &QPushButton::clicked, asc,
-          &ServerConnectionGuiSubkernel::printLastBoxSticker);
-  connect(PrintBoxStickerButton, &QPushButton::clicked, asc,
-          &ServerConnectionGuiSubkernel::printBoxSticker);
-  connect(PrintLastPalletStickerButton, &QPushButton::clicked, asc,
-          &ServerConnectionGuiSubkernel::printLastPalletSticker);
-  connect(PrintPalletStickerButton, &QPushButton::clicked, asc,
-          &ServerConnectionGuiSubkernel::printPalletSticker);
-
-  StickerPrinterGuiSubkernel* asp =
-      GlobalEnvironment::instance()->getObject<StickerPrinterGuiSubkernel>(
-          "StickerPrinterGuiSubkernel");
-
-  // Связывание моделей и представлений
-  ProductionLineDataView->setModel(&pmgs->productionLineModel());
-  TransponderDataView->setModel(&pmgs->transponderModel());
+  connect(PrintLastBoxStickerButton, &QPushButton::clicked, this,
+          &TesterUnitUserInterface::printLastBoxSticker_trigger);
+  connect(PrintBoxStickerButton, &QPushButton::clicked, this,
+          &TesterUnitUserInterface::printBoxSticker_trigger);
+  connect(PrintLastPalletStickerButton, &QPushButton::clicked, this,
+          &TesterUnitUserInterface::printLastPalletSticker_trigger);
+  connect(PrintPalletStickerButton, &QPushButton::clicked, this,
+          &TesterUnitUserInterface::printPalletSticker_trigger);
 }
 
 void TesterUnitUserInterface::create() {

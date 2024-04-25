@@ -4,11 +4,11 @@
 #include "abstract_gui_subkernel.h"
 #include "types.h"
 
-class StickerPrinterGuiSubkernel : public AbstractGuiSubkernel {
+class StickerPrinterGuiSubkernel final : public AbstractGuiSubkernel {
   Q_OBJECT
 
  public:
-  explicit StickerPrinterGuiSubkernel();
+  explicit StickerPrinterGuiSubkernel() = default;
   ~StickerPrinterGuiSubkernel() = default;
   Q_DISABLE_COPY_MOVE(StickerPrinterGuiSubkernel);
 

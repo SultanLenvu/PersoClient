@@ -5,8 +5,7 @@
 
 #include "te310_printer.h"
 
-TE310Printer::TE310Printer(const QString& name)
-    : LoggableObject("TE310Printer") {
+TE310Printer::TE310Printer() : LoggableObject("TE310Printer") {
   doLoadSettings();
 
   loadTscLib();

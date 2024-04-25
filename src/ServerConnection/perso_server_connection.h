@@ -15,9 +15,8 @@
 #include "i_server_connection.h"
 #include "configurable_object.h"
 #include "loggable_object.h"
-#include "named_object.h"
 
-class PersoServerConnection final : public NamedObject,
+class PersoServerConnection final : public QObject,
                                     public IServerConnection,
                                     public LoggableObject,
                                     public ConfigurableObject {
@@ -67,7 +66,7 @@ class PersoServerConnection final : public NamedObject,
   std::unique_ptr<QEventLoop> WaitingLoop;
 
  public:
-  explicit PersoServerConnection(const QString& name);
+  explicit PersoServerConnection();
   ~PersoServerConnection() = default;
   Q_DISABLE_COPY_MOVE(PersoServerConnection)
 
@@ -108,7 +107,7 @@ class PersoServerConnection final : public NamedObject,
   virtual ReturnStatus printLastPalletSticker(void) override;
 
  private:
-  void connectDependencies(void);
+  void connectInternals(void);
 
  private:
   virtual void loadSettings(void) override;

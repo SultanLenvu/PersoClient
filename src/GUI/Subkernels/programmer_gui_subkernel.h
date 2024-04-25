@@ -3,11 +3,11 @@
 
 #include "abstract_gui_subkernel.h"
 
-class ProgrammerGuiSubkernel : public AbstractGuiSubkernel {
+class ProgrammerGuiSubkernel final : public AbstractGuiSubkernel {
   Q_OBJECT
 
  public:
-  explicit ProgrammerGuiSubkernel();
+  explicit ProgrammerGuiSubkernel() = default;
   ~ProgrammerGuiSubkernel() = default;
   Q_DISABLE_COPY_MOVE(ProgrammerGuiSubkernel);
 

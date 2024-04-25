@@ -1,10 +1,9 @@
-#include "global_environment.h"
-#include "sticker_printer_gui_subkernel.h"
 #include "sticker_printer_widget.h"
+#include "transponder_sticker_setup_dialog.h"
 
 StickerPrinterWidget::StickerPrinterWidget(QWidget* parent) : QWidget{parent} {
   create();
-  connectDependencies();
+  connectInternals();
 }
 
 void StickerPrinterWidget::create() {
@@ -39,18 +38,14 @@ void StickerPrinterWidget::create() {
   CommandSriptLayout->addWidget(CommandSriptInput);
 }
 
-void StickerPrinterWidget::connectDependencies() {
-  StickerPrinterGuiSubkernel* spgs =
-      GlobalEnvironment::instance()->getObject<StickerPrinterGuiSubkernel>(
-          "StickerPrinterGuiSubkernel");
+void StickerPrinterWidget::connectInternals() {
+  connect(PrintTransponderStickerButton, &QPushButton::clicked, this,
+          &StickerPrinterWidget::printTransponderSticker);
+  connect(ExecCommandScriptButton, &QPushButton::clicked, this,
+          &StickerPrinterWidget::execCommandSript);
 
-  connect(PrintTransponderStickerButton, &QPushButton::clicked, spgs,
-          &StickerPrinterGuiSubkernel::printTransponderSticker);
-  connect(PrintLastTransponderStickerButton, &QPushButton::clicked, spgs,
-          &StickerPrinterGuiSubkernel::printLastTransponderSticker);
-
-  connect(this, &StickerPrinterWidget::execCommandScript_signal, spgs,
-          &StickerPrinterGuiSubkernel::exec);
+  connect(PrintLastTransponderStickerButton, &QPushButton::clicked, this,
+          &StickerPrinterWidget::printLastTransponderSticker_trigger);
 }
 
 void StickerPrinterWidget::execCommandSript() {
@@ -58,5 +53,16 @@ void StickerPrinterWidget::execCommandSript() {
   scriptStr.remove("\r");
 
   QStringList script = scriptStr.split("\n");
-  emit execCommandScript_signal(script);
+  emit execCommandScript_trigger(script);
+}
+
+void StickerPrinterWidget::printTransponderSticker() {
+  StringDictionary param;
+  TransponderStickerSetupDialog dialog;
+  if (dialog.exec() == QDialog::Rejected) {
+    return;
+  }
+  dialog.getData(param);
+
+  emit printTransponderSticker_trigger(param);
 }

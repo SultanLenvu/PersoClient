@@ -59,8 +59,7 @@ class ServerConnectionConnector : public IObjectConnector<F, S> {
   }
   virtual void unplug(const F* fobj, const S* sobj) override {
     QObject::connect(fobj, &F::connect_signal, sobj, &S::connect);
-    QObject::disconnect(fobj, &F::disdisconnect_signal, sobj,
-                        &S::disdisconnect);
+    QObject::disconnect(fobj, &F::disconnect_signal, sobj, &S::disconnect);
 
     QObject::disconnect(fobj, &F::echo_signal, sobj, &S::echo);
 

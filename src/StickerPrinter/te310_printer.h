@@ -46,7 +46,7 @@ class TE310Printer final : public QObject,
   TscOpenEthernet openEthernet;
 
  public:
-  Q_INVOKABLE explicit TE310Printer();
+  explicit TE310Printer();
   ~TE310Printer() = default;
   Q_DISABLE_COPY_MOVE(TE310Printer);
 

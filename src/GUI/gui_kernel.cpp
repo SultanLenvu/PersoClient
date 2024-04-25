@@ -27,6 +27,7 @@ GuiKernel::GuiKernel(QWidget* parent)
   // Создаем графический интерфейс для авторизации
   //  createAuthorizationUserInterface();
   createMasterInterface();
+  connectAssemblerUnitUserInterface();
 }
 
 void GuiKernel::displayMasterInterface() {
@@ -49,10 +50,12 @@ void GuiKernel::displayMasterInterface() {
 
 void GuiKernel::displayAssemblerUnitInterface() {
   createAssemblerUnitUserInterface();
+  connectAssemblerUnitUserInterface();
 }
 
 void GuiKernel::displayTesterUnitInterface() {
-  createProductionTesterGui();
+  createTesterUnitUserInterface();
+  connectTesterUnitUserInterface();
 }
 
 void GuiKernel::logOutServerAct_slot() {
@@ -81,6 +84,8 @@ void GuiKernel::createAuthorizationUserInterface() {
   setFixedSize(size());
 }
 
+void GuiKernel::connectAuthorizationUserInterface() {}
+
 void GuiKernel::createMasterInterface() {
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
@@ -92,6 +97,8 @@ void GuiKernel::createMasterInterface() {
   setCentralWidget(new MasterUserInterface());
 }
 
+void GuiKernel::connectMasterInterafce() {}
+
 void GuiKernel::createAssemblerUnitUserInterface() {
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
@@ -102,7 +109,9 @@ void GuiKernel::createAssemblerUnitUserInterface() {
   setCentralWidget(new AssemblerUnitUserInterface());
 }
 
-void GuiKernel::createProductionTesterGui() {
+void GuiKernel::connectAssemblerUnitUserInterface() {}
+
+void GuiKernel::createTesterUnitUserInterface() {
   // Настраиваем размер главного окна
   setFixedSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX);
   setGeometry(DesktopGeometry.width() * 0.1, DesktopGeometry.height() * 0.1,
@@ -111,6 +120,8 @@ void GuiKernel::createProductionTesterGui() {
 
   setCentralWidget(new TesterUnitUserInterface());
 }
+
+void GuiKernel::connectTesterUnitUserInterface() {}
 
 void GuiKernel::displaySettingsDialog() {
   SettingsDialog dialog;

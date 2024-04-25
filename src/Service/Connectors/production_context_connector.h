@@ -17,14 +17,16 @@ class ProductionContextConnector : public IObjectConnector<F, S> {
     QObject::connect(fobj, &F::boxChanged, sobj, &S::displayBoxData);
     QObject::connect(fobj, &F::transponderChanged, sobj,
                      &S::displayTransponderData);
-    QObject::connect(fobj, &F::firmwareChanged, sobj, &S::displayFirmware);
+    //    QObject::connect(fobj, &F::firmwareChanged, sobj,
+    //    &S::displayFirmware);
   }
   virtual void unplug(const F* fobj, const S* sobj) override {
     QObject::disconnect(fobj, &F::stateChanged, sobj, &S::displayStateData);
     QObject::disconnect(fobj, &F::boxChanged, sobj, &S::displayBoxData);
     QObject::disconnect(fobj, &F::transponderChanged, sobj,
                         &S::displayTransponderData);
-    QObject::disconnect(fobj, &F::firmwareChanged, sobj, &S::displayFirmware);
+    //    QObject::disconnect(fobj, &F::firmwareChanged, sobj,
+    //    &S::displayFirmware);
   }
 };
 

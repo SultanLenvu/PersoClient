@@ -1,8 +1,5 @@
 #include "production_manager_gui_subkernel.h"
-#include "async_production_manager.h"
 #include "authorization_dialog.h"
-#include "global_environment.h"
-#include "production_unit_context.h"
 #include "transponder_sticker_scan_dialog.h"
 
 ProductionManagerGuiSubkernel::ProductionManagerGuiSubkernel() {

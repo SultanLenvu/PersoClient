@@ -4,16 +4,6 @@
 #include "transponder_sticker_scan_dialog.h"
 #include "ucid_checker.h"
 
-ServerConnectionGuiSubkernel::ServerConnectionGuiSubkernel() {
-  createCommandMethod();
-}
-
-void ServerConnectionGuiSubkernel::executeCommand(const QString& name) {
-  emit clearLogDisplay_signal();
-
-  (this->*CommandMethods.value(name))();
-}
-
 void ServerConnectionGuiSubkernel::connect() {
   emit clearLogDisplay_signal();
   emit connect_signal();
@@ -179,49 +169,4 @@ void ServerConnectionGuiSubkernel::printLastPalletSticker() {
 void ServerConnectionGuiSubkernel::generateDisconnectionAlert() {
   QMessageBox::critical(nullptr, "Ошибка", "Соединение с сервером оборвалось.",
                         QMessageBox::Ok);
-}
-
-void ServerConnectionGuiSubkernel::createCommandMethod() {
-  CommandMethods["connect"] = &ServerConnectionGuiSubkernel::connect;
-  CommandMethods["disconnect"] = &ServerConnectionGuiSubkernel::disconnect;
-
-  CommandMethods["echo"] = &ServerConnectionGuiSubkernel::echo;
-  CommandMethods["launch_production_line"] =
-      &ServerConnectionGuiSubkernel::launchProductionLine;
-  CommandMethods["shutdown_production_line"] =
-      &ServerConnectionGuiSubkernel::shutdownProductionLine;
-  CommandMethods["get_production_line_data"] =
-      &ServerConnectionGuiSubkernel::getProductionLineData;
-
-  CommandMethods["request_box"] = &ServerConnectionGuiSubkernel::requestBox;
-  CommandMethods["get_current_box_data"] =
-      &ServerConnectionGuiSubkernel::getCurrentBoxData;
-  CommandMethods["refund_current_box"] =
-      &ServerConnectionGuiSubkernel::refundCurrentBox;
-  CommandMethods["complete_current_box"] =
-      &ServerConnectionGuiSubkernel::completeCurrentBox;
-
-  CommandMethods["release_transponder"] =
-      &ServerConnectionGuiSubkernel::releaseTransponder;
-  CommandMethods["confirm_transponder_release"] =
-      &ServerConnectionGuiSubkernel::confirmTransponderRelease;
-  CommandMethods["rerelease_transponder"] =
-      &ServerConnectionGuiSubkernel::rereleaseTransponder;
-  CommandMethods["confirm_transponder_rerelease"] =
-      &ServerConnectionGuiSubkernel::confirmTransponderRerelease;
-  CommandMethods["rollback_transponder"] =
-      &ServerConnectionGuiSubkernel::rollbackTransponder;
-  CommandMethods["get_current_transponder_data"] =
-      &ServerConnectionGuiSubkernel::getCurrentTransponderData;
-  CommandMethods["get_transponder_data"] =
-      &ServerConnectionGuiSubkernel::getTransponderData;
-
-  CommandMethods["print_box_sticker"] =
-      &ServerConnectionGuiSubkernel::printBoxSticker;
-  CommandMethods["print_last_box_sticker"] =
-      &ServerConnectionGuiSubkernel::printLastBoxSticker;
-  CommandMethods["print_pallet_sticker"] =
-      &ServerConnectionGuiSubkernel::printPalletSticker;
-  CommandMethods["print_last_pallet_sticker"] =
-      &ServerConnectionGuiSubkernel::printLastPalletSticker;
 }
