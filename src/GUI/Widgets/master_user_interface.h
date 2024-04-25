@@ -21,9 +21,6 @@ class MasterUserInterface final : public QWidget {
   ~MasterUserInterface() = default;
   Q_DISABLE_COPY_MOVE(MasterUserInterface);
 
-  void addMenu();
-  void setLogDiplay(QWidget* ld);
-
  private:
   void createTabs(QWidget* pwg, QWidget* pw, QWidget* spw);
 

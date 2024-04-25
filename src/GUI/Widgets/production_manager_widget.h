@@ -2,6 +2,7 @@
 #define PERSOSERVERWIDGET_H
 
 #include "abstract_user_interface.h"
+#include "types.h"
 
 class ProductionManagerWidget final : public AbstractUserInterface {
   Q_OBJECT
@@ -74,7 +75,12 @@ class ProductionManagerWidget final : public AbstractUserInterface {
   void createPrintingGroup(void);
   void createDataDisplayPanel(void);
 
-  void connectDependencies(void);
+ signals:
+  void logOn_trigger(const StringDictionary& param);
+  void logOut_trigger();
+
+  void requestBox_trigger();
+  void releaseTransponder_trigger();
 };
 
 #endif  // PERSOSERVERWIDGET_H

@@ -18,14 +18,21 @@ find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Network PrintSupport)
 # Получение пути к директории src
 get_filename_component(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src" ABSOLUTE)
 
+# Получаем список поддиректорий в src
+file(GLOB_RECURSE src_subdirectories LIST_DIRECTORIES true "${SRC_DIR}/*")
+
 # Получение списка файлов в директории src и её поддиректориях
 file(GLOB_RECURSE SOURCE_FILES "${SRC_DIR}/*")
 
 # Создаем цель сборки, исполняемый файл
 add_executable(PersoClient ${SOURCE_FILES})
 
-# Включаем поиск по заголовочных файлов директориям
-target_include_directories(PersoClient PRIVATE "${SRC_DIR}")
+# Добавляем во включения все поддиректории src
+foreach(subdirectory ${src_subdirectories})
+  if(IS_DIRECTORY ${subdirectory})
+    target_include_directories(PersoClient PRIVATE ${subdirectory})
+  endif()
+endforeach()
 
 # Связываем цель сборки с динамическими библиотеками
 target_link_libraries(PersoClient PRIVATE

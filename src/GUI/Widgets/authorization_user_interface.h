@@ -1,8 +1,8 @@
 #ifndef AUTHORIZATIONUSERINTERFACE_H
 #define AUTHORIZATIONUSERINTERFACE_H
 
+#include <types.h>
 #include <QtWidgets>
-#include "types.h"
 
 class AuthorizationUserInterface : public QWidget {
   Q_OBJECT
