@@ -26,6 +26,8 @@ class MasterUserInterface final : public QWidget {
 
  private:
   void createTabs(QWidget* pwg, QWidget* pw, QWidget* spw);
+
+ signals:
 };
 
 #endif  // MASTER_USER_INTERFACE_H
