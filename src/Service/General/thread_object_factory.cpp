@@ -1,6 +1,6 @@
-#include "async_object_factory.h"
+#include "thread_object_factory.h"
 
-AsyncObjectFactory::AsyncObjectFactory(QThread* t) {
+ThreadObjectFactory::ThreadObjectFactory(QThread* t) {
   assert(t);
 
   Thread = t;

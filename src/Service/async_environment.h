@@ -4,19 +4,25 @@
 #include <QObject>
 #include <QThread>
 
-#include "async_object_factory.h"
+#include "thread_object_factory.h"
 
 class AsyncEnvironment final : public QObject {
   Q_OBJECT
 
  private:
   QThread Thread;
-  std::unique_ptr<AsyncObjectFactory> Factory;
+  std::unique_ptr<ThreadObjectFactory> Factory;
   std::vector<std::unique_ptr<QObject>> Objects;
 
  public:
-  explicit AsyncEnvironment();
-  ~AsyncEnvironment();
+  explicit AsyncEnvironment() {
+    Thread.start();
+    Factory = std::make_unique<ThreadObjectFactory>(&Thread);
+  }
+  ~AsyncEnvironment() {
+    Thread.quit();
+    Thread.wait();
+  }
   Q_DISABLE_COPY_MOVE(AsyncEnvironment)
 
  public:

@@ -29,7 +29,7 @@ add_executable(PersoClient ${SOURCE_FILES})
 
 # Добавляем во включения все поддиректории src
 foreach(subdirectory ${src_subdirectories})
-  if(IS_DIRECTORY ${subdirectory})
+    if(IS_DIRECTORY ${subdirectory})
     target_include_directories(PersoClient PRIVATE ${subdirectory})
   endif()
 endforeach()
