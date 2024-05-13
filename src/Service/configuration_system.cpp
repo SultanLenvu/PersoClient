@@ -1,0 +1,32 @@
+#include "configuration_system.h"
+
+#include <QCoreApplication>
+#include <QSettings>
+
+#include "definitions.h"
+#include "types.h"
+
+ConfigurationSystem::ConfigurationSystem(const QString& name)
+    : NamedObject(name) {
+  Global = GlobalEnvironment::instance();
+
+  initApplication();
+  registerMetaTypes();
+}
+
+void ConfigurationSystem::initApplication() {
+  QCoreApplication::setOrganizationName(ORGANIZATION_NAME);
+  QCoreApplication::setOrganizationDomain(ORGANIZATION_DOMAIN);
+  QCoreApplication::setApplicationName(PROGRAM_NAME);
+
+  QSettings::setDefaultFormat(QSettings::IniFormat);
+}
+
+void ConfigurationSystem::registerMetaTypes() {
+  qRegisterMetaType<std::shared_ptr<StringDictionary>>(
+      "std::shared_ptr<StringDictionary>");
+  qRegisterMetaType<std::shared_ptr<QStringList>>(
+      "std::shared_ptr<QStringList>");
+  qRegisterMetaType<ReturnStatus>("ReturnStatus");
+  qRegisterMetaType<std::shared_ptr<QByteArray>>("std::shared_ptr<QByteArray>");
+}

@@ -1,102 +1,42 @@
 cmake_minimum_required(VERSION 3.16)
-project(PersoClient VERSION 1.0 LANGUAGES C CXX)
+project(PersoClient VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#========================================== INCLUSION OF QT ===========================================#
+# QT
+#======================================================================================================#
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(QT NAMES Qt5 Qt6 REQUIRED COMPONENTS Core)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui Network PrintSupport Core5Compat)
-find_package(Qt${QT_VERSION_MAJOR} OPTIONAL_COMPONENTS Widgets)
+find_package(QT NAMES Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Gui Widgets Network PrintSupport Core5Compat)
 #======================================================================================================#
 
-#========================================== SOURCE DIRECTORIES ===========================================#
-include_directories(Management/)
-include_directories(GUI/)
-include_directories(GUI/Dialogs)
-include_directories(GUI/Subkernels)
-include_directories(General/)
-include_directories(Log/)
-include_directories(Programmers/)
-include_directories(Printing/)
-include_directories(ServerConnection/)
-include_directories(ServerConnection/Commands/)
-#======================================================================================================#
+# Получение пути к директории src
+get_filename_component(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src" ABSOLUTE)
 
-add_executable(PersoClient WIN32
-    Management/global_environment.cpp Management/global_environment.h
-    Management/abstract_manager.h Management/abstract_manager.cpp
-    Management/production_manager.h Management/production_manager.cpp
-    Management/programmer_manager.h Management/programmer_manager.cpp
-    Management/sticker_printer_manager.h Management/sticker_printer_manager.cpp
+# Получаем список поддиректорий в src
+file(GLOB_RECURSE src_subdirectories LIST_DIRECTORIES true "${SRC_DIR}/*")
 
-    GUI/abstract_gui.cpp GUI/abstract_gui.h
-    GUI/authorization_gui.cpp GUI/authorization_gui.h
-    GUI/interaction_system.cpp GUI/interaction_system.h
-    GUI/gui_kernel.cpp GUI/gui_kernel.h
-    GUI/master_gui.cpp GUI/master_gui.h
-    GUI/production_assembler_gui.cpp GUI/production_assembler_gui.h
-    GUI/production_tester_gui.cpp GUI/production_tester_gui.h
+# Получение списка файлов в директории src и её поддиректориях
+file(GLOB_RECURSE SOURCE_FILES "${SRC_DIR}/*")
 
-    GUI/Subkernels/abstract_gui_subkernel.h GUI/Subkernels/abstract_gui_subkernel.cpp
-    GUI/Subkernels/production_gui_subkernel.h GUI/Subkernels/production_gui_subkernel.cpp
-    GUI/Subkernels/programmer_gui_subkernel.h GUI/Subkernels/programmer_gui_subkernel.cpp
-    GUI/Subkernels/sticker_printer_gui_subkernel.h GUI/Subkernels/sticker_printer_gui_subkernel.cpp
+# Создаем цель сборки, исполняемый файл
+add_executable(PersoClient ${SOURCE_FILES})
 
-    GUI/Dialogs/authorization_dialog.cpp GUI/Dialogs/authorization_dialog.h
-    GUI/Dialogs/master_password_input_dialog.cpp GUI/Dialogs/master_password_input_dialog.h
-    GUI/Dialogs/custom_transponder_sticker_dialog.cpp GUI/Dialogs/custom_transponder_sticker_dialog.h
-    GUI/Dialogs/transponder_sticker_scan_dialog.cpp GUI/Dialogs/transponder_sticker_scan_dialog.h
-    GUI/Dialogs/abstract_input_dialog.cpp GUI/Dialogs/abstract_input_dialog.h
-    GUI/Dialogs/settings_dialog.cpp GUI/Dialogs/settings_dialog.h
+# Добавляем во включения все поддиректории src
+foreach(subdirectory ${src_subdirectories})
+    if(IS_DIRECTORY ${subdirectory})
+    target_include_directories(PersoClient PRIVATE ${subdirectory})
+  endif()
+endforeach()
 
-    General/definitions.h
-    General/hash_table_model.cpp General/hash_table_model.h
-    General/types.h
-
-    Log/file_log_backend.cpp Log/file_log_backend.h
-    Log/log_backend.cpp Log/log_backend.h
-    Log/log_system.cpp Log/log_system.h
-    Log/widget_log_backend.cpp Log/widget_log_backend.h
-
-    Programmers/abstract_programmer.cpp Programmers/abstract_programmer.h
-    Programmers/jlink_exe_programmer.cpp Programmers/jlink_exe_programmer.h
-
-    Printing/abstract_sticker_printer.cpp Printing/abstract_sticker_printer.h
-    Printing/te310_printer.cpp Printing/te310_printer.h
-
-    ServerConnection/perso_server_connection.cpp ServerConnection/perso_server_connection.h
-    ServerConnection/abstract_server_connection.h ServerConnection/abstract_server_connection.cpp
-    ServerConnection/Commands/abstract_client_command.h ServerConnection/Commands/abstract_client_command.cpp
-    ServerConnection/Commands/echo.h ServerConnection/Commands/echo.cpp
-    ServerConnection/Commands/release_transponder.h ServerConnection/Commands/release_transponder.cpp
-    ServerConnection/Commands/confirm_transponder_release.h ServerConnection/Commands/confirm_transponder_release.cpp
-    ServerConnection/Commands/rerelease_transponder.h ServerConnection/Commands/rerelease_transponder.cpp
-    ServerConnection/Commands/confirm_transponder_rerelease.h ServerConnection/Commands/confirm_transponder_rerelease.cpp
-    ServerConnection/Commands/rollback_transponder.h ServerConnection/Commands/rollback_transponder.cpp
-    ServerConnection/Commands/print_box_sticker.h ServerConnection/Commands/print_box_sticker.cpp
-    ServerConnection/Commands/print_last_box_sticker.h ServerConnection/Commands/print_last_box_sticker.cpp
-    ServerConnection/Commands/print_pallet_sticker.h ServerConnection/Commands/print_pallet_sticker.cpp
-    ServerConnection/Commands/print_last_pallet_sticker.h ServerConnection/Commands/print_last_pallet_sticker.cpp
-    ServerConnection/Commands/launch_production_line.h ServerConnection/Commands/launch_production_line.cpp
-    ServerConnection/Commands/shutdown_production_line.h ServerConnection/Commands/shutdown_production_line.cpp
-    ServerConnection/Commands/get_current_transponder_data.h ServerConnection/Commands/get_current_transponder_data.cpp
-    ServerConnection/Commands/get_transponder_data.cpp ServerConnection/Commands/get_transponder_data.h
-    ServerConnection/Commands/refund_current_box.cpp ServerConnection/Commands/refund_current_box.h
-    ServerConnection/Commands/get_current_box_data.cpp ServerConnection/Commands/get_current_box_data.h
-    ServerConnection/Commands/complete_current_box.h ServerConnection/Commands/complete_current_box.cpp
-    ServerConnection/Commands/request_box.h ServerConnection/Commands/request_box.cpp
-    ServerConnection/Commands/get_production_line_data.h ServerConnection/Commands/get_production_line_data.cpp
-
-    main.cpp
-    )
-
+# Связываем цель сборки с динамическими библиотеками
 target_link_libraries(PersoClient PRIVATE
+    Qt::Widgets
     Qt::Core
     Qt::Gui
     Qt::Network
@@ -104,25 +44,18 @@ target_link_libraries(PersoClient PRIVATE
     Qt6::Core5Compat
 )
 
-if((QT_VERSION_MAJOR GREATER 4))
-    target_link_libraries(PersoClient PRIVATE
-        Qt::Widgets
-    )
-endif()
-
+# Размещение собранной цели в заданной директории
 install(TARGETS PersoClient
     BUNDLE DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-add_custom_target(docs doxygen doxygen.conf
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-)
-
-add_custom_target(manual pandoc -s --pdf-engine=xelatex manual.md -V "mainfont:PT Sans" -V "lang:ru" -V papersize:a4 -V "geometry:margin=0.5in" -V "mainfontoptions:Scale=1.5" -o manual.pdf
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/Doc/manual
-)
-
+# Размещение файлов конфигурации в UNIX-системе
 if (UNIX AND NOT APPLE)
     install(FILES supplemental/persoclient.desktop DESTINATION ${DESTDIR}/usr/share/applications)
 endif (UNIX AND NOT APPLE)
+
+# Сборка мануала для пользователей
+add_custom_target(manual pandoc -s --pdf-engine=xelatex manual.md -V "mainfont:PT Sans" -V "lang:ru" -V papersize:a4 -V "geometry:margin=0.5in" -V "mainfontoptions:Scale=1.5" -o manual.pdf
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc/manual
+)
